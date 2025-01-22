@@ -1,0 +1,89 @@
+/* Custom page CSS
+-------------------------------------------------- */
+/* Not required for template or sticky footer method. */
+
+main>.container {
+  padding: 0px 15px 0;
+}
+
+.nav-link:hover,
+.nav-link:focus {
+  color: #adb5bd;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show>.nav-link {
+  color: #fff;
+  background-color: #fd0d29;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  color: #fff;
+  background-color: #fd0d29;
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+  background-color: #fd0d29;
+}
+
+.btn.btn-primary {
+  color: #fff;
+  background-color: #fd0d29;
+}
+
+.nav-pills li>a {
+  color: #fd0d29;
+  transition: background-color .2s, color .2s;
+}
+
+
+.form-range {
+  height: 1.5rem;
+  overflow: hidden;
+  border-radius: 25px;
+}
+
+.form-range::-webkit-slider-runnable-track {
+  height: 1.5rem;
+  -webkit-appearance: none;
+}
+
+.form-range::-moz-range-track {
+  height: 1.5rem;
+  -webkit-appearance: none;
+}
+
+.form-range:focus::-webkit-slider-thumb {
+  background-color: #adb5bd;
+  box-shadow: -1024px 0 0 996px #fd0d29, 0 0 0 1px #fff, 0 0 0 0.25rem #adb5bd;
+}
+
+.form-range:focus::-moz-range-thumb {
+  background-color: #adb5bd;
+  box-shadow: -1024px 0 0 996px #fd0d29, 0 0 0 1px #fff, 0 0 0 0.25rem #adb5bd;
+}
+
+.form-range::-webkit-slider-thumb {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 0rem;
+  background-color: #fd0d29;
+  box-shadow: -1024px 0 0 1014px #adb5bd;
+}
+
+.form-range::-moz-range-thumb {
+  width: 1.5rem;
+  height: 1.5rem;
+  background-color: #fd0d29;
+  box-shadow: -1024px 0 0 1014px #adb5bd;
+}
+
+.form-range::-webkit-slider-thumb:active {
+  background-color: #adb5bd;
+}
+
+.form-range::-moz-range-thumb:active {
+  background-color: #adb5bd;
+}
