@@ -1,0 +1,12 @@
+{
+  "collectionName": "components_rich_json_rich_jsons",
+  "info": {
+    "displayName": "Rich JSON"
+  },
+  "options": {},
+  "attributes": {
+    "richtext": {
+      "type": "blocks"
+    }
+  }
+}

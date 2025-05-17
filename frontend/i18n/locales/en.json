@@ -1,0 +1,455 @@
+{
+  "menu": {
+    "home": "Home",
+    "roi": "ROI",
+    "about": "About",
+    "blog": "Blog",
+    "forum": "Forum",
+    "logIn": "Log In",
+    "rights": "All rights reserved.",
+    "terms": "Terms and conditions",
+    "privacy": "Privacy policy"
+  },
+  "index": {
+    "banner": "Highly durable equipment,<br>ready to take your company to the next level",
+    "ourBrands": {
+      "title": "Our brands",
+      "johnBean": "John Bean® has been a leader in automotive equipment for garages, tire shops, and body repair services since launching the world’s first wheel aligner in 1925. John Bean has been a world-leading source for automotive undercar service equipment solutions for over 100 years and was acquired in 1996 by Snap-on Incorporated.",
+      "hoffman": " Steeped in a legacy of innovation and excellence, Hofmann® designs wheel alignment machines that truly set industry standards. We fuse eight decades of experience with cutting-edge technology, ensuring our equipment offers time-honored reliability and forward-thinking features."
+    },
+    "ourBlog": "Our blog",
+  },
+  "contact": {
+    "title": "Contact",
+    "us": "Contact Us",
+    "send": "Enviar"
+  },
+  "services": {
+    "title": "Services",
+    "installations": {
+      "title": "Installations",
+      "description": "Our Installation service allows clients to request official installation certificates for any equipment purchased through SOE Latam, ensuring compliance and quality standards."
+    },
+    "equipments": {
+      "title": "Equipments",
+      "description": "Through our Equipment section, customers can explore our full catalog of cutting-edge tools and machinery tailored for professional automotive service centers."
+    },
+    "warranties": {
+      "title": "Warranties",
+      "description": "Our Warranty service provides a seamless process to submit warranty requests for certified and properly installed equipment, backed by Snap-on’s commitment to durability and support."
+    },
+    "manuals": {
+      "title": "Manuals",
+      "description": "Additionally, our Manuals section offers easy access to user guides and documentation for all installed equipment—ensuring technicians can operate with confidence and efficiency. With SOE Latam, excellence doesn't stop at purchase—it extends through every step of your workshop’s journey."
+    }
+  },
+  "roi": {
+    "title": "ROI Calculator",
+    "settings": "Settings",
+    "exchangeRate": "Exchange rate",
+    "averageServicesDay": "Average number of services per day",
+    "serviceSaleRate": "Service sale rate (average)",
+    "employeesMonthSalary": "Employee's month salary",
+    "daysWorkedMonth": "Days worked per month",
+    "hoursWorkDay": "Hours of work per day",
+    "rentPremisesMonth": "Rent of the premises per month",
+    "areaPremises": "Area of the premises m²",
+    "workSiteArea": "Work site area m²",
+    "equipmentLeaseMonth": "Equipment lease/financial per month",
+    "equipmentPrice": "Equipment price"
+  },
+  "aboutUs": {
+    "title": "About Us",
+    "part1": {
+      "title": "🛠️ About SOE Latam",
+      "paragraph1": "At SOE Latam, we are proud to be the official franchise partner of Snap-on, the world-renowned leader in premium automotive equipment. Our mission is to bring the same legacy of precision, performance, and innovation to workshops and service centers across Latin America.",
+      "paragraph2": "Backed by Snap-on’s century-long heritage of excellence, we deliver industry-leading garage equipment, including advanced wheel aligners, tire changers, lifts, diagnostic tools, and more—designed for professionals who demand nothing but the best.",
+      "paragraph3": "With deep roots in Latin American markets and a passion for automotive progress, we provide tailored solutions that help businesses increase efficiency, improve safety, and raise service quality to global standards."
+    },
+    "part2": {
+      "title": "🌍 Vision & Mission",
+      "vision": {
+        "title": "Vision",
+        "description": "To become the most trusted and advanced provider of automotive equipment solutions across Latin America, empowering professionals with the technology and support they need to thrive in a rapidly evolving industry."
+      },
+      "mission": {
+        "title": "Mission",
+        "description": "To deliver world-class Snap-on Equipment and services throughout Latin America by combining global innovation with local expertise. We aim to build lasting partnerships with our customers, grounded in reliability, performance, and continuous improvement."
+      }
+    },
+    "part3": {
+      "title": "💡 Why Choose SOE Latam?",
+      "bullet1": {
+        "title": "Global Innovation, Local Service",
+        "description": "We bring state-of-the-art technology from Snap-on’s global R&D centers directly to Latin American businesses—with local support and training every step of the way."
+      },
+      "bullet2": {
+        "title": "Unmatched Product Quality",
+        "description": "From precision alignment machines to heavy-duty lifts, our equipment is engineered for durability, safety, and consistent performance in the most demanding environments."
+      },
+      "bullet3": {
+        "title": "Expert Technical Support",
+        "description": "Our regional teams are factory-trained to ensure optimal installation, calibration, and after-sales assistance tailored to your needs."
+      },
+      "bullet4": {
+        "title": "Customized Business Solutions",
+        "description": "We understand the diverse challenges of the Latin American market. That’s why we offer scalable packages for workshops of all sizes, from independent garages to dealership networks."
+      },
+      "bullet5": {
+        "title": "Commitment to Growth & Training",
+        "description": "Our priority is not just to sell equipment but to grow with you—through ongoing education, service optimization, and next-generation technology."
+      }
+    }
+  },
+  "blog": {
+    "title": "Blog",
+    "articles": {
+      "title": "Articles",
+      "category": "CATEGORY"
+    },
+    "videos": {
+      "title": "Videos"
+    },
+    "date": "DATE",
+    "viewMore": "View more",
+    "loadMore": "Load more"
+  },
+  "forum": {
+    "title": "Forum",
+    "latestPost": "Latest post",
+    "replies": "Replies"
+  },
+  "terms": {
+    "title": "Terms and conditions",
+    "acceptanceTerms": {
+      "title": "1. Acceptance of terms",
+      "description": "By accessing and using the SOE Latam platform (hereinafter referred to as \"the Platform\"), the user agrees to comply with these Terms and Conditions, as well as our privacy and data usage policies. If you do not agree with any part of these terms, you must refrain from using the Platform."
+    },
+    "platformDescription": {
+      "title": "2. Platform Description",
+      "description": "SOE Latam is a digital tool designed to facilitate communication between users and the company's administrators for the purpose of managing the request and delivery of:",
+      "list": {
+        "bullet1": "<span class='font-weight-bold'>Installation certificates</span> for equipment such as wheel balancers, wheel aligners, forklifts, and other products offered by the company.",
+        "bullet2": "<span class='font-weight-bold'>Equipment warranties</span> for installed or acquired products.",
+        "bullet3": "<span class='font-weight-bold'>User manuals</span> and technical documentation for the equipment.",
+      }
+    },
+    "registrationAccess": {
+      "title": "3. Registration and Access",
+      "description": "To access certain services, users must register by providing truthful, complete, and up-to-date information. Users are responsible for maintaining the confidentiality of their login credentials and for all activities conducted under their account."
+    },
+    "acceptableUse": {
+      "title": "4. Acceptable Use",
+      "description": "Users agree to use the Platform legally and solely for its intended purposes. The following actions are strictly prohibited:",
+      "list": {
+        "bullet1": "Providing false information or impersonating third parties.",
+        "bullet2": "Interfering with the technical functioning of the Platform.",
+        "bullet3": "Attempting to access restricted areas or other users’ data without authorization.",
+      }
+    },
+    "issuanceCertificates": {
+      "title": "5. Issuance of Certificates and Warranties",
+      "description": "The issuance of installation certificates is subject to prior validation by the company’s technical team. Certificates will be delivered digitally through the Platform. Users will also be able to consult and download <span class='font-weight-bold'>equipment warranties,</span> provided that the installation has been previously registered in accordance with the company’s procedures.",
+    },
+    "availabilityManuals": {
+      "title": "6. Availability of Manuals",
+      "description": "The Platform provides users with access to technical manuals for the equipment acquired. These manuals may be viewed or downloaded in digital format. These documents are protected by copyright and may not be redistributed without prior authorization.",
+    },
+    "responsibilities": {
+      "title": "7. Responsibilities",
+      "description": "The company shall not be held liable for:",
+      "list": {
+        "bullet1": "Errors or omissions in the information provided by users.",
+        "bullet2": "Damages resulting from the improper use of certificates or warranties.",
+        "bullet3": "External technical failures that temporarily hinder access to the Platform.",
+      }
+    },
+    "modifications": {
+      "title": "8. Modifications",
+      "description": "The company reserves the right to modify these Terms and Conditions at any time. Changes will be communicated via the Platform, and continued use of the Platform implies acceptance of such changes.",
+    },
+    "intellectualProperty": {
+      "title": "9. Intellectual Property",
+      "description": "All rights related to the content, design, and functionalities of the Platform are the property of the company. Any total or partial reproduction is prohibited without prior consent."
+    },
+    "governingLaw": {
+      "title": "10. Governing Law",
+      "description": "These Terms shall be governed by the laws of the country where the company’s main office is located. Any dispute will be resolved before the competent courts of that jurisdiction."
+    }
+  },
+  "distributors": {
+    "title": "Distributor | Distributors",
+    "name": "Name",
+    "create": {
+      "title": "Create distributor"
+    },
+    "update": {
+      "title": "Update distributor"
+    },
+    "delete": {
+      "title": "Delete distributor",
+      "message": "Are you sure you want to delete the distributor?"
+    },
+    "search": {
+      "title": "Search distributor",
+      "message": "Search distributor by name or ID",
+      "fields": "Name or id"
+    }
+  },
+  "clients": {
+    "title": "Client | Clients",
+    "name": "Name",
+    "phone": "Phone",
+    "create": {
+      "title": "Create client"
+    },
+    "update": {
+      "title": "Update client"
+    },
+    "delete": {
+      "title": "Delete client",
+      "message": "Are you sure you want to delete the client?"
+    },
+    "search": {
+      "title": "Search client",
+      "message": "Search client by name or ID",
+      "fields": "Name or id"
+    }
+  },
+  "users": {
+    "title": "User | Users",
+    "fullname": "Fullname",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "type": "Type",
+    "create": {
+      "title": "Create user"
+    },
+    "update": {
+      "title": "Update user"
+    },
+    "delete": {
+      "title": "Delete user",
+      "message": "Are you sure you want to delete the user?"
+    },
+    "search": {
+      "title": "Search user",
+      "message": "Search user by fullname, username, email or ID",
+      "fields": "Fullname, username, email or id"
+    }
+  },
+  "groups": {
+    "title": "Group | Groups",
+    "name": "Name",
+    "create": {
+      "title": "Create group"
+    },
+    "update": {
+      "title": "Update group"
+    },
+    "delete": {
+      "title": "Delete group",
+      "message": "Are you sure you want to delete the group?"
+    },
+    "search": {
+      "title": "Search group",
+      "message": "Search group by name or ID",
+      "fields": "Name or id"
+    }
+  },
+  "brands": {
+    "title": "Brand | Brands",
+    "name": "Name",
+    "slug": "Slug",
+    "create": {
+      "title": "Create brand"
+    },
+    "update": {
+      "title": "Update brand"
+    },
+    "delete": {
+      "title": "Delete brand",
+      "message": "Are you sure you want to delete the brand?"
+    },
+    "search": {
+      "title": "Search brand",
+      "message": "Search brands by name, slug or ID",
+      "fields": "Name, slug or id"
+    }
+  },
+  "categories": {
+    "title": "Category | Categories",
+    "name": "Name",
+    "slug": "Slug",
+    "create": {
+      "title": "Create category"
+    },
+    "update": {
+      "title": "Update category"
+    },
+    "delete": {
+      "title": "Delete category",
+      "message": "Are you sure you want to delete the category?"
+    },
+    "search": {
+      "title": "Search category",
+      "message": "Search cateogires by name, slug or ID",
+      "fields": "Name, slug or id"
+    }
+  },
+  "equipments": {
+    "title": "Equipment | Equipments",
+    "serial": "Serial",
+    "model": "Model",
+    "create": {
+      "title": "Create equipment"
+    },
+    "update": {
+      "title": "Update equipment"
+    },
+    "delete": {
+      "title": "Delete equipment",
+      "message": "Are you sure you want to delete the equipment?"
+    },
+    "search": {
+      "title": "Search equipment",
+      "message": "Search equipments by serial, model or ID",
+      "fields": "Serial, model or id"
+    }
+  },
+  "parts": {
+    "title": "Part | Parts",
+    "serial": "Serial",
+    "description": "Description",
+    "slug": "Slug",
+    "create": {
+      "title": "Create part"
+    },
+    "update": {
+      "title": "Update part"
+    },
+    "delete": {
+      "title": "Delete part",
+      "message": "Are you sure you want to delete the part?"
+    },
+    "search": {
+      "title": "Search part",
+      "message": "Search part by serial or ID",
+      "fields": "Serial or id"
+    }
+  },
+  "installations": {
+    "title": "Installation | Installations",
+    "installedAt": "Installed At",
+    "installedDate": "Installed Date",
+    "create": {
+      "title": "Create installation"
+    },
+    "update": {
+      "title": "Update installation"
+    },
+    "delete": {
+      "title": "Delete installation",
+      "message": "Are you sure you want to delete the installation?"
+    },
+    "search": {
+      "title": "Search installation",
+      "message": "Search installations by installed at, installed date or ID",
+      "fields": "Installed at, installed date or ID"
+    }
+  },
+  "reasons": {
+    "title": "Reason | Reasons",
+    "name": "Name",
+    "slug": "Slug",
+    "create": {
+      "title": "Create reason"
+    },
+    "update": {
+      "title": "Update reason"
+    },
+    "delete": {
+      "title": "Delete reason",
+      "message": "Are you sure you want to delete the reason?"
+    },
+    "search": {
+      "title": "Search reason",
+      "message": "Search reason by name, slug or ID",
+      "fields": "Name, slug or id"
+    }
+  },
+  "warranties": {
+    "title": "Warranty | Warranties",
+    "invoice": "Invoice",
+    "problemDescription": "Problem description",
+    "solutionDescription": "Solution description",
+    "create": {
+      "title": "Create warranty"
+    },
+    "update": {
+      "title": "Update warranty"
+    },
+    "delete": {
+      "title": "Delete warranty",
+      "message": "Are you sure you want to delete the warranty?"
+    },
+    "search": {
+      "title": "Search warranty",
+      "message": "Search warranty by invoice or ID",
+      "fields": "Invoice or id"
+    }
+  },
+  "manuals": {
+    "title": "Manual | Manuals",
+    "name": "Name",
+    "file": "File",
+    "type": "Type",
+    "create": {
+      "title": "Create manual"
+    },
+    "update": {
+      "title": "Update manual"
+    },
+    "delete": {
+      "title": "Delete manual",
+      "message": "Are you sure you want to delete the manual?"
+    },
+    "search": {
+      "title": "Search manual",
+      "message": "Search manual by name, type or ID",
+      "fields": "Name, type or id"
+    }
+  },
+  "zones": {
+    "title": "Zone | Zones",
+    "name": "Name",
+    "file": "File",
+    "type": "Type",
+    "create": {
+      "title": "Create manual"
+    },
+    "update": {
+      "title": "Update manual"
+    },
+    "delete": {
+      "title": "Delete manual",
+      "message": "Are you sure you want to delete the manual?"
+    },
+    "search": {
+      "title": "Search manual",
+      "message": "Search manual by name, type or ID",
+      "fields": "Name, type or id"
+    }
+  },
+  "confirm": "Confirm",
+  "email": "Email",
+  "password": "Password",
+  "phone": "Phone",
+  "name": "Name",
+  "message": "Message",
+  "send": "Send",
+  "options": "Options",
+  "search": "Search",
+  "cancel": "Cancel"
+}
