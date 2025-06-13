@@ -40,3 +40,4 @@ class ManualOut(BaseSchema):
 
 class ManualsOut(Schema):
     items = fields.List(fields.Nested(ManualOut))
+    total = fields.Integer()

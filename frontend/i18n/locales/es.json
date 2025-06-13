@@ -144,16 +144,16 @@
       "list": {
         "bullet1": "Proporcionar información falsa o suplantar a terceros.",
         "bullet2": "Interferir con el funcionamiento técnico de la Plataforma.",
-        "bullet3": "Intentar acceder sin autorización a secciones restringidas o a datos de otros usuarios.",
+        "bullet3": "Intentar acceder sin autorización a secciones restringidas o a datos de otros usuarios."
       }
     },
     "issuanceCertificates": {
       "title": "5. Emisión de Certificados y Garantías",
-      "description": "La emisión de certificados de instalación está sujeta a la validación previa por parte del equipo técnico de la empresa. Los certificados se entregarán en formato digital a través de la Plataforma. Asimismo, los usuarios podrán consultar y descargar los documentos de garantía asociados a sus equipos, siempre y cuando se haya registrado previamente la instalación conforme a los procedimientos establecidos por la empresa.",
+      "description": "La emisión de certificados de instalación está sujeta a la validación previa por parte del equipo técnico de la empresa. Los certificados se entregarán en formato digital a través de la Plataforma. Asimismo, los usuarios podrán consultar y descargar los documentos de garantía asociados a sus equipos, siempre y cuando se haya registrado previamente la instalación conforme a los procedimientos establecidos por la empresa."
     },
     "availabilityManuals": {
       "title": "6. Disponibilidad de Manuales",
-      "description": "La Plataforma pone a disposición de los usuarios los manuales técnicos de los equipos adquiridos, los cuales podrán ser consultados o descargados en formato digital. Estos documentos están sujetos a derechos de autor y no podrán ser redistribuidos sin autorización.",
+      "description": "La Plataforma pone a disposición de los usuarios los manuales técnicos de los equipos adquiridos, los cuales podrán ser consultados o descargados en formato digital. Estos documentos están sujetos a derechos de autor y no podrán ser redistribuidos sin autorización."
     },
     "responsibilities": {
       "title": "7. Responsabilidades",
@@ -161,12 +161,12 @@
       "list": {
         "bullet1": "Errores u omisiones en la información proporcionada por el usuario.",
         "bullet2": "Daños derivados del uso incorrecto de los certificados o garantías.",
-        "bullet3": "Fallos técnicos externos que impidan temporalmente el acceso a la Plataforma.",
+        "bullet3": "Fallos técnicos externos que impidan temporalmente el acceso a la Plataforma."
       }
     },
     "modifications": {
       "title": "8. Modificaciones",
-      "description": "La empresa se reserva el derecho de modificar estos Términos y Condiciones en cualquier momento. Los cambios serán notificados oportunamente a través de la Plataforma y su uso continuado implicará la aceptación de las modificaciones.",
+      "description": "La empresa se reserva el derecho de modificar estos Términos y Condiciones en cualquier momento. Los cambios serán notificados oportunamente a través de la Plataforma y su uso continuado implicará la aceptación de las modificaciones."
     },
     "intellectualProperty": {
       "title": "9. Propiedad Intelectual",
@@ -176,6 +176,12 @@
       "title": "10. Legislación Aplicable",
       "description": "Estos Términos se regirán por las leyes del país donde la empresa tiene su sede principal. Cualquier disputa será resuelta ante los tribunales competentes de dicha jurisdicción."
     }
+  },
+  "login": {
+    "title": "Iniciar sesión",
+    "emailUsername": "Correo o nombre de usuario",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?"
   },
   "distributors": {
     "title": "Distribuidor | Distribuidores",
@@ -193,6 +199,30 @@
     "search": {
       "title": "Buscar distribuidor",
       "message": "Buscar distribuidor por nombre o ID",
+      "fields": "Nombre o id"
+    }
+  },
+  "sites": {
+    "title": "Sede | Sedes",
+    "name": "Nombre",
+    "address": "Dirección",
+    "distributorClient": "Distribuidor/Cliente",
+    "create": {
+      "title": "Crear sede",
+      "companyType": "Para distribuidores o clientes",
+      "selectDistributor": "Seleccione el distribuidor",
+      "selectClient": "Seleccione el cliente"
+    },
+    "update": {
+      "title": "Actualizar sede"
+    },
+    "delete": {
+      "title": "Eliminar sede",
+      "message": "¿Está seguro que desea eliminar la sede?"
+    },
+    "search": {
+      "title": "Buscar sede",
+      "message": "Buscar sede por nombre o ID",
       "fields": "Nombre o id"
     }
   },
@@ -218,7 +248,7 @@
   },
   "users": {
     "title": "Usuario | Usuarios",
-    "fullname": "Nombre completo",
+    "fullName": "Nombre completo",
     "username": "Nombre de usuario",
     "email": "Correo",
     "password": "Contraseña",
@@ -342,6 +372,7 @@
     "title": "Instalación | Instalaciones",
     "installedAt": "Instalado en",
     "installedDate": "Fecha de instalación",
+    "format": "Formato",
     "create": {
       "title": "Registrar instalación"
     },
@@ -420,6 +451,9 @@
       "fields": "Nombre, tipo o id"
     }
   },
+  "countries": "País | Paises",
+  "states": "Estado | Estados",
+  "cities": "Ciudad | Ciudades",
   "confirm": "Confirmar",
   "email": "Correo",
   "password": "Contraseña",

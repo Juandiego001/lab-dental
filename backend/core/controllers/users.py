@@ -19,9 +19,10 @@ def get_users(query_data):
     '''Get users'''
 
     try:
-        return {'items': users.get_users(query_data['search'],
-                                         query_data['page'],
-                                         query_data['per_page'])}
+        results = users.get_users(query_data['search'],
+                                  query_data['page'],
+                                  query_data['per_page'])
+        return {'items': results, 'total': results.total}
     except Exception as ex:
         abort(500, str(ex))
 
@@ -84,7 +85,8 @@ def get_profile():
         user_id = int(get_jwt_identity())
         user_detail = users.get_user_by_id(user_id)
         user_profile = ProfileOut().dump(user_detail)
-        user_profile['abilities'] = [{'subject': ability[0], 'action': ability[1]} for ability in get_user_permissions(user_id)]
+        user_profile['abilities'] = [
+            {'subject': ability[0], 'action': ability[1]} for ability in get_user_permissions(user_id)]
         return user_profile
     except Exception as ex:
         abort(500, str(ex))

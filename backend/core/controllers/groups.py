@@ -15,9 +15,10 @@ def get_groups(query_data):
     '''Get groups'''
 
     try:
-        return {'items': groups.get_groups(query_data['search'],
+        results = groups.get_groups(query_data['search'],
                                          query_data['page'],
-                                         query_data['per_page'])}
+                                         query_data['per_page'])
+        return {'items': results, 'total': results.total}
     except Exception as ex:
         abort(500, str(ex))
 

@@ -1,0 +1,116 @@
+from core.app import db
+from core.models import Address, Site
+from core.services import sites
+from apiflask import APIBlueprint, abort
+from core.schemas.utils import Message, Pagination
+from core.schemas.sites import SiteInUpdate, SiteInCreate, SiteOut, SitesOut
+
+
+bp = APIBlueprint('sites', __name__)
+
+
+@bp.get('/')
+@bp.input(Pagination, location='query')
+@bp.output(SitesOut)
+def get_sites(query_data):
+    '''Get sites'''
+
+    try:
+        results, total = sites.get_sites(query_data['search'],
+                                  query_data['page'],
+                                  query_data['per_page'])
+        formated_results = []
+        for site, distributor_client in results:
+            data = site.__dict__
+            data['distributor_client'] = distributor_client
+            formated_results.append(data)
+
+        return {'items': formated_results, 'total': total}
+    except Exception as ex:
+        abort(500, str(ex))
+
+
+@bp.get('/clients/<string:client_id>')
+@bp.input(Pagination, location='query')
+@bp.output(SitesOut)
+def get_clients_sites(query_data, client_id):
+    '''Get clients sites'''
+
+    try:
+        return {'items': sites.get_clients_sites(client_id, query_data['search'])}
+    except Exception as ex:
+        abort(500, str(ex))
+
+
+@bp.get('/distributors/<string:distributor_id>')
+@bp.input(Pagination, location='query')
+@bp.output(SitesOut)
+def get_distributors_sites(query_data, distributor_id):
+    '''Get distributors sites'''
+
+    try:
+        return {'items': sites.get_distributors_sites(distributor_id, query_data['search'])}
+    except Exception as ex:
+        abort(500, str(ex))
+
+
+@bp.get('/<int:site_id>')
+@bp.output(SiteOut)
+def get_site(site_id):
+    '''Get site'''
+
+    try:
+        return sites.get_site_by_id(site_id)
+    except Exception as ex:
+        abort(500, str(ex))
+
+
+@bp.post('/')
+@bp.input(SiteInCreate, arg_name='site_and_address')
+def create_sites(site_and_address):
+    '''Create sites'''
+
+    try:
+        # Se obtienen dirección y sede
+        address: Address = site_and_address[0]
+        site: Site = site_and_address[1]
+
+        # Se crea objeto de dirección
+        db.session.add(address)
+        db.session.flush()
+
+        # Se crea objeto de sede
+        site.address_id = address.id
+        db.session.add(site)
+        db.session.commit()
+        return {'message': 'Site registered successfully'}
+    except Exception as ex:
+        print(str(ex))
+        abort(500, str(ex))
+
+
+@bp.put('/<int:site_id>')
+@bp.input(SiteInUpdate)
+@bp.output(Message)
+def update_sites(site_id, json_data):
+    '''Update site'''
+
+    try:
+        sites.update_site(site_id, json_data)
+        return {'message': 'Site updated successfuly'}
+    except Exception as ex:
+        print(str(ex))
+        abort(500, str(ex))
+
+
+@bp.delete('/<int:site_id>')
+@bp.output(Message)
+def delete_sites(site_id):
+    '''Delete sites'''
+
+    try:
+        sites.delete_site(site_id)
+        return {'message': 'Site deleted successfuly'}
+    except Exception as ex:
+        print(str(ex))
+        abort(500, str(ex))

@@ -8,7 +8,7 @@ class BaseSchema(Schema):
 
 
 class Pagination(Schema):
-    search = fields.String()
+    search = fields.String(load_default='')
     page = fields.Integer()
     per_page = fields.Integer(data_key='perPage')
 

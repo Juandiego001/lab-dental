@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: 9c773e01122a
+Revision ID: 3f0917151f29
 Revises: 
-Create Date: 2025-05-10 12:38:58.666582
+Create Date: 2025-06-01 09:57:07.566886
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '9c773e01122a'
+revision = '3f0917151f29'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -121,15 +121,15 @@ def upgrade():
     )
     op.create_table('equipments',
     sa.Column('id', sa.BigInteger(), nullable=False),
-    sa.Column('category_id', sa.BigInteger(), nullable=False),
     sa.Column('brand_id', sa.BigInteger(), nullable=False),
+    sa.Column('category_id', sa.BigInteger(), nullable=False),
     sa.Column('serial', sa.String(length=100), nullable=False),
     sa.Column('model', sa.String(length=100), nullable=False),
     sa.Column('status', sa.String(length=20), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['brand_id'], ['categories.id'], ),
-    sa.ForeignKeyConstraint(['category_id'], ['brands.id'], ),
+    sa.ForeignKeyConstraint(['brand_id'], ['brands.id'], ),
+    sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('permissions',
@@ -252,9 +252,10 @@ def upgrade():
     sa.ForeignKeyConstraint(['city_id'], ['cities.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('sites_clients',
+    op.create_table('sites',
     sa.Column('id', sa.BigInteger(), nullable=False),
-    sa.Column('client_id', sa.BigInteger(), nullable=False),
+    sa.Column('client_id', sa.BigInteger(), nullable=True),
+    sa.Column('distributor_id', sa.BigInteger(), nullable=True),
     sa.Column('address_id', sa.BigInteger(), nullable=False),
     sa.Column('main_site', sa.Boolean(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
@@ -264,19 +265,6 @@ def upgrade():
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['address_id'], ['addresses.id'], ),
     sa.ForeignKeyConstraint(['client_id'], ['clients.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('sites_distributors',
-    sa.Column('id', sa.BigInteger(), nullable=False),
-    sa.Column('distributor_id', sa.BigInteger(), nullable=False),
-    sa.Column('address_id', sa.BigInteger(), nullable=False),
-    sa.Column('main_site', sa.Boolean(), nullable=False),
-    sa.Column('name', sa.String(length=100), nullable=False),
-    sa.Column('description', sa.String(length=200), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['address_id'], ['addresses.id'], ),
     sa.ForeignKeyConstraint(['distributor_id'], ['distributors.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -293,8 +281,8 @@ def upgrade():
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['client_id'], ['clients.id'], ),
     sa.ForeignKeyConstraint(['equipment_id'], ['equipments.id'], ),
-    sa.ForeignKeyConstraint(['site_client_id'], ['sites_clients.id'], ),
-    sa.ForeignKeyConstraint(['site_distributor_id'], ['sites_distributors.id'], ),
+    sa.ForeignKeyConstraint(['site_client_id'], ['sites.id'], ),
+    sa.ForeignKeyConstraint(['site_distributor_id'], ['sites.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -324,7 +312,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['reasons_id'], ['reasons.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.get_bind().commit()
     # ### end Alembic commands ###
 
 
@@ -333,8 +320,7 @@ def downgrade():
     op.drop_table('warranties')
     op.drop_table('formats')
     op.drop_table('installations')
-    op.drop_table('sites_distributors')
-    op.drop_table('sites_clients')
+    op.drop_table('sites')
     op.drop_table('addresses')
     op.drop_table('specifications')
     op.drop_table('parts')

@@ -8,14 +8,12 @@ def get_manuals(search: str, page: int, per_page: int):
     '''Get manuals'''
 
     query = Manual.status == 'ACTIVE'
-    if search:
-        query = and_(Manual.status == 'ACTIVE',
-                     or_(Manual.full_name.ilike(f'%{search}%'),
-                         Manual.document.ilike(f'%{search}%'),
-                         Manual.email.ilike(f'%{search}%')))
+    # if search:
+    #     query = and_(Manual.status == 'ACTIVE',
+    #                  or_(Manual.id.ilike(f'%{search}%')))
 
     return db.paginate(db.session.query(Manual).filter(query),
-                       page=page, per_page=per_page)
+                       page=page, per_page=per_page, count=True)
 
 
 def get_manual_by_id(manual_id: int):

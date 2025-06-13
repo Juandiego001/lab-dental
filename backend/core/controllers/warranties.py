@@ -16,9 +16,10 @@ def get_warranties(query_data):
     '''Get warranties'''
 
     try:
-        return {'items': warranties.get_warranties(query_data['search'],
+        results = warranties.get_warranties(query_data['search'],
                                          query_data['page'],
-                                         query_data['per_page'])}
+                                         query_data['per_page'])
+        return {'items': results, 'total': results.total}
     except Exception as ex:
         abort(500, str(ex))
 

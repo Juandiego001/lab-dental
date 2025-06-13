@@ -63,9 +63,10 @@
             int list_id FK "NN"
         }
 
-        SITES_DISTRIBUTORS {
+        SITES {
             int id PK, UK "AUTO_INCREMENT, NN"
-            int distributor_id FK "NN"
+            int client_id FK "N"
+            int distributor_id FK "N"
             int address_id FK "NN"
             boolean main_site "NN, DEFAULT FALSE"
             string name
@@ -81,18 +82,6 @@
             int distributor_id FK "NN"
             string name "NN"
             string phone "NN"
-            string status "NN"
-            date created_at "NN"
-            date updated_at "NN"
-        }
-
-        SITES_CLIENTS {
-            int id PK, UK "AUTO_INCREMENT, NN"
-            int client_id FK "NN"
-            int address_id FK "NN"
-            boolean main_site "NN, DEFAULT FALSE"
-            string name
-            string description
             string status "NN"
             date created_at "NN"
             date updated_at "NN"
@@ -274,11 +263,10 @@
         COUNTRIES ||--o{ STATES : has
         STATES ||--o{ CITIES : has
         CITIES ||--o{ ADDRESSES : has
-        ADDRESSES ||--|| SITES_DISTRIBUTORS : has
-        ADDRESSES ||--|| SITES_CLIENTS : has
-        DISTRIBUTORS ||--o{ SITES_DISTRIBUTORS : has
+        ADDRESSES ||--|| SITES : has
+        DISTRIBUTORS ||--o{ SITES : has
         DISTRIBUTORS ||--o{ CLIENTS : has
-        CLIENTS ||--o{ SITES_CLIENTS : has
+        CLIENTS ||--o{ SITES : has
         DISTRIBUTORS ||--o{ DISTRIBUTORS_LISTS : has 
         BRANDS ||--o{ EQUIPMENTS : has
         LISTS ||--o{ DISTRIBUTORS_LISTS : has 

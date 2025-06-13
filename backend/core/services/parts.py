@@ -13,7 +13,7 @@ def get_parts(search: str, page: int, per_page: int):
                      or_(Part.serial.ilike(f'%{search}%')))
 
     return db.paginate(db.session.query(Part).filter(query),
-                       page=page, per_page=per_page)
+                       page=page, per_page=per_page, count=True)
 
 
 def get_part_by_id(part_id: int):

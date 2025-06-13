@@ -15,9 +15,10 @@ def get_categories(query_data):
     '''Get categories'''
 
     try:
-        return {'items': categories.get_categories(query_data['search'],
+        results = categories.get_categories(query_data['search'],
                                          query_data['page'],
-                                         query_data['per_page'])}
+                                         query_data['per_page'])
+        return {'items': results, 'total': results.total}
     except Exception as ex:
         abort(500, str(ex))
 

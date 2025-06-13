@@ -25,3 +25,4 @@ class PartOut(BaseSchema):
 
 class PartsOut(Schema):
     items = fields.List(fields.Nested(PartOut))
+    total = fields.Integer()

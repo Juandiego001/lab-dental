@@ -15,9 +15,10 @@ def get_reasons(query_data):
     '''Get reasons'''
 
     try:
-        return {'items': reasons.get_reasons(query_data['search'],
+        results = reasons.get_reasons(query_data['search'],
                                          query_data['page'],
-                                         query_data['per_page'])}
+                                         query_data['per_page'])
+        return {'items': results, 'total': results.total}
     except Exception as ex:
         abort(500, str(ex))
 

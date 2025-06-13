@@ -19,11 +19,11 @@ def get_users(search: str, page: int, per_page: int):
     if search:
         query = and_(User.status == 'ACTIVE',
                      or_(User.full_name.ilike(f'%{search}%'),
-                         User.document.ilike(f'%{search}%'),
+                     User.username.ilike(f'%{search}%'),
                          User.email.ilike(f'%{search}%')))
 
     return db.paginate(db.session.query(User).filter(query),
-                       page=page, per_page=per_page)
+                       page=page, per_page=per_page, count=True)
 
 
 def get_user_by_id(user_id: int):

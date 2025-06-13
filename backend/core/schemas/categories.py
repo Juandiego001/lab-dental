@@ -35,3 +35,4 @@ class CategoryOut(BaseSchema):
 
 class CategoriesOut(Schema):
     items = fields.List(fields.Nested(CategoryOut))
+    total = fields.Integer()

@@ -9,14 +9,12 @@ def get_warranties(search: str, page: int, per_page: int):
     '''Get warranties'''
 
     query = Warranty.status == 'ACTIVE'
-    if search:
-        query = and_(Warranty.status == 'ACTIVE',
-                     or_(Warranty.full_name.ilike(f'%{search}%'),
-                         Warranty.document.ilike(f'%{search}%'),
-                         Warranty.email.ilike(f'%{search}%')))
+    # if search:
+    #     query = and_(Warranty.status == 'ACTIVE',
+    #                  or_(Warranty.id.ilike(f'%{search}%')))
 
     return db.paginate(db.session.query(Warranty).filter(query),
-                       page=page, per_page=per_page)
+                       page=page, per_page=per_page, count=True)
 
 
 def get_warranty_by_id(warranty_id: int):

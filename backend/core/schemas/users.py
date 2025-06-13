@@ -46,6 +46,7 @@ class UserInUpdate(UserIn):
 class UserOut(BaseSchema):
     id = fields.Integer()
     full_name = fields.String(data_key='fullName')
+    username = fields.String()
     email = fields.String()
     status = fields.String()
     created_at = fields.DateTime()
@@ -54,6 +55,7 @@ class UserOut(BaseSchema):
 
 class UsersOut(Schema):
     items = fields.List(fields.Nested(UserOut))
+    total = fields.Integer()
 
 
 class AbilitiesOut(Schema):

@@ -27,3 +27,4 @@ class ReasonOut(BaseSchema):
 
 class ReasonsOut(Schema):
     items = fields.List(fields.Nested(ReasonOut))
+    total = fields.Integer()

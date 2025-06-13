@@ -13,7 +13,7 @@ def get_clients(search: str, page: int, per_page: int):
                      or_(Client.name.ilike(f'%{search}%')))
 
     return db.paginate(db.session.query(Client).filter(query),
-                       page=page, per_page=per_page)
+                       page=page, per_page=per_page, count=True)
 
 
 def get_client_by_id(client_id: int):

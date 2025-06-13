@@ -16,9 +16,10 @@ def get_brands(query_data):
     '''Get brands'''
 
     try:
-        return {'items': brands.get_brands(query_data['search'],
+        results = brands.get_brands(query_data['search'],
                                          query_data['page'],
-                                         query_data['per_page'])}
+                                         query_data['per_page'])
+        return {'items': results, 'total': results.total}
     except Exception as ex:
         abort(500, str(ex))
 

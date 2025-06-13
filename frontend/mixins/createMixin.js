@@ -1,7 +1,7 @@
 import { reactive } from 'vue'
 
 export const createMixin = reactive({
-  createDialog: true,
+  createDialog: false,
   show () {
     this.createDialog = true
   },

@@ -27,3 +27,4 @@ class GroupOut(BaseSchema):
 
 class GroupsOut(Schema):
     items = fields.List(fields.Nested(GroupOut))
+    total = fields.Integer()

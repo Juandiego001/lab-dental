@@ -13,7 +13,7 @@ def get_reasons(search: str, page: int, per_page: int):
                      or_(Reason.name.ilike(f'%{search}%')))
 
     return db.paginate(db.session.query(Reason).filter(query),
-                       page=page, per_page=per_page)
+                       page=page, per_page=per_page, count=True)
 
 
 def get_reason_by_id(reason_id: int):

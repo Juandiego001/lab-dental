@@ -16,8 +16,20 @@ class EquipmentInUpdate(EquipmentIn):
     status = fields.String(load_default='ACTIVE')
 
 
+class BrandEquipmentOut(Schema):
+    id = fields.Integer()
+    name = fields.String()
+
+
+class CategoryEquipmentOut(Schema):
+    id = fields.Integer()
+    name = fields.String()
+
+
 class EquipmentOut(BaseSchema):
     id = fields.Integer()
+    brand = fields.Nested(BrandEquipmentOut)
+    category = fields.Nested(CategoryEquipmentOut)
     model = fields.String()
     serial = fields.String()
     status = fields.String()
@@ -27,3 +39,4 @@ class EquipmentOut(BaseSchema):
 
 class EquipmentsOut(Schema):
     items = fields.List(fields.Nested(EquipmentOut))
+    total = fields.Integer()

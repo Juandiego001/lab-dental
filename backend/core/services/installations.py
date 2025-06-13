@@ -8,14 +8,12 @@ def get_installations(search: str, page: int, per_page: int):
     '''Get installations'''
 
     query = Installation.status == 'ACTIVE'
-    if search:
-        query = and_(Installation.status == 'ACTIVE',
-                     or_(Installation.full_name.ilike(f'%{search}%'),
-                         Installation.document.ilike(f'%{search}%'),
-                         Installation.email.ilike(f'%{search}%')))
+    # if search:
+    #     query = and_(Installation.status == 'ACTIVE',
+    #                  or_(Installation.equipment_id.ilike(f'%{search}%')))
 
     return db.paginate(db.session.query(Installation).filter(query),
-                       page=page, per_page=per_page)
+                       page=page, per_page=per_page, count=True)
 
 
 def get_installation_by_id(installation_id: int):

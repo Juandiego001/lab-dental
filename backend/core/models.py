@@ -44,7 +44,7 @@ class Address(db.Model):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     city_id: Mapped[int] = mapped_column(ForeignKey('cities.id'), nullable=False)
     description: Mapped[str] = mapped_column(String(100), nullable=False)
-    zip_code: Mapped[str] = mapped_column(String(40), nullable=False)
+    zip_code: Mapped[str] = mapped_column(String(40), nullable=True)
     status: Mapped[str] = mapped_column(String(20), 
                                         nullable=False,
                                         default='ACTIVE')
@@ -76,6 +76,8 @@ class Distributor(db.Model):
         nullable=False,
         default=lambda: datetime.now(),
         onupdate=lambda: datetime.now())
+    client = relationship('Client', back_populates='distributor')
+    site = relationship('Site', back_populates='distributor')
 
 
 class Client(db.Model):
@@ -97,17 +99,20 @@ class Client(db.Model):
         nullable=False,
         default=lambda: datetime.now(),
         onupdate=lambda: datetime.now())
+    distributor = relationship('Distributor', back_populates='client')
+    site = relationship('Site', back_populates='client')
 
 
-class SiteDistributor(db.Model):
-    __tablename__ = 'sites_distributors'
+class Site(db.Model):
+    __tablename__ = 'sites'
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    distributor_id: Mapped[int] = mapped_column(ForeignKey('distributors.id'), nullable=False)
+    client_id: Mapped[int] = mapped_column(ForeignKey('clients.id'), nullable=True)
+    distributor_id: Mapped[int] = mapped_column(ForeignKey('distributors.id'), nullable=True)
     address_id: Mapped[int] = mapped_column(ForeignKey('addresses.id'), nullable=False)
     main_site: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    description: Mapped[str] = mapped_column(String(200), nullable=False)
+    description: Mapped[str] = mapped_column(String(200), nullable=True)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
                                         default='ACTIVE')
@@ -120,29 +125,8 @@ class SiteDistributor(db.Model):
         nullable=False,
         default=lambda: datetime.now(),
         onupdate=lambda: datetime.now())
-
-
-class SiteClient(db.Model):
-    __tablename__ = 'sites_clients'
-
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    client_id: Mapped[int] = mapped_column(ForeignKey('clients.id'), nullable=False)
-    address_id: Mapped[int] = mapped_column(ForeignKey('addresses.id'), nullable=False)
-    main_site: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    name: Mapped[str] = mapped_column(String(100), nullable=False)
-    description: Mapped[str] = mapped_column(String(200), nullable=False)
-    status: Mapped[str] = mapped_column(String(20),
-                                        nullable=False,
-                                        default='ACTIVE')
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(),
-        nullable=False,
-        default=lambda: datetime.now())
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(),
-        nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+    distributor = relationship('Distributor', back_populates='site')
+    client = relationship('Client', back_populates='site')
 
 
 class List_(db.Model):
@@ -300,6 +284,7 @@ class Brand(db.Model):
         nullable=False,
         default=lambda: datetime.now(),
         onupdate=lambda: datetime.now())
+    equipment = relationship('Equipment', back_populates='brand')
 
 
 class Category(db.Model):
@@ -320,14 +305,15 @@ class Category(db.Model):
         nullable=False,
         default=lambda: datetime.now(),
         onupdate=lambda: datetime.now())
+    equipment = relationship('Equipment', back_populates='category')
 
 
 class Equipment(db.Model):
     __tablename__ = 'equipments'
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    category_id: Mapped[int] = mapped_column(ForeignKey('brands.id'), nullable=False)
-    brand_id: Mapped[int] = mapped_column(ForeignKey('categories.id'), nullable=False)
+    brand_id: Mapped[int] = mapped_column(ForeignKey('brands.id'), nullable=False)
+    category_id: Mapped[int] = mapped_column(ForeignKey('categories.id'), nullable=False)
     serial: Mapped[str] = mapped_column(String(100), nullable=False)
     model: Mapped[str] = mapped_column(String(100), nullable=False)
     status: Mapped[str] = mapped_column(String(20), 
@@ -342,6 +328,8 @@ class Equipment(db.Model):
         nullable=False,
         default=lambda: datetime.now(),
         onupdate=lambda: datetime.now())
+    brand = relationship('Brand', back_populates='equipment')
+    category = relationship('Category', back_populates='equipment')
 
 
 class ManualType(db.Model):
@@ -459,8 +447,8 @@ class Installation(db.Model):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     equipment_id: Mapped[int] = mapped_column(ForeignKey('equipments.id'), nullable=False)
     client_id: Mapped[int] = mapped_column(ForeignKey('clients.id'), nullable=False)
-    site_distributor_id: Mapped[int] = mapped_column(ForeignKey('sites_distributors.id'), nullable=False)
-    site_client_id: Mapped[int] = mapped_column(ForeignKey('sites_clients.id'), nullable=False)
+    site_distributor_id: Mapped[int] = mapped_column(ForeignKey('sites.id'), nullable=False)
+    site_client_id: Mapped[int] = mapped_column(ForeignKey('sites.id'), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
     installed_date: Mapped[datetime] = mapped_column(DateTime(), nullable=False)
     status: Mapped[str] = mapped_column(String(20), 

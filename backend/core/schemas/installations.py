@@ -41,3 +41,4 @@ class InstallationOut(BaseSchema):
 
 class InstallationsOut(Schema):
     items = fields.List(fields.Nested(InstallationOut))
+    total = fields.Integer()

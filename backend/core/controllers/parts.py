@@ -15,9 +15,10 @@ def get_parts(query_data):
     '''Get parts'''
 
     try:
-        return {'items': parts.get_parts(query_data['search'],
+        results = parts.get_parts(query_data['search'],
                                          query_data['page'],
-                                         query_data['per_page'])}
+                                         query_data['per_page'])
+        return {'items': results, 'total': results.total}
     except Exception as ex:
         abort(500, str(ex))
 

@@ -38,3 +38,4 @@ class BrandOut(BaseSchema):
 
 class BrandsOut(Schema):
     items = fields.List(fields.Nested(BrandOut))
+    total = fields.Integer()

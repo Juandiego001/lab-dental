@@ -13,7 +13,7 @@ def get_distributors(search: str, page: int, per_page: int):
                      or_(Distributor.name.ilike(f'%{search}%')))
 
     return db.paginate(db.session.query(Distributor).filter(query),
-                       page=page, per_page=per_page)
+                       page=page, per_page=per_page, count=True)
 
 
 def get_distributor_by_id(distributor_id: int):

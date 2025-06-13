@@ -15,9 +15,10 @@ def get_installations(query_data):
     '''Get installations'''
 
     try:
-        return {'items': installations.get_installations(query_data['search'],
+        results = installations.get_installations(query_data['search'],
                                          query_data['page'],
-                                         query_data['per_page'])}
+                                         query_data['per_page'])
+        return {'items': results, 'total': results.total}
     except Exception as ex:
         abort(500, str(ex))
 

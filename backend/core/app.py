@@ -1,11 +1,12 @@
 import os
-from dotenv import load_dotenv
-from apiflask import APIFlask
-from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import JWTManager
 from flask_cors import CORS
+from apiflask import APIFlask
+from dotenv import load_dotenv
+from datetime import timedelta
 from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
+from flask_jwt_extended import JWTManager
+from flask_sqlalchemy import SQLAlchemy
 
 load_dotenv()
 
@@ -19,6 +20,7 @@ CORS(app)
 app.config['JWT_SECRET_KEY'] = 'super-secret987'  # Change this!
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
 
 db = SQLAlchemy(app)
 jwt = JWTManager(app)

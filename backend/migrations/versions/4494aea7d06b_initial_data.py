@@ -1,20 +1,22 @@
 """Initial data
 
-Revision ID: ddeb77e2f92b
-Revises: 9c773e01122a
-Create Date: 2025-05-10 12:39:12.404982
+Revision ID: 4494aea7d06b
+Revises: 3f0917151f29
+Create Date: 2025-06-01 09:57:24.675032
 
 """
 from alembic import op
 import sqlalchemy as sa
 from core.app import db
-from core.models import Brand, City, Country, Distributor, List_, DistributorList, State, User, UserList, Group, UserGroup, Module, Permission
+from core.models import Brand, City, Country, Distributor, List_, DistributorList, State, User, UserList,\
+    Group, UserGroup, Module, Permission, Category, ManualType, Equipment
 import json
+import pandas as pd
 
 
 # revision identifiers, used by Alembic.
-revision = 'ddeb77e2f92b'
-down_revision = '9c773e01122a'
+revision = '4494aea7d06b'
+down_revision = '3f0917151f29'
 branch_labels = None
 depends_on = None
 
@@ -100,6 +102,7 @@ def upgrade():
         Module(name='equipments'),
         Module(name='warranties'),
         Module(name='distributors'),
+        Module(name='sites'),
         Module(name='manuals'),
         Module(name='brands')]
     db.session.add_all(modules)
@@ -140,9 +143,47 @@ def upgrade():
     ]
     db.session.add_all(brands)
     db.session.flush()
+    
+    # Categories
+    categories = [
+        Category(name='TIRE CHANGERS', slug='tire-changers'),
+        Category(name='BALANCERS', slug='balancers'),
+        Category(name='AIR CONDITIONERS', slug='air-conditioners'),
+        Category(name='LIFTS', slug='lifts'),
+        Category(name='BRAKE SERVICE', slug='break-service'),
+        Category(name='WHEEL ALIGNERS', slug='wheel-aligners'),
+        Category(name='TESTING EQUIPMENT', slug='testing-equipment'),
+        Category(name='COLLISION REPAIR', slug='collision-repair'),
+        Category(name='DIAGNOSTICS', slug='diagnostics')
+    ]
+    db.session.add_all(categories)
+    db.session.flush()
+
+    # Equipments
+    df = pd.read_csv('equipments_data/equipments_with_categories.csv')
+    equipments = []
+    for index, row in df.iterrows():
+        equipments.append(
+            Equipment(
+                brand_id=row['brand_id'],
+                category_id=row['category_id'],
+                serial=row['serial'],
+                model=row['model']
+            ))
+    db.session.add_all(equipments)
+
+    # Manuals Types
+    manuals_types = [
+        ManualType(name='Installation manuals', slug='installation-manuals'),
+        ManualType(name='Service manuals', slug='service-manuals'),
+        ManualType(name='Parts manuals', slug='parts-manuals'),
+        ManualType(name='Newsletters', slug='newsletters'),
+    ]
+    db.session.add_all(manuals_types)
     db.session.flush()
 
     db.session.commit()
+
 
 def downgrade():
     pass

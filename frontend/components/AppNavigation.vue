@@ -62,6 +62,12 @@ const menu = ref([
         icon: 'mdi-account-tie'
     },
     {
+        title: 'Sites',
+        subject: 'sites',
+        path: '/app/sites',
+        icon: 'mdi-fireplace-off'
+    },
+    {
         title: 'Users',
         subject: 'users',
         path: '/app/users',
@@ -125,10 +131,10 @@ const menu = ref([
         
     },
     {
-        title: 'Zones',
+        title: 'Lists',
         subject: 'zones',
-        path: '/app/zones',
-        icon: 'mdi-map-marker'
+        path: '/app/lists',
+        icon: 'mdi-office-building-cog-outline'
     },
     {
         title: 'Configuration',

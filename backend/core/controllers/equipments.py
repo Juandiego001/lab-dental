@@ -15,9 +15,11 @@ def get_equipments(query_data):
     '''Get equipments'''
 
     try:
-        return {'items': equipments.get_equipments(query_data['search'],
+        results = equipments.get_equipments(query_data['search'],
                                          query_data['page'],
-                                         query_data['per_page'])}
+                                         query_data['per_page'])
+
+        return {'items': results, 'total': results.total}
     except Exception as ex:
         abort(500, str(ex))
 

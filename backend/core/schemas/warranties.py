@@ -40,3 +40,4 @@ class WarrantyOut(BaseSchema):
 
 class WarrantiesOut(Schema):
     items = fields.List(fields.Nested(WarrantyOut))
+    total = fields.Integer()

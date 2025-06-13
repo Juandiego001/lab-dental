@@ -17,7 +17,7 @@
       "johnBean": "John Bean® has been a leader in automotive equipment for garages, tire shops, and body repair services since launching the world’s first wheel aligner in 1925. John Bean has been a world-leading source for automotive undercar service equipment solutions for over 100 years and was acquired in 1996 by Snap-on Incorporated.",
       "hoffman": " Steeped in a legacy of innovation and excellence, Hofmann® designs wheel alignment machines that truly set industry standards. We fuse eight decades of experience with cutting-edge technology, ensuring our equipment offers time-honored reliability and forward-thinking features."
     },
-    "ourBlog": "Our blog",
+    "ourBlog": "Our blog"
   },
   "contact": {
     "title": "Contact",
@@ -131,7 +131,7 @@
       "list": {
         "bullet1": "<span class='font-weight-bold'>Installation certificates</span> for equipment such as wheel balancers, wheel aligners, forklifts, and other products offered by the company.",
         "bullet2": "<span class='font-weight-bold'>Equipment warranties</span> for installed or acquired products.",
-        "bullet3": "<span class='font-weight-bold'>User manuals</span> and technical documentation for the equipment.",
+        "bullet3": "<span class='font-weight-bold'>User manuals</span> and technical documentation for the equipment."
       }
     },
     "registrationAccess": {
@@ -144,16 +144,16 @@
       "list": {
         "bullet1": "Providing false information or impersonating third parties.",
         "bullet2": "Interfering with the technical functioning of the Platform.",
-        "bullet3": "Attempting to access restricted areas or other users’ data without authorization.",
+        "bullet3": "Attempting to access restricted areas or other users’ data without authorization."
       }
     },
     "issuanceCertificates": {
       "title": "5. Issuance of Certificates and Warranties",
-      "description": "The issuance of installation certificates is subject to prior validation by the company’s technical team. Certificates will be delivered digitally through the Platform. Users will also be able to consult and download <span class='font-weight-bold'>equipment warranties,</span> provided that the installation has been previously registered in accordance with the company’s procedures.",
+      "description": "The issuance of installation certificates is subject to prior validation by the company’s technical team. Certificates will be delivered digitally through the Platform. Users will also be able to consult and download <span class='font-weight-bold'>equipment warranties,</span> provided that the installation has been previously registered in accordance with the company’s procedures."
     },
     "availabilityManuals": {
       "title": "6. Availability of Manuals",
-      "description": "The Platform provides users with access to technical manuals for the equipment acquired. These manuals may be viewed or downloaded in digital format. These documents are protected by copyright and may not be redistributed without prior authorization.",
+      "description": "The Platform provides users with access to technical manuals for the equipment acquired. These manuals may be viewed or downloaded in digital format. These documents are protected by copyright and may not be redistributed without prior authorization."
     },
     "responsibilities": {
       "title": "7. Responsibilities",
@@ -161,12 +161,12 @@
       "list": {
         "bullet1": "Errors or omissions in the information provided by users.",
         "bullet2": "Damages resulting from the improper use of certificates or warranties.",
-        "bullet3": "External technical failures that temporarily hinder access to the Platform.",
+        "bullet3": "External technical failures that temporarily hinder access to the Platform."
       }
     },
     "modifications": {
       "title": "8. Modifications",
-      "description": "The company reserves the right to modify these Terms and Conditions at any time. Changes will be communicated via the Platform, and continued use of the Platform implies acceptance of such changes.",
+      "description": "The company reserves the right to modify these Terms and Conditions at any time. Changes will be communicated via the Platform, and continued use of the Platform implies acceptance of such changes."
     },
     "intellectualProperty": {
       "title": "9. Intellectual Property",
@@ -176,6 +176,12 @@
       "title": "10. Governing Law",
       "description": "These Terms shall be governed by the laws of the country where the company’s main office is located. Any dispute will be resolved before the competent courts of that jurisdiction."
     }
+  },
+  "login": {
+    "title": "Log In",
+    "emailUsername": "Username or email",
+    "password": "Password",
+    "forgotPassword": "Forgot your password?"
   },
   "distributors": {
     "title": "Distributor | Distributors",
@@ -193,6 +199,30 @@
     "search": {
       "title": "Search distributor",
       "message": "Search distributor by name or ID",
+      "fields": "Name or id"
+    }
+  },
+  "sites": {
+    "title": "Site | Sites",
+    "name": "Name",
+    "address": "Address",
+    "distributorClient": "Distributor/Client",
+    "create": {
+      "title": "Create site",
+      "companyType": "For distributors or clients",
+      "selectDistributor": "Select the distributor",
+      "selectClient": "Select the client"
+    },
+    "update": {
+      "title": "Update site"
+    },
+    "delete": {
+      "title": "Delete site",
+      "message": "Are you sure you want to delete the site?"
+    },
+    "search": {
+      "title": "Search site",
+      "message": "Seach site by name or ID",
       "fields": "Name or id"
     }
   },
@@ -218,7 +248,7 @@
   },
   "users": {
     "title": "User | Users",
-    "fullname": "Fullname",
+    "fullName": "Full name",
     "username": "Username",
     "email": "Email",
     "password": "Password",
@@ -235,8 +265,8 @@
     },
     "search": {
       "title": "Search user",
-      "message": "Search user by fullname, username, email or ID",
-      "fields": "Fullname, username, email or id"
+      "message": "Search user by full name, username, email or ID",
+      "fields": "Full name, username, email or id"
     }
   },
   "groups": {
@@ -343,6 +373,7 @@
     "title": "Installation | Installations",
     "installedAt": "Installed At",
     "installedDate": "Installed Date",
+    "format": "Format",
     "create": {
       "title": "Create installation"
     },
@@ -442,6 +473,9 @@
       "fields": "Name, type or id"
     }
   },
+  "countries": "Country | Countries",
+  "states": "State | States",
+  "cities": "City | Cities",
   "confirm": "Confirm",
   "email": "Email",
   "password": "Password",

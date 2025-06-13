@@ -13,9 +13,8 @@ def get_equipments(search: str, page: int, per_page: int):
                      or_(Equipment.serial.ilike(f'%{search}%'),
                          Equipment.model.ilike(f'%{search}%')))
 
-    return db.paginate(db.session.query(Equipment).filter(query),
-                       page=page, per_page=per_page)
-
+    return db.paginate(db.session.query(Equipment).filter(query), page=page, per_page=per_page, count=True)
+        
 
 def get_equipment_by_id(equipment_id: int):
     '''Get equipment by equipment id'''
