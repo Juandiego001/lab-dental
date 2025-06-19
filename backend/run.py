@@ -15,6 +15,7 @@ from core.controllers.installations import bp as bp_installations
 from core.controllers.reasons import bp as bp_reasons
 from core.controllers.manuals import bp as bp_manuals
 from core.controllers.warranties import bp as bp_warranties
+from core.controllers.lists import bp as bp_lists
 
 
 app.register_blueprint(bp_locations, url_prefix='/api/locations')
@@ -33,6 +34,7 @@ app.register_blueprint(bp_installations, url_prefix='/api/installations')
 app.register_blueprint(bp_reasons, url_prefix='/api/reasons')
 app.register_blueprint(bp_manuals, url_prefix='/api/manuals')
 app.register_blueprint(bp_warranties, url_prefix='/api/warranties')
+app.register_blueprint(bp_lists, url_prefix='/api/lists')
 
 
 if __name__ == '__main__':

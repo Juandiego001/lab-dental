@@ -29,11 +29,10 @@
         <v-toolbar-title>SOE Latam</v-toolbar-title>
         <v-spacer></v-spacer>
         <template v-if="$vuetify.display.mdAndUp">
-            <v-btn icon="mdi-plus" variant="text" @click="createDialog = !createDialog"></v-btn>
-            <v-btn icon="mdi-magnify" variant="text" @click="searchDialog = !searchDialog"></v-btn>
+            <v-btn class="me-2" icon="mdi-plus" size="small" variant="text" @click="createDialog = !createDialog"></v-btn>
+            <v-btn class="me-2" icon="mdi-magnify" size="small" variant="text" @click="searchDialog = !searchDialog"></v-btn>
         </template>
-
-        <v-btn icon="mdi-dots-vertical" variant="text"></v-btn>
+        <v-btn icon="mdi-dots-vertical" size="small" variant="text"></v-btn>
     </v-app-bar>
 </template>
 

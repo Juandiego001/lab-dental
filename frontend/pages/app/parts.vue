@@ -18,8 +18,8 @@
   </v-container>
 
   <!-- Create Dialog -->
-  <v-dialog v-model="createDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="createDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('parts.create.title') }}
@@ -38,7 +38,7 @@
                 :label="$t('parts.description')"></v-text-field>
             </v-col>
             <v-col class="text-end">
-              <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
               <span class="mx-1"></span>
               <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
             </v-col>
@@ -49,13 +49,13 @@
   </v-dialog>
 
   <!-- Update Dialog -->
-  <v-dialog v-model="updateDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="updateDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('parts.update.title') }}
           <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="updateDialog = false"></v-btn>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="updateDialog = false"></v-btn>
         </v-row>
       </v-card-title>
       <v-card-text>
@@ -80,8 +80,8 @@
   </v-dialog>
 
   <!-- Delete Dialog -->
-  <v-dialog v-model="deleteDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="deleteDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('parts.delete.title') }}
@@ -99,8 +99,8 @@
   </v-dialog>
 
   <!-- Search Dialog -->
-  <v-dialog v-model="searchDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="searchDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('parts.search.title') }}
@@ -190,6 +190,18 @@ watch(perPage, async () => {
   await getParts();
 })
 
+const resetForm = () => {
+  form.value = {
+    id: '',
+    equipmentId: '',
+    serial: '',
+    description: '',
+    status: '',
+    createdAt: '',
+    updatedAt: ''
+  }
+}
+
 const getEquipments = async () => {
   try {
     const data = await $fetch('/api/parts/', {
@@ -241,6 +253,7 @@ const createPart = async () => {
       body: form.value
     })
     await getEquipments()
+    resetForm()
     createDialog.value = false
   } catch (err) {
     console.log(err)
@@ -254,6 +267,7 @@ const updatePart = async () => {
       body: form.value
     })
     await getEquipments()
+    resetForm()
     updateDialog.value = false
   } catch (err) {
     console.log(err)
@@ -265,6 +279,7 @@ const deletePart = async () => {
     method: 'DELETE'
   })
   await getEquipments()
+  resetForm()
   deleteDialog.value = false
 }
 

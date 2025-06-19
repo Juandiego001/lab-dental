@@ -18,8 +18,8 @@
   </v-container>
 
   <!-- Create Dialog -->
-  <v-dialog v-model="createDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="createDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('warranties.create.title') }}
@@ -42,7 +42,7 @@
                 :label="$t('warranties.solutionDescription')"></v-text-field>
             </v-col>
             <v-col class="text-end">
-              <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}l</v-btn>
+              <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
               <span class="mx-1"></span>
               <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
             </v-col>
@@ -53,13 +53,13 @@
   </v-dialog>
 
   <!-- Update Dialog -->
-  <v-dialog v-model="updateDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="updateDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('warranties.update.title') }}
           <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="updateDialog = false"></v-btn>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="updateDialog = false"></v-btn>
         </v-row>
       </v-card-title>
       <v-card-text>
@@ -86,8 +86,8 @@
   </v-dialog>
 
   <!-- Delete Dialog -->
-  <v-dialog v-model="deleteDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="deleteDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('warranties.delete.title') }}
@@ -106,8 +106,8 @@
   </v-dialog>
 
   <!-- Search Dialog -->
-  <v-dialog v-model="searchDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="searchDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('warranties.search.title') }}
@@ -198,6 +198,18 @@ onBeforeMount(async () => {
   await getWarranties();
 })
 
+const resetForm = () => {
+  form.value = {
+    id: '',
+    invoice: '',
+    problemDescription: '',
+    solutionDescription: '',
+    status: '',
+    created_at: '',
+    updated_at: ''
+  }
+}
+
 const getWarranties = async () => {
   try {
     const data = await $fetch('/api/warranties/', {
@@ -234,6 +246,7 @@ const createWarranty = async () => {
       body: form.value
     })
     await getWarranties()
+    resetForm()
     createDialog.value = false
   } catch (err) {
     console.log(err)
@@ -247,6 +260,7 @@ const updateWarranty = async () => {
       body: form.value
     })
     await getWarranties()
+    resetForm()
     updateDialog.value = false
   } catch (err) {
     console.log(err)
@@ -258,6 +272,7 @@ const deleteWarranty = async () => {
     method: 'DELETE'
   })
   await getWarranties()
+  resetForm()
   deleteDialog.value = false
 }
 

@@ -1,14 +1,14 @@
 from core.models import Address, Site
 from apiflask import Schema, fields
-from marshmallow import post_load, validates
+from marshmallow import post_load, validates_schema
 from core.schemas.utils import BaseSchema
 from werkzeug.exceptions import HTTPException
 
 
 class SiteIn(BaseSchema):
     id = fields.Integer()
-    distributor_id = fields.Integer(data_key='distributorId', required=False)
-    client_id = fields.Integer(data_key='clientId', required=False)
+    distributor_id = fields.Integer(data_key='distributorId', required=False, allow_none=True)
+    client_id = fields.Integer(data_key='clientId', required=False, allow_none=True)
     city_id = fields.Integer(data_key='cityId')
     description = fields.String()
     name = fields.String()
@@ -16,11 +16,18 @@ class SiteIn(BaseSchema):
 
 
 class SiteInCreate(SiteIn):
-    # @validaes
-    # def validate_distributor_or_client(self, data, **kwargs):
-    #     print(data)
-    #     if not data['distributor_id'] and not data['client_id']:
-    #         raise HTTPException('Not valid distributor_id or client_id')
+    @validates_schema
+    def distributor_id_or_client_id(self, data: dict, **kwargs):
+        '''There must be either a distributor id or a client id'''
+
+        if ('distributor_id' in data and not data['distributor_id']) and ('client_id' in data and not data['client_id']):
+            raise HTTPException('Distributor ID or Client ID required')
+
+        if 'distributor_id' in data and not data['distributor_id']:
+            data.pop('distributor_id')
+
+        if 'client_id' in data and not data['client_id']:
+            data.pop('client_id')
 
     @post_load
     def make_object(self, data: dict, **kwargs):

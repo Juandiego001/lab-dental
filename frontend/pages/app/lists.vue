@@ -1,271 +1,314 @@
 <template>
-    <v-container fluid class="fill-height align-start">
-        <v-card width="100%" flat>
-            <v-card-title>Users</v-card-title>
-            <v-card-text>
-                <v-data-table :items="items" :headers="headers" :items-per-page="perPage"
-                    @update:itemsPerPage="v => perPage = v">
+  <v-container fluid class="fill-height align-start">
+    <v-card width="100%" flat>
+      <v-card-title>{{ $t('lists.title', 2) }}</v-card-title>
+      <v-card-text>
+        <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
+          :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
+          @update:itemsPerPage="v => perPage = v" :disable-sort="true">
+          <template v-slot:item.option="{ item }">
+            <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getList(item.id)"></v-btn>
+            <span class="mx-2"></span>
+            <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
+              @click="form.id = item.id; deleteDialog = true"></v-btn>
+          </template>
+        </v-data-table-server>
+      </v-card-text>
+    </v-card>
+  </v-container>
 
-                    <template v-slot:item.option="{ item }">
-                        <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getUser(item.id)"></v-btn>
-                        <span class="mx-2"></span>
-                        <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                            @click="form.id = item.id; deleteDialog = true"></v-btn>
-                    </template>
+  <!-- Create Dialog -->
+  <v-dialog v-model="createDialog" max-width="500" persistent>
+    <v-card tile>
+      <v-card-title class="bg-primary">
+        <v-row no-gutters align="center">
+          {{ $t('lists.create.title') }}
+          <v-spacer></v-spacer>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="createDialog = false"></v-btn>
+        </v-row>
+      </v-card-title>
+      <v-card-text>
+        <v-form @submit.prevent="createList">
+          <v-row>
+            <v-col cols="12">
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('lists.name')"></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.distributorsIds" :label="$t('lists.distributors')" :items="distributors"
+                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable multiple chips />
+            </v-col>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.usersIds" :label="$t('lists.users')" :items="users"
+                item-title="fullName" item-value="id" hide-details="auto" @update:search="getUsers" clearable multiple chips />
+            </v-col>
+            <v-col class="text-end">
+              <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
+              <span class="mx-1"></span>
+              <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
+            </v-col>
+          </v-row>
+        </v-form>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 
-                </v-data-table>
-            </v-card-text>
-        </v-card>
-    </v-container>
+  <!-- Update Dialog -->
+  <v-dialog v-model="updateDialog" max-width="500" persistent>
+    <v-card tile>
+      <v-card-title class="bg-primary">
+        <v-row no-gutters align="center">
+          {{ $t('lists.update.title') }}
+          <v-spacer></v-spacer>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="updateDialog = false"></v-btn>
+        </v-row>
+      </v-card-title>
+      <v-card-text>
+        <v-form @submit.prevent="updateList">
+          <v-row>
+            <v-col cols="12">
+              <v-text-field v-model="form.name" hide-details="auto"
+                :label="$t('lists.name')"></v-text-field>
+            </v-col>
+            <v-col class="text-end">
+              <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
+              <span class="mx-1"></span>
+              <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
+            </v-col>
+          </v-row>
+        </v-form>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 
-    <!-- Create Dialog -->
-    <v-dialog v-model="createDialog" max-width="500">
-        <v-card>
-            <v-card-title class="bg-primary">
-                <v-row no-gutters align="center">
-                    Create user
-                    <v-spacer></v-spacer>
-                    <v-btn class="bg-primary" icon="mdi-close" @click="createDialog = false"></v-btn>
-                </v-row>
-            </v-card-title>
-            <v-card-text>
-                <v-form @submit.prevent="createUser">
-                    <v-row>
-                        <v-col cols="12">
-                            <v-text-field v-model="form.fullName" hide-details="auto" label="Full name"></v-text-field>
-                        </v-col>
-                        <v-col cols="12">
-                            <v-text-field v-model="form.email" type="email" hide-details="auto"
-                                label="Email"></v-text-field>
-                        </v-col>
-                        <v-col cols="12">
-                            <v-text-field v-model="form.password" type="password" hide-details="auto"
-                                label="Password"></v-text-field>
-                        </v-col>
-                        <v-col class="text-end">
-                            <v-btn variant="outlined" @click="updateDialog = false">Cancel</v-btn>
-                            <span class="mx-1"></span>
-                            <v-btn type="submit" class="bg-primary">Create</v-btn>
-                        </v-col>
-                    </v-row>
-                </v-form>
+  <!-- Delete Dialog -->
+  <v-dialog v-model="deleteDialog" max-width="500" persistent>
+    <v-card tile>
+      <v-card-title class="bg-primary">
+        <v-row no-gutters align="center">
+          {{ $t('lists.delete.title') }}
+          <v-spacer></v-spacer>
+          <v-btn class="bg-primary" icon="mdi-close" @click="deleteDialog = false"></v-btn>
+        </v-row>
+      </v-card-title>
+      <v-card-text class="text-center py-6">
+        <p class="text-subtitle-1 mb-6 text-center">{{ $t('lists.delete.message') }}</p>
+        <v-btn @click="deleteDialog = false" variant="outlined">{{ $t('cancel') }}</v-btn>
+        <span class="mx-2"></span>
+        <v-btn @click="deleteList" class="bg-red">{{ $t('confirm') }}</v-btn>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 
-            </v-card-text>
-        </v-card>
-    </v-dialog>
-
-    <!-- Update Dialog -->
-    <v-dialog v-model="updateDialog" max-width="500">
-        <v-card>
-            <v-card-title class="bg-primary">
-                <v-row no-gutters align="center">
-                    Update user
-                    <v-spacer></v-spacer>
-                    <v-btn class="bg-primary" icon="mdi-close" @click="updateDialog = false"></v-btn>
-                </v-row>
-            </v-card-title>
-            <v-card-text>
-                <v-form @submit.prevent="updateUser">
-                    <v-row>
-                        <v-col cols="12">
-                            <v-text-field v-model="form.fullName" hide-details="auto" label="Full name"></v-text-field>
-                        </v-col>
-                        <v-col cols="12">
-                            <v-text-field v-model="form.email" type="email" hide-details="auto"
-                                label="Email"></v-text-field>
-                        </v-col>
-                        <v-col cols="12">
-                            <v-text-field v-model="form.password" type="password" hide-details="auto"
-                                label="Password"></v-text-field>
-                        </v-col>
-                        <v-col cols="12">
-                            <v-text-field v-model="form.document" hide-details="auto" label="Document"></v-text-field>
-                        </v-col>
-
-                        <v-col class="text-end">
-                            <v-btn variant="outlined" @click="updateDialog = false">Cancel</v-btn>
-                            <span class="mx-1"></span>
-                            <v-btn type="submit" class="bg-primary">Update</v-btn>
-                        </v-col>
-                    </v-row>
-                </v-form>
-
-            </v-card-text>
-        </v-card>
-    </v-dialog>
-
-    <!-- Delete Dialog -->
-    <v-dialog v-model="deleteDialog" max-width="500">
-        <v-card>
-            <v-card-title class="bg-primary">
-                <v-row no-gutters align="center">
-                    Delete user
-                    <v-spacer></v-spacer>
-                    <v-btn class="bg-primary" icon="mdi-close" @click="deleteDialog = false"></v-btn>
-                </v-row>
-            </v-card-title>
-            <v-card-text class="text-center py-6">
-                <p class="text-subtitle-1 mb-6 text-center">¿Are you sure you want to delete the user?</p>
-
-                <v-btn @click="deleteDialog = false" variant="outlined">Cancel</v-btn>
-                <span class="mx-2"></span>
-                <v-btn @click="deleteUser" class="bg-red">Confirm</v-btn>
-            </v-card-text>
-        </v-card>
-    </v-dialog>
-
-    <!-- Search Dialog -->
-    <v-dialog v-model="searchDialog" max-width="500">
-        <v-card>
-            <v-card-title class="bg-primary">
-                <v-row no-gutters align="center">
-                    Search users
-                    <v-spacer></v-spacer>
-                    <v-btn class="bg-primary" icon="mdi-close" @click="searchDialog = false"></v-btn>
-                </v-row>
-            </v-card-title>
-            <v-card-text>
-                <p class="text-subtitle-2 pb-2">Search users by full name, email or document</p>
-                <v-form @submit.prevent="doSearch">
-                    <v-row no-gutters="">
-                        <v-col cols="12">
-                            <v-text-field v-model="search" label="Full name, email, document" hide-details="auto"
-                                prepend-inner-icon="mdi-magnify" clearable></v-text-field>
-                        </v-col>
-
-                        <v-col class="text-end mt-4" cols="12">
-                            <v-btn class="bg-primary" type="submit">Search</v-btn>
-                        </v-col>
-
-                    </v-row>
-                </v-form>
-            </v-card-text>
-        </v-card>
-    </v-dialog>
+  <!-- Search Dialog -->
+  <v-dialog v-model="searchDialog" max-width="500" persistent>
+    <v-card tile>
+      <v-card-title class="bg-primary">
+        <v-row no-gutters align="center">
+          {{ $t('lists.search.title') }}
+          <v-spacer></v-spacer>
+          <v-btn class="bg-primary" icon="mdi-close" @click="searchDialog = false"></v-btn>
+        </v-row>
+      </v-card-title>
+      <v-card-text>
+        <p class="text-subtitle-2 pb-2">{{ $t('lists.search.message') }}</p>
+        <v-form @submit.prevent="doSearch">
+          <v-row no-gutters="">
+            <v-col cols="12">
+              <v-text-field v-model="search" :label="$t('lists.search.fields')" hide-details="auto"
+                prepend-inner-icon="mdi-magnify" clearable></v-text-field>
+            </v-col>
+            <v-col class="text-end mt-4" cols="12">
+              <v-btn class="bg-primary" type="submit">{{ $t('search') }}</v-btn>
+            </v-col>
+          </v-row>
+        </v-form>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
-import { ref, computed, watch, onBeforeMount, } from 'vue'
-import { toRefs } from 'vue'
+import { ref, computed, watch, onBeforeMount, useTemplateRef, toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
+import { useI18n } from 'vue-i18n'
+import { useDate } from 'vuetify'
+
+const { t } = useI18n();
+const date = useDate();
 
 definePageMeta({
-    layout: 'app',
-    middleware: ['private']
+  layout: 'app',
+  middleware: ['private']
 })
 
 useHead({
-    title: 'SOE Latam | Zones'
+  title: `SOE Latam | ${t('installations.title', 2)}`
 })
 
 const { searchDialog } = toRefs(searchMixin)
 const { createDialog } = toRefs(createMixin)
+const distributors = ref([]);
+const users = ref([]);
 const items = ref([]);
 const search = ref('');
 const page = ref(1);
 const perPage = ref(15);
+const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
+const showPicker = ref(false);
+const selectedDate = ref(null);
 const form = ref({
-    id: '',
-    fullName: '',
-    email: '',
-    password: '',
-    document: '',
-    status: '',
-    created_at: '',
-    updated_at: ''
+  name: '',
+  distributorsIds: [],
+  usersIds: [],
+  slug: ''
 })
 
-
-const headers = computed(() => [
-    { title: 'Id', key: 'id' },
-    { title: 'Full name', key: 'fullName' },
-    { title: 'Email', key: 'email' },
-    { title: 'Options', key: 'option', align: 'center' }
+const itemsPerPageOptions = computed(() => [
+  { value: 15, title: '15' },
+  { value: 25, title: '25' },
+  { value: 50, title: '50' },
+  { value: 100, title: '100' }
 ])
 
-// watch(perPage, async (val) => {
-//     await getUsers();
-// })
+const headers = computed(() => [
+  { title: 'Id', key: 'id', align: 'center', sortable: false },
+  { title: t('lists.name'), key: 'name', align: 'center', sortable: false },
+  { title: t('options'), key: 'option', align: 'center', sortable: false }
+])
 
-onBeforeMount(async () => {
+watch(createDialog, async (val) => {
+  if (val) {
+    await getDistributors();
     await getUsers();
+  }
 })
 
-const getUsers = async () => {
-    try {
-        const data = await $fetch('/api/users/', {
-            query: {
-                search: search.value,
-                page: page.value,
-                perPage: perPage.value
-            },
-            method: 'GET'
-        })
-        console.log('ITEMS: ', data.items);
-        items.value = data.items
-    } catch (err) {
-        console.log(err)
-    }
+watch(page, async () => {
+  await getLists();
+})
+
+watch(perPage, async () => {
+  await getLists();
+})
+
+onBeforeMount(async () => {
+  await getLists();
+})
+
+const resetForm = () => {
+  form.value = {
+    name: '',
+    slug: ''
+  }
 }
 
-const getUser = async (id) => {
-    try {
-        const user = await $fetch(`/api/users/${id}`, {
-            method: 'GET'
-        })
-        form.value = user
-        updateDialog.value = true
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-const createUser = async () => {
-    try {
-        const response = await $fetch('/api/users/signup', {
-            method: 'POST',
-            body: this.form
-        })
-        await getUsers()
-        createDialog.value = false
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-const updateUser = async () => {
-    try {
-        const response = await $fetch(`/api/users/${this.form.id}`, {
-            method: 'PUT',
-            body: this.form
-        })
-        await getUsers()
-        updateDialog.value = false
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-const deleteUser = async () => {
-    const response = await $fetch(`/api/users/${this.form.id}`, {
-        method: 'DELETE'
+const getDistributors = async (search) => {
+  try {
+    const data = await $fetch('/api/distributors/', {
+      query: {
+        search,
+        page: 1,
+        perPage: 15
+      },
+      method: 'GET'
     })
-    await getUsers()
-    deleteDialog.value = false
+    distributors.value = data.items
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+const getUsers = async (search) => {
+  try {
+    const data = await $fetch('/api/users/', {
+      query: {
+        search,
+        page: 1,
+        perPage: 15
+      },
+      method: 'GET'
+    })
+    users.value = data.items
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+const getLists = async () => {
+  try {
+    const data = await $fetch('/api/lists/', {
+      query: {
+        search: search.value,
+        page: page.value,
+        perPage: perPage.value
+      },
+      method: 'GET'
+    })
+    items.value = data.items
+    total.value = data.total
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+const getList = async (id) => {
+  try {
+    const user = await $fetch(`/api/lists/${id}`, {
+      method: 'GET'
+    })
+    form.value = user
+    updateDialog.value = true
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+const createList = async () => {
+  try {
+    const response = await $fetch('/api/lists/', {
+      method: 'POST',
+      body: form.value
+    })
+    await getLists()
+    createDialog.value = false
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+const updateList = async () => {
+  try {
+    const response = await $fetch(`/api/lists/${form.value.id}`, {
+      method: 'PUT',
+      body: form.value
+    })
+    await getLists()
+    updateDialog.value = false
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+const deleteList = async () => {
+  const response = await $fetch(`/api/lists/${form.value.id}`, {
+    method: 'DELETE'
+  })
+  await getLists()
+  deleteDialog.value = false
 }
 
 const doSearch = async () => {
-    try {
-        page.value = 1
-        perPage.value = 15
-        await this.getUsers()
-        searchDialog.value = false
-    } catch (err) {
-        console.log(err)
-    }
+  try {
+    page.value = 1
+    perPage.value = 15
+    await getLists()
+    searchDialog.value = false
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 </script>

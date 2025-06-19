@@ -176,9 +176,10 @@
         INSTALLATIONS {
             int id PK, UK "AUTO_INCREMENT, NN"
             int equipment_id FK "NN"
+            int distributor_id FK "NN"
+            int site_distributor_id FK "NN"
             int client_id FK "NN"
             int site_client_id FK "NN"
-            int site_distributor_id FK "NN"
             int user_id FK "NN"
             date installed_date "NN"
             string status "NN"
@@ -208,11 +209,12 @@
             date updated_at "NN"
         }
 
-        FORMATS {
+        INSTALLATIONS_FILES {
             int id PK, UK "AUTO_INCREMENT, NN"
             int installation_id FK "NN"
             string original_name "NN"
             string path "NN"
+            string file_type "NN, [FORMAT, SERIAL, EVIDENCES]"
             string status "NN"
             date created_at "NN"
             date updated_at "NN"
@@ -229,13 +231,13 @@
             date updated_at "NN"
         }
 
-        FILES {
+        EQUIPMENTS_FILES {
             int id PK, UK "AUTO_INCREMENT, NN"
             int equipment_id FK "NN"
             string name "NN"
             string path "NN"
             string original_name "NN"
-            string type "NN"
+            string file_type "NN"
             string status "NN"
             date created_at "NN"
             date updated_at "NN"
@@ -273,14 +275,14 @@
         LISTS ||--o{ USERS_LISTS : has
         USERS ||--o{ USERS_LISTS : has
         USERS ||--o{ USERS_GROUPS : has
-        INSTALLATIONS ||--|| FORMATS : has
+        INSTALLATIONS ||--o{ INSTALLATIONS_FILES : has
         INSTALLATIONS ||--|| WARRANTIES : has
         GROUPS ||--o{ USERS_GROUPS : has
         GROUPS ||--o{ PERMISSIONS : has
         MODULES ||--o{ PERMISSIONS : has
         CATEGORIES ||--o{ EQUIPMENTS : has
         CATEGORIES ||--o{ REASONS : has
-        EQUIPMENTS ||--o{ FILES : has
+        EQUIPMENTS ||--o{ EQUIPMENTS_FILES : has
         EQUIPMENTS ||--o{ INSTALLATIONS : has
         EQUIPMENTS ||--o{ PARTS : has
         EQUIPMENTS ||--o{ SPECIFICATIONS : has

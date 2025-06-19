@@ -1,5 +1,7 @@
+import enum
 from core.app import db
 from bcrypt import checkpw
+from sqlalchemy import Enum
 from sqlalchemy import BigInteger, String, DateTime, ForeignKey, Boolean
 from datetime import datetime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -375,15 +377,15 @@ class Manual(db.Model):
         onupdate=lambda: datetime.now())
 
 
-class File(db.Model):
-    __tablename__ = 'files'
+class EquipmentFile(db.Model):
+    __tablename__ = 'equipments_files'
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     equipment_id: Mapped[int] = mapped_column(ForeignKey('equipments.id'), nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     path: Mapped[str] = mapped_column(String, nullable=False)
     original_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    type: Mapped[str] = mapped_column(String(20), nullable=False)
+    file_type: Mapped[str] = mapped_column(String(20), nullable=False)
     status: Mapped[str] = mapped_column(String(20), 
                                         nullable=False,
                                         default='ACTIVE')
@@ -446,8 +448,9 @@ class Installation(db.Model):
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     equipment_id: Mapped[int] = mapped_column(ForeignKey('equipments.id'), nullable=False)
-    client_id: Mapped[int] = mapped_column(ForeignKey('clients.id'), nullable=False)
+    distributor_id: Mapped[int] = mapped_column(ForeignKey('distributors.id'), nullable=False)
     site_distributor_id: Mapped[int] = mapped_column(ForeignKey('sites.id'), nullable=False)
+    client_id: Mapped[int] = mapped_column(ForeignKey('clients.id'), nullable=False)
     site_client_id: Mapped[int] = mapped_column(ForeignKey('sites.id'), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
     installed_date: Mapped[datetime] = mapped_column(DateTime(), nullable=False)
@@ -465,14 +468,21 @@ class Installation(db.Model):
         onupdate=lambda: datetime.now())
 
 
-class Format(db.Model):
-    __tablename__ = 'formats'
+class Installation_File_Type(enum.Enum):
+    FORMAT = 'FORMAT'
+    SERIAL = 'SERIAL'
+    EVIDENCES = 'EVIDENCES'
+
+
+class InstallationFile(db.Model):
+    __tablename__ = 'installations_files'
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     installation_id: Mapped[int] = mapped_column(ForeignKey('installations.id'), nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     path: Mapped[str] = mapped_column(String, nullable=False)
     original_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    file_type: Mapped[str] = mapped_column(Enum(Installation_File_Type), nullable=False, comment='Installation file type could be one of [FORMAT, SERIAL, EVIDENCES]')
     status: Mapped[str] = mapped_column(String(20), 
                                         nullable=False,
                                         default='ACTIVE')

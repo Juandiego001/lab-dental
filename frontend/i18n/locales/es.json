@@ -372,7 +372,9 @@
     "title": "Instalación | Instalaciones",
     "installedAt": "Instalado en",
     "installedDate": "Fecha de instalación",
-    "format": "Formato",
+    "formatPicture": "Foto de formato",
+    "serialPicture": "Foto de serial",
+    "installationPictures": "Fotos de la instalación",
     "create": {
       "title": "Registrar instalación"
     },
@@ -448,6 +450,28 @@
     "search": {
       "title": "Buscar manual",
       "message": "Buscar manual por nombre, tipo o ID",
+      "fields": "Nombre, tipo o id"
+    }
+  },
+  "lists": {
+    "title": "Lista | Listas",
+    "name": "Nombre",
+    "distributors": "Distribuidores",
+    "users": "Usuarios",
+    "slug": "Slug",
+    "create": {
+      "title": "Crear lista"
+    },
+    "update": {
+      "title": "Actualizar lista"
+    },
+    "delete": {
+      "title": "Eliminar lista",
+      "message": "¿Está seguro que desea eliminar la lista?"
+    },
+    "search": {
+      "title": "Buscar lista",
+      "message": "Buscar lista por nombre, tipo o ID",
       "fields": "Nombre, tipo o id"
     }
   },

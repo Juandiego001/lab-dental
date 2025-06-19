@@ -3,8 +3,8 @@
     <v-card width="100%" flat>
       <v-card-title>{{ $t('sites.title', 2) }}</v-card-title>
       <v-card-text>
-        <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage" :items-length="total"
-          :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
+        <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
+          :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
           <template v-slot:item.option="{ item }">
             <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getSite(item.id)"></v-btn>
@@ -18,8 +18,8 @@
   </v-container>
 
   <!-- Create Dialog -->
-  <v-dialog v-model="createDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="createDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('sites.create.title') }}
@@ -36,18 +36,25 @@
                 <v-radio :label="$t('clients.title', 2)" value="clients"></v-radio>
               </v-radio-group>
             </v-col>
-            <v-col cols="12">
-              <v-select v-model="companyId"
-                :label="companyType === 'distributors' ? $t('distributors.title') : $t('clients.title')"
-                :items="companies" item-title="name" item-value="id" hide-details="auto" />
-            </v-col>
+            <template v-if="companyType === 'distributors'">
+              <v-col cols="12">
+                <v-autocomplete v-model="form.distributorId" :label="$t('distributors.title')" :items="distributors"
+                  item-title="name" item-value="id" hide-details="auto" clearable @update:search="getDistributors" />
+              </v-col>
+            </template>
+            <template v-else>
+              <v-col cols="12">
+                <v-autocomplete v-model="form.clientId" :label="$t('clients.title')" :items="clients" item-title="name"
+                  item-value="id" hide-details="auto" clearable @update:search="getClients" />
+              </v-col>
+            </template>
             <v-col cols="12">
               <v-autocomplete v-model="countryId" :label="$t('countries')" :items="countries" item-title="name"
-                item-value="id" hide-details="auto" @update:search="getCountries" />
+                item-value="id" hide-details="auto" @update:search="getCountries" clearable />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="stateId" :label="$t('states')" :items="states" item-title="name" item-value="id"
-                hide-details="auto" @update:search="getStates" />
+                hide-details="auto" @update:search="getStates" clearable />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="cityId" :label="$t('cities')" :items="cities" item-title="name" item-value="id"
@@ -60,7 +67,7 @@
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('sites.name')"></v-text-field>
             </v-col>
             <v-col class="text-end">
-              <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
               <span class="mx-1"></span>
               <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
             </v-col>
@@ -71,13 +78,13 @@
   </v-dialog>
 
   <!-- Update Dialog -->
-  <v-dialog v-model="updateDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="updateDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('sites.update.title') }}
           <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="updateDialog = false"></v-btn>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="updateDialog = false"></v-btn>
         </v-row>
       </v-card-title>
       <v-card-text>
@@ -98,8 +105,8 @@
   </v-dialog>
 
   <!-- Delete Dialog -->
-  <v-dialog v-model="deleteDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="deleteDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('sites.delete.title') }}
@@ -117,8 +124,8 @@
   </v-dialog>
 
   <!-- Search Dialog -->
-  <v-dialog v-model="searchDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="searchDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('sites.search.title') }}
@@ -166,7 +173,8 @@ const { createDialog } = toRefs(createMixin)
 const items = ref([]);
 const companyType = ref('distributors');
 const companyId = ref('');
-const companies = ref([]);
+const distributors = ref([]);
+const clients = ref([]);
 const countries = ref([]);
 const states = ref([]);
 const cities = ref([]);
@@ -180,6 +188,8 @@ const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
 const form = ref({
+  distributorId: null,
+  clientId: null,
   cityId: '',
   description: '',
   name: ''
@@ -201,22 +211,21 @@ const headers = computed(() => [
 
 watch(createDialog, async (val) => {
   if (val) {
-    await getCompanies();
+    await getDistributors();
+    await getClients();
     await getCountries();
+  } else {
+    resetForm()
   }
 })
 
-watch(companyType, async (val) => {
-  if (val) await getCompanies();
-})
-
-watch(companyId, async (val) => {
+watch(updateDialog, async (val) => {
   if (val) {
-    if (companyType.value === 'distributors') {
-      form.value.distributorId = val;
-    } else {
-      form.value.clientId = val;
-    }
+    await getDistributors();
+    await getClients();
+    await getCountries();
+  } else {
+    resetForm()
   }
 })
 
@@ -244,17 +253,47 @@ onBeforeMount(async () => {
   await getSites();
 })
 
-const getCompanies = async () => {
+const resetForm = () => {
+  companyType.value = 'distributors'
+  countryId.value = ''
+  stateId.value = ''
+  cityId.value = ''
+  form.value = {
+    distributorId: null,
+    clientId: null,
+    cityId: '',
+    description: '',
+    name: ''
+  }
+}
+
+const getDistributors = async (search) => {
   try {
-    const data = await $fetch(`/api/${companyType.value}/`, {
+    const data = await $fetch(`/api/distributors/`, {
       query: {
-        search: '',
-        page: page.value,
-        perPage: perPage.value
+        search,
+        page: 1,
+        perPage: 15
       },
       method: 'GET'
     })
-    companies.value = data.items
+    distributors.value = data.items
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+const getClients = async (search) => {
+  try {
+    const data = await $fetch(`/api/clients/`, {
+      query: {
+        search,
+        page: 1,
+        perPage: 15
+      },
+      method: 'GET'
+    })
+    clients.value = data.items
   } catch (err) {
     console.log(err);
   }
@@ -344,6 +383,7 @@ const createSite = async () => {
       body: form.value
     })
     await getSites()
+    resetForm()
     createDialog.value = false
   } catch (err) {
     console.log(err)
@@ -357,6 +397,7 @@ const updateSite = async () => {
       body: form.value
     })
     await getSites()
+    resetForm()
     updateDialog.value = false
   } catch (err) {
     console.log(err)
@@ -368,6 +409,7 @@ const deleteSite = async () => {
     method: 'DELETE'
   })
   await getSites()
+  resetForm()
   deleteDialog.value = false
 }
 

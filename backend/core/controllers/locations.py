@@ -29,7 +29,6 @@ def get_states(query_data, country_id):
     '''Get states'''
 
     try:
-        print('country_id: ', country_id)
         return {'items': locations.get_states(
             country_id,
             query_data['search'],

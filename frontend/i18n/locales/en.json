@@ -373,7 +373,9 @@
     "title": "Installation | Installations",
     "installedAt": "Installed At",
     "installedDate": "Installed Date",
-    "format": "Format",
+    "formatPicture": "Format picture",
+    "serialPicture": "Serial picture",
+    "installationPictures": "Installation pictures",
     "create": {
       "title": "Create installation"
     },
@@ -452,25 +454,26 @@
       "fields": "Name, type or id"
     }
   },
-  "zones": {
-    "title": "Zone | Zones",
+  "lists": {
+    "title": "List | Lists",
     "name": "Name",
-    "file": "File",
-    "type": "Type",
+    "distributors": "Distributors",
+    "users": "Users",
+    "slug": "Slug",
     "create": {
-      "title": "Create manual"
+      "title": "Create list"
     },
     "update": {
-      "title": "Update manual"
+      "title": "Update list"
     },
     "delete": {
-      "title": "Delete manual",
-      "message": "Are you sure you want to delete the manual?"
+      "title": "Delete list",
+      "message": "Are you sure you want to delete the list?"
     },
     "search": {
-      "title": "Search manual",
-      "message": "Search manual by name, type or ID",
-      "fields": "Name, type or id"
+      "title": "Search list",
+      "message": "Search list by name, type or ID",
+      "fields": "Name, type or ID"
     }
   },
   "countries": "Country | Countries",

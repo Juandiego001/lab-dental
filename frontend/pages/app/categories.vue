@@ -4,7 +4,7 @@
       <v-card-title>{{ $t('categories.title', 2) }}</v-card-title>
       <v-card-text>
         <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
-        :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
+          :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
 
           <template v-slot:item.option="{ item }">
@@ -20,8 +20,8 @@
   </v-container>
 
   <!-- Create Dialog -->
-  <v-dialog v-model="createDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="createDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('categories.create.title') }}
@@ -39,7 +39,7 @@
               <v-text-field v-model="form.slug" hide-details="auto" :label="$t('categories.slug')"></v-text-field>
             </v-col>
             <v-col class="text-end">
-              <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
               <span class="mx-1"></span>
               <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
             </v-col>
@@ -51,13 +51,13 @@
   </v-dialog>
 
   <!-- Update Dialog -->
-  <v-dialog v-model="updateDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="updateDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('update.category') }}
           <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="updateDialog = false"></v-btn>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="updateDialog = false"></v-btn>
         </v-row>
       </v-card-title>
       <v-card-text>
@@ -81,8 +81,8 @@
   </v-dialog>
 
   <!-- Delete Dialog -->
-  <v-dialog v-model="deleteDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="deleteDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('categories.delete.title') }}
@@ -101,8 +101,8 @@
   </v-dialog>
 
   <!-- Search Dialog -->
-  <v-dialog v-model="searchDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="searchDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('categories.search.title') }}
@@ -189,6 +189,17 @@ onBeforeMount(async () => {
   await getCategories();
 })
 
+const resetForm = () => {
+  form.value = {
+    id: '',
+    name: '',
+    slug: '',
+    status: '',
+    createdAt: '',
+    updatedAt: ''
+  }
+}
+
 const getCategories = async () => {
   try {
     const data = await $fetch('/api/categories/', {
@@ -225,6 +236,7 @@ const createCategory = async () => {
       body: form.value
     })
     await getCategories()
+    resetForm()
     createDialog.value = false
   } catch (err) {
     console.log(err)
@@ -238,6 +250,7 @@ const updateCategory = async () => {
       body: form.value
     })
     await getCategories()
+    resetForm()
     updateDialog.value = false
   } catch (err) {
     console.log(err)
@@ -249,6 +262,7 @@ const deleteCategory = async () => {
     method: 'DELETE'
   })
   await getCategories()
+  resetForm()
   deleteDialog.value = false
 }
 

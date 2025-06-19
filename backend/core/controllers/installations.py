@@ -1,4 +1,4 @@
-from core.app import db
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from core.services import installations
 from apiflask import APIBlueprint, abort
 from core.schemas.utils import Message, Pagination
@@ -35,13 +35,13 @@ def get_installation(installation_id):
 
 
 @bp.post('/')
-@bp.input(InstallationInCreate, arg_name='installation')
-def create_installations(installation):
+@bp.input(InstallationInCreate, location='form_and_files')
+def create_installations(form_and_files_data):
     '''Create installation'''
 
     try:
-        db.session.add(installation)
-        db.session.commit()
+        installation = installations.create_installation(form_and_files_data)
+        # installations.send_notification(1)
         return {'message': 'Installation registered successfully'}
     except Exception as ex:
         print(str(ex))

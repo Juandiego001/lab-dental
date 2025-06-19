@@ -18,8 +18,8 @@
   </v-container>
 
   <!-- Create Dialog -->
-  <v-dialog v-model="createDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="createDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('clients.create.title') }}
@@ -41,7 +41,7 @@
               <v-text-field v-model="form.phone" hide-details="auto" :label="$t('clients.phone')"></v-text-field>
             </v-col>
             <v-col class="text-end">
-              <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
               <span class="mx-1"></span>
               <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
             </v-col>
@@ -52,13 +52,13 @@
   </v-dialog>
 
   <!-- Update Dialog -->
-  <v-dialog v-model="updateDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="updateDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('clients.update.title') }}
           <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="updateDialog = false"></v-btn>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="updateDialog = false"></v-btn>
         </v-row>
       </v-card-title>
       <v-card-text>
@@ -86,8 +86,8 @@
   </v-dialog>
 
   <!-- Delete Dialog -->
-  <v-dialog v-model="deleteDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="deleteDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('clients.delete.title') }}
@@ -105,8 +105,8 @@
   </v-dialog>
 
   <!-- Search Dialog -->
-  <v-dialog v-model="searchDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="searchDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('clients.search.title') }}
@@ -198,6 +198,17 @@ onBeforeMount(async () => {
   await getClients();
 })
 
+const resetForm = () => {
+  form.value = {
+    distributor: {
+      id: '',
+      name: ''
+    },
+    name: '',
+    phone: ''
+  }
+}
+
 const getDistributors = async () => {
   try {
     const data = await $fetch('/api/distributors/', {
@@ -250,6 +261,7 @@ const createClient = async () => {
       body: form.value
     })
     await getClients()
+    resetForm()
     createDialog.value = false
   } catch (err) {
     console.log(err)
@@ -263,6 +275,7 @@ const updateClient = async () => {
       body: form.value
     })
     await getClients()
+    resetForm()
     updateDialog.value = false
   } catch (err) {
     console.log(err)
@@ -274,6 +287,7 @@ const deleteClient = async () => {
     method: 'DELETE'
   })
   await getClients()
+  resetForm()
   deleteDialog.value = false
 }
 

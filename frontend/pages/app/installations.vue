@@ -7,10 +7,12 @@
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
           <template v-slot:item.option="{ item }">
-            <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getInstallation(item.id)"></v-btn>
-            <span class="mx-2"></span>
-            <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
-              @click="form.id = item.id; deleteDialog = true"></v-btn>
+            <v-btn class="my-2 bg-primary me-2" size="small" icon="mdi-pencil"
+              @click="getInstallation(item.id)"></v-btn>
+            <v-btn class="my-2 bg-red me-2" size="small" icon="mdi-trash-can" @click="form.id = item.id"></v-btn>
+            <v-btn class="my-2 bg-teal-darken-4 me-2" size="small" icon="mdi-check-bold"
+              @click="form.id = item.id"></v-btn>
+            <v-btn class="my-2 bg-red-darken-4 me-2" size="small" icon="mdi-cancel" @click="form.id = item.id"></v-btn>
           </template>
         </v-data-table-server>
       </v-card-text>
@@ -18,8 +20,8 @@
   </v-container>
 
   <!-- Create Dialog -->
-  <v-dialog v-model="createDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="createDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('installations.create.title') }}
@@ -32,40 +34,57 @@
           <v-row>
             <v-col cols="12">
               <v-autocomplete v-model="form.equipmentId" :label="$t('equipments.title')" :items="equipments"
-                item-title="serial" item-value="id" hide-details="auto" @update:search="getEquipments" />
-            </v-col>
-            <v-col cols="12">
-              <v-autocomplete v-model="form.clientId" :label="$t('clients.title')" :items="clients" item-title="name"
-                item-value="id" hide-details="auto" @update:search="getClients" />
-            </v-col>
-            <v-col cols="12">
-              <v-autocomplete v-model="form.clientSiteId" :label="`${$t('sites.title')} ${$t('clients.title')}`"
-                :items="clientsSites" item-title="name" item-value="id" hide-details="auto"
-                @update:search="getClientsSites" />
+                item-title="serial" item-value="id" hide-details="auto" @update:search="getEquipments" clearable />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.distributorId" :label="$t('distributors.title')" :items="distributors"
-                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" />
+                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable />
             </v-col>
             <v-col cols="12">
-              <v-autocomplete v-model="form.distributorSiteId"
+              <v-autocomplete v-model="form.siteDistributorId"
                 :label="`${$t('sites.title')} ${$t('distributors.title')}`" :items="distributorsSites" item-title="name"
-                item-value="id" hide-details="auto" @update:search="getDistributorsSites" />
+                item-value="id" hide-details="auto" @update:search="getDistributorsSites" clearable />
+            </v-col>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.clientId" :label="$t('clients.title')" :items="clients" item-title="name"
+                item-value="id" hide-details="auto" @update:search="getClients" clearable />
+            </v-col>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.siteClientId" :label="`${$t('sites.title')} ${$t('clients.title')}`"
+                :items="clientsSites" item-title="name" item-value="id" hide-details="auto"
+                @update:search="getClientsSites" clearable />
             </v-col>
             <v-col cols="12">
               <v-menu v-model="showPicker" :close-on-content-click="false" transition="scale-transition" offset-y
                 full-width max-width="290px" min-width="290px">
                 <template v-slot:activator="{ props }">
-                  <v-text-field v-model="selectedDateText" :label="$t('installations.installedDate')" readonly hide-details="auto" v-bind="props"></v-text-field>
+                  <v-text-field v-model="form.installedDate" :label="$t('installations.installedDate')" readonly
+                    hide-details="auto" v-bind="props"></v-text-field>
                 </template>
-                <v-date-picker v-model="selectedDate" title="" hide-header @update:model-value="showPicker=false"></v-date-picker>
+                <v-date-picker v-model="selectedDate" title="" hide-header
+                  @update:model-value="showPicker = false"></v-date-picker>
               </v-menu>
             </v-col>
             <v-col cols="12">
-              <v-file-input v-model="format" hide-details="auto" :label="$t('installations.format')" />
+              <v-file-input v-model="formatPicture" :prepend-icon="null" prepend-inner-icon="mdi-paperclip"
+                hide-details="auto" :label="$t('installations.formatPicture')" chips />
+            </v-col>
+            <v-col cols="12">
+              <v-file-input v-model="serialPicture" :prepend-icon="null" prepend-inner-icon="mdi-paperclip"
+                hide-details="auto" :label="$t('installations.serialPicture')" chips />
+            </v-col>
+            <v-col cols="12">
+              <v-file-input v-model="installationPictures" :prepend-icon="null" prepend-inner-icon="mdi-paperclip"
+                hide-details="auto" :label="$t('installations.installationPictures')" multiple chips>
+                <template v-slot:selection="{ fileNames }">
+                  <v-chip v-for="fileName in fileNames" :key="fileName" size="small" label>
+                    {{ fileName }}
+                  </v-chip>
+                </template>
+              </v-file-input>
             </v-col>
             <v-col class="text-end">
-              <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
               <span class="mx-1"></span>
               <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
             </v-col>
@@ -76,25 +95,50 @@
   </v-dialog>
 
   <!-- Update Dialog -->
-  <v-dialog v-model="updateDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="updateDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('installations.update.title') }}
           <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="updateDialog = false"></v-btn>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="updateDialog = false"></v-btn>
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="updateUser">
+        <v-form @submit.prevent="updateInstallation">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.installedAt" hide-details="auto"
-                :label="$t('installations.installedAt')"></v-text-field>
+              <v-autocomplete v-model="form.equipmentId" :label="$t('equipments.title')" :items="equipments"
+                item-title="serial" item-value="id" hide-details="auto" @update:search="getEquipments" clearable />
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.installedDate" hide-details="auto"
-                :label="$t('installations.installedDate')"></v-text-field>
+              <v-autocomplete v-model="form.distributorId" :label="$t('distributors.title')" :items="distributors"
+                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable />
+            </v-col>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.siteDistributorId"
+                :label="`${$t('sites.title')} ${$t('distributors.title')}`" :items="distributorsSites" item-title="name"
+                item-value="id" hide-details="auto" @update:search="getDistributorsSites" clearable />
+            </v-col>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.clientId" :label="$t('clients.title')" :items="clients" item-title="name"
+                item-value="id" hide-details="auto" @update:search="getClients" clearable />
+            </v-col>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.siteClientId" :label="`${$t('sites.title')} ${$t('clients.title')}`"
+                :items="clientsSites" item-title="name" item-value="id" hide-details="auto"
+                @update:search="getClientsSites" clearable />
+            </v-col>
+            <v-col cols="12">
+              <v-menu v-model="showPicker" :close-on-content-click="false" transition="scale-transition" offset-y
+                full-width max-width="290px" min-width="290px">
+                <template v-slot:activator="{ props }">
+                  <v-text-field v-model="form.installedDate" :label="$t('installations.installedDate')" readonly
+                    hide-details="auto" v-bind="props"></v-text-field>
+                </template>
+                <v-date-picker v-model="selectedDate" title="" hide-header
+                  @update:model-value="showPicker = false"></v-date-picker>
+              </v-menu>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -108,8 +152,8 @@
   </v-dialog>
 
   <!-- Delete Dialog -->
-  <v-dialog v-model="deleteDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="deleteDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('installations.delete.title') }}
@@ -127,8 +171,8 @@
   </v-dialog>
 
   <!-- Search Dialog -->
-  <v-dialog v-model="searchDialog" max-width="500">
-    <v-card>
+  <v-dialog v-model="searchDialog" max-width="500" persistent>
+    <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('installations.search.title') }}
@@ -155,8 +199,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onBeforeMount, } from 'vue'
-import { toRefs } from 'vue'
+import { ref, computed, watch, onBeforeMount, useTemplateRef, toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
@@ -188,16 +231,17 @@ const perPage = ref(15);
 const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
-const format = ref(null);
+const formatPicture = ref(null);
+const serialPicture = ref(null);
+const installationPictures = ref(null);
 const showPicker = ref(false);
 const selectedDate = ref(null);
-const selectedDateText = ref(null);
 const form = ref({
   equipmentId: '',
   clientId: '',
-  clientSiteId: '',
+  siteClientId: '',
   distributorId: '',
-  distributorSiteId: '',
+  siteDistributorId: '',
   installedDate: null,
 })
 
@@ -209,13 +253,21 @@ const itemsPerPageOptions = computed(() => [
 ])
 
 const headers = computed(() => [
-  { title: 'Id', key: 'id', sortable: false },
-  { title: t('installations.installedAt'), key: 'installedAt', sortable: false },
-  { title: t('installations.installedDate'), key: 'installedDate', sortable: false },
+  { title: 'Id', key: 'id', align: 'center', sortable: false },
+  { title: t('equipments.title'), key: 'equipmentId', align: 'center', sortable: false },
+  { title: t('installations.installedDate'), key: 'installedDate', align: 'center', sortable: false },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
 watch(createDialog, async (val) => {
+  if (val) {
+    await getEquipments();
+    await getClients();
+    await getDistributors();
+  }
+})
+
+watch(updateDialog, async (val) => {
   if (val) {
     await getEquipments();
     await getClients();
@@ -240,12 +292,24 @@ watch(() => form.value.distributorId, async (val) => {
 })
 
 watch(selectedDate, async (val) => {
-  if (val) selectedDateText.value = date.format(val, 'fullDate');
+  if (val) form.value.installedDate = date.format(val, 'fullDate');
 })
 
 onBeforeMount(async () => {
   await getInstallations();
 })
+
+const resetForm = () => {
+  selectedDate.value = null
+  form.value = {
+    equipmentId: '',
+    clientId: '',
+    siteClientId: '',
+    distributorId: '',
+    siteDistributorId: '',
+    installedDate: null,
+  }
+}
 
 const getEquipments = async (search) => {
   try {
@@ -346,10 +410,10 @@ const getInstallations = async () => {
 
 const getInstallation = async (id) => {
   try {
-    const user = await $fetch(`/api/installations/${id}`, {
+    const data = await $fetch(`/api/installations/${id}`, {
       method: 'GET'
     })
-    form.value = user
+    form.value = data
     updateDialog.value = true
   } catch (err) {
     console.log(err)
@@ -358,9 +422,21 @@ const getInstallation = async (id) => {
 
 const createInstallation = async () => {
   try {
+    const formData = new FormData();
+    formData.append('formatPicture', formatPicture.value);
+    formData.append('serialPicture', serialPicture.value);
+
+    for (const installationPicture of installationPictures.value) {
+      formData.append('installationPictures', installationPicture);
+    }
+
+    for (const [key, value] of Object.entries(form.value)) {
+      formData.append(key, value);
+    }
+
     const response = await $fetch('/api/installations/', {
       method: 'POST',
-      body: form.value
+      body: formData
     })
     await getInstallations()
     createDialog.value = false
@@ -369,7 +445,7 @@ const createInstallation = async () => {
   }
 }
 
-const updateUser = async () => {
+const updateInstallation = async () => {
   try {
     const response = await $fetch(`/api/installations/${form.value.id}`, {
       method: 'PUT',

@@ -7,24 +7,23 @@ from core.schemas.utils import BaseSchema
 
 class InstallationIn(BaseSchema):
     id = fields.Integer()
-    full_name = fields.String(data_key='fullName')
-    email = fields.String()
-    password = fields.String()
+    equipment_id = fields.Integer(data_key='equipmentId')
+    client_id = fields.Integer(data_key='clientId')
+    site_client_id = fields.Integer(data_key='siteClientId')
+    distributor_id = fields.Integer(data_key='distributorId', required=False)
+    site_distributor_id = fields.Integer(data_key='siteDistributorId')
+    installed_date = fields.String(data_key='installedDate')
+    format_picture = fields.File(data_key='formatPicture')
+    serial_picture = fields.File(data_key='serialPicture')
+    installation_pictures = fields.List(fields.File(), data_key='installationPictures')
     status = fields.String(load_default='ACTIVE')
 
 
 class InstallationInCreate(InstallationIn):
-    full_name = fields.String(data_key='fullName')
-    email = fields.String()
-    password = fields.String()
-
-    @post_load
-    def make_object(self, data, **kwargs):
-        return Installation(**data)
+    pass
 
 
 class InstallationInUpdate(InstallationIn):
-
     @post_load
     def make_object(self, data, **kwargs):
         return Installation(**data)
@@ -32,11 +31,16 @@ class InstallationInUpdate(InstallationIn):
 
 class InstallationOut(BaseSchema):
     id = fields.Integer()
-    full_name = fields.String(data_key='fullName')
-    email = fields.String()
+    equipment_id = fields.Integer(data_key='equipmentId')
+    client_id = fields.Integer(data_key='clientId')
+    site_client_id = fields.Integer(data_key='siteClientId')
+    distributor_id = fields.Integer(data_key='distributorId')
+    site_distributor_id = fields.Integer(data_key='siteDistributorId')
+    installed_date = fields.String(data_key='installedDate')
+    format_picture = fields.File(date_key='formatPicture')
+    serial_picture = fields.File(date_key='serialPicture')
+    installation_pictures = fields.File(date_key='installationPictures')
     status = fields.String()
-    created_at = fields.DateTime()
-    updated_at = fields.DateTime()
 
 
 class InstallationsOut(Schema):
