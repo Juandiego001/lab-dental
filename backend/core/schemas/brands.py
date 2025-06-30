@@ -12,16 +12,12 @@ class BrandIn(BaseSchema):
 
 
 class BrandInCreate(BrandIn):
-    name = fields.String()
-    slug = fields.String()
-
     @post_load
     def make_object(self, data, **kwargs):
         return Brand(**data)
 
 
 class BrandInUpdate(BrandIn):
-
     @post_load
     def make_object(self, data, **kwargs):
         return Brand(**data)

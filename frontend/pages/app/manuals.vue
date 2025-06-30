@@ -194,7 +194,7 @@ onBeforeMount(async () => {
 
 const getManuals = async () => {
   try {
-    const data = await $fetch('/api/manuals/', {
+    const data = await $api('/api/manuals/', {
       query: {
         search: search.value,
         page: page.value,
@@ -211,7 +211,7 @@ const getManuals = async () => {
 
 const getManual = async (id) => {
   try {
-    const user = await $fetch(`/api/manuals/${id}`, {
+    const user = await $api(`/api/manuals/${id}`, {
       method: 'GET'
     })
     form.value = user
@@ -223,7 +223,7 @@ const getManual = async (id) => {
 
 const createManual = async () => {
   try {
-    const response = await $fetch('/api/manuals/', {
+    const response = await $api('/api/manuals/', {
       method: 'POST',
       body: form.value
     })
@@ -236,7 +236,7 @@ const createManual = async () => {
 
 const updateManual = async () => {
   try {
-    const response = await $fetch(`/api/manuals/${form.value.id}`, {
+    const response = await $api(`/api/manuals/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
@@ -248,7 +248,7 @@ const updateManual = async () => {
 }
 
 const deleteManual = async () => {
-  const response = await $fetch(`/api/manuals/${form.value.id}`, {
+  const response = await $api(`/api/manuals/${form.value.id}`, {
     method: 'DELETE'
   })
   await getManuals()

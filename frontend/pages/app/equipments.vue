@@ -30,13 +30,13 @@
       <v-card-text>
         <v-form @submit.prevent="createEquipment">
           <v-row>
-            <v-col>
-              <v-select v-model="form.brandId" :label="$t('brands.title', 1)" :items="brands"
-                hide-details="auto"></v-select>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.brandId" :label="$t('brands.title', 1)" :items="brands" item-title="name"
+                item-value="id" hide-details="auto" @update:search="getBrands" />
             </v-col>
-            <v-col>
-              <v-select v-model="form.categoryId" :label="$t('categories.title', 1)" :items="categories"
-                hide-details="auto"></v-select>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.categoryId" :label="$t('categories.title', 1)" :items="categories"
+                item-title="name" item-value="id" hide-details="auto" @update:search="getCategories" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.serial" hide-details="auto" :label="$t('equipments.serial')"></v-text-field>
@@ -68,6 +68,14 @@
       <v-card-text>
         <v-form @submit.prevent="updateEquipment">
           <v-row>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.brandId" :label="$t('brands.title', 1)" :items="brands" item-title="name"
+                item-value="id" hide-details="auto" @update:search="getBrands" clearable />
+            </v-col>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.categoryId" :label="$t('categories.title', 1)" :items="categories"
+                item-title="name" item-value="id" hide-details="auto" @update:search="getCategories" clearable />
+            </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.serial" hide-details="auto" :label="$t('equipments.serial')"></v-text-field>
             </v-col>
@@ -162,14 +170,12 @@ const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
 const form = ref({
-  id: '',
-  categoryId: '',
   brandId: '',
+  brandName: '',
+  categoryId: '',
+  categoryName: '',
   serial: '',
-  model: '',
-  status: null,
-  createdAt: '',
-  updatedAt: ''
+  model: ''
 })
 
 const itemsPerPageOptions = computed(() => [
@@ -181,16 +187,29 @@ const itemsPerPageOptions = computed(() => [
 
 const headers = computed(() => [
   { title: 'Id', key: 'id', sortable: false },
-  { title: t('brands.title', 1), key: 'brand.name', sortable: false },
-  { title: t('categories.title', 1), key: 'category.name', sortable: false },
+  { title: t('brands.title', 1), key: 'brandName', sortable: false },
+  { title: t('categories.title', 1), key: 'categoryName', sortable: false },
   { title: t('equipments.serial'), key: 'serial', sortable: false },
   { title: t('equipments.model'), key: 'model', sortable: false },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
-watch(createDialog, async () => {
-  await getBrands();
-  await getCategories();
+watch(createDialog, async (val) => {
+  if (val) {
+    await getBrands();
+    await getCategories();
+  } else {
+    resetForm();
+  }
+})
+
+watch(updateDialog, async (val) => {
+  if (val) {
+    await getBrands(form.value.brandName);
+    await getCategories(form.value.categoryName);
+  } else {
+    resetForm();
+  }
 })
 
 watch(page, async () => {
@@ -207,22 +226,20 @@ onBeforeMount(async () => {
 
 const resetForm = () => {
   form.value = {
-    id: '',
-    categoryId: '',
     brandId: '',
+    brandName: '',
+    categoryId: '',
+    categoryName: '',
     serial: '',
-    model: '',
-    status: null,
-    createdAt: '',
-    updatedAt: ''
+    model: ''
   }
 }
 
-const getBrands = async () => {
+const getBrands = async (search) => {
   try {
-    const data = await $fetch('/api/brands/', {
+    const data = await $api('/api/brands/', {
       query: {
-        search: search.value,
+        search,
         page: page.value,
         perPage: perPage.value
       },
@@ -234,11 +251,11 @@ const getBrands = async () => {
   }
 }
 
-const getCategories = async () => {
+const getCategories = async (search) => {
   try {
-    const data = await $fetch('/api/categories/', {
+    const data = await $api('/api/categories/', {
       query: {
-        search: search.value,
+        search: search,
         page: page.value,
         perPage: perPage.value
       },
@@ -252,7 +269,7 @@ const getCategories = async () => {
 
 const getEquipments = async () => {
   try {
-    const data = await $fetch('/api/equipments/', {
+    const data = await $api('/api/equipments/', {
       query: {
         search: search.value,
         page: page.value,
@@ -269,10 +286,10 @@ const getEquipments = async () => {
 
 const getEquipment = async (id) => {
   try {
-    const user = await $fetch(`/api/equipments/${id}`, {
+    const data = await $api(`/api/equipments/${id}`, {
       method: 'GET'
     })
-    form.value = user
+    form.value = data
     updateDialog.value = true
   } catch (err) {
     console.log(err)
@@ -281,13 +298,13 @@ const getEquipment = async (id) => {
 
 const createEquipment = async () => {
   try {
-    const response = await $fetch('/api/equipments/', {
+    const response = await $api('/api/equipments/', {
       method: 'POST',
       body: form.value
     })
     await getEquipments()
-    resetForm()
     createDialog.value = false
+    resetForm()
   } catch (err) {
     console.log(err)
   }
@@ -295,25 +312,29 @@ const createEquipment = async () => {
 
 const updateEquipment = async () => {
   try {
-    const response = await $fetch(`/api/equipments/${form.value.id}`, {
+    const response = await $api(`/api/equipments/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
     await getEquipments()
-    resetForm()
     updateDialog.value = false
+    resetForm()
   } catch (err) {
     console.log(err)
   }
 }
 
 const deleteEquipment = async () => {
-  const response = await $fetch(`/api/equipments/${form.value.id}`, {
-    method: 'DELETE'
-  })
-  await getEquipments()
-  resetForm()
-  deleteDialog.value = false
+  try {
+    const response = await $api(`/api/equipments/${form.value.id}`, {
+      method: 'DELETE'
+    })
+    await getEquipments()
+    deleteDialog.value = false
+    resetForm()
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 const doSearch = async () => {

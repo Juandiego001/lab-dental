@@ -15,11 +15,10 @@ def get_equipments(query_data):
     '''Get equipments'''
 
     try:
-        results = equipments.get_equipments(query_data['search'],
-                                         query_data['page'],
-                                         query_data['per_page'])
-
-        return {'items': results, 'total': results.total}
+        results, total = equipments.get_equipments(query_data['search'],
+                                                   query_data['page'],
+                                                   query_data['per_page'])
+        return {'items': results, 'total': total}
     except Exception as ex:
         abort(500, str(ex))
 
@@ -56,7 +55,8 @@ def update_equipments(equipment_id, json_data):
     '''Update equipment'''
 
     try:
-        equipments.update_equipment(equipment_id, json_data)
+        db.session.merge(json_data)
+        db.session.commit()
         return {'message': 'Equipment updated successfuly'}
     except Exception as ex:
         print(str(ex))

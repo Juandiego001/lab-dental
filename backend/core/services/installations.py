@@ -1,7 +1,8 @@
 import uuid
 from core.app import db
-from core.models import DistributorList, Installation, List_, User, UserList
-from sqlalchemy import or_, and_
+from core.models import Client, Distributor, DistributorList, Equipment, Installation, List_, Site, User, UserList
+from sqlalchemy import or_, and_, func
+from sqlalchemy.orm import aliased
 from werkzeug.exceptions import HTTPException
 from werkzeug.datastructures import FileStorage
 from core.models import Installation, InstallationFile
@@ -15,14 +16,41 @@ def get_installations(search: str, page: int, per_page: int):
     #     query = and_(Installation.status == 'ACTIVE',
     #                  or_(Installation.equipment_id.ilike(f'%{search}%')))
 
-    return db.paginate(db.session.query(Installation).filter(query),
-                       page=page, per_page=per_page, count=True)
+    total = db.session.query(Installation).count()
+
+    return list(db.session.execute(
+        db.session.query(
+            *Installation.__table__.c,
+            func.concat(Equipment.model, ' - ', Equipment.serial).label('equipment_serial_model'))
+        .join(Equipment)
+        .filter(query)
+        .order_by(Installation.id.desc())
+        .limit(per_page)
+        .offset((page - 1) * per_page)
+    ).unique()), total
 
 
 def get_installation_by_id(installation_id: int):
     '''Get installation by installation id'''
 
-    return db.session.query(Installation).filter(Installation.id == installation_id).first()
+    distributor_site = aliased(Site)
+    client_site = aliased(Site)
+
+    return db.session.query(
+        *Installation.__table__.c,
+        func.concat(Equipment.model, ' - ', Equipment.serial).label('equipment_serial_model'),
+        Distributor.name.label('distributor_name'),
+        Client.name.label('client_name'),
+        client_site.name.label('site_client_name'),
+        distributor_site.name.label('site_distributor_name'))\
+        .select_from(Installation)\
+        .join(Equipment)\
+        .join(Distributor)\
+        .join(Client)\
+        .join(client_site, client_site.id == Installation.site_client_id)\
+        .join(distributor_site, distributor_site.id == Installation.site_distributor_id)\
+        .filter(Installation.id == installation_id)\
+        .first()
 
 
 def check_installation_exists(installation_id: int):
@@ -82,9 +110,6 @@ def send_notification(distributor_id):
         .where(DistributorList.id == distributor_id)
     )
     users_emails = [user_data[0] for user_data in users_]
-
-    
-    
 
 
 def update_installation(installation_id: int, installation_load):

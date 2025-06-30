@@ -230,6 +230,7 @@
     "title": "Client | Clients",
     "name": "Name",
     "phone": "Phone",
+    "distributor": "Distributor",
     "create": {
       "title": "Create client"
     },
@@ -252,7 +253,11 @@
     "username": "Username",
     "email": "Email",
     "password": "Password",
-    "type": "Type",
+    "role": {
+      "title": "Role",
+      "admin": "Admin",
+      "distributor": "Distributor"
+    },
     "create": {
       "title": "Create user"
     },
@@ -268,6 +273,9 @@
       "message": "Search user by full name, username, email or ID",
       "fields": "Full name, username, email or id"
     }
+  },
+  "modules": {
+    "title": "Module | Modules"
   },
   "groups": {
     "title": "Group | Groups",
@@ -286,6 +294,13 @@
       "title": "Search group",
       "message": "Search group by name or ID",
       "fields": "Name or id"
+    },
+    "permissions": {
+      "title": "Permissions",
+      "read": "Read",
+      "create": "Create",
+      "update": "Update",
+      "delete": "Delete"
     }
   },
   "brands": {

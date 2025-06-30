@@ -8,6 +8,7 @@ class CategoryIn(BaseSchema):
     id = fields.Integer()
     name = fields.String()
     slug = fields.String()
+    status = fields.String(load_default='ACTIVE')
 
 
 class CategoryInCreate(CategoryIn):
@@ -17,8 +18,6 @@ class CategoryInCreate(CategoryIn):
 
 
 class CategoryInUpdate(CategoryIn):
-    status = fields.String(load_default='ACTIVE')
-    
     @post_load
     def make_object(self, data, **kwargs):
         return Category(**data)

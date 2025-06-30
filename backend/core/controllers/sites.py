@@ -19,13 +19,8 @@ def get_sites(query_data):
         results, total = sites.get_sites(query_data['search'],
                                   query_data['page'],
                                   query_data['per_page'])
-        formated_results = []
-        for site, distributor_client in results:
-            data = site.__dict__
-            data['distributor_client'] = distributor_client
-            formated_results.append(data)
 
-        return {'items': formated_results, 'total': total}
+        return {'items': results, 'total': total}
     except Exception as ex:
         abort(500, str(ex))
 
@@ -90,14 +85,19 @@ def create_sites(site_and_address):
 
 
 @bp.put('/<int:site_id>')
-@bp.input(SiteInUpdate)
+@bp.input(SiteInUpdate, arg_name='site_and_address')
 @bp.output(Message)
-def update_sites(site_id, json_data):
+def update_sites(site_id, site_and_address):
     '''Update site'''
 
     try:
-        sites.update_site(site_id, json_data)
-        return {'message': 'Site updated successfuly'}
+        address: Address = site_and_address[0]
+        site: Site = site_and_address[1]
+
+        db.session.merge(address)
+        db.session.merge(site)
+        db.session.commit()
+        return {'message': 'Site registered successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))

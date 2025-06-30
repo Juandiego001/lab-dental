@@ -230,6 +230,7 @@
     "title": "Cliente | Clientes",
     "name": "Nombre",
     "phone": "Teléfono",
+    "distributor": "Distribuidor",
     "create": {
       "title": "Crear cliente"
     },
@@ -252,7 +253,11 @@
     "username": "Nombre de usuario",
     "email": "Correo",
     "password": "Contraseña",
-    "type": "Tipo",
+    "role": {
+      "title": "Rol",
+      "admin": "Admin",
+      "distributor": "Distribuidor"
+    },
     "create": {
       "title": "Crear usuario"
     },
@@ -268,6 +273,9 @@
       "message": "Buscar usuario por nombre completo, nombre de usuario, correo o ID",
       "fields": "Nombre completo, nombre de usuario, correo o id"
     }
+  },
+  "modules": {
+    "title": "Módulo | Modulos"
   },
   "groups": {
     "title": "Grupo | Grupos",
@@ -286,6 +294,13 @@
       "title": "Buscar grupo",
       "message": "Buscar grupo por nombre o ID",
       "fields": "Nombre o id"
+    },
+    "permissions": {
+      "title": "Permisos",
+      "read": "Leer",
+      "create": "Crear",
+      "update": "Actualizar",
+      "delete": "Eliminar"
     }
   },
   "brands": {

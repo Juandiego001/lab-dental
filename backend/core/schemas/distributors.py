@@ -17,7 +17,6 @@ class DistributorInCreate(DistributorIn):
 
 
 class DistributorInUpdate(DistributorIn):
-
     @post_load
     def make_object(self, data, **kwargs):
         return Distributor(**data)
@@ -27,8 +26,8 @@ class DistributorOut(BaseSchema):
     id = fields.Integer()
     name = fields.String()
     status = fields.String()
-    created_at = fields.DateTime()
-    updated_at = fields.DateTime()
+    created_at = fields.DateTime(data_key='createdAt')
+    updated_at = fields.DateTime(data_key='updatedAt')
 
 
 class DistributorsOut(Schema):

@@ -16,6 +16,8 @@ class ListIn(BaseSchema):
 class ListOut(BaseSchema):
     id = fields.Integer()
     name = fields.String()
+    distributors_ids = fields.List(fields.Integer, data_key='distributorsIds')
+    users_ids = fields.List(fields.Integer, data_key='usersIds')
     slug = fields.String()
     status = fields.String()
     created_at = fields.DateTime()

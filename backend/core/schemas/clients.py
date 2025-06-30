@@ -4,14 +4,9 @@ from marshmallow import post_load
 from core.schemas.utils import BaseSchema
 
 
-class DistributorClient(Schema):
-    id = fields.Integer()
-    name = fields.String(required=False)
-
-
 class ClientIn(BaseSchema):
     id = fields.Integer()
-    distributor = fields.Nested(DistributorClient)
+    distributor_id = fields.Integer(data_key='distributorId')
     name = fields.String()
     phone = fields.String()
     status = fields.String(load_default='ACTIVE')
@@ -20,20 +15,19 @@ class ClientIn(BaseSchema):
 class ClientInCreate(ClientIn):
     @post_load
     def make_object(self, data, **kwargs):
-        data['distributor_id'] = data.pop('distributor')['id']
         return Client(**data)
 
 
 class ClientInUpdate(ClientIn):
     @post_load
     def make_object(self, data, **kwargs):
-        data['distributor_id'] = data.pop('distributor')['id']
         return Client(**data)
 
 
 class ClientOut(BaseSchema):
     id = fields.Integer()
-    distributor = fields.Nested(DistributorClient)
+    distributor_id = fields.Integer(data_key='distributorId')
+    distributor_name = fields.String(data_key='distributorName')
     name = fields.String()
     phone = fields.String()
     status = fields.String()

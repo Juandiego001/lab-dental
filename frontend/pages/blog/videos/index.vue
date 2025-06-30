@@ -36,7 +36,7 @@ const strapiUrl = config.public.strapiUrl;
 const videos = ref([]);
 
 onBeforeMount(async () => {
-  const { data } = await $fetch('/strapi/videos?populate=*');
+  const { data } = await $api('/strapi/videos?populate=*');
   videos.value = data;
 })
 </script>

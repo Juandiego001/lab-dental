@@ -49,16 +49,16 @@
               </v-col>
             </template>
             <v-col cols="12">
-              <v-autocomplete v-model="countryId" :label="$t('countries')" :items="countries" item-title="name"
+              <v-autocomplete v-model="form.countryId" :label="$t('countries')" :items="countries" item-title="name"
                 item-value="id" hide-details="auto" @update:search="getCountries" clearable />
             </v-col>
             <v-col cols="12">
-              <v-autocomplete v-model="stateId" :label="$t('states')" :items="states" item-title="name" item-value="id"
-                hide-details="auto" @update:search="getStates" clearable />
+              <v-autocomplete v-model="form.stateId" :label="$t('states')" :items="states" item-title="name"
+                item-value="id" hide-details="auto" @update:search="getStates" clearable :readonly="!form.countryId" />
             </v-col>
             <v-col cols="12">
-              <v-autocomplete v-model="cityId" :label="$t('cities')" :items="cities" item-title="name" item-value="id"
-                hide-details="auto" @update:search="getCities" />
+              <v-autocomplete v-model="form.cityId" :label="$t('cities')" :items="cities" item-title="name"
+                item-value="id" hide-details="auto" @update:search="getCities" :readonly="!form.stateId" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.description" hide-details="auto" :label="$t('sites.address')"></v-text-field>
@@ -90,6 +90,21 @@
       <v-card-text>
         <v-form @submit.prevent="updateSite">
           <v-row>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.countryId" :label="$t('countries')" :items="countries" item-title="name"
+                item-value="id" hide-details="auto" @update:search="getCountries" clearable />
+            </v-col>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.stateId" :label="$t('states')" :items="states" item-title="name"
+                item-value="id" hide-details="auto" @update:search="getStates" clearable :readonly="!form.countryId" />
+            </v-col>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.cityId" :label="$t('cities')" :items="cities" item-title="name"
+                item-value="id" hide-details="auto" @update:search="getCities" :readonly="!form.stateId" />
+            </v-col>
+            <v-col cols="12">
+              <v-text-field v-model="form.description" hide-details="auto" :label="$t('sites.address')"></v-text-field>
+            </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('sites.name')"></v-text-field>
             </v-col>
@@ -191,6 +206,12 @@ const form = ref({
   distributorId: null,
   clientId: null,
   cityId: '',
+  cityName: '',
+  stateId: '',
+  stateName: '',
+  countryId: '',
+  countryName: '',
+  addressId: '',
   description: '',
   name: ''
 })
@@ -221,24 +242,38 @@ watch(createDialog, async (val) => {
 
 watch(updateDialog, async (val) => {
   if (val) {
-    await getDistributors();
-    await getClients();
-    await getCountries();
+    await getCountries(form.value.countryName);
   } else {
     resetForm()
   }
 })
 
-watch(countryId, async (val) => {
-  if (val) await getStates();
+watch(() => form.value.countryId, async (val) => {
+  if (val) {
+    if (updateDialog.value || createDialog.value) await getStates();
+    else await getStates(form.value.stateName);
+    nextTick(() => {
+      if (form.value.stateId && !(states.value.map(e => e.id)).includes(form.value.stateId)) {
+        form.value.stateId = '';
+        form.value.stateName = '';
+      }
+    })
+  }
+  else { form.value.stateId = ''; form.value.stateName = '' }
 })
 
-watch(stateId, async (val) => {
-  if (val) await getCities();
-})
-
-watch(cityId, async (val) => {
-  if (val) form.value.cityId = val;
+watch(() => form.value.stateId, async (val) => {
+  if (val) {
+    if (updateDialog.value || createDialog.value) await getCities();
+    else await getCities(form.value.cityName);
+    nextTick(() => {
+      if (form.value.cityId && !(cities.value.map(e => e.id)).includes(form.value.cityId)) {
+        form.value.cityId = '';
+        form.value.cityName = '';
+      }
+    })
+  }
+  else { form.value.cityId = ''; form.value.cityName = ''; }
 })
 
 watch(page, async () => {
@@ -262,6 +297,12 @@ const resetForm = () => {
     distributorId: null,
     clientId: null,
     cityId: '',
+    cityName: '',
+    stateId: '',
+    stateName: '',
+    countryId: '',
+    countryName: '',
+    addressId: '',
     description: '',
     name: ''
   }
@@ -269,7 +310,7 @@ const resetForm = () => {
 
 const getDistributors = async (search) => {
   try {
-    const data = await $fetch(`/api/distributors/`, {
+    const data = await $api(`/api/distributors/`, {
       query: {
         search,
         page: 1,
@@ -285,7 +326,7 @@ const getDistributors = async (search) => {
 
 const getClients = async (search) => {
   try {
-    const data = await $fetch(`/api/clients/`, {
+    const data = await $api(`/api/clients/`, {
       query: {
         search,
         page: 1,
@@ -301,7 +342,7 @@ const getClients = async (search) => {
 
 const getCountries = async (search) => {
   try {
-    const data = await $fetch(`/api/locations/countries`, {
+    const data = await $api(`/api/locations/countries`, {
       query: {
         search,
         page: page.value,
@@ -317,7 +358,8 @@ const getCountries = async (search) => {
 
 const getStates = async (search) => {
   try {
-    const data = await $fetch(`/api/locations/states/${countryId.value}`, {
+    if (!form.value.countryId) return;
+    const data = await $api(`/api/locations/states/${form.value.countryId}`, {
       query: {
         search,
         page: page.value,
@@ -333,7 +375,8 @@ const getStates = async (search) => {
 
 const getCities = async (search) => {
   try {
-    const data = await $fetch(`/api/locations/cities/${stateId.value}`, {
+    if (!form.value.stateId) return;
+    const data = await $api(`/api/locations/cities/${form.value.stateId}`, {
       query: {
         search,
         page: page.value,
@@ -349,7 +392,7 @@ const getCities = async (search) => {
 
 const getSites = async () => {
   try {
-    const data = await $fetch('/api/sites/', {
+    const data = await $api('/api/sites/', {
       query: {
         search: search.value,
         page: page.value,
@@ -366,11 +409,11 @@ const getSites = async () => {
 
 const getSite = async (id) => {
   try {
-    const site = await $fetch(`/api/sites/${id}`, {
+    const site = await $api(`/api/sites/${id}`, {
       method: 'GET'
     })
     form.value = site
-    updateDialog.value = true
+    nextTick(() => updateDialog.value = true);
   } catch (err) {
     console.log(err)
   }
@@ -378,7 +421,7 @@ const getSite = async (id) => {
 
 const createSite = async () => {
   try {
-    const response = await $fetch('/api/sites/', {
+    const response = await $api('/api/sites/', {
       method: 'POST',
       body: form.value
     })
@@ -392,7 +435,7 @@ const createSite = async () => {
 
 const updateSite = async () => {
   try {
-    const response = await $fetch(`/api/sites/${form.value.id}`, {
+    const response = await $api(`/api/sites/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
@@ -405,7 +448,7 @@ const updateSite = async () => {
 }
 
 const deleteSite = async () => {
-  const response = await $fetch(`/api/sites/${form.value.id}`, {
+  const response = await $api(`/api/sites/${form.value.id}`, {
     method: 'DELETE'
   })
   await getSites()

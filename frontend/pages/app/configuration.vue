@@ -196,7 +196,7 @@ onBeforeMount(async () => {
 
 const getUsers = async () => {
     try {
-        const data = await $fetch('/api/users/', {
+        const data = await $api('/api/users/', {
             query: {
                 search: search.value,
                 page: page.value,
@@ -204,7 +204,6 @@ const getUsers = async () => {
             },
             method: 'GET'
         })
-        console.log('ITEMS: ', data.items);
         items.value = data.items
     } catch (err) {
         console.log(err)
@@ -213,7 +212,7 @@ const getUsers = async () => {
 
 const getUser = async (id) => {
     try {
-        const user = await $fetch(`/api/users/${id}`, {
+        const user = await $api(`/api/users/${id}`, {
             method: 'GET'
         })
         form.value = user
@@ -225,7 +224,7 @@ const getUser = async (id) => {
 
 const createUser = async () => {
     try {
-        const response = await $fetch('/api/users/signup', {
+        const response = await $api('/api/users/signup', {
             method: 'POST',
             body: this.form
         })
@@ -238,7 +237,7 @@ const createUser = async () => {
 
 const updateUser = async () => {
     try {
-        const response = await $fetch(`/api/users/${this.form.id}`, {
+        const response = await $api(`/api/users/${this.form.id}`, {
             method: 'PUT',
             body: this.form
         })
@@ -250,7 +249,7 @@ const updateUser = async () => {
 }
 
 const deleteUser = async () => {
-    const response = await $fetch(`/api/users/${this.form.id}`, {
+    const response = await $api(`/api/users/${this.form.id}`, {
         method: 'DELETE'
     })
     await getUsers()

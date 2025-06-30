@@ -4,7 +4,7 @@ from flask.globals import request
 from flask_jwt_extended.utils import get_jwt
 from core.models import Permission, Module, Group, UserGroup, User
 from flask_sqlalchemy.query import Query
-from core.app import db
+from core.app import db, jwt
 from sqlalchemy import case, or_
 
 
@@ -73,3 +73,9 @@ def type_jwt_required(jwt_type: list):
             return fn(*args, **kwargs)
         return decorator
     return wrapper
+
+
+@jwt.user_lookup_loader
+def user_lookup_callback(_jwt_header, jwt_data):
+    identity = jwt_data["sub"]
+    return User.query.filter_by(id=identity).one_or_none()

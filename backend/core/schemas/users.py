@@ -1,8 +1,11 @@
 from bcrypt import hashpw, gensalt
+from sqlalchemy import or_
+from core.app import db
 from core.models import User
-from apiflask import Schema, fields
-from marshmallow import post_load, pre_load
+from apiflask import Schema, abort, fields
+from marshmallow import post_load, pre_load, validates_schema
 from core.schemas.utils import BaseSchema
+from werkzeug.exceptions import HTTPException
 
 
 class UserInLogIn(BaseSchema):
@@ -12,19 +15,30 @@ class UserInLogIn(BaseSchema):
 
 class UserIn(BaseSchema):
     id = fields.Integer()
+    distributor_id = fields.Integer(data_key='distributorId', required=False, allow_none=True)
     full_name = fields.String(data_key='fullName')
+    username = fields.String()
     email = fields.String()
+    role = fields.String()
     password = fields.String()
     status = fields.String(load_default='ACTIVE')
 
 
 class UserInCreate(UserIn):
-    full_name = fields.String(data_key='fullName')
-    email = fields.String()
-    password = fields.String()
+    @pre_load
+    def check_email_or_username_exists(self, data, **kwargs):
+        '''Check if there is already a user with the username or the email given'''
+
+        user = db.session.query(User)\
+            .filter(or_(User.email == data['email'], User.username == data['username']))\
+            .first()
+
+        if user: abort(400, 'Username or email already exists')
+
+        return data
 
     @pre_load
-    def config(self, data, **kwargs):
+    def set_password(self, data: dict, **kwargs):
         new_password = data['password'].encode('utf-8')
         new_password = hashpw(new_password, gensalt()).decode('utf-8')
         data['password'] = new_password
@@ -32,8 +46,9 @@ class UserInCreate(UserIn):
         return data
 
     @post_load
-    def make_object(self, data, **kwargs):
-        return User(**data)
+    def make_object(self, data: dict, **kwargs):
+        distributor_id = data.pop('distributor_id')
+        return User(**data), distributor_id
 
 
 class UserInUpdate(UserIn):
@@ -45,12 +60,15 @@ class UserInUpdate(UserIn):
 
 class UserOut(BaseSchema):
     id = fields.Integer()
+    distributor_id = fields.Integer(data_key='distributorId')
+    distributor_name = fields.String(data_key='distributorName')
     full_name = fields.String(data_key='fullName')
     username = fields.String()
     email = fields.String()
+    role = fields.String()
     status = fields.String()
-    created_at = fields.DateTime()
-    updated_at = fields.DateTime()
+    created_at = fields.DateTime(data_key='createdAt')
+    updated_at = fields.DateTime(data_key='updatedAt')
 
 
 class UsersOut(Schema):
@@ -73,5 +91,6 @@ class ProfileIn(Schema):
 
 class ProfileOut(Schema):
     full_name = fields.String()
+    role = fields.String()
     email = fields.String()
     abilities = fields.List(fields.Nested(AbilitiesOut), dump_only=True)

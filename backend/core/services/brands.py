@@ -12,7 +12,7 @@ def get_brands(search: str, page: int, per_page: int):
         query = and_(Brand.status == 'ACTIVE',
                      or_(Brand.name.ilike(f'%{search}%')))
 
-    return db.paginate(db.session.query(Brand).filter(query),
+    return db.paginate(db.session.query(Brand).filter(query).order_by(Brand.id.desc()),
                        page=page, per_page=per_page, count=True)
 
 

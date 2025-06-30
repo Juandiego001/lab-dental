@@ -31,8 +31,8 @@
         <v-form @submit.prevent="createClient">
           <v-row>
             <v-col cols="12">
-              <v-select v-model="form.distributor.id" hide-details="auto" :label="$t('distributors.title')"
-                :items="distributors" item-title="name" item-value="id" />
+              <v-autocomplete v-model="form.distributorId" hide-details="auto" :label="$t('distributors.title')"
+                :items="distributors" item-title="name" item-value="id" @update:search="getDistributors" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('clients.name')"></v-text-field>
@@ -65,8 +65,8 @@
         <v-form @submit.prevent="updateClient">
           <v-row>
             <v-col cols="12">
-              <v-select v-model="form.distributor.id" hide-details="auto" :label="$t('distributors.title')"
-                :items="distributors" item-title="name" item-value="id" />
+              <v-autocomplete v-model="form.distributorId" hide-details="auto" :label="$t('distributors.title')"
+                :items="distributors" item-title="name" item-value="id" @update:search="getDistributors" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('clients.name')"></v-text-field>
@@ -160,10 +160,8 @@ const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
 const form = ref({
-  distributor: {
-    id: '',
-    name: ''
-  },
+  distributorId: '',
+  distributorName: '',
   name: '',
   phone: ''
 })
@@ -179,11 +177,18 @@ const headers = computed(() => [
   { title: 'Id', key: 'id', sortable: false },
   { title: t('clients.name'), key: 'name', sortable: false },
   { title: t('clients.phone'), key: 'phone', sortable: false },
+  { title: t('clients.distributor'), key: 'distributorName', sortable: false },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
 watch(createDialog, async (val) => {
   if (val) await getDistributors();
+  else resetForm();
+})
+
+watch(updateDialog, async (val) => {
+  if (val) await getDistributors(form.value.distributorName);
+  else resetForm();
 })
 
 watch(page, async () => {
@@ -200,20 +205,17 @@ onBeforeMount(async () => {
 
 const resetForm = () => {
   form.value = {
-    distributor: {
-      id: '',
-      name: ''
-    },
+    distributorId: '',
     name: '',
     phone: ''
   }
 }
 
-const getDistributors = async () => {
+const getDistributors = async (search) => {
   try {
-    const data = await $fetch('/api/distributors/', {
+    const data = await $api('/api/distributors/', {
       query: {
-        search: '',
+        search,
         page: page.value,
         perPage: perPage.value
       },
@@ -227,7 +229,7 @@ const getDistributors = async () => {
 
 const getClients = async () => {
   try {
-    const data = await $fetch('/api/clients/', {
+    const data = await $api('/api/clients/', {
       query: {
         search: search.value,
         page: page.value,
@@ -244,11 +246,11 @@ const getClients = async () => {
 
 const getClient = async (id) => {
   try {
-    const client = await $fetch(`/api/clients/${id}`, {
+    const client = await $api(`/api/clients/${id}`, {
       method: 'GET'
     })
     form.value = client
-    updateDialog.value = true
+    nextTick(() => updateDialog.value = true);
   } catch (err) {
     console.log(err)
   }
@@ -256,13 +258,13 @@ const getClient = async (id) => {
 
 const createClient = async () => {
   try {
-    const response = await $fetch('/api/clients/', {
+    const response = await $api('/api/clients/', {
       method: 'POST',
       body: form.value
     })
     await getClients()
-    resetForm()
     createDialog.value = false
+    resetForm()
   } catch (err) {
     console.log(err)
   }
@@ -270,25 +272,29 @@ const createClient = async () => {
 
 const updateClient = async () => {
   try {
-    const response = await $fetch(`/api/clients/${form.value.id}`, {
+    const response = await $api(`/api/clients/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
     await getClients()
-    resetForm()
     updateDialog.value = false
+    resetForm()
   } catch (err) {
     console.log(err)
   }
 }
 
 const deleteClient = async () => {
-  const response = await $fetch(`/api/clients/${form.value.id}`, {
-    method: 'DELETE'
-  })
-  await getClients()
-  resetForm()
-  deleteDialog.value = false
+  try {
+    const response = await $api(`/api/clients/${form.value.id}`, {
+      method: 'DELETE'
+    })
+    await getClients()
+    deleteDialog.value = false
+    resetForm()
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 const doSearch = async () => {

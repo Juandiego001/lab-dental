@@ -35,7 +35,7 @@ const strapiUrl = config.public.strapiUrl;
 const articles = ref([]);
 
 onBeforeMount(async () => {
-  const { data } = await $fetch('/strapi/articles?populate=*');
+  const { data } = await $api('/strapi/articles?populate=*');
   articles.value = data;
 })
 </script>

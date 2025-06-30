@@ -5,7 +5,7 @@ from core.services import users
 from apiflask import APIBlueprint, abort
 from werkzeug.exceptions import HTTPException
 from core.schemas.utils import Message, Pagination
-from flask_jwt_extended import create_access_token, set_access_cookies, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, set_access_cookies, jwt_required, get_jwt_identity, current_user
 from core.schemas.users import UserInLogIn, UserInUpdate, UserInCreate, UserOut, UsersOut, ProfileIn, ProfileOut
 
 
@@ -59,13 +59,14 @@ def login_users(user):
 
 
 @bp.post('/')
-@bp.input(UserInCreate, arg_name='user')
-def signup_users(user):
+@bp.input(UserInCreate)
+@jwt_required()
+def create_users(json_data):
     '''Create users'''
 
     try:
-        db.session.add(user)
-        db.session.commit()
+        user_data, distributor_id = json_data
+        users.create_user(current_user, user_data, distributor_id)
         return {'message': 'User created successfully'}
     except Exception as ex:
         print(str(ex))

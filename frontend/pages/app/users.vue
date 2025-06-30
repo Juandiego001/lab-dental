@@ -30,6 +30,14 @@
       <v-card-text>
         <v-form @submit.prevent="createUser">
           <v-row>
+            <v-col v-if="isAdmin" cols="12">
+              <v-select v-model="form.role" item-title="title" item-value="value" hide-details="auto"
+                :label="$t('users.role.title')" :items="usersRoles"></v-select>
+            </v-col>
+            <v-col v-if="isAdmin && form.role === 'DISTRIBUTOR'" cols="12">
+              <v-autocomplete v-model="form.distributorId" hide-details="auto" :label="$t('distributors.title')"
+                :items="distributors" item-title="name" item-value="id" clearable />
+            </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.fullName" hide-details="auto" :label="$t('users.fullName')"></v-text-field>
             </v-col>
@@ -38,10 +46,11 @@
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.email" type="email" hide-details="auto"
-                :label="$t('users.email')"></v-text-field>
+              :label="$t('users.email')"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.password" type="password" hide-details="auto" label="Password"></v-text-field>
+              <v-text-field v-model="form.password" type="password" hide-details="auto" label="Password"
+                autocomplete="off"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -67,6 +76,10 @@
       <v-card-text>
         <v-form @submit.prevent="updateUser">
           <v-row>
+            <v-col v-if="isAdmin" cols="12">
+              <v-autocomplete v-model="form.distributorId" hide-details="auto" :label="$t('distributors.title')"
+                :items="distributors" item-title="name" item-value="id" clearable />
+            </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.fullName" hide-details="auto" :label="$t('users.fullName')"></v-text-field>
             </v-col>
@@ -78,8 +91,12 @@
                 :label="$t('users.email')"></v-text-field>
             </v-col>
             <v-col cols="12">
+              <v-select v-model="form.role" hide-details="auto" :items="usersRoles" item-title="title"
+                item-value="value" :label="$t('users.role.title')" />
+            </v-col>
+            <v-col cols="12">
               <v-text-field v-model="form.password" type="password" hide-details="auto"
-                :label="$t('users.password')"></v-text-field>
+                :label="$t('users.password')" autocomplete="off"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -145,6 +162,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { profile } = useProfile();
 const { t } = useI18n();
 
 definePageMeta({
@@ -158,6 +176,7 @@ useHead({
 
 const { searchDialog } = toRefs(searchMixin)
 const { createDialog } = toRefs(createMixin)
+const distributors = ref([]);
 const items = ref([]);
 const search = ref('');
 const page = ref(1);
@@ -166,14 +185,13 @@ const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
 const form = ref({
-  id: '',
+  distributorId: null,
+  distributorName: '',
   fullName: '',
   username: '',
   email: '',
-  password: '',
-  status: '',
-  created_at: '',
-  updated_at: ''
+  role: '',
+  password: ''
 })
 
 const itemsPerPageOptions = computed(() => [
@@ -191,6 +209,21 @@ const headers = computed(() => [
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
+const usersRoles = computed(() => [
+  { title: t('users.role.admin'), value: 'ADMIN' },
+  { title: t('users.role.distributor'), value: 'DISTRIBUTOR' },
+])
+
+watch(createDialog, async (val) => {
+  if (val && isAdmin.value) await getDistributors();
+  else resetForm();
+})
+
+watch(updateDialog, async (val) => {
+  if (val && isAdmin.value) await getDistributors(form.value.distributorName);
+  else resetForm();
+})
+
 watch(page, async () => {
   await getUsers();
 })
@@ -203,22 +236,39 @@ onBeforeMount(async () => {
   await getUsers();
 })
 
+const isAdmin = computed(() => profile.value.role === 'ADMIN');
+
 const resetForm = () => {
   form.value = {
-    id: '',
+    distributorId: null,
+    distributorName: '',
     fullName: '',
     username: '',
     email: '',
-    password: '',
-    status: '',
-    created_at: '',
-    updated_at: ''
+    role: '',
+    password: ''
+  }
+}
+
+const getDistributors = async (search) => {
+  try {
+    const data = await $api('/api/distributors/', {
+      query: {
+        search,
+        page: 1,
+        perPage: 15
+      },
+      method: 'GET'
+    })
+    distributors.value = data.items
+  } catch (err) {
+    console.log(err)
   }
 }
 
 const getUsers = async () => {
   try {
-    const data = await $fetch('/api/users/', {
+    const data = await $api('/api/users/', {
       query: {
         search: search.value,
         page: page.value,
@@ -235,11 +285,11 @@ const getUsers = async () => {
 
 const getUser = async (id) => {
   try {
-    const user = await $fetch(`/api/users/${id}`, {
+    const user = await $api(`/api/users/${id}`, {
       method: 'GET'
     })
     form.value = user
-    updateDialog.value = true
+    nextTick(() => updateDialog.value = true);
   } catch (err) {
     console.log(err)
   }
@@ -247,13 +297,13 @@ const getUser = async (id) => {
 
 const createUser = async () => {
   try {
-    const response = await $fetch('/api/users/', {
+    const response = await $api('/api/users/', {
       method: 'POST',
       body: form.value
     })
     await getUsers()
-    resetForm()
     createDialog.value = false
+    resetForm()
   } catch (err) {
     console.log(err)
   }
@@ -261,25 +311,29 @@ const createUser = async () => {
 
 const updateUser = async () => {
   try {
-    const response = await $fetch(`/api/users/${form.value.id}`, {
+    const response = await $api(`/api/users/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
     await getUsers()
-    resetForm()
     updateDialog.value = false
+    resetForm()
   } catch (err) {
     console.log(err)
   }
 }
 
 const deleteUser = async () => {
-  const response = await $fetch(`/api/users/${form.value.id}`, {
-    method: 'DELETE'
-  })
-  await getUsers()
-  resetForm()
-  deleteDialog.value = false
+  try {
+    const response = await $api(`/api/users/${form.value.id}`, {
+      method: 'DELETE'
+    })
+    await getUsers()
+    deleteDialog.value = false
+    resetForm()
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 const doSearch = async () => {

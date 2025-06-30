@@ -161,6 +161,14 @@ const headers = computed(() => [
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
+watch(createDialog, (val) => {
+  if (!val) { resetForm() }
+})
+
+watch(updateDialog, (val) => {
+  if (!val) { resetForm() }
+})
+
 watch(page, async () => {
   await getDistributors();
 })
@@ -181,7 +189,7 @@ const resetForm = () => {
 
 const getDistributors = async () => {
   try {
-    const data = await $fetch('/api/distributors/', {
+    const data = await $api('/api/distributors/', {
       query: {
         search: search.value,
         page: page.value,
@@ -198,7 +206,7 @@ const getDistributors = async () => {
 
 const getDistributor = async (id) => {
   try {
-    const user = await $fetch(`/api/distributors/${id}`, {
+    const user = await $api(`/api/distributors/${id}`, {
       method: 'GET'
     })
     form.value = user
@@ -210,7 +218,7 @@ const getDistributor = async (id) => {
 
 const createDistributor = async () => {
   try {
-    const response = await $fetch('/api/distributors/', {
+    const response = await $api('/api/distributors/', {
       method: 'POST',
       body: form.value
     })
@@ -224,7 +232,7 @@ const createDistributor = async () => {
 
 const updateDistributor = async () => {
   try {
-    const response = await $fetch(`/api/distributors/${form.value.id}`, {
+    const response = await $api(`/api/distributors/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
@@ -237,7 +245,7 @@ const updateDistributor = async () => {
 }
 
 const deleteDistributor = async () => {
-  const response = await $fetch(`/api/distributors/${form.value.id}`, {
+  const response = await $api(`/api/distributors/${form.value.id}`, {
     method: 'DELETE'
   })
   await getDistributors()

@@ -1,6 +1,6 @@
 from core.app import db
-from core.models import Equipment
-from sqlalchemy import or_, and_
+from core.models import Brand, Category, Equipment
+from sqlalchemy import or_, and_, literal, func
 from werkzeug.exceptions import HTTPException
 
 
@@ -10,16 +10,38 @@ def get_equipments(search: str, page: int, per_page: int):
     query = Equipment.status == 'ACTIVE'
     if search:
         query = and_(Equipment.status == 'ACTIVE',
-                     or_(Equipment.serial.ilike(f'%{search}%'),
-                         Equipment.model.ilike(f'%{search}%')))
+                     or_(literal(search).ilike('%' + Equipment.serial + '%'),
+                         literal(search).ilike('%' + Equipment.model + '%')))
 
-    return db.paginate(db.session.query(Equipment).filter(query), page=page, per_page=per_page, count=True)
-        
+    total = db.session.query(Equipment).count()
+
+    return list(db.session.execute(
+        db.session.query(
+            *Equipment.__table__.c,
+            func.concat(Equipment.model, ' - ', Equipment.serial).label('serial_model'),
+            Brand.name.label('brand_name'),
+            Category.name.label('category_name')
+        )
+        .join(Brand)
+        .join(Category)
+        .filter(query)
+        .order_by(Equipment.id.desc())
+        .limit(per_page)
+        .offset((page - 1) * per_page)
+    ).unique()), total
+
 
 def get_equipment_by_id(equipment_id: int):
     '''Get equipment by equipment id'''
 
-    return db.session.query(Equipment).filter(Equipment.id == equipment_id).first()
+    return db.session.query(
+        *Equipment.__table__.c,
+        Brand.name.label('brand_name'),
+        Category.name.label('category_name'))\
+        .join(Brand)\
+        .join(Category)\
+        .filter(Equipment.id == equipment_id)\
+        .first()
 
 
 def check_equipment_exists(equipment_id: int):

@@ -3,12 +3,13 @@
     <v-card width="100%" flat>
       <v-card-title>{{ $t('groups.title', 2) }}</v-card-title>
       <v-card-text>
-        <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
+        <v-data-table-server :items="items" :headers="tableHeaders" :page="page" :items-per-page="perPage"
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
           <template v-slot:item.option="{ item }">
             <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getGroup(item.id)"></v-btn>
-            <span class="mx-2"></span>
+            <v-btn class="my-2 mx-2 bg-secondary" size="small" icon="mdi-shield-edit"
+              @click="form.id = item.id; getPermissions()"></v-btn>
             <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
               @click="form.id = item.id; deleteDialog = true"></v-btn>
           </template>
@@ -32,6 +33,15 @@
           <v-row>
             <v-col cols="12">
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('groups.name')"></v-text-field>
+            </v-col>
+            <v-col v-if="isAdmin" cols="12">
+              <v-autocomplete v-model="form.distributorId" :label="$t('distributors.title')" :items="distributors"
+                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable />
+            </v-col>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.usersIds" :label="$t('users.title', 2)" :items="users" item-title="fullName"
+                item-value="id" hide-details="auto" @update:search="getUsers" clearable multiple chips
+                :readonly="isAdmin && !form.distributorId" />
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -78,14 +88,14 @@
         <v-row no-gutters align="center">
           {{ $t('groups.delete.title') }}
           <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="deleteDialog = false"></v-btn>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="deleteDialog = false"></v-btn>
         </v-row>
       </v-card-title>
       <v-card-text class="text-center py-6">
         <p class="text-subtitle-1 mb-6 text-center">{{ $t('groups.delete.message') }}</p>
         <v-btn @click="deleteDialog = false" variant="outlined">{{ $t('cancel') }}</v-btn>
         <span class="mx-2"></span>
-        <v-btn @click="deleteUser" class="bg-red">{{ $t('confirm') }}</v-btn>
+        <v-btn @click="deleteGroup" class="bg-red">{{ $t('confirm') }}</v-btn>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -97,7 +107,7 @@
         <v-row no-gutters align="center">
           {{ $t('groups.search.title') }}
           <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="searchDialog = false"></v-btn>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="searchDialog = false"></v-btn>
         </v-row>
       </v-card-title>
       <v-card-text>
@@ -116,6 +126,40 @@
       </v-card-text>
     </v-card>
   </v-dialog>
+
+  <!-- Permissions Dialog -->
+  <v-dialog v-model="permissionsDialog" max-width="500" persistent>
+    <v-card tile>
+      <v-card-title class="bg-primary">
+        <v-row no-gutters align="center">
+          {{ $t('groups.permissions.title') }}
+          <v-spacer></v-spacer>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="permissionsDialog = false"></v-btn>
+        </v-row>
+      </v-card-title>
+      <v-card-text>
+        <v-data-table-server :items="itemsPermissions" :headers="headersPermissions" :page="pagePermissions" :items-per-page="perPagePermissions"
+          :items-length="totalPermissions" :items-per-page-options="itemsPerPageOptions" @update:page="v => pagePermissions = v"
+          @update:itemsPerPage="v => perPage = v" :disable-sort="true" density="compact">
+          <template v-slot:item.moduleName="{ item }">
+            <span class="text-capitalize">{{ item.moduleName }}</span>
+          </template>
+          <template v-slot:item.read="{ item }">
+            <v-checkbox-btn color ="primary" :model-value="item.read" :ripple="false" hide-details="auto" density="compact" />
+          </template>
+          <template v-slot:item.create="{ item }">
+            <v-checkbox-btn color="primary" :model-value="item.create" :ripple="false" hide-details="auto" density="compact" />
+          </template>
+          <template v-slot:item.update="{ item }">
+            <v-checkbox-btn color="primary" :model-value="item.update" :ripple="false" hide-details="auto" density="compact" />
+          </template>
+          <template v-slot:item.delete="{ item }">
+            <v-checkbox-btn color="primary" :model-value="item.delete" :ripple="false" hide-details="auto" density="compact" />
+          </template>
+        </v-data-table-server>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
@@ -124,6 +168,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { profile } = useProfile();
 const { t } = useI18n();
 
 definePageMeta({
@@ -137,23 +182,32 @@ useHead({
 
 const { searchDialog } = toRefs(searchMixin)
 const { createDialog } = toRefs(createMixin)
+const users = ref([]);
+const distributors = ref([]);
+
+/* Groups */
 const items = ref([]);
 const search = ref('');
 const page = ref(1);
 const perPage = ref(15);
 const total = ref(15);
+
+/* Permissions */
+const itemsPermissions = ref([]);
+const pagePermissions = ref(1);
+const perPagePermissions = ref(15);
+const totalPermissions = ref(15);
+
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
+const permissionsDialog = ref(false);
 const form = ref({
-  id: '',
-  fullname: '',
-  username: '',
-  email: '',
-  password: '',
-  status: '',
-  created_at: '',
-  updated_at: ''
+  name: '',
+  distributorId: '',
+  usersIds: null
 })
+
+const isAdmin = computed(() => profile.value.role === 'ADMIN');
 
 const itemsPerPageOptions = computed(() => [
   { value: 15, title: '15' },
@@ -162,11 +216,38 @@ const itemsPerPageOptions = computed(() => [
   { value: 100, title: '100' }
 ])
 
-const headers = computed(() => [
+const tableHeaders = computed(() => [
   { title: 'Id', key: 'id', sortable: false },
   { title: t('groups.name'), key: 'name', sortable: false },
+  (isAdmin && { title: t('distributors.title'), key: 'distributorName', sortable: false }),
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
+
+const headersPermissions = computed(() => [
+  { title: t('modules.title'), key: 'moduleName', sortable: false },
+  { title: t('groups.permissions.read'), key: 'read', sortable: false },
+  { title: t('groups.permissions.create'), key: 'create', sortable: false },
+  { title: t('groups.permissions.update'), key: 'update', sortable: false },
+  { title: t('groups.permissions.delete'), key: 'delete', sortable: false }
+])
+
+watch(createDialog, async (val) => {
+  if (val) {
+    if (isAdmin) {
+      await getDistributors();
+    } else {
+      await getUsers();
+    }
+  } else resetForm();
+})
+
+watch(() => form.value.distributorId, async (val) => {
+  if (val) await getUsers();
+})
+
+watch(updateDialog, (val) => {
+  if (!val) { resetForm() }
+})
 
 watch(page, async () => {
   await getGroups();
@@ -182,20 +263,15 @@ onBeforeMount(async () => {
 
 const resetForm = () => {
   form.value = {
-    id: '',
-    fullname: '',
-    username: '',
-    email: '',
-    password: '',
-    status: '',
-    created_at: '',
-    updated_at: ''
+    name: '',
+    distributorId: '',
+    usersIds: null
   }
 }
 
 const getGroups = async () => {
   try {
-    const data = await $fetch('/api/groups/', {
+    const data = await $api('/api/groups/', {
       query: {
         search: search.value,
         page: page.value,
@@ -212,10 +288,10 @@ const getGroups = async () => {
 
 const getGroup = async (id) => {
   try {
-    const user = await $fetch(`/api/groups/${id}`, {
+    const data = await $api(`/api/groups/${id}`, {
       method: 'GET'
     })
-    form.value = user
+    form.value = data
     updateDialog.value = true
   } catch (err) {
     console.log(err)
@@ -224,13 +300,14 @@ const getGroup = async (id) => {
 
 const createGroup = async () => {
   try {
-    const response = await $fetch('/api/groups/', {
+    const response = await $api('/api/groups/', {
+      credentials: 'include',
       method: 'POST',
       body: form.value
     })
     await getGroups()
-    resetForm()
     createDialog.value = false
+    resetForm()
   } catch (err) {
     console.log(err)
   }
@@ -238,25 +315,29 @@ const createGroup = async () => {
 
 const updateGroup = async () => {
   try {
-    const response = await $fetch(`/api/groups/${form.value.id}`, {
+    const response = await $api(`/api/groups/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
     await getGroups()
-    resetForm()
     updateDialog.value = false
+    resetForm()
   } catch (err) {
     console.log(err)
   }
 }
 
-const deleteUser = async () => {
-  const response = await $fetch(`/api/groups/${form.value.id}`, {
-    method: 'DELETE'
-  })
-  await getGroups()
-  resetForm()
-  deleteDialog.value = false
+const deleteGroup = async () => {
+  try {
+    const response = await $api(`/api/groups/${form.value.id}`, {
+      method: 'DELETE'
+    })
+    await getGroups()
+    deleteDialog.value = false
+    resetForm()
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 const doSearch = async () => {
@@ -267,6 +348,68 @@ const doSearch = async () => {
     searchDialog.value = false
   } catch (err) {
     console.log(err)
+  }
+}
+
+const getDistributors = async (search) => {
+  try {
+    const data = await $api('/api/distributors/', {
+      query: {
+        search,
+        page: 1,
+        perPage: 15
+      },
+      method: 'GET'
+    })
+    distributors.value = data.items
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+const getUsers = async (search) => {
+  try {
+    let data;
+    if (form.value.distributorId) {
+      data = await $api(`/api/distributors/${form.value.distributorId}/users`, {
+        query: {
+          search,
+          page: 1,
+          perPage: 15
+        },
+        method: 'GET'
+      })
+    } else {
+      data = await $api(`/api/users`, {
+        query: {
+          search,
+          page: 1,
+          perPage: 15
+        },
+        method: 'GET'
+      })
+    }
+    users.value = data.items
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+const getPermissions = async (search) => {
+  try {
+    const data = await $api(`/api/permissions/groups/${form.value.id}`, {
+      query: {
+        search,
+        page: 1,
+        perPage: 15
+      },
+      method: 'GET'
+    })
+    permissionsDialog.value = true;
+    itemsPermissions.value = data.items
+    totalPermissions.value = data.total
+  } catch (err) {
+    console.log(err);
   }
 }
 

@@ -54,9 +54,9 @@ const videos = ref([]);
 
 onBeforeMount(async () => {
   let data;
-  ({ data } = await $fetch('/strapi/articles?populate=*'));
+  ({ data } = await $api('/strapi/articles?populate=*'));
   articles.value = data;
-  ({ data } = await $fetch('/strapi/videos?populate=*'));
+  ({ data } = await $api('/strapi/videos?populate=*'));
   videos.value = data;
 })
 

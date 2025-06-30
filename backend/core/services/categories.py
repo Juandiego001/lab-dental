@@ -13,7 +13,7 @@ def get_categories(search: str, page: int, per_page: int):
                      or_(Category.name.ilike(f'%{search}%'),
                          Category.slug.ilike(f'%{search}%')))
 
-    return db.paginate(db.session.query(Category).filter(query),
+    return db.paginate(db.session.query(Category).filter(query).order_by(Category.id.desc()),
                        page=page, per_page=per_page, count=True)
 
 

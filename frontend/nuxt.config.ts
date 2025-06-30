@@ -24,7 +24,7 @@ export default defineNuxtConfig({
   },
   routeRules: {
     '/api/**': { proxy: `${process.env.NUXT_APP_URL}/api/**` },
-    '/strapi/**': { proxy: `${process.env.NUXT_STRAPI_URL}/api/**` },
+    '/strapi/**': { proxy: `${process.env.NUXT_STRAPI_URL}/strapi/**` },
     '/discourse/**': { proxy: `${process.env.NUXT_DISCOURSE_URL}/**` }
   },
   modules: [

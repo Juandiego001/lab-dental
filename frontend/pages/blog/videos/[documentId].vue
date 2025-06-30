@@ -46,7 +46,7 @@ const video = ref({
 })
 
 onBeforeMount(async () => {
-  const { data } = await $fetch(`/strapi/videos/${route.params.documentId}?populate=*`)
+  const { data } = await $api(`/strapi/videos/${route.params.documentId}?populate=*`)
   video.value = data;
 })
 </script>

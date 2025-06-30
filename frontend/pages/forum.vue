@@ -46,8 +46,8 @@ const posts = ref([]);
 
 onBeforeMount(async () => {
     try {
-        let { latest_posts } = await $fetch('/discourse/posts.json');
-        const { categories } = (await $fetch('/discourse/categories.json')).category_list;
+        let { latest_posts } = await $api('/discourse/posts.json');
+        const { categories } = (await $api('/discourse/categories.json')).category_list;
         latest_posts = latest_posts.map(a => {
             let { slug, color } = categories.find(b => b.id === a.category_id);
             a['category_color'] = `#${color}`;

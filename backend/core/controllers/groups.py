@@ -1,7 +1,7 @@
-from core.app import db
 from core.services import groups
 from apiflask import APIBlueprint, abort
 from core.schemas.utils import Message, Pagination
+from flask_jwt_extended import jwt_required, current_user
 from core.schemas.groups import GroupInUpdate, GroupInCreate, GroupOut, GroupsOut
 
 
@@ -11,14 +11,17 @@ bp = APIBlueprint('groups', __name__)
 @bp.get('/')
 @bp.input(Pagination, location='query')
 @bp.output(GroupsOut)
+@jwt_required()
 def get_groups(query_data):
     '''Get groups'''
 
     try:
-        results = groups.get_groups(query_data['search'],
-                                         query_data['page'],
-                                         query_data['per_page'])
-        return {'items': results, 'total': results.total}
+        results, total = groups.get_groups(
+            current_user,
+            query_data['search'],
+            query_data['page'],
+            query_data['per_page'])
+        return {'items': results, 'total': total}
     except Exception as ex:
         abort(500, str(ex))
 
@@ -35,13 +38,15 @@ def get_group(group_id):
 
 
 @bp.post('/')
-@bp.input(GroupInCreate, arg_name='group')
-def create_groups(group):
+@bp.input(GroupInCreate)
+@bp.output(Message)
+@jwt_required()
+def create_groups(json_data):
     '''Create groups'''
 
     try:
-        db.session.add(group)
-        db.session.commit()
+        group_object, users_ids = json_data
+        groups.create_group(current_user, group_object, users_ids)
         return {'message': 'Group registered successfully'}
     except Exception as ex:
         print(str(ex))
@@ -51,6 +56,7 @@ def create_groups(group):
 @bp.put('/<int:group_id>')
 @bp.input(GroupInUpdate)
 @bp.output(Message)
+@jwt_required()
 def update_groups(group_id, json_data):
     '''Update group'''
 

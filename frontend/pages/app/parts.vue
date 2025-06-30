@@ -204,7 +204,7 @@ const resetForm = () => {
 
 const getEquipments = async () => {
   try {
-    const data = await $fetch('/api/parts/', {
+    const data = await $api('/api/parts/', {
       query: {
         search: search.value,
         page: page.value,
@@ -220,7 +220,7 @@ const getEquipments = async () => {
 
 const getParts = async () => {
   try {
-    const data = await $fetch('/api/parts/', {
+    const data = await $api('/api/parts/', {
       query: {
         search: search.value,
         page: page.value,
@@ -236,7 +236,7 @@ const getParts = async () => {
 
 const getPart = async (id) => {
   try {
-    const user = await $fetch(`/api/parts/${id}`, {
+    const user = await $api(`/api/parts/${id}`, {
       method: 'GET'
     })
     form.value = user
@@ -248,7 +248,7 @@ const getPart = async (id) => {
 
 const createPart = async () => {
   try {
-    const response = await $fetch('/api/parts/', {
+    const response = await $api('/api/parts/', {
       method: 'POST',
       body: form.value
     })
@@ -262,7 +262,7 @@ const createPart = async () => {
 
 const updatePart = async () => {
   try {
-    const response = await $fetch(`/api/parts/${form.value.id}`, {
+    const response = await $api(`/api/parts/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
@@ -275,7 +275,7 @@ const updatePart = async () => {
 }
 
 const deletePart = async () => {
-  const response = await $fetch(`/api/parts/${form.value.id}`, {
+  const response = await $api(`/api/parts/${form.value.id}`, {
     method: 'DELETE'
   })
   await getEquipments()

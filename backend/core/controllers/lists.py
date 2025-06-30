@@ -29,7 +29,7 @@ def get_list(list_id):
     '''Get list'''
 
     try:
-        return lists.get_list_by_id(list_id)
+        return lists.get_list_by_id(list_id)  
     except Exception as ex:
         abort(500, str(ex))
 

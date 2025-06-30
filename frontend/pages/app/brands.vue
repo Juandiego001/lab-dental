@@ -68,9 +68,9 @@
               <v-text-field v-model="form.slug" hide-details="auto" :label="$t('brands.slug')"></v-text-field>
             </v-col>
             <v-col class="text-end">
-              <v-btn variant="outlined" @click="updateDialog = false">{{ $t('brands.cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
               <span class="mx-1"></span>
-              <v-btn type="submit" class="bg-primary">{{ $t('brands.confirm') }}</v-btn>
+              <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -151,13 +151,9 @@ const perPage = ref(15);
 const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
-const form = ref({
-  id: '',
+const form = ref({  
   name: '',
-  slug: '',
-  status: '',
-  createdAt: '',
-  updatedAt: ''
+  slug: ''
 })
 
 const itemsPerPageOptions = computed(() => [
@@ -174,6 +170,14 @@ const headers = computed(() => [
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
+watch(createDialog, (val) => {
+  if (!val) { resetForm() }
+})
+
+watch(updateDialog, (val) => {
+  if (!val) { resetForm() }
+})
+
 watch(page, async () => {
   await getBrands();
 })
@@ -188,18 +192,14 @@ onBeforeMount(async () => {
 
 const resetForm = () => {
   form.value = {
-    id: '',
     name: '',
     slug: '',
-    status: '',
-    createdAt: '',
-    updatedAt: ''
   }
 }
 
 const getBrands = async () => {
   try {
-    const data = await $fetch('/api/brands/', {
+    const data = await $api('/api/brands/', {
       query: {
         search: search.value,
         page: page.value,
@@ -216,10 +216,10 @@ const getBrands = async () => {
 
 const getBrand = async (id) => {
   try {
-    const user = await $fetch(`/api/brands/${id}`, {
+    const data = await $api(`/api/brands/${id}`, {
       method: 'GET'
     })
-    form.value = user
+    form.value = data
     updateDialog.value = true
   } catch (err) {
     console.log(err)
@@ -228,13 +228,13 @@ const getBrand = async (id) => {
 
 const createBrand = async () => {
   try {
-    const response = await $fetch('/api/brands/', {
+    const response = await $api('/api/brands/', {
       method: 'POST',
       body: form.value
     })
     await getBrands()
-    resetForm()
     createDialog.value = false
+    resetForm()
   } catch (err) {
     console.log(err)
   }
@@ -242,25 +242,29 @@ const createBrand = async () => {
 
 const updateBrand = async () => {
   try {
-    const response = await $fetch(`/api/brands/${form.value.id}`, {
+    const response = await $api(`/api/brands/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
     await getBrands()
-    resetForm()
     updateDialog.value = false
+    resetForm()
   } catch (err) {
     console.log(err)
   }
 }
 
 const deleteBrand = async () => {
-  const response = await $fetch(`/api/brands/${form.value.id}`, {
-    method: 'DELETE'
-  })
-  await getBrands()
-  resetForm()
-  deleteDialog.value = false
+  try {
+    const response = await $api(`/api/brands/${form.value.id}`, {
+      method: 'DELETE'
+    })
+    await getBrands()
+    deleteDialog.value = false
+    resetForm()
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 const doSearch = async () => {

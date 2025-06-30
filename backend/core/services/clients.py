@@ -1,5 +1,5 @@
 from core.app import db
-from core.models import Client
+from core.models import Client, Distributor
 from sqlalchemy import or_, and_
 from werkzeug.exceptions import HTTPException
 
@@ -12,14 +12,29 @@ def get_clients(search: str, page: int, per_page: int):
         query = and_(Client.status == 'ACTIVE',
                      or_(Client.name.ilike(f'%{search}%')))
 
-    return db.paginate(db.session.query(Client).filter(query),
-                       page=page, per_page=per_page, count=True)
+    total = db.session.query(Client).count()
+
+    return list(db.session.execute(
+        db.session.query(
+            *Client.__table__.c,
+            Distributor.name.label('distributor_name'))
+        .join(Distributor)
+        .filter(query)
+        .order_by(Client.id.desc())
+        .limit(per_page)
+        .offset((page - 1) * per_page)
+    ).unique()), total
 
 
 def get_client_by_id(client_id: int):
     '''Get client by client id'''
 
-    return db.session.query(Client).filter(Client.id == client_id).first()
+    return db.session.query(
+        *Client.__table__.c,
+        Distributor.name.label('distributor_name'))\
+        .join(Distributor)\
+        .filter(Client.id == client_id)\
+        .first()
 
 
 def check_client_exists(client_id: int):

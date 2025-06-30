@@ -15,10 +15,11 @@ def get_clients(query_data):
     '''Get clients'''
 
     try:
-        results = clients.get_clients(query_data['search'],
-                                         query_data['page'],
-                                         query_data['per_page'])
-        return {'items': results, 'total': results.total}
+        results, total = clients.get_clients(query_data['search'],
+                                  query_data['page'],
+                                  query_data['per_page'])
+
+        return {'items': results, 'total': total}
     except Exception as ex:
         abort(500, str(ex))
 

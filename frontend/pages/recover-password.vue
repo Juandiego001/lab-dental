@@ -21,14 +21,13 @@ export default {
       movies: []
     }),
     async beforeMount () {
-        const { items } = await $fetch('/api/categories/', {
+        const { items } = await $api('/api/categories/', {
             query: {
                 search: '',
                 page: 1,
                 perPage: 15
             }
         })
-        console.log('ITEMS: ', items)
         this.categories = items
     },
     watch: {
@@ -41,16 +40,13 @@ export default {
     methods: {
         async getMovies(categoryId) {
             try {
-                console.log('CATEGORY ID:_ ', categoryId)
-                const { items } = await $fetch(`/api/movies/category/${categoryId}`, {
+                const { items } = await $api(`/api/movies/category/${categoryId}`, {
                     query: {
                         search: '',
                         page: 1,
                         perPage: 15
                     }
                 })
-                console.log('MOVIES: ');
-                console.log(items);
                 return items
             } catch (err ) {
                 console.log(err)

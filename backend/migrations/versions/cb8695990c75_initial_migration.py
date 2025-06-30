@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: 9eff11cb6180
+Revision ID: cb8695990c75
 Revises: 
-Create Date: 2025-06-17 20:38:18.121368
+Create Date: 2025-06-28 13:29:15.922549
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '9eff11cb6180'
+revision = 'cb8695990c75'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -52,18 +52,11 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
-    op.create_table('groups',
-    sa.Column('id', sa.BigInteger(), nullable=False),
-    sa.Column('name', sa.String(length=30), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.PrimaryKeyConstraint('id')
-    )
     op.create_table('lists',
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('name', sa.String(length=60), nullable=False),
     sa.Column('slug', sa.String(length=60), nullable=False),
+    sa.Column('is_main', sa.Boolean(), nullable=False),
     sa.Column('status', sa.String(length=20), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
@@ -92,7 +85,7 @@ def upgrade():
     sa.Column('username', sa.String(length=20), nullable=True),
     sa.Column('email', sa.String(length=450), nullable=True),
     sa.Column('password', sa.String(), nullable=False),
-    sa.Column('type', sa.String(length=20), nullable=False),
+    sa.Column('role', sa.String(length=20), nullable=False),
     sa.Column('status', sa.String(length=20), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
@@ -132,19 +125,14 @@ def upgrade():
     sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('permissions',
+    op.create_table('groups',
     sa.Column('id', sa.BigInteger(), nullable=False),
-    sa.Column('group_id', sa.BigInteger(), nullable=False),
-    sa.Column('module_id', sa.BigInteger(), nullable=False),
-    sa.Column('read', sa.Boolean(), nullable=False),
-    sa.Column('create', sa.Boolean(), nullable=False),
-    sa.Column('update', sa.Boolean(), nullable=False),
-    sa.Column('delete', sa.Boolean(), nullable=False),
+    sa.Column('distributor_id', sa.BigInteger(), nullable=False),
+    sa.Column('name', sa.String(length=30), nullable=False),
     sa.Column('status', sa.String(length=20), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['group_id'], ['groups.id'], ),
-    sa.ForeignKeyConstraint(['module_id'], ['modules.id'], ),
+    sa.ForeignKeyConstraint(['distributor_id'], ['distributors.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('reasons',
@@ -165,14 +153,6 @@ def upgrade():
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('status', sa.String(length=20), nullable=False),
     sa.ForeignKeyConstraint(['country_id'], ['countries.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('user_groups',
-    sa.Column('id', sa.BigInteger(), nullable=False),
-    sa.Column('user_id', sa.BigInteger(), nullable=False),
-    sa.Column('group_id', sa.BigInteger(), nullable=False),
-    sa.ForeignKeyConstraint(['group_id'], ['groups.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('users_lists',
@@ -229,16 +209,39 @@ def upgrade():
     sa.ForeignKeyConstraint(['equipment_id'], ['equipments.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('permissions',
+    sa.Column('id', sa.BigInteger(), nullable=False),
+    sa.Column('group_id', sa.BigInteger(), nullable=False),
+    sa.Column('module_id', sa.BigInteger(), nullable=False),
+    sa.Column('read', sa.Boolean(), nullable=False),
+    sa.Column('create', sa.Boolean(), nullable=False),
+    sa.Column('update', sa.Boolean(), nullable=False),
+    sa.Column('delete', sa.Boolean(), nullable=False),
+    sa.Column('status', sa.String(length=20), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.ForeignKeyConstraint(['group_id'], ['groups.id'], ),
+    sa.ForeignKeyConstraint(['module_id'], ['modules.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('specifications',
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('equipment_id', sa.BigInteger(), nullable=False),
     sa.Column('name', sa.String(length=40), nullable=False),
     sa.Column('value', sa.String(length=120), nullable=False),
-    sa.Column('type', sa.String(length=20), nullable=False),
+    sa.Column('field_type', sa.String(length=20), nullable=False),
     sa.Column('status', sa.String(length=20), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['equipment_id'], ['equipments.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('user_groups',
+    sa.Column('id', sa.BigInteger(), nullable=False),
+    sa.Column('user_id', sa.BigInteger(), nullable=False),
+    sa.Column('group_id', sa.BigInteger(), nullable=False),
+    sa.ForeignKeyConstraint(['group_id'], ['groups.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('addresses',
@@ -257,7 +260,7 @@ def upgrade():
     sa.Column('client_id', sa.BigInteger(), nullable=True),
     sa.Column('distributor_id', sa.BigInteger(), nullable=True),
     sa.Column('address_id', sa.BigInteger(), nullable=False),
-    sa.Column('main_site', sa.Boolean(), nullable=False),
+    sa.Column('is_main', sa.Boolean(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('description', sa.String(length=200), nullable=True),
     sa.Column('status', sa.String(length=20), nullable=False),
@@ -325,16 +328,17 @@ def downgrade():
     op.drop_table('installations')
     op.drop_table('sites')
     op.drop_table('addresses')
+    op.drop_table('user_groups')
     op.drop_table('specifications')
+    op.drop_table('permissions')
     op.drop_table('parts')
     op.drop_table('manuals')
     op.drop_table('equipments_files')
     op.drop_table('cities')
     op.drop_table('users_lists')
-    op.drop_table('user_groups')
     op.drop_table('states')
     op.drop_table('reasons')
-    op.drop_table('permissions')
+    op.drop_table('groups')
     op.drop_table('equipments')
     op.drop_table('distributors_lists')
     op.drop_table('clients')
@@ -342,7 +346,6 @@ def downgrade():
     op.drop_table('modules')
     op.drop_table('manuals_types')
     op.drop_table('lists')
-    op.drop_table('groups')
     op.drop_table('distributors')
     op.drop_table('countries')
     op.drop_table('categories')

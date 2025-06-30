@@ -112,7 +112,7 @@ class Site(db.Model):
     client_id: Mapped[int] = mapped_column(ForeignKey('clients.id'), nullable=True)
     distributor_id: Mapped[int] = mapped_column(ForeignKey('distributors.id'), nullable=True)
     address_id: Mapped[int] = mapped_column(ForeignKey('addresses.id'), nullable=False)
-    main_site: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    is_main: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str] = mapped_column(String(200), nullable=True)
     status: Mapped[str] = mapped_column(String(20),
@@ -137,6 +137,7 @@ class List_(db.Model):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     name: Mapped[str] = mapped_column(String(60), nullable=False)
     slug: Mapped[str] = mapped_column(String(60), nullable=False)
+    is_main: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
                                         default='ACTIVE')
@@ -167,7 +168,7 @@ class User(db.Model):
     username: Mapped[str] = mapped_column(String(20), nullable=True, unique=True)
     email: Mapped[str] = mapped_column(String(450), nullable=True, unique=True)
     password: Mapped[str] = mapped_column(String, nullable=False)
-    type: Mapped[str] = mapped_column(String(20), nullable=False)
+    role: Mapped[str] = mapped_column(String(20), nullable=False)
     status: Mapped[str] = mapped_column(String(20), 
                                         nullable=False,
                                         default='ACTIVE')
@@ -198,6 +199,7 @@ class Group(db.Model):
     __tablename__ = 'groups'
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    distributor_id: Mapped[int] = mapped_column(ForeignKey('distributors.id'), nullable=False)
     name: Mapped[str] = mapped_column(String(30))
     status: Mapped[str] = mapped_column(String(20), 
                                         nullable=False,
@@ -428,7 +430,7 @@ class Specification(db.Model):
     equipment_id: Mapped[int] = mapped_column(ForeignKey('equipments.id'), nullable=False)
     name: Mapped[str] = mapped_column(String(40), nullable=False)
     value: Mapped[str] = mapped_column(String(120), nullable=False)
-    type: Mapped[str] = mapped_column(String(20), nullable=False)
+    field_type: Mapped[str] = mapped_column(String(20), nullable=False)
     status: Mapped[str] = mapped_column(String(20), 
                                         nullable=False,
                                         default='ACTIVE')

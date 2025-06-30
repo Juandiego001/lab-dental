@@ -1,22 +1,22 @@
 """Initial data
 
-Revision ID: 4368ef4b8473
-Revises: 9eff11cb6180
-Create Date: 2025-06-17 20:38:32.460788
+Revision ID: f3824dc7af3f
+Revises: cb8695990c75
+Create Date: 2025-06-28 13:29:30.083597
 
 """
 from alembic import op
 import sqlalchemy as sa
 from core.app import db
-from core.models import Brand, City, Country, Distributor, List_, DistributorList, State, User, UserList,\
+from core.models import Brand, City, Country, Distributor, List_, DistributorList, State, User, UserList, \
     Group, UserGroup, Module, Permission, Category, ManualType, Equipment
 import json
 import pandas as pd
 
 
 # revision identifiers, used by Alembic.
-revision = '4368ef4b8473'
-down_revision = '9eff11cb6180'
+revision = 'f3824dc7af3f'
+down_revision = 'cb8695990c75'
 branch_labels = None
 depends_on = None
 
@@ -25,9 +25,12 @@ def upgrade():
     '''Initial data'''
 
     # Countries, states and cities
-    countries_file = open('./locations_data/america_countries.json', 'r', encoding='utf-8')
-    states_file = open('./locations_data/america_states.json', 'r', encoding='utf-8')
-    cities_file = open('./locations_data/america_cities.json', 'r', encoding='utf-8')
+    countries_file = open(
+        './locations_data/america_countries.json', 'r', encoding='utf-8')
+    states_file = open('./locations_data/america_states.json',
+                       'r', encoding='utf-8')
+    cities_file = open('./locations_data/america_cities.json',
+                       'r', encoding='utf-8')
 
     countries_json = json.load(countries_file)
     states_json = json.load(states_file)
@@ -39,19 +42,22 @@ def upgrade():
 
     countries = []
     for country in countries_json:
-        countries.append(Country(id=country['id'], code=country['iso3'], name=country['name'], status='ACTIVE'))
+        countries.append(Country(
+            id=country['id'], code=country['iso3'], name=country['name'], status='ACTIVE'))
     db.session.add_all(countries)
     db.session.flush()
 
     states = []
     for state in states_json:
-        states.append(State(id=state['id'], country_id=state['country_id'], name=state['name'], status='ACTIVE'))
+        states.append(State(
+            id=state['id'], country_id=state['country_id'], name=state['name'], status='ACTIVE'))
     db.session.add_all(states)
     db.session.flush()
 
     cities = []
     for city in cities_json:
-        cities.append(City(id=city['id'], state_id=city['state_id'], name=city['name'], status='ACTIVE'))
+        cities.append(City(
+            id=city['id'], state_id=city['state_id'], name=city['name'], status='ACTIVE'))
     db.session.add_all(cities)
     db.session.flush()
 
@@ -60,12 +66,13 @@ def upgrade():
     db.session.add(distributor)
 
     # List
-    list_ = List_(name='Admins', slug='admins')
+    list_ = List_(name='Admins', slug='admins', is_main=True)
     db.session.add(list_)
     db.session.flush()
 
     # Distributor list
-    distributor_list = DistributorList(distributor_id=distributor.id, list_id=list_.id)
+    distributor_list = DistributorList(
+        distributor_id=distributor.id, list_id=list_.id)
     db.session.add(distributor_list)
 
     # User
@@ -73,7 +80,7 @@ def upgrade():
                 username='juan',
                 email='juandiego14012003@gmail.com',
                 password='$2b$12$X7dhm0Idj49oUtZvzyJxd.ddFa7rvfilqaW4dzbkz0qYqs16uVrAi',
-                type='ADMIN')
+                role='ADMIN')
     db.session.add(user)
     db.session.flush()
 
@@ -82,7 +89,7 @@ def upgrade():
     db.session.add(user_list)
 
     # Group
-    group = Group(name='Admins')
+    group = Group(name='Admins', distributor_id=distributor.id)
     db.session.add(group)
     db.session.flush()
 
@@ -143,7 +150,7 @@ def upgrade():
     ]
     db.session.add_all(brands)
     db.session.flush()
-    
+
     # Categories
     categories = [
         Category(name='TIRE CHANGERS', slug='tire-changers'),

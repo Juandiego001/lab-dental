@@ -71,7 +71,7 @@ const article = ref({
 })
 
 onBeforeMount(async () => {
-  const { data } = await $fetch(`/strapi/articles/${route.params.documentId}?populate[cover][fields][0]=url&populate[category][fields][0]=name&populate[author][fields][0]=name&populate[blocks][on][shared.media][populate][file][fields][0]=url&populate[blocks][on][rich-json.rich-json][populate]=*&populate[blocks][on][shared.quote][populate]=*&populate[blocks][on][shared.slider][populate][files][fields][0]=url`)
+  const { data } = await $api(`/strapi/articles/${route.params.documentId}?populate[cover][fields][0]=url&populate[category][fields][0]=name&populate[author][fields][0]=name&populate[blocks][on][shared.media][populate][file][fields][0]=url&populate[blocks][on][rich-json.rich-json][populate]=*&populate[blocks][on][shared.quote][populate]=*&populate[blocks][on][shared.slider][populate][files][fields][0]=url`)
   article.value = data;
 })
 </script>

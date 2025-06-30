@@ -6,6 +6,7 @@
         <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
+          <template v-slot:item.installedDate="{ item }">{{ date.format(item.installedDate, 'fullDate') }}</template>
           <template v-slot:item.option="{ item }">
             <v-btn class="my-2 bg-primary me-2" size="small" icon="mdi-pencil"
               @click="getInstallation(item.id)"></v-btn>
@@ -34,7 +35,7 @@
           <v-row>
             <v-col cols="12">
               <v-autocomplete v-model="form.equipmentId" :label="$t('equipments.title')" :items="equipments"
-                item-title="serial" item-value="id" hide-details="auto" @update:search="getEquipments" clearable />
+                item-title="serialModel" item-value="id" hide-details="auto" @update:search="getEquipments" clearable />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.distributorId" :label="$t('distributors.title')" :items="distributors"
@@ -43,16 +44,16 @@
             <v-col cols="12">
               <v-autocomplete v-model="form.siteDistributorId"
                 :label="`${$t('sites.title')} ${$t('distributors.title')}`" :items="distributorsSites" item-title="name"
-                item-value="id" hide-details="auto" @update:search="getDistributorsSites" clearable />
+                item-value="id" hide-details="auto" @update:search="getDistributorsSites" clearable :readonly="!form.distributorId" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.clientId" :label="$t('clients.title')" :items="clients" item-title="name"
-                item-value="id" hide-details="auto" @update:search="getClients" clearable />
+                item-value="id" hide-details="auto" @update:search="getClients" clearable :readonly="!form.distributorId" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.siteClientId" :label="`${$t('sites.title')} ${$t('clients.title')}`"
                 :items="clientsSites" item-title="name" item-value="id" hide-details="auto"
-                @update:search="getClientsSites" clearable />
+                @update:search="getClientsSites" clearable :readonly="!form.clientId" />
             </v-col>
             <v-col cols="12">
               <v-menu v-model="showPicker" :close-on-content-click="false" transition="scale-transition" offset-y
@@ -62,7 +63,7 @@
                     hide-details="auto" v-bind="props"></v-text-field>
                 </template>
                 <v-date-picker v-model="selectedDate" title="" hide-header
-                  @update:model-value="showPicker = false"></v-date-picker>
+                  @update:model-value="showPicker = false" :max="todayDate"></v-date-picker>
               </v-menu>
             </v-col>
             <v-col cols="12">
@@ -109,7 +110,7 @@
           <v-row>
             <v-col cols="12">
               <v-autocomplete v-model="form.equipmentId" :label="$t('equipments.title')" :items="equipments"
-                item-title="serial" item-value="id" hide-details="auto" @update:search="getEquipments" clearable />
+                item-title="serialModel" item-value="id" hide-details="auto" @update:search="getEquipments" clearable />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.distributorId" :label="$t('distributors.title')" :items="distributors"
@@ -118,16 +119,16 @@
             <v-col cols="12">
               <v-autocomplete v-model="form.siteDistributorId"
                 :label="`${$t('sites.title')} ${$t('distributors.title')}`" :items="distributorsSites" item-title="name"
-                item-value="id" hide-details="auto" @update:search="getDistributorsSites" clearable />
+                item-value="id" hide-details="auto" @update:search="getDistributorsSites" clearable :readonly="!form.distributorId" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.clientId" :label="$t('clients.title')" :items="clients" item-title="name"
-                item-value="id" hide-details="auto" @update:search="getClients" clearable />
+                item-value="id" hide-details="auto" @update:search="getClients" clearable :readonly="!form.distributorId" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.siteClientId" :label="`${$t('sites.title')} ${$t('clients.title')}`"
                 :items="clientsSites" item-title="name" item-value="id" hide-details="auto"
-                @update:search="getClientsSites" clearable />
+                @update:search="getClientsSites" clearable :readonly="!form.clientId" />
             </v-col>
             <v-col cols="12">
               <v-menu v-model="showPicker" :close-on-content-click="false" transition="scale-transition" offset-y
@@ -137,7 +138,7 @@
                     hide-details="auto" v-bind="props"></v-text-field>
                 </template>
                 <v-date-picker v-model="selectedDate" title="" hide-header
-                  @update:model-value="showPicker = false"></v-date-picker>
+                  @update:model-value="showPicker = false" :max="todayDate"></v-date-picker>
               </v-menu>
             </v-col>
             <v-col class="text-end">
@@ -220,10 +221,10 @@ useHead({
 const { searchDialog } = toRefs(searchMixin)
 const { createDialog } = toRefs(createMixin)
 const equipments = ref([]);
-const clients = ref([]);
-const clientsSites = ref([]);
 const distributors = ref([]);
 const distributorsSites = ref([]);
+const clients = ref([]);
+const clientsSites = ref([]);
 const items = ref([]);
 const search = ref('');
 const page = ref(1);
@@ -238,12 +239,19 @@ const showPicker = ref(false);
 const selectedDate = ref(null);
 const form = ref({
   equipmentId: '',
-  clientId: '',
-  siteClientId: '',
+  equipmentSerialModel: '',
   distributorId: '',
+  distributorName: '',
   siteDistributorId: '',
+  siteDistributorName: '',
+  clientId: '',
+  clientName: '',
+  siteClientId: '',
+  siteClientName: '',
   installedDate: null,
 })
+
+const todayDate = computed(() => (new Date()).toISOString().split('T')[0])
 
 const itemsPerPageOptions = computed(() => [
   { value: 15, title: '15' },
@@ -254,7 +262,7 @@ const itemsPerPageOptions = computed(() => [
 
 const headers = computed(() => [
   { title: 'Id', key: 'id', align: 'center', sortable: false },
-  { title: t('equipments.title'), key: 'equipmentId', align: 'center', sortable: false },
+  { title: t('equipments.title'), key: 'equipmentSerialModel', align: 'center', sortable: false },
   { title: t('installations.installedDate'), key: 'installedDate', align: 'center', sortable: false },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
@@ -262,16 +270,20 @@ const headers = computed(() => [
 watch(createDialog, async (val) => {
   if (val) {
     await getEquipments();
-    await getClients();
     await getDistributors();
+    await getClients();
+  } else {
+    resetForm();
   }
 })
 
 watch(updateDialog, async (val) => {
   if (val) {
-    await getEquipments();
-    await getClients();
-    await getDistributors();
+    await getEquipments(form.value.equipmentSerialModel);
+    await getDistributors(form.value.distributorName);
+    await getClients(form.value.clientName);
+  } else {
+    resetForm();
   }
 })
 
@@ -283,12 +295,47 @@ watch(perPage, async () => {
   await getInstallations();
 })
 
-watch(() => form.value.clientId, async (val) => {
-  if (val) await getClientsSites();
+watch(() => form.value.distributorId, async (val) => {
+  if (val) {
+    if (updateDialog.value || createDialog.value) {
+      await getDistributorsSites();
+      await getClients();
+    } else {
+      await getDistributorsSites(form.value.siteDistributorName);
+      await getClients(form.value.clientName);
+    }
+    nextTick(() => {
+      if (form.value.siteDistributorId && !(distributorsSites.value.map(e => e.id)).includes(form.value.siteDistributorId)) {
+        form.value.siteDistributorId = '';
+        form.value.siteDistributorName = '';
+      }
+      if (form.value.clientId && !(clients.value.map(e => e.id)).includes(form.value.clientId)) {
+        form.value.clientId = '';
+        form.value.clientName = '';
+      }
+    })
+  } else {
+    form.value.siteDistributorId = '';
+    form.value.siteDistributorName = '';
+    form.value.clientId = '';
+    form.value.clientName = '';
+  }
 })
 
-watch(() => form.value.distributorId, async (val) => {
-  if (val) await getDistributorsSites();
+watch(() => form.value.clientId, async (val) => {
+  if (val) {
+    if (updateDialog.value || createDialog.value) await getClientsSites();
+    else await getClientsSites(form.value.siteClientName);
+    nextTick(() => {
+      if (form.value.siteClientId && !(clientsSites.value.map(e => e.id)).includes(form.value.siteClientId)) {
+        form.value.siteClientId = '';
+        form.value.siteClientName = '';
+      }
+    })
+  } else {
+    form.value.siteClientId = '';
+    form.value.siteClientName = '';
+  }
 })
 
 watch(selectedDate, async (val) => {
@@ -303,17 +350,17 @@ const resetForm = () => {
   selectedDate.value = null
   form.value = {
     equipmentId: '',
-    clientId: '',
-    siteClientId: '',
     distributorId: '',
     siteDistributorId: '',
+    clientId: '',
+    siteClientId: '',
     installedDate: null,
   }
 }
 
 const getEquipments = async (search) => {
   try {
-    const data = await $fetch('/api/equipments/', {
+    const data = await $api('/api/equipments/', {
       query: {
         search,
         page: page.value,
@@ -327,25 +374,9 @@ const getEquipments = async (search) => {
   }
 }
 
-const getClients = async (search) => {
-  try {
-    const data = await $fetch('/api/clients/', {
-      query: {
-        search,
-        page: page.value,
-        perPage: perPage.value
-      },
-      method: 'GET'
-    })
-    clients.value = data.items
-  } catch (err) {
-    console.log(err)
-  }
-}
-
 const getDistributors = async (search) => {
   try {
-    const data = await $fetch('/api/distributors/', {
+    const data = await $api('/api/distributors/', {
       query: {
         search,
         page: page.value,
@@ -359,25 +390,9 @@ const getDistributors = async (search) => {
   }
 }
 
-const getClientsSites = async (search) => {
-  try {
-    const data = await $fetch(`/api/sites/clients/${form.value.clientId}`, {
-      query: {
-        search,
-        page: page.value,
-        perPage: perPage.value
-      },
-      method: 'GET'
-    })
-    clientsSites.value = data.items
-  } catch (err) {
-    console.log(err)
-  }
-}
-
 const getDistributorsSites = async (search) => {
   try {
-    const data = await $fetch(`/api/sites/distributors/${form.value.distributorId}`, {
+    const data = await $api(`/api/sites/distributors/${form.value.distributorId}`, {
       query: {
         search,
         page: page.value,
@@ -391,9 +406,42 @@ const getDistributorsSites = async (search) => {
   }
 }
 
+const getClients = async (search) => {
+  try {
+    if (!form.value.distributorId) return;
+    const data = await $api(`/api/distributors/${form.value.distributorId}/clients`, {
+      query: {
+        search,
+        page: page.value,
+        perPage: perPage.value
+      },
+      method: 'GET'
+    })
+    clients.value = data.items
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+const getClientsSites = async (search) => {
+  try {
+    const data = await $api(`/api/sites/clients/${form.value.clientId}`, {
+      query: {
+        search,
+        page: page.value,
+        perPage: perPage.value
+      },
+      method: 'GET'
+    })
+    clientsSites.value = data.items
+  } catch (err) {
+    console.log(err)
+  }
+}
+
 const getInstallations = async () => {
   try {
-    const data = await $fetch('/api/installations/', {
+    const data = await $api('/api/installations/', {
       query: {
         search: search.value,
         page: page.value,
@@ -410,11 +458,14 @@ const getInstallations = async () => {
 
 const getInstallation = async (id) => {
   try {
-    const data = await $fetch(`/api/installations/${id}`, {
+    const data = await $api(`/api/installations/${id}`, {
       method: 'GET'
     })
     form.value = data
-    updateDialog.value = true
+    nextTick(() => {
+      selectedDate.value = new Date(form.value.installedDate);
+      updateDialog.value = true
+    });
   } catch (err) {
     console.log(err)
   }
@@ -434,7 +485,7 @@ const createInstallation = async () => {
       formData.append(key, value);
     }
 
-    const response = await $fetch('/api/installations/', {
+    const response = await $api('/api/installations/', {
       method: 'POST',
       body: formData
     })
@@ -447,7 +498,7 @@ const createInstallation = async () => {
 
 const updateInstallation = async () => {
   try {
-    const response = await $fetch(`/api/installations/${form.value.id}`, {
+    const response = await $api(`/api/installations/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
@@ -459,11 +510,16 @@ const updateInstallation = async () => {
 }
 
 const deleteInstallation = async () => {
-  const response = await $fetch(`/api/installations/${form.value.id}`, {
-    method: 'DELETE'
-  })
-  await getInstallations()
-  deleteDialog.value = false
+  try {
+    const response = await $api(`/api/installations/${form.value.id}`, {
+      method: 'DELETE'
+    })
+    await getInstallations()
+    deleteDialog.value = false
+    resetForm();
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 const doSearch = async () => {

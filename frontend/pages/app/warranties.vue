@@ -212,7 +212,7 @@ const resetForm = () => {
 
 const getWarranties = async () => {
   try {
-    const data = await $fetch('/api/warranties/', {
+    const data = await $api('/api/warranties/', {
       query: {
         search: search.value,
         page: page.value,
@@ -229,7 +229,7 @@ const getWarranties = async () => {
 
 const getWarranty = async (id) => {
   try {
-    const user = await $fetch(`/api/warranties/${id}`, {
+    const user = await $api(`/api/warranties/${id}`, {
       method: 'GET'
     })
     form.value = user
@@ -241,7 +241,7 @@ const getWarranty = async (id) => {
 
 const createWarranty = async () => {
   try {
-    const response = await $fetch('/api/warranties/', {
+    const response = await $api('/api/warranties/', {
       method: 'POST',
       body: form.value
     })
@@ -255,7 +255,7 @@ const createWarranty = async () => {
 
 const updateWarranty = async () => {
   try {
-    const response = await $fetch(`/api/warranties/${form.value.id}`, {
+    const response = await $api(`/api/warranties/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
@@ -268,7 +268,7 @@ const updateWarranty = async () => {
 }
 
 const deleteWarranty = async () => {
-  const response = await $fetch(`/api/warranties/${form.value.id}`, {
+  const response = await $api(`/api/warranties/${form.value.id}`, {
     method: 'DELETE'
   })
   await getWarranties()

@@ -198,7 +198,7 @@ const resetForm = () => {
 
 const getReasons = async () => {
   try {
-    const data = await $fetch('/api/reasons/', {
+    const data = await $api('/api/reasons/', {
       query: {
         search: search.value,
         page: page.value,
@@ -215,7 +215,7 @@ const getReasons = async () => {
 
 const getReason = async (id) => {
   try {
-    const user = await $fetch(`/api/reasons/${id}`, {
+    const user = await $api(`/api/reasons/${id}`, {
       method: 'GET'
     })
     form.value = user
@@ -227,7 +227,7 @@ const getReason = async (id) => {
 
 const createReason = async () => {
   try {
-    const response = await $fetch('/api/reasons/', {
+    const response = await $api('/api/reasons/', {
       method: 'POST',
       body: form.value
     })
@@ -241,7 +241,7 @@ const createReason = async () => {
 
 const updateReason = async () => {
   try {
-    const response = await $fetch(`/api/reasons/${form.value.id}`, {
+    const response = await $api(`/api/reasons/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
@@ -254,7 +254,7 @@ const updateReason = async () => {
 }
 
 const deleteReason = async () => {
-  const response = await $fetch(`/api/reasons/${form.value.id}`, {
+  const response = await $api(`/api/reasons/${form.value.id}`, {
     method: 'DELETE'
   })
   await getReasons()

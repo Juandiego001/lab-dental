@@ -51,6 +51,7 @@
             int id PK, UK "AUTO_INCREMENT, NN"
             string name "NN"
             string slug UK "NN"
+            boolean is_main "NN, DEFAULT FALSE"
             string status "NN"
             date created_at "NN"
             date updated_at "NN"
@@ -68,14 +69,13 @@
             int client_id FK "N"
             int distributor_id FK "N"
             int address_id FK "NN"
-            boolean main_site "NN, DEFAULT FALSE"
+            boolean is_main "NN, DEFAULT FALSE"
             string name
             string description
             string status "NN"
             date created_at "NN"
             date updated_at "NN"
         }
-
 
         CLIENTS {
             int id PK, UK "AUTO_INCREMENT, NN"
@@ -92,8 +92,8 @@
             string full_name "NN"
             string username UK "NN"
             string email UK "NN"
+            string role "NN"
             string password "NN"
-            string type "NN"
             string status "NN"
             date created_at "NN"
             date updated_at "NN"
@@ -107,6 +107,7 @@
 
         GROUPS {
             int id PK, UK "AUTO_INCREMENT, NN"
+            int distributor_id FK "NN"
             string name UK "NN"
             string status "NN"
             date created_at "NN"

@@ -55,7 +55,7 @@
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
-          {{ $t('update.category') }}
+          {{ $t('categories.update.title') }}
           <v-spacer></v-spacer>
           <v-btn class="bg-primary" size="small" icon="mdi-close" @click="updateDialog = false"></v-btn>
         </v-row>
@@ -64,10 +64,10 @@
         <v-form @submit.prevent="updateCategory">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('category.name')"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('categories.name')"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('category.slug')"></v-text-field>
+              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('categories.slug')"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -154,13 +154,9 @@ const perPage = ref(15);
 const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
-const form = ref({
-  id: '',
+const form = ref({  
   name: '',
   slug: '',
-  status: '',
-  createdAt: '',
-  updatedAt: ''
 })
 
 const itemsPerPageOptions = computed(() => [
@@ -177,6 +173,14 @@ const headers = computed(() => [
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
+watch(createDialog, (val) => {
+  if (!val) { resetForm() }
+})
+
+watch(updateDialog, (val) => {
+  if (!val) { resetForm() }
+})
+
 watch(page, async () => {
   await getCategories();
 })
@@ -191,18 +195,14 @@ onBeforeMount(async () => {
 
 const resetForm = () => {
   form.value = {
-    id: '',
     name: '',
-    slug: '',
-    status: '',
-    createdAt: '',
-    updatedAt: ''
+    slug: ''
   }
 }
 
 const getCategories = async () => {
   try {
-    const data = await $fetch('/api/categories/', {
+    const data = await $api('/api/categories/', {
       query: {
         search: search.value,
         page: page.value,
@@ -219,7 +219,7 @@ const getCategories = async () => {
 
 const getCategory = async (id) => {
   try {
-    const category = await $fetch(`/api/categories/${id}`, {
+    const category = await $api(`/api/categories/${id}`, {
       method: 'GET'
     })
     form.value = category
@@ -231,13 +231,13 @@ const getCategory = async (id) => {
 
 const createCategory = async () => {
   try {
-    const response = await $fetch('/api/categories/', {
+    const response = await $api('/api/categories/', {
       method: 'POST',
       body: form.value
     })
     await getCategories()
-    resetForm()
     createDialog.value = false
+    resetForm()
   } catch (err) {
     console.log(err)
   }
@@ -245,25 +245,29 @@ const createCategory = async () => {
 
 const updateCategory = async () => {
   try {
-    const response = await $fetch(`/api/categories/${form.value.id}`, {
+    const response = await $api(`/api/categories/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
     await getCategories()
-    resetForm()
     updateDialog.value = false
+    resetForm()
   } catch (err) {
     console.log(err)
   }
 }
 
 const deleteCategory = async () => {
-  const response = await $fetch(`/api/categories/${this.form.id}`, {
-    method: 'DELETE'
-  })
-  await getCategories()
-  resetForm()
-  deleteDialog.value = false
+  try {
+    const response = await $api(`/api/categories/${this.form.id}`, {
+      method: 'DELETE'
+    })
+    await getCategories()
+    deleteDialog.value = false
+    resetForm()
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 const doSearch = async () => {

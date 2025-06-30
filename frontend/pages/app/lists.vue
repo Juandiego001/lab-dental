@@ -35,11 +35,12 @@
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.distributorsIds" :label="$t('lists.distributors')" :items="distributors"
-                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable multiple chips />
+                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable
+                multiple chips />
             </v-col>
             <v-col cols="12">
-              <v-autocomplete v-model="form.usersIds" :label="$t('lists.users')" :items="users"
-                item-title="fullName" item-value="id" hide-details="auto" @update:search="getUsers" clearable multiple chips />
+              <v-autocomplete v-model="form.usersIds" :label="$t('lists.users')" :items="users" item-title="fullName"
+                item-value="id" hide-details="auto" @update:search="getUsers" clearable multiple chips />
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -66,8 +67,16 @@
         <v-form @submit.prevent="updateList">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto"
-                :label="$t('lists.name')"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('lists.name')"></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.distributorsIds" :label="$t('lists.distributors')" :items="distributors"
+                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable
+                multiple chips />
+            </v-col>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.usersIds" :label="$t('lists.users')" :items="users" item-title="fullName"
+                item-value="id" hide-details="auto" @update:search="getUsers" clearable multiple chips />
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -183,6 +192,17 @@ watch(createDialog, async (val) => {
   if (val) {
     await getDistributors();
     await getUsers();
+  } else {
+    resetForm()
+  }
+})
+
+watch(updateDialog, async (val) => {
+  if (val) {
+    await getDistributors();
+    await getUsers();
+  } else {
+    resetForm()
   }
 })
 
@@ -201,13 +221,15 @@ onBeforeMount(async () => {
 const resetForm = () => {
   form.value = {
     name: '',
-    slug: ''
+    slug: '',
+    distributorsIds: [],
+    usersIds: [],
   }
 }
 
 const getDistributors = async (search) => {
   try {
-    const data = await $fetch('/api/distributors/', {
+    const data = await $api('/api/distributors/', {
       query: {
         search,
         page: 1,
@@ -223,7 +245,7 @@ const getDistributors = async (search) => {
 
 const getUsers = async (search) => {
   try {
-    const data = await $fetch('/api/users/', {
+    const data = await $api('/api/users/', {
       query: {
         search,
         page: 1,
@@ -239,7 +261,7 @@ const getUsers = async (search) => {
 
 const getLists = async () => {
   try {
-    const data = await $fetch('/api/lists/', {
+    const data = await $api('/api/lists/', {
       query: {
         search: search.value,
         page: page.value,
@@ -256,10 +278,10 @@ const getLists = async () => {
 
 const getList = async (id) => {
   try {
-    const user = await $fetch(`/api/lists/${id}`, {
+    const data = await $api(`/api/lists/${id}`, {
       method: 'GET'
     })
-    form.value = user
+    form.value = data
     updateDialog.value = true
   } catch (err) {
     console.log(err)
@@ -268,12 +290,13 @@ const getList = async (id) => {
 
 const createList = async () => {
   try {
-    const response = await $fetch('/api/lists/', {
+    const response = await $api('/api/lists/', {
       method: 'POST',
       body: form.value
     })
     await getLists()
     createDialog.value = false
+    resetForm()
   } catch (err) {
     console.log(err)
   }
@@ -281,23 +304,29 @@ const createList = async () => {
 
 const updateList = async () => {
   try {
-    const response = await $fetch(`/api/lists/${form.value.id}`, {
+    const response = await $api(`/api/lists/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
     await getLists()
     updateDialog.value = false
+    resetForm()
   } catch (err) {
     console.log(err)
   }
 }
 
 const deleteList = async () => {
-  const response = await $fetch(`/api/lists/${form.value.id}`, {
-    method: 'DELETE'
-  })
-  await getLists()
-  deleteDialog.value = false
+  try {
+    const response = await $api(`/api/lists/${form.value.id}`, {
+      method: 'DELETE'
+    })
+    await getLists()
+    deleteDialog.value = false
+    resetForm()
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 const doSearch = async () => {
