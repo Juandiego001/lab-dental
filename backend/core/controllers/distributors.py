@@ -70,6 +70,19 @@ def get_users_by_distributor(distributor_id, query_data):
         abort(500, str(ex))
 
 
+@bp.get('/distributors/users')
+@bp.input(Pagination, location='query')
+@bp.output(DistributorsOut)
+@jwt_required()
+def get_distributors_for_users_creation(query_data):
+    '''Get distributors for users creation without Snapon distributor'''
+
+    try:
+        return distributors.get_distributors_for_users_creation(current_user, query_data['search'])
+    except Exception as ex:
+        abort(500, str(ex))
+
+
 @bp.post('/')
 @bp.input(DistributorInCreate, arg_name='distributor')
 @jwt_required()

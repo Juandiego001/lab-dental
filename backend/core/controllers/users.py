@@ -15,11 +15,13 @@ bp = APIBlueprint('users', __name__)
 @bp.get('/')
 @bp.input(Pagination, location='query')
 @bp.output(UsersOut)
+@jwt_required()
 def get_users(query_data):
     '''Get users'''
 
     try:
-        results = users.get_users(query_data['search'],
+        results = users.get_users(current_user,
+                                  query_data['search'],
                                   query_data['page'],
                                   query_data['per_page'])
         return {'items': results, 'total': results.total}
@@ -29,6 +31,7 @@ def get_users(query_data):
 
 @bp.get('/<int:user_id>')
 @bp.output(UserOut)
+@jwt_required()
 def get_user(user_id):
     '''Get user'''
 
@@ -114,6 +117,7 @@ def update_profile(user_data):
 @bp.put('/<int:user_id>')
 @bp.input(UserInUpdate)
 @bp.output(Message)
+@jwt_required()
 def update_users(user_id, json_data):
     '''Update user'''
     try:
@@ -126,6 +130,7 @@ def update_users(user_id, json_data):
 
 @bp.delete('/<int:user_id>')
 @bp.output(Message)
+@jwt_required()
 def delete_users(user_id):
     '''Delete users'''
 

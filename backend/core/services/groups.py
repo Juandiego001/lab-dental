@@ -1,9 +1,9 @@
 from core.app import db
-from core.models import Distributor, Group, Module, Permission, User, UserGroup
-from sqlalchemy import func, or_, and_
 from werkzeug.exceptions import HTTPException
+from sqlalchemy import func, or_, and_, delete
+from core.services.distributors import get_distributor_from_user
+from core.models import Distributor, Group, Module, Permission, User, UserGroup
 
-from core.services.distributors import get_distributor_id_from_user
 
 
 def get_groups(current_user: User, search: str, page: int, per_page: int) -> tuple[list, int]:
@@ -11,8 +11,7 @@ def get_groups(current_user: User, search: str, page: int, per_page: int) -> tup
 
     query = Group.status == 'ACTIVE'
     if search:
-        query = and_(Group.status == 'ACTIVE',
-                     or_(Group.name.ilike(f'%{search}%')))
+        query = and_(Group.status == 'ACTIVE', Group.name.ilike(f'%{search}%'))
 
     if current_user.role == 'ADMIN':
         total = db.session.query(Group).filter(query).count()
@@ -29,11 +28,13 @@ def get_groups(current_user: User, search: str, page: int, per_page: int) -> tup
             .offset((page - 1) * per_page)
         ).unique()), total
 
-    distributor_id = get_distributor_id_from_user(current_user.id)
-    query = and_(query, Distributor.id == distributor_id)
+    distributor: Distributor = get_distributor_from_user(current_user)
+    query = and_(query, Distributor.id == distributor.id)
     total = db.session.query(Group).filter(query).count()
     return list(db.session.execute(
-        db.session.query(Group)
+        db.session.query(
+          *Group.__table__.c
+        )
         .select_from(Group)
         .join(Distributor)
         .filter(query)
@@ -48,13 +49,15 @@ def get_group_by_id(group_id: int):
 
     return db.session.query(
         *Group.__table__.c,
+        Distributor.name.label('distributor_name'),
         func.array_agg(User.id).label('users_ids')
     )\
         .select_from(Group)\
-        .join(UserGroup)\
-        .join(User)\
+        .outerjoin(UserGroup)\
+        .outerjoin(User)\
+        .outerjoin(Distributor)\
         .filter(Group.id == group_id)\
-        .group_by(Group.id, Group.name)\
+        .group_by(Group.id, Group.name, Distributor.name)\
         .first()
 
 
@@ -62,8 +65,7 @@ def create_group(current_user: User, group_object: Group, users_ids: list):
     '''Create a group'''
 
     # Get distributor_id if current_user not exists
-    group_object.distributor_id = group_object.distributor_id if group_object.distributor_id else get_distributor_id_from_user(
-        current_user.id)
+    group_object.distributor_id = group_object.distributor_id if group_object.distributor_id else get_distributor_from_user(current_user).id
 
     # Creation of group
     db.session.add(group_object)
@@ -98,13 +100,22 @@ def check_group_exists(group_id: int):
     return db.session.query(Group).filter(Group.id == group_id).first()
 
 
-def update_group(group_id: int, group_load):
+def update_group(group_id: int, json_data: tuple[Group, list]):
     '''Update group'''
+
+    group_obj, users_ids = json_data
 
     if not check_group_exists(group_id):
         raise HTTPException('Group not found')
+    
+    # Delete users from group
+    db.session.execute(delete(UserGroup).where(UserGroup.group_id == group_id))
 
-    db.session.merge(group_load)
+    # Inser users in group again
+    user_groups = [UserGroup(group_id=group_id, user_id=user_id) for user_id in users_ids]
+    db.session.add_all(user_groups)
+
+    db.session.merge(group_obj)
     db.session.commit()
 
 

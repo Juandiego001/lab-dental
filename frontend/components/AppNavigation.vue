@@ -56,7 +56,7 @@ const menu = ref([
     },
     {
         title: 'Clients',
-        subject: 'distributors',
+        subject: 'clients',
         path: '/app/clients',
         icon: 'mdi-account-tie'
     },
@@ -100,7 +100,7 @@ const menu = ref([
     },
     {
         title: 'Parts',
-        subject: 'equipments',
+        subject: 'parts',
         path: '/app/parts',
         icon: 'mdi-nut'
     },
@@ -112,7 +112,7 @@ const menu = ref([
     },
     {
         title: 'Reasons',
-        subject: 'warranties',
+        subject: 'reasons',
         path: '/app/reasons',
         icon: 'mdi-file-cancel'
     },
@@ -131,7 +131,7 @@ const menu = ref([
     },
     {
         title: 'Lists',
-        subject: 'zones',
+        subject: 'lists',
         path: '/app/lists',
         icon: 'mdi-office-building-cog-outline'
     },

@@ -7,9 +7,10 @@
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
           <template v-slot:item.option="{ item }">
-            <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getSite(item.id)"></v-btn>
+            <v-btn v-if="$ability.can('update', 'sites')" class="my-2 bg-primary" size="small" icon="mdi-pencil"
+              @click="getSite(item.id)"></v-btn>
             <span class="mx-2"></span>
-            <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
+            <v-btn v-if="$ability.can('delete', 'sites')" class="my-2 bg-red" size="small" icon="mdi-trash-can"
               @click="form.id = item.id; deleteDialog = true"></v-btn>
           </template>
         </v-data-table-server>
@@ -31,18 +32,18 @@
         <v-form @submit.prevent="createSite">
           <v-row>
             <v-col cols="12">
-              <v-radio-group v-model="companyType" :label="$t('sites.create.companyType')" hide-details="auto" inline>
+              <v-radio-group v-model="form.companyType" :label="$t('sites.create.companyType')" hide-details="auto" inline>
                 <v-radio :label="$t('distributors.title', 2)" value="distributors"></v-radio>
                 <v-radio :label="$t('clients.title', 2)" value="clients"></v-radio>
               </v-radio-group>
             </v-col>
-            <template v-if="companyType === 'distributors'">
+            <template v-if="isAdmin && form.companyType === 'distributors'">
               <v-col cols="12">
                 <v-autocomplete v-model="form.distributorId" :label="$t('distributors.title')" :items="distributors"
                   item-title="name" item-value="id" hide-details="auto" clearable @update:search="getDistributors" />
               </v-col>
             </template>
-            <template v-else>
+            <template v-else-if="form.companyType === 'clients'">
               <v-col cols="12">
                 <v-autocomplete v-model="form.clientId" :label="$t('clients.title')" :items="clients" item-title="name"
                   item-value="id" hide-details="auto" clearable @update:search="getClients" />
@@ -90,6 +91,24 @@
       <v-card-text>
         <v-form @submit.prevent="updateSite">
           <v-row>
+            <v-col cols="12">
+              <v-radio-group v-model="form.companyType" :label="$t('sites.create.companyType')" hide-details="auto" inline>
+                <v-radio :label="$t('distributors.title', 2)" value="distributors"></v-radio>
+                <v-radio :label="$t('clients.title', 2)" value="clients"></v-radio>
+              </v-radio-group>
+            </v-col>
+            <template v-if="isAdmin && form.companyType === 'distributors'">
+              <v-col cols="12">
+                <v-autocomplete v-model="form.distributorId" :label="$t('distributors.title')" :items="distributors"
+                  item-title="name" item-value="id" hide-details="auto" clearable @update:search="getDistributors" />
+              </v-col>
+            </template>
+            <template v-else-if="form.companyType === 'clients'">
+              <v-col cols="12">
+                <v-autocomplete v-model="form.clientId" :label="$t('clients.title')" :items="clients" item-title="name"
+                  item-value="id" hide-details="auto" clearable @update:search="getClients" />
+              </v-col>
+            </template>
             <v-col cols="12">
               <v-autocomplete v-model="form.countryId" :label="$t('countries')" :items="countries" item-title="name"
                 item-value="id" hide-details="auto" @update:search="getCountries" clearable />
@@ -172,6 +191,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { profile } = useProfile();
 const { t } = useI18n();
 
 definePageMeta({
@@ -186,8 +206,6 @@ useHead({
 const { searchDialog } = toRefs(searchMixin)
 const { createDialog } = toRefs(createMixin)
 const items = ref([]);
-const companyType = ref('distributors');
-const companyId = ref('');
 const distributors = ref([]);
 const clients = ref([]);
 const countries = ref([]);
@@ -203,8 +221,11 @@ const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
 const form = ref({
+  companyType: 'distributors',
   distributorId: null,
   clientId: null,
+  distributorName: '',
+  clientName: '',
   cityId: '',
   cityName: '',
   stateId: '',
@@ -215,6 +236,8 @@ const form = ref({
   description: '',
   name: ''
 })
+
+const isAdmin = computed(() => profile.value.role === 'ADMIN');
 
 const itemsPerPageOptions = computed(() => [
   { value: 15, title: '15' },
@@ -232,7 +255,7 @@ const headers = computed(() => [
 
 watch(createDialog, async (val) => {
   if (val) {
-    await getDistributors();
+    if (isAdmin.value) await getDistributors();
     await getClients();
     await getCountries();
   } else {
@@ -242,6 +265,8 @@ watch(createDialog, async (val) => {
 
 watch(updateDialog, async (val) => {
   if (val) {
+    if (isAdmin.value) await getDistributors(form.value.distributorName);
+    await getClients(form.value.clientName);
     await getCountries(form.value.countryName);
   } else {
     resetForm()
@@ -289,11 +314,11 @@ onBeforeMount(async () => {
 })
 
 const resetForm = () => {
-  companyType.value = 'distributors'
   countryId.value = ''
   stateId.value = ''
   cityId.value = ''
   form.value = {
+    companyType: 'distributors',
     distributorId: null,
     clientId: null,
     cityId: '',

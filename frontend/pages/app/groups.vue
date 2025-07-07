@@ -10,7 +10,7 @@
             <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getGroup(item.id)"></v-btn>
             <v-btn class="my-2 mx-2 bg-secondary" size="small" icon="mdi-shield-edit"
               @click="form.id = item.id; getPermissions()"></v-btn>
-            <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
+            <v-btn v-if="item.id !== 1" class="my-2 bg-red" size="small" icon="mdi-trash-can"
               @click="form.id = item.id; deleteDialog = true"></v-btn>
           </template>
         </v-data-table-server>
@@ -69,6 +69,15 @@
           <v-row>
             <v-col cols="12">
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('groups.name')"></v-text-field>
+            </v-col>
+            <v-col v-if="isAdmin" cols="12">
+              <v-autocomplete v-model="form.distributorId" :label="$t('distributors.title')" :items="distributors"
+                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable />
+            </v-col>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.usersIds" :label="$t('users.title', 2)" :items="users" item-title="fullName"
+                item-value="id" hide-details="auto" @update:search="getUsers" clearable multiple chips
+                :readonly="isAdmin && !form.distributorId" />
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -138,23 +147,32 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-data-table-server :items="itemsPermissions" :headers="headersPermissions" :page="pagePermissions" :items-per-page="perPagePermissions"
-          :items-length="totalPermissions" :items-per-page-options="itemsPerPageOptions" @update:page="v => pagePermissions = v"
+        <v-data-table-server :items="itemsPermissions" :headers="headersPermissions" :page="pagePermissions"
+          :items-per-page="perPagePermissions" :items-length="totalPermissions"
+          :items-per-page-options="itemsPerPageOptions" @update:page="v => pagePermissions = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true" density="compact">
           <template v-slot:item.moduleName="{ item }">
             <span class="text-capitalize">{{ item.moduleName }}</span>
           </template>
           <template v-slot:item.read="{ item }">
-            <v-checkbox-btn color ="primary" :model-value="item.read" :ripple="false" hide-details="auto" density="compact" />
+            <v-checkbox-btn color="primary" :model-value="item.read" :ripple="false" hide-details="auto"
+              density="compact" @update:modelValue="v => updatePermissions(v, item, 'read')"
+              :disabled="form.id === 1" />
           </template>
           <template v-slot:item.create="{ item }">
-            <v-checkbox-btn color="primary" :model-value="item.create" :ripple="false" hide-details="auto" density="compact" />
+            <v-checkbox-btn color="primary" :model-value="item.create" :ripple="false" hide-details="auto"
+              density="compact" @update:modelValue="v => updatePermissions(v, item, 'create')"
+              :disabled="form.id === 1" />
           </template>
           <template v-slot:item.update="{ item }">
-            <v-checkbox-btn color="primary" :model-value="item.update" :ripple="false" hide-details="auto" density="compact" />
+            <v-checkbox-btn color="primary" :model-value="item.update" :ripple="false" hide-details="auto"
+              density="compact" @update:modelValue="v => updatePermissions(v, item, 'update')"
+              :disabled="form.id === 1" />
           </template>
           <template v-slot:item.delete="{ item }">
-            <v-checkbox-btn color="primary" :model-value="item.delete" :ripple="false" hide-details="auto" density="compact" />
+            <v-checkbox-btn color="primary" :model-value="item.delete" :ripple="false" hide-details="auto"
+              density="compact" @update:modelValue="v => updatePermissions(v, item, 'delete')"
+              :disabled="form.id === 1" />
           </template>
         </v-data-table-server>
       </v-card-text>
@@ -204,6 +222,7 @@ const permissionsDialog = ref(false);
 const form = ref({
   name: '',
   distributorId: '',
+  distributorName: '',
   usersIds: null
 })
 
@@ -216,12 +235,22 @@ const itemsPerPageOptions = computed(() => [
   { value: 100, title: '100' }
 ])
 
-const tableHeaders = computed(() => [
-  { title: 'Id', key: 'id', sortable: false },
-  { title: t('groups.name'), key: 'name', sortable: false },
-  (isAdmin && { title: t('distributors.title'), key: 'distributorName', sortable: false }),
-  { title: t('options'), key: 'option', align: 'center', sortable: false }
-])
+const tableHeaders = computed(() => {
+  if (isAdmin.value) {
+    return [
+      { title: 'Id', key: 'id', sortable: false },
+      { title: t('groups.name'), key: 'name', sortable: false },
+      { title: t('distributors.title'), key: 'distributorName', sortable: false },
+      { title: t('options'), key: 'option', align: 'center', sortable: false }
+    ]
+  }
+
+  return [
+    { title: 'Id', key: 'id', align: 'center', sortable: false },
+    { title: t('groups.name'), key: 'name', align: 'center', sortable: false },
+    { title: t('options'), key: 'option', align: 'center', sortable: false }
+  ]
+})
 
 const headersPermissions = computed(() => [
   { title: t('modules.title'), key: 'moduleName', sortable: false },
@@ -238,6 +267,13 @@ watch(createDialog, async (val) => {
     } else {
       await getUsers();
     }
+  } else resetForm();
+})
+
+watch(updateDialog, async (val) => {
+  if (val) {
+    if (isAdmin.value) await getDistributors(form.value.distributorName);
+    await getUsers();
   } else resetForm();
 })
 
@@ -261,10 +297,16 @@ onBeforeMount(async () => {
   await getGroups();
 })
 
+onMounted(() => {
+  console.log({ isAdmin: isAdmin.value })
+  console.log({ tableHeaders: tableHeaders.value })
+})
+
 const resetForm = () => {
   form.value = {
     name: '',
     distributorId: '',
+    distributorName: '',
     usersIds: null
   }
 }
@@ -301,7 +343,6 @@ const getGroup = async (id) => {
 const createGroup = async () => {
   try {
     const response = await $api('/api/groups/', {
-      credentials: 'include',
       method: 'POST',
       body: form.value
     })
@@ -408,6 +449,18 @@ const getPermissions = async (search) => {
     permissionsDialog.value = true;
     itemsPermissions.value = data.items
     totalPermissions.value = data.total
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+const updatePermissions = async (v, item, action) => {
+  try {
+    item[action] = v;
+    const response = await $api('/api/permissions/', {
+      method: 'PUT',
+      body: item
+    })
   } catch (err) {
     console.log(err);
   }

@@ -19,7 +19,13 @@ def get_permissions_by_group_id(group_id: int, search: str = '', page: int = 1, 
         .join(Module)
         .join(Group)
         .filter(query)
-        .order_by(Module.id)
+        .order_by(Module.name)
         .limit(per_page)
         .offset((page - 1) * per_page)
     ).unique()), total
+
+
+def update_permissions_by_group_id(group_id: int):
+    '''Update permissions by group_id'''
+
+    pass

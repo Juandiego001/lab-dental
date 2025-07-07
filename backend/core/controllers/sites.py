@@ -2,6 +2,7 @@ from core.app import db
 from core.models import Address, Site
 from core.services import sites
 from apiflask import APIBlueprint, abort
+from flask_jwt_extended import jwt_required, current_user
 from core.schemas.utils import Message, Pagination
 from core.schemas.sites import SiteInUpdate, SiteInCreate, SiteOut, SitesOut
 
@@ -12,13 +13,17 @@ bp = APIBlueprint('sites', __name__)
 @bp.get('/')
 @bp.input(Pagination, location='query')
 @bp.output(SitesOut)
+@jwt_required()
 def get_sites(query_data):
     '''Get sites'''
 
     try:
-        results, total = sites.get_sites(query_data['search'],
-                                  query_data['page'],
-                                  query_data['per_page'])
+        results, total = sites.get_sites(
+            current_user,
+            query_data['search'],
+            query_data['page'],
+            query_data['per_page'])
+
 
         return {'items': results, 'total': total}
     except Exception as ex:
@@ -28,6 +33,7 @@ def get_sites(query_data):
 @bp.get('/clients/<string:client_id>')
 @bp.input(Pagination, location='query')
 @bp.output(SitesOut)
+@jwt_required()
 def get_clients_sites(query_data, client_id):
     '''Get clients sites'''
 
@@ -40,6 +46,7 @@ def get_clients_sites(query_data, client_id):
 @bp.get('/distributors/<string:distributor_id>')
 @bp.input(Pagination, location='query')
 @bp.output(SitesOut)
+@jwt_required()
 def get_distributors_sites(query_data, distributor_id):
     '''Get distributors sites'''
 
@@ -51,6 +58,7 @@ def get_distributors_sites(query_data, distributor_id):
 
 @bp.get('/<int:site_id>')
 @bp.output(SiteOut)
+@jwt_required()
 def get_site(site_id):
     '''Get site'''
 
@@ -62,6 +70,7 @@ def get_site(site_id):
 
 @bp.post('/')
 @bp.input(SiteInCreate, arg_name='site_and_address')
+@jwt_required()
 def create_sites(site_and_address):
     '''Create sites'''
 
@@ -87,6 +96,7 @@ def create_sites(site_and_address):
 @bp.put('/<int:site_id>')
 @bp.input(SiteInUpdate, arg_name='site_and_address')
 @bp.output(Message)
+@jwt_required()
 def update_sites(site_id, site_and_address):
     '''Update site'''
 
@@ -105,6 +115,7 @@ def update_sites(site_id, site_and_address):
 
 @bp.delete('/<int:site_id>')
 @bp.output(Message)
+@jwt_required()
 def delete_sites(site_id):
     '''Delete sites'''
 

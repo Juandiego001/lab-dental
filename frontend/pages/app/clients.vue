@@ -30,7 +30,7 @@
       <v-card-text>
         <v-form @submit.prevent="createClient">
           <v-row>
-            <v-col cols="12">
+            <v-col v-if="isAdmin" cols="12">
               <v-autocomplete v-model="form.distributorId" hide-details="auto" :label="$t('distributors.title')"
                 :items="distributors" item-title="name" item-value="id" @update:search="getDistributors" />
             </v-col>
@@ -64,7 +64,7 @@
       <v-card-text>
         <v-form @submit.prevent="updateClient">
           <v-row>
-            <v-col cols="12">
+            <v-col v-if="isAdmin" cols="12">
               <v-autocomplete v-model="form.distributorId" hide-details="auto" :label="$t('distributors.title')"
                 :items="distributors" item-title="name" item-value="id" @update:search="getDistributors" />
             </v-col>
@@ -138,6 +138,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { profile } = useProfile();
 const { t } = useI18n();
 
 definePageMeta({
@@ -166,6 +167,8 @@ const form = ref({
   phone: ''
 })
 
+const isAdmin = computed(() => profile.value.role === 'ADMIN');
+
 const itemsPerPageOptions = computed(() => [
   { value: 15, title: '15' },
   { value: 25, title: '25' },
@@ -173,21 +176,32 @@ const itemsPerPageOptions = computed(() => [
   { value: 100, title: '100' }
 ])
 
-const headers = computed(() => [
-  { title: 'Id', key: 'id', sortable: false },
-  { title: t('clients.name'), key: 'name', sortable: false },
-  { title: t('clients.phone'), key: 'phone', sortable: false },
-  { title: t('clients.distributor'), key: 'distributorName', sortable: false },
-  { title: t('options'), key: 'option', align: 'center', sortable: false }
-])
+const headers = computed(() => {
+  if (isAdmin.value) {
+    return [
+      { title: 'Id', key: 'id', sortable: false },
+      { title: t('clients.name'), key: 'name', sortable: false },
+      { title: t('clients.phone'), key: 'phone', sortable: false },
+      { title: t('clients.distributor'), key: 'distributorName', sortable: false },
+      { title: t('options'), key: 'option', align: 'center', sortable: false }
+    ]
+  }
+
+  return [
+    { title: 'Id', key: 'id', sortable: false },
+      { title: t('clients.name'), key: 'name', sortable: false },
+      { title: t('clients.phone'), key: 'phone', sortable: false },
+      { title: t('options'), key: 'option', align: 'center', sortable: false }
+  ]
+})
 
 watch(createDialog, async (val) => {
-  if (val) await getDistributors();
+  if (val) { if (isAdmin.value) await getDistributors(); }
   else resetForm();
 })
 
 watch(updateDialog, async (val) => {
-  if (val) await getDistributors(form.value.distributorName);
+  if (val) { if (isAdmin.value) await getDistributors(form.value.distributorName); }
   else resetForm();
 })
 
@@ -205,7 +219,7 @@ onBeforeMount(async () => {
 
 const resetForm = () => {
   form.value = {
-    distributorId: '',
+    distributorId: null,
     name: '',
     phone: ''
   }

@@ -1,11 +1,13 @@
 from core.app import db
-from core.models import Address, City, Client, Country, Distributor, Site, State
+from core.models import Address, City, Client, Country, Distributor, Site, State, User
 from sqlalchemy import or_, and_
 from werkzeug.exceptions import HTTPException
 from sqlalchemy import func
 
+from core.services.distributors import get_distributor_from_user
 
-def get_sites(search: str, page: int, per_page: int):
+
+def get_sites(current_user: User, search: str, page: int, per_page: int):
     '''Get sites and total of sites in DB'''
 
     query = Site.status == 'ACTIVE'
@@ -13,13 +15,33 @@ def get_sites(search: str, page: int, per_page: int):
         query = and_(Site.status == 'ACTIVE',
                      or_(Site.name.ilike(f'%{search}%')))
 
-    total = db.session.query(Site).count()
+    if current_user.role == 'ADMIN':
+        total = db.session.query(Site).count()
+        return list(db.session.execute(
+            db.session.query(
+                *Site.__table__.c,
+                Client.name.label('client_name'),
+                Distributor.name.label('distributor_name'))
+            .outerjoin(Site.client)
+            .outerjoin(Site.distributor)
+            .filter(query)
+            .order_by(Site.id.desc())
+            .limit(per_page)
+            .offset((page - 1) * per_page)
+        ).unique()), total
 
+    distributor: Distributor = get_distributor_from_user(current_user)
+    query = and_(query, or_(Site.distributor_id == distributor.id,
+                 Client.distributor_id == distributor.id))
+    total = db.session.query(Site)\
+        .outerjoin(Site.client)\
+        .outerjoin(Site.distributor)\
+        .filter(query).count()
     return list(db.session.execute(
         db.session.query(
             *Site.__table__.c,
-            func.concat(
-                Client.name, Distributor.name).label('distributor_client'))
+            Client.name.label('client_name'),
+            Distributor.name.label('distributor_name'))
         .outerjoin(Site.client)
         .outerjoin(Site.distributor)
         .filter(query)
@@ -62,12 +84,16 @@ def get_site_by_id(site_id: int):
         State.country_id.label('country_id'),
         State.name.label('state_name'),
         Country.name.label('country_name'),
+        Client.name.label('client_name'),
+        Distributor.name.label('distributor_name')
     )\
         .select_from(Site)\
         .join(Address)\
         .join(City)\
         .join(State)\
         .join(Country)\
+        .outerjoin(Site.client)\
+        .outerjoin(Site.distributor)\
         .filter(Site.id == site_id)\
         .first()
 

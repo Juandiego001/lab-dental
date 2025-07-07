@@ -6,11 +6,11 @@
         <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
-
           <template v-slot:item.option="{ item }">
-            <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getCategory(item.id)"></v-btn>
+            <v-btn v-if="$ability.can('update', 'categories')" class="my-2 bg-primary" size="small" icon="mdi-pencil"
+              @click="getCategory(item.id)"></v-btn>
             <span class="mx-2"></span>
-            <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
+            <v-btn v-if="$ability.can('delete', 'categories')" class="my-2 bg-red" size="small" icon="mdi-trash-can"
               @click="form.id = item.id; deleteDialog = true"></v-btn>
           </template>
 
@@ -145,6 +145,7 @@ useHead({
   title: `SOE Latam | ${t('categories.title', 2)}`
 })
 
+const { $ability } = useNuxtApp();
 const { searchDialog } = toRefs(searchMixin)
 const { createDialog } = toRefs(createMixin)
 const items = ref([]);
@@ -154,7 +155,7 @@ const perPage = ref(15);
 const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
-const form = ref({  
+const form = ref({
   name: '',
   slug: '',
 })
@@ -166,12 +167,19 @@ const itemsPerPageOptions = computed(() => [
   { value: 100, title: '100' }
 ])
 
-const headers = computed(() => [
-  { title: 'Id', key: 'id', sortable: false },
-  { title: t('categories.name'), key: 'name', sortable: false },
-  { title: t('categories.slug'), key: 'slug', sortable: false },
-  { title: t('options'), key: 'option', align: 'center', sortable: false }
-])
+const headers = computed(() => {
+  const defaultHeaders = [
+    { title: 'Id', key: 'id', sortable: false },
+    { title: t('categories.name'), key: 'name', sortable: false },
+    { title: t('categories.slug'), key: 'slug', sortable: false }
+  ];
+
+  if ($ability.can('update', 'categories') || $ability.can('delete', 'categories')) {
+    defaultHeaders.push({ title: t('options'), key: 'option', align: 'center', sortable: false })
+  }
+
+  return defaultHeaders;
+})
 
 watch(createDialog, (val) => {
   if (!val) { resetForm() }

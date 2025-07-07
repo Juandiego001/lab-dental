@@ -28,6 +28,7 @@ def get_groups(query_data):
 
 @bp.get('/<int:group_id>')
 @bp.output(GroupOut)
+@jwt_required()
 def get_group(group_id):
     '''Get group'''
 
@@ -70,6 +71,7 @@ def update_groups(group_id, json_data):
 
 @bp.delete('/<int:group_id>')
 @bp.output(Message)
+@jwt_required()
 def delete_groups(group_id):
     '''Delete groups'''
 

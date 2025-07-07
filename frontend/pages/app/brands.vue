@@ -7,9 +7,9 @@
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
           <template v-slot:item.option="{ item }">
-            <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getBrand(item.id)"></v-btn>
+            <v-btn v-if="$ability.can('update', 'brands')" class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getBrand(item.id)"></v-btn>
             <span class="mx-2"></span>
-            <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
+            <v-btn v-if="$ability.can('delete', 'brands')" class="my-2 bg-red" size="small" icon="mdi-trash-can"
               @click="form.id = item.id; deleteDialog = true"></v-btn>
           </template>
 
@@ -142,6 +142,7 @@ useHead({
   title: `SOE Latam | ${t('brands.title', 2)}`
 })
 
+const { $ability } = useNuxtApp();
 const { searchDialog } = toRefs(searchMixin)
 const { createDialog } = toRefs(createMixin)
 const items = ref([]);
@@ -163,12 +164,20 @@ const itemsPerPageOptions = computed(() => [
   { value: 100, title: '100' }
 ])
 
-const headers = computed(() => [
-  { title: 'Id', key: 'id', sortable: false },
-  { title: t('brands.name'), key: 'name', sortable: false },
-  { title: t('brands.slug'), key: 'slug', sortable: false },
-  { title: t('options'), key: 'option', align: 'center', sortable: false }
-])
+const headers = computed(() => {
+
+  const defaultHeaders =  [
+    { title: 'Id', key: 'id', sortable: false },
+    { title: t('brands.name'), key: 'name', sortable: false },
+    { title: t('brands.slug'), key: 'slug', sortable: false },
+  ]
+
+  if ($ability.can('update', 'brands') || $ability.can('delete', 'brands')) {
+    defaultHeaders.push({ title: t('options'), key: 'option', align: 'center', sortable: false })
+  }
+
+  return defaultHeaders;
+})
 
 watch(createDialog, (val) => {
   if (!val) { resetForm() }

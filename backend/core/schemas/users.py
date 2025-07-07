@@ -15,7 +15,8 @@ class UserInLogIn(BaseSchema):
 
 class UserIn(BaseSchema):
     id = fields.Integer()
-    distributor_id = fields.Integer(data_key='distributorId', required=False, allow_none=True)
+    distributor_id = fields.Integer(
+        data_key='distributorId', required=False, allow_none=True)
     full_name = fields.String(data_key='fullName')
     username = fields.String()
     email = fields.String()
@@ -33,7 +34,8 @@ class UserInCreate(UserIn):
             .filter(or_(User.email == data['email'], User.username == data['username']))\
             .first()
 
-        if user: abort(400, 'Username or email already exists')
+        if user:
+            abort(400, 'Username or email already exists')
 
         return data
 
@@ -52,10 +54,46 @@ class UserInCreate(UserIn):
 
 
 class UserInUpdate(UserIn):
+    @pre_load
+    def check_email_or_username_exists(self, data, **kwargs):
+        '''Check if there is already a user with the username or the email given'''
+
+        current_user: User = db.session.query(
+            User).filter(User.id == data['id']).first()
+
+        user_exists = None
+        if current_user.email != data['email'] and current_user.email != data['username']:
+            user_exists = db.session.query(User)\
+                .filter(or_(User.email == data['email'], User.username == data['username']))\
+                .first()
+        elif current_user.email != data['email']:
+            user_exists = db.session.query(User)\
+                .filter(User.email == data['email'])\
+                .first()
+        elif current_user.username != data['username']:
+            user_exists = db.session.query(User)\
+                .filter(User.username == data['username'])\
+                .first()
+            
+        if user_exists:
+            abort(400, 'Username or email already exists')
+
+        return data
+
+    @pre_load
+    def set_password(self, data: dict, **kwargs):
+
+        if 'password' in data and data['password']:
+            new_password = data['password'].encode('utf-8')
+            new_password = hashpw(new_password, gensalt()).decode('utf-8')
+            data['password'] = new_password
+
+        return data
 
     @post_load
-    def make_object(self, data, **kwargs):
-        return User(**data)
+    def make_object(self, data: dict, **kwargs):
+        distributor_id = data.pop('distributor_id')
+        return User(**data), distributor_id
 
 
 class UserOut(BaseSchema):

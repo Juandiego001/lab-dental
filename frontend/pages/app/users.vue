@@ -36,7 +36,7 @@
             </v-col>
             <v-col v-if="isAdmin && form.role === 'DISTRIBUTOR'" cols="12">
               <v-autocomplete v-model="form.distributorId" hide-details="auto" :label="$t('distributors.title')"
-                :items="distributors" item-title="name" item-value="id" clearable />
+                :items="distributors" item-title="name" item-value="id" @update:search="getDistributors" clearable />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.fullName" hide-details="auto" :label="$t('users.fullName')"></v-text-field>
@@ -77,8 +77,12 @@
         <v-form @submit.prevent="updateUser">
           <v-row>
             <v-col v-if="isAdmin" cols="12">
+              <v-select v-model="form.role" hide-details="auto" :items="usersRoles" item-title="title"
+                item-value="value" :label="$t('users.role.title')" />
+            </v-col>
+            <v-col v-if="isAdmin && form.role === 'DISTRIBUTOR'" cols="12">
               <v-autocomplete v-model="form.distributorId" hide-details="auto" :label="$t('distributors.title')"
-                :items="distributors" item-title="name" item-value="id" clearable />
+                :items="distributors" item-title="name" item-value="id" @update:search="getDistributors" clearable />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.fullName" hide-details="auto" :label="$t('users.fullName')"></v-text-field>
@@ -89,10 +93,6 @@
             <v-col cols="12">
               <v-text-field v-model="form.email" type="email" hide-details="auto"
                 :label="$t('users.email')"></v-text-field>
-            </v-col>
-            <v-col cols="12">
-              <v-select v-model="form.role" hide-details="auto" :items="usersRoles" item-title="title"
-                item-value="value" :label="$t('users.role.title')" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.password" type="password" hide-details="auto"
@@ -190,8 +190,7 @@ const form = ref({
   fullName: '',
   username: '',
   email: '',
-  role: '',
-  password: ''
+  role: ''
 })
 
 const itemsPerPageOptions = computed(() => [
@@ -215,13 +214,17 @@ const usersRoles = computed(() => [
 ])
 
 watch(createDialog, async (val) => {
-  if (val && isAdmin.value) await getDistributors();
+  if (val) { if (isAdmin.value) await getDistributors(); }
   else resetForm();
 })
 
 watch(updateDialog, async (val) => {
-  if (val && isAdmin.value) await getDistributors(form.value.distributorName);
+  if (val) { if (isAdmin.value) await getDistributors(form.value.distributorName); }
   else resetForm();
+})
+
+watch(() => form.value.role, async (val) => {
+  if (updateDialog.value) form.value.distributorId = null;
 })
 
 watch(page, async () => {
@@ -245,14 +248,13 @@ const resetForm = () => {
     fullName: '',
     username: '',
     email: '',
-    role: '',
-    password: ''
+    role: ''
   }
 }
 
 const getDistributors = async (search) => {
   try {
-    const data = await $api('/api/distributors/', {
+    const data = await $api('/api/distributors/distributors/users', {
       query: {
         search,
         page: 1,
@@ -288,6 +290,9 @@ const getUser = async (id) => {
     const user = await $api(`/api/users/${id}`, {
       method: 'GET'
     })
+
+    console.log({ user });
+
     form.value = user
     nextTick(() => updateDialog.value = true);
   } catch (err) {

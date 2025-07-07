@@ -1,6 +1,6 @@
 from core.models import Address, Site
 from apiflask import Schema, fields
-from marshmallow import post_load, validates_schema
+from marshmallow import post_load, pre_dump, pre_load, validates_schema
 from core.schemas.utils import BaseSchema
 from werkzeug.exceptions import HTTPException
 
@@ -65,6 +65,8 @@ class SiteInUpdate(SiteIn):
 class SiteOut(BaseSchema):
     id = fields.Integer()
     name = fields.String()
+    distributor_id = fields.Integer(data_key='distributorId')
+    client_id = fields.Integer(data_key='clientId')
     address_id = fields.Integer(data_key='addressId')
     description = fields.String()
     status = fields.String()
@@ -74,9 +76,14 @@ class SiteOut(BaseSchema):
     state_name = fields.String(data_key='stateName')
     city_id = fields.Integer(data_key='cityId')
     city_name = fields.String(data_key='cityName')
-    distributor_client = fields.String(data_key='distributorClient')
+    client_name = fields.String(data_key='clientName')
+    distributor_name = fields.String(data_key='distributorName')
     created_at = fields.DateTime(data_key='createdAt')
     updated_at = fields.DateTime(data_key='updatedAt')
+    company_type = fields.Function(
+        lambda data: 'distributors' if data.distributor_id else 'clients', data_key='companyType')
+    distributor_client = fields.Function(
+        lambda data: data._mapping['distributor_name'] if data._mapping['distributor_name'] else data._mapping['client_name'], data_key='distributorClient')
 
 
 class SitesOut(Schema):

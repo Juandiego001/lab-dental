@@ -1,7 +1,9 @@
 from apiflask import APIBlueprint, abort
 from flask_jwt_extended import jwt_required
-from core.schemas.permissions import PermissionsGroupOut
+from core.models import Permission
+from core.schemas.permissions import PermissionIn, PermissionsGroupOut
 from core.services import permissions
+from core.app import db
 
 
 bp = APIBlueprint('permissions', __name__)
@@ -22,6 +24,21 @@ def get_permissions_by_group_id(group_id: int):
     try:
         results, total = permissions.get_permissions_by_group_id(group_id)
         return {'items': results, 'total': total}
+    except Exception as ex:
+        print(str(ex))
+        abort(500, str(ex))
+
+
+@bp.put('/')
+@bp.input(PermissionIn, arg_name='permission_obj')
+@jwt_required()
+def update_permissions_by_group_id(permission_obj: Permission):
+    '''Update permissions by group_id'''
+
+    try:
+        db.session.merge(permission_obj)
+        db.session.commit()
+        return {'message': 'Permission updated succesfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))
