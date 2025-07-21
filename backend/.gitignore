@@ -1,6 +1,7 @@
 .env
 venv
 files
+files_data
 __pycache__
 /__pycache__
 coments.txt
