@@ -200,6 +200,9 @@
       "title": "Search distributor",
       "message": "Search distributor by name or ID",
       "fields": "Name or id"
+    },
+    "rules": {
+      "nameRequired": "The name is required"
     }
   },
   "sites": {
@@ -224,6 +227,15 @@
       "title": "Search site",
       "message": "Seach site by name or ID",
       "fields": "Name or id"
+    },
+    "rules": {
+      "distributorRequired": "The distributor is required",
+      "clientRequired": "The client is required",
+      "countryRequired": "The country is required",
+      "stateRequired": "The state is required",
+      "cityRequired": "The city is required",
+      "addressRequired": "The address is required",
+      "nameRequired": "The name is required"
     }
   },
   "clients": {
@@ -245,6 +257,11 @@
       "title": "Search client",
       "message": "Search client by name or ID",
       "fields": "Name or id"
+    },
+    "rules": {
+      "distributorRequired": "The distributor is required",
+      "nameRequired": "The name is required",
+      "phoneRequired": "The phone is required"
     }
   },
   "users": {
@@ -272,6 +289,14 @@
       "title": "Search user",
       "message": "Search user by full name, username, email or ID",
       "fields": "Full name, username, email or id"
+    },
+    "rules": {
+      "roleRequired": "The role is required",
+      "distributorRequired": "The distributor is required",
+      "fullNameRequired": "The full name is required",
+      "usernameRequired": "The username is required",
+      "emailRequired": "The email is required",
+      "passwordRequired": "The password is required"
     }
   },
   "modules": {
@@ -301,6 +326,11 @@
       "create": "Create",
       "update": "Update",
       "delete": "Delete"
+    },
+    "rules": {
+      "nameRequired": "The name is required",
+      "distributorRequired": "The distributor is required",
+      "usersRequired": "At least one user is required"
     }
   },
   "brands": {
@@ -321,6 +351,10 @@
       "title": "Search brand",
       "message": "Search brands by name, slug or ID",
       "fields": "Name, slug or id"
+    },
+    "rules": {
+      "nameRequired": "The name is required",
+      "slugRequired": "The slug is required"
     }
   },
   "categories": {
@@ -341,6 +375,10 @@
       "title": "Search category",
       "message": "Search cateogires by name, slug or ID",
       "fields": "Name, slug or id"
+    },
+    "rules": {
+      "nameRequired": "The name is required",
+      "slugRequired": "The slug is required"
     }
   },
   "equipments": {
@@ -361,6 +399,12 @@
       "title": "Search equipment",
       "message": "Search equipments by serial, model or ID",
       "fields": "Serial, model or id"
+    },
+    "rules": {
+      "brandRequired": "The brand is required",
+      "categoryRequired": "The category is required",
+      "serialRequired": "The serial is required",
+      "modelRequired": "The model is required"
     }
   },
   "parts": {
@@ -405,6 +449,17 @@
       "title": "Search installation",
       "message": "Search installations by installed at, installed date or ID",
       "fields": "Installed at, installed date or ID"
+    },
+    "rules": {
+      "equipmentRequired": "The equipment is required",
+      "distributorRequired": "The distributor is required",
+      "siteDistributorRequired": "The distributor site is required",
+      "clientRequired": "The client is required",
+      "siteClientRequired": "The client site is required",
+      "installedDateRequired": "The installed date is required",
+      "formatPictureRequired": "The format picture is required",
+      "serialPictureRequired": "The serial picture is required",
+      "installationPicturesRequired": "At least one installation picture is required"
     }
   },
   "reasons": {
@@ -475,6 +530,7 @@
     "distributors": "Distributors",
     "users": "Users",
     "slug": "Slug",
+    "isMain": "Is Main?",
     "create": {
       "title": "Create list"
     },

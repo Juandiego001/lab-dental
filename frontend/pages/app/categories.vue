@@ -30,13 +30,13 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="createCategory">
+        <v-form ref="createForm" v-model="createModel" @submit.prevent="createCategory">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('categories.name')"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('categories.name')" :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('categories.slug')"></v-text-field>
+              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('categories.slug')" :rules="[slugRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -61,13 +61,13 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="updateCategory">
+        <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateCategory">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('categories.name')"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('categories.name')" :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('categories.slug')"></v-text-field>
+              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('categories.slug')" :rules="[slugRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -134,6 +134,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { $ability } = useNuxtApp();
 const { t } = useI18n();
 
 definePageMeta({
@@ -145,7 +146,6 @@ useHead({
   title: `SOE Latam | ${t('categories.title', 2)}`
 })
 
-const { $ability } = useNuxtApp();
 const { searchDialog } = toRefs(searchMixin)
 const { createDialog } = toRefs(createMixin)
 const items = ref([]);
@@ -155,6 +155,10 @@ const perPage = ref(15);
 const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
+const createModel = ref(false);
+const updateModel = ref(false);
+const createForm = ref();
+const updateForm = ref();
 const form = ref({
   name: '',
   slug: '',
@@ -182,11 +186,17 @@ const headers = computed(() => {
 })
 
 watch(createDialog, (val) => {
-  if (!val) { resetForm() }
+  if (!val) {
+    createForm.value.reset();
+    resetForm();
+  }
 })
 
 watch(updateDialog, (val) => {
-  if (!val) { resetForm() }
+  if (!val) {
+    updateForm.value.reset();
+    resetForm();
+  }
 })
 
 watch(page, async () => {
@@ -198,6 +208,10 @@ watch(perPage, async () => {
 })
 
 onBeforeMount(async () => {
+  if (!$ability.can('read', 'categories')) {
+    navigateTo(history.state?.back || '/login');
+    return;
+  }
   await getCategories();
 })
 
@@ -239,6 +253,7 @@ const getCategory = async (id) => {
 
 const createCategory = async () => {
   try {
+    if (!createModel.value) return;
     const response = await $api('/api/categories/', {
       method: 'POST',
       body: form.value
@@ -253,6 +268,7 @@ const createCategory = async () => {
 
 const updateCategory = async () => {
   try {
+    if (!updateModel.value) return;
     const response = await $api(`/api/categories/${form.value.id}`, {
       method: 'PUT',
       body: form.value
@@ -288,5 +304,9 @@ const doSearch = async () => {
     console.log(err)
   }
 }
+
+// Rules
+const nameRequired = (v) => !!v || t('categories.rules.nameRequired');
+const slugRequired = (v) => !!v || t('categories.rules.slugRequired');
 
 </script>

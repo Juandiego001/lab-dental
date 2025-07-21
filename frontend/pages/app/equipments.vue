@@ -28,21 +28,21 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="createEquipment">
+        <v-form ref="createForm" v-model="createModel" @submit.prevent="createEquipment">
           <v-row>
             <v-col cols="12">
               <v-autocomplete v-model="form.brandId" :label="$t('brands.title', 1)" :items="brands" item-title="name"
-                item-value="id" hide-details="auto" @update:search="getBrands" />
+                item-value="id" hide-details="auto" @update:search="getBrands" :rules="[brandRequired]" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.categoryId" :label="$t('categories.title', 1)" :items="categories"
-                item-title="name" item-value="id" hide-details="auto" @update:search="getCategories" />
+                item-title="name" item-value="id" hide-details="auto" @update:search="getCategories" :rules="[categoryRequired]" />
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.serial" hide-details="auto" :label="$t('equipments.serial')"></v-text-field>
+              <v-text-field v-model="form.serial" hide-details="auto" :label="$t('equipments.serial')" :rules="[serialRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.model" hide-details="auto" :label="$t('equipments.model')"></v-text-field>
+              <v-text-field v-model="form.model" hide-details="auto" :label="$t('equipments.model')" :rules="[modelRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -66,21 +66,21 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="updateEquipment">
+        <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateEquipment">
           <v-row>
             <v-col cols="12">
               <v-autocomplete v-model="form.brandId" :label="$t('brands.title', 1)" :items="brands" item-title="name"
-                item-value="id" hide-details="auto" @update:search="getBrands" clearable />
+                item-value="id" hide-details="auto" @update:search="getBrands" clearable :rules="[brandRequired]" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.categoryId" :label="$t('categories.title', 1)" :items="categories"
-                item-title="name" item-value="id" hide-details="auto" @update:search="getCategories" clearable />
+                item-title="name" item-value="id" hide-details="auto" @update:search="getCategories" clearable :rules="[categoryRequired]" />
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.serial" hide-details="auto" :label="$t('equipments.serial')"></v-text-field>
+              <v-text-field v-model="form.serial" hide-details="auto" :label="$t('equipments.serial')" :rules="[serialRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.model" hide-details="auto" :label="$t('equipments.model')"></v-text-field>
+              <v-text-field v-model="form.model" hide-details="auto" :label="$t('equipments.model')" :rules="[modelRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -147,6 +147,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { $ability } = useNuxtApp();
 const { t } = useI18n();
 
 definePageMeta({
@@ -169,6 +170,10 @@ const perPage = ref(15);
 const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
+const createModel = ref(false);
+const updateModel = ref(false);
+const createForm = ref();
+const updateForm = ref();
 const form = ref({
   brandId: '',
   brandName: '',
@@ -185,20 +190,28 @@ const itemsPerPageOptions = computed(() => [
   { value: 100, title: '100' }
 ])
 
-const headers = computed(() => [
-  { title: 'Id', key: 'id', sortable: false },
-  { title: t('brands.title', 1), key: 'brandName', sortable: false },
-  { title: t('categories.title', 1), key: 'categoryName', sortable: false },
-  { title: t('equipments.serial'), key: 'serial', sortable: false },
-  { title: t('equipments.model'), key: 'model', sortable: false },
-  { title: t('options'), key: 'option', align: 'center', sortable: false }
-])
+const headers = computed(() => {
+  const defaultHeaders = [
+    { title: 'Id', key: 'id', sortable: false },
+    { title: t('brands.title', 1), key: 'brandName', sortable: false },
+    { title: t('categories.title', 1), key: 'categoryName', sortable: false },
+    { title: t('equipments.serial'), key: 'serial', sortable: false },
+    { title: t('equipments.model'), key: 'model', sortable: false }
+  ]
+
+  if ($ability.can('update', 'equipments') || $ability.can('delete', 'equipments')) {
+    defaultHeaders.push({ title: t('options'), key: 'option', align: 'center', sortable: false })
+  }
+
+  return defaultHeaders;
+})
 
 watch(createDialog, async (val) => {
   if (val) {
     await getBrands();
     await getCategories();
   } else {
+    createForm.value.reset();
     resetForm();
   }
 })
@@ -208,6 +221,7 @@ watch(updateDialog, async (val) => {
     await getBrands(form.value.brandName);
     await getCategories(form.value.categoryName);
   } else {
+    updateForm.value.reset();
     resetForm();
   }
 })
@@ -221,6 +235,10 @@ watch(perPage, async () => {
 })
 
 onBeforeMount(async () => {
+  if (!$ability.can('read', 'equipments')) {
+    navigateTo(history.state?.back || '/login');
+    return;
+  }
   await getEquipments();
 })
 
@@ -237,6 +255,7 @@ const resetForm = () => {
 
 const getBrands = async (search) => {
   try {
+    if (!createDialog.value && !updateDialog.value) return;
     const data = await $api('/api/brands/', {
       query: {
         search,
@@ -253,6 +272,7 @@ const getBrands = async (search) => {
 
 const getCategories = async (search) => {
   try {
+    if (!createDialog.value && !updateDialog.value) return;
     const data = await $api('/api/categories/', {
       query: {
         search: search,
@@ -297,6 +317,7 @@ const getEquipment = async (id) => {
 }
 
 const createEquipment = async () => {
+  if (!createModel.value) return;
   try {
     const response = await $api('/api/equipments/', {
       method: 'POST',
@@ -312,6 +333,7 @@ const createEquipment = async () => {
 
 const updateEquipment = async () => {
   try {
+    if (!updateModel.value) return;
     const response = await $api(`/api/equipments/${form.value.id}`, {
       method: 'PUT',
       body: form.value
@@ -347,5 +369,11 @@ const doSearch = async () => {
     console.log(err)
   }
 }
+
+// Rules
+const brandRequired = (v) => !!v || t('equipments.rules.brandRequired');
+const categoryRequired = (v) => !!v || t('equipments.rules.categoryRequired');
+const serialRequired = (v) => !!v || t('equipments.rules.serialRequired');
+const modelRequired = (v) => !!v || t('equipments.rules.modelRequired');
 
 </script>

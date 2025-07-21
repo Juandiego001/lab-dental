@@ -28,10 +28,11 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="createDistributor">
+        <v-form ref="createForm" v-model="createModel" @submit.prevent="createDistributor">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('distributors.name')"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('distributors.name')"
+                :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -55,10 +56,11 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="updateDistributor">
+        <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateDistributor">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('distributors.name')"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('distributors.name')"
+                :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -124,6 +126,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { $ability } = useNuxtApp();
 const { t } = useI18n();
 
 definePageMeta({
@@ -144,6 +147,10 @@ const perPage = ref(15);
 const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
+const createModel = ref(false);
+const updateModel = ref(false);
+const createForm = ref();
+const updateForm = ref();
 const form = ref({
   name: ''
 })
@@ -162,11 +169,17 @@ const headers = computed(() => [
 ])
 
 watch(createDialog, (val) => {
-  if (!val) { resetForm() }
+  if (!val) {
+    createForm.value.reset();
+    resetForm();
+  }
 })
 
 watch(updateDialog, (val) => {
-  if (!val) { resetForm() }
+  if (!val) {
+    updateForm.value.reset();
+    resetForm();
+  }
 })
 
 watch(page, async () => {
@@ -178,6 +191,10 @@ watch(perPage, async () => {
 })
 
 onBeforeMount(async () => {
+  if (!$ability.can('read', 'distributors')) {
+    navigateTo(history.state?.back || '/login');
+    return;
+  }
   await getDistributors();
 })
 
@@ -218,12 +235,12 @@ const getDistributor = async (id) => {
 
 const createDistributor = async () => {
   try {
+    if (!createModel.value) return;
     const response = await $api('/api/distributors/', {
       method: 'POST',
       body: form.value
     })
     await getDistributors()
-    resetForm()
     createDialog.value = false;
   } catch (err) {
     console.log(err)
@@ -232,12 +249,12 @@ const createDistributor = async () => {
 
 const updateDistributor = async () => {
   try {
+    if (!updateModel.value) return;
     const response = await $api(`/api/distributors/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
     await getDistributors()
-    resetForm()
     updateDialog.value = false
   } catch (err) {
     console.log(err)
@@ -263,5 +280,8 @@ const doSearch = async () => {
     console.log(err)
   }
 }
+
+// Rules
+const nameRequired = (v) => !!v || t('distributors.rules.nameRequired');
 
 </script>

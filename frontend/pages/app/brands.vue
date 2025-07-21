@@ -7,7 +7,8 @@
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
           <template v-slot:item.option="{ item }">
-            <v-btn v-if="$ability.can('update', 'brands')" class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getBrand(item.id)"></v-btn>
+            <v-btn v-if="$ability.can('update', 'brands')" class="my-2 bg-primary" size="small" icon="mdi-pencil"
+              @click="getBrand(item.id)"></v-btn>
             <span class="mx-2"></span>
             <v-btn v-if="$ability.can('delete', 'brands')" class="my-2 bg-red" size="small" icon="mdi-trash-can"
               @click="form.id = item.id; deleteDialog = true"></v-btn>
@@ -29,13 +30,15 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="createBrand">
+        <v-form ref="createForm" v-model="createModel" @submit.prevent="createBrand">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('brands.name')"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('brands.name')"
+                :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('brands.slug')"></v-text-field>
+              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('brands.slug')"
+                :rules="[slugRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -59,13 +62,15 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="updateBrand">
+        <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateBrand">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('brands.name')"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('brands.name')"
+                :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('brands.slug')"></v-text-field>
+              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('brands.slug')"
+                :rules="[slugRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -131,6 +136,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { $ability } = useNuxtApp();
 const { t } = useI18n();
 
 definePageMeta({
@@ -142,7 +148,6 @@ useHead({
   title: `SOE Latam | ${t('brands.title', 2)}`
 })
 
-const { $ability } = useNuxtApp();
 const { searchDialog } = toRefs(searchMixin)
 const { createDialog } = toRefs(createMixin)
 const items = ref([]);
@@ -152,7 +157,11 @@ const perPage = ref(15);
 const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
-const form = ref({  
+const createModel = ref(false);
+const updateModel = ref(false);
+const createForm = ref();
+const updateForm = ref();
+const form = ref({
   name: '',
   slug: ''
 })
@@ -166,7 +175,7 @@ const itemsPerPageOptions = computed(() => [
 
 const headers = computed(() => {
 
-  const defaultHeaders =  [
+  const defaultHeaders = [
     { title: 'Id', key: 'id', sortable: false },
     { title: t('brands.name'), key: 'name', sortable: false },
     { title: t('brands.slug'), key: 'slug', sortable: false },
@@ -180,11 +189,17 @@ const headers = computed(() => {
 })
 
 watch(createDialog, (val) => {
-  if (!val) { resetForm() }
+  if (!val) {
+    createForm.value.reset();
+    resetForm();
+  }
 })
 
 watch(updateDialog, (val) => {
-  if (!val) { resetForm() }
+  if (!val) {
+    updateForm.value.reset();
+    resetForm();
+  }
 })
 
 watch(page, async () => {
@@ -196,6 +211,10 @@ watch(perPage, async () => {
 })
 
 onBeforeMount(async () => {
+  if (!$ability.can('read', 'brands')) {
+    navigateTo(history.state?.back || '/login');
+    return;
+  }
   await getBrands();
 })
 
@@ -237,13 +256,13 @@ const getBrand = async (id) => {
 
 const createBrand = async () => {
   try {
+    if (!createModel.value) return;
     const response = await $api('/api/brands/', {
       method: 'POST',
       body: form.value
     })
     await getBrands()
     createDialog.value = false
-    resetForm()
   } catch (err) {
     console.log(err)
   }
@@ -251,13 +270,13 @@ const createBrand = async () => {
 
 const updateBrand = async () => {
   try {
+    if (!updateModel.value) return;
     const response = await $api(`/api/brands/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
     await getBrands()
     updateDialog.value = false
-    resetForm()
   } catch (err) {
     console.log(err)
   }
@@ -286,5 +305,9 @@ const doSearch = async () => {
     console.log(err)
   }
 }
+
+// Rules
+const nameRequired = (v) => !!v || t('brands.rules.nameRequired');
+const slugRequired = (v) => !!v || t('brands.rules.slugRequired');
 
 </script>

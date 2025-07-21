@@ -1,8 +1,8 @@
+from apiflask import fields
 from core.models import Address, Site
-from apiflask import Schema, fields
-from marshmallow import post_load, pre_dump, pre_load, validates_schema
 from core.schemas.utils import BaseSchema
 from werkzeug.exceptions import HTTPException
+from marshmallow import post_load, validates_schema
 
 
 class SiteIn(BaseSchema):
@@ -86,6 +86,15 @@ class SiteOut(BaseSchema):
         lambda data: data._mapping['distributor_name'] if data._mapping['distributor_name'] else data._mapping['client_name'], data_key='distributorClient')
 
 
-class SitesOut(Schema):
+class SitesOut(BaseSchema):
     items = fields.List(fields.Nested(SiteOut))
     total = fields.Integer()
+
+
+class SiteInstallationOut(BaseSchema):
+    id = fields.Integer()
+    name = fields.String()
+
+
+class SitesInstallationsOut(BaseSchema):
+    items = fields.List(fields.Nested(SiteInstallationOut))

@@ -1,3 +1,4 @@
+from flask_jwt_extended import jwt_required
 from core.app import db
 from core.services import reasons
 from apiflask import APIBlueprint, abort
@@ -11,6 +12,7 @@ bp = APIBlueprint('reasons', __name__)
 @bp.get('/')
 @bp.input(Pagination, location='query')
 @bp.output(ReasonsOut)
+@jwt_required()
 def get_reasons(query_data):
     '''Get reasons'''
 
@@ -25,6 +27,7 @@ def get_reasons(query_data):
 
 @bp.get('/<int:reason_id>')
 @bp.output(ReasonOut)
+@jwt_required()
 def get_reason(reason_id):
     '''Get reason'''
 
@@ -36,6 +39,7 @@ def get_reason(reason_id):
 
 @bp.post('/')
 @bp.input(ReasonInCreate, arg_name='reason')
+@jwt_required()
 def create_reasons(reason):
     '''Create reasons'''
 
@@ -51,6 +55,7 @@ def create_reasons(reason):
 @bp.put('/<int:reason_id>')
 @bp.input(ReasonInUpdate)
 @bp.output(Message)
+@jwt_required()
 def update_reasons(reason_id, json_data):
     '''Update reason'''
 
@@ -64,6 +69,7 @@ def update_reasons(reason_id, json_data):
 
 @bp.delete('/<int:reason_id>')
 @bp.output(Message)
+@jwt_required()
 def delete_reasons(reason_id):
     '''Delete reasons'''
 

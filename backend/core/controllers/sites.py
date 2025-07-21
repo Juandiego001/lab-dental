@@ -4,7 +4,7 @@ from core.services import sites
 from apiflask import APIBlueprint, abort
 from flask_jwt_extended import jwt_required, current_user
 from core.schemas.utils import Message, Pagination
-from core.schemas.sites import SiteInUpdate, SiteInCreate, SiteOut, SitesOut
+from core.schemas.sites import SiteInUpdate, SiteInCreate, SiteOut, SitesInstallationsOut, SitesOut
 
 
 bp = APIBlueprint('sites', __name__)
@@ -32,7 +32,7 @@ def get_sites(query_data):
 
 @bp.get('/clients/<string:client_id>')
 @bp.input(Pagination, location='query')
-@bp.output(SitesOut)
+@bp.output(SitesInstallationsOut)
 @jwt_required()
 def get_clients_sites(query_data, client_id):
     '''Get clients sites'''
@@ -45,7 +45,7 @@ def get_clients_sites(query_data, client_id):
 
 @bp.get('/distributors/<string:distributor_id>')
 @bp.input(Pagination, location='query')
-@bp.output(SitesOut)
+@bp.output(SitesInstallationsOut)
 @jwt_required()
 def get_distributors_sites(query_data, distributor_id):
     '''Get distributors sites'''

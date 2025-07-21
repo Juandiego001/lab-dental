@@ -140,6 +140,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { $ability } = useNuxtApp();
 const { t } = useI18n();
 
 
@@ -195,6 +196,10 @@ watch(perPage, async () => {
 })
 
 onBeforeMount(async () => {
+  if (!$ability.can('read', 'warranties')) {
+    navigateTo(history.state?.back || '/login');
+    return;
+  }
   await getWarranties();
 })
 

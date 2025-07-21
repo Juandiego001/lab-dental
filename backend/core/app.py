@@ -14,7 +14,7 @@ ENV = os.getenv('ENV') or 'development'
 HOST = os.getenv('HOST') or 'localhost'
 PORT = int(os.getenv('PORT') or 5000)
 
-app = APIFlask(__name__, title='Cinema API', version='0.0.1', enable_openapi=ENV == 'development')
+app = APIFlask(__name__, title='SOE Latam API', version='0.0.1', enable_openapi=ENV == 'development')
 CORS(app)
 
 app.config['JWT_SECRET_KEY'] = 'super-secret987'  # Change this!

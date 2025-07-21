@@ -11,6 +11,7 @@ bp = APIBlueprint('installations', __name__)
 @bp.get('/')
 @bp.input(Pagination, location='query')
 @bp.output(InstallationsOut)
+@jwt_required()
 def get_installations(query_data):
     '''Get installations'''
 
@@ -25,6 +26,7 @@ def get_installations(query_data):
 
 @bp.get('/<int:installation_id>')
 @bp.output(InstallationOut)
+@jwt_required()
 def get_installation(installation_id):
     '''Get installation'''
 
@@ -36,6 +38,7 @@ def get_installation(installation_id):
 
 @bp.post('/')
 @bp.input(InstallationInCreate, location='form_and_files')
+@jwt_required()
 def create_installations(form_and_files_data):
     '''Create installation'''
 
@@ -51,6 +54,7 @@ def create_installations(form_and_files_data):
 @bp.put('/<int:installation_id>')
 @bp.input(InstallationInUpdate)
 @bp.output(Message)
+@jwt_required()
 def update_installations(installation_id, json_data):
     '''Update installation'''
     try:
@@ -63,6 +67,7 @@ def update_installations(installation_id, json_data):
 
 @bp.delete('/<int:installation_id>')
 @bp.output(Message)
+@jwt_required()
 def delete_installations(installation_id):
     '''Delete installations'''
 

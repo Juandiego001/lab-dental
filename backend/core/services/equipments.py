@@ -10,10 +10,13 @@ def get_equipments(search: str, page: int, per_page: int):
     query = Equipment.status == 'ACTIVE'
     if search:
         query = and_(Equipment.status == 'ACTIVE',
-                     or_(literal(search).ilike('%' + Equipment.serial + '%'),
+                     or_(
+                         Equipment.serial.ilike(f'%{search}%'),
+                         Equipment.model.ilike(f'%{search}%'),
+                         literal(search).ilike('%' + Equipment.serial + '%'),
                          literal(search).ilike('%' + Equipment.model + '%')))
 
-    total = db.session.query(Equipment).count()
+    total = db.session.query(Equipment).filter(query).count()
 
     return list(db.session.execute(
         db.session.query(

@@ -1,20 +1,19 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
-  const { setProfile }  = useProfile();
+  if (import.meta.server) return
+  const { setProfile } = useProfile();
   const { $ability } = useNuxtApp();
   try {
-    const headers = useRequestHeaders(['cookie'])
-    const { data } = await useFetch<any>(`http://localhost:3000/api/users/profile`, {
-      method: 'GET',
-      headers: {
-        ...(headers?.cookie ? { cookie: headers.cookie } : {})
-      }
-    });
-    if (!data.value.email) {
+    const data: any = await $api(`/api/users/profile`);
+    if (!data) {
       setProfile(null);
       return navigateTo('/login');
     }
-    if (data.value.abilities) $ability.update(data.value.abilities)
-    setProfile(data.value);
+    if (!data.email) {
+      setProfile(null);
+      return navigateTo('/login');
+    }
+    if (data.abilities) $ability.update(data.abilities)
+    setProfile(data);
   } catch (err) {
     console.error(err);
     return navigateTo('/login')

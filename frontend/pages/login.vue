@@ -32,20 +32,18 @@
 </template>
 
 <script setup>
-import { useProfile } from '~/composables/useProfile'
-
 definePageMeta({
   layout: 'account'
 })
 
+const { show } = useSnackbar();
 const { $ability } = useNuxtApp();
-const profile = useProfile()
 const email = ref('')
 const password = ref('')
 
 const logIn = async () => {
   try {
-    await $api('/api/users/login', {
+    const response = await $api('/api/users/login', {
       method: 'POST',
       body: {
         email: email.value,
@@ -54,6 +52,7 @@ const logIn = async () => {
     })
     const { abilities } = await $api('/api/users/profile', { method: 'GET' });
     $ability.update(abilities);
+    show(response.message, 'success')
     navigateTo('/app');
   } catch (err) {
     console.log(err);

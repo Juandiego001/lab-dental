@@ -51,7 +51,7 @@ def login_users(user):
         user_data = ProfileOut().dump(user)
         access_token = create_access_token(
             identity=str(user.id), additional_claims=user_data)
-        response = jsonify(access_token=access_token)
+        response = jsonify(access_token=access_token, message=f'Welcome {user_data['full_name']}')
         set_access_cookies(response, access_token)
         return response
     except HTTPException as ex:
@@ -97,9 +97,9 @@ def get_profile():
 
 
 @bp.put('/profile')
-@jwt_required()
 @bp.input(ProfileIn, arg_name='user_data')
 @bp.output(Message)
+@jwt_required()
 def update_profile(user_data):
     '''
     Actualización del perfil de usuario

@@ -41,10 +41,20 @@ class UserInCreate(UserIn):
 
     @pre_load
     def set_password(self, data: dict, **kwargs):
+        '''Set the password'''
+
         new_password = data['password'].encode('utf-8')
         new_password = hashpw(new_password, gensalt()).decode('utf-8')
         data['password'] = new_password
         data['status'] = 'ACTIVE'
+        return data
+
+    @pre_load
+    def if_role_not_exists(self, data, **kwargs):
+        '''If role not exists set DISTRIBUTOR role'''
+
+        if not 'role' in data or not data['role']:
+            data['role'] = 'DISTRIBUTOR'
         return data
 
     @post_load
@@ -74,7 +84,7 @@ class UserInUpdate(UserIn):
             user_exists = db.session.query(User)\
                 .filter(User.username == data['username'])\
                 .first()
-            
+
         if user_exists:
             abort(400, 'Username or email already exists')
 
@@ -128,6 +138,7 @@ class ProfileIn(Schema):
 
 
 class ProfileOut(Schema):
+    distributor_id = fields.Integer()
     full_name = fields.String()
     role = fields.String()
     email = fields.String()

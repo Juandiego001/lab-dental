@@ -1,7 +1,7 @@
 import re
 import unicodedata
 from core.app import db
-from sqlalchemy import or_, and_, func
+from sqlalchemy import or_, and_, func, delete
 from werkzeug.exceptions import HTTPException
 from core.models import List_, DistributorList, UserList
 
@@ -26,8 +26,8 @@ def get_list_by_id(list_id: int):
             DistributorList.distributor_id).label('distributors_ids'),
         func.array_agg(UserList.user_id).label('users_ids'))\
         .select_from(List_)\
-        .join(DistributorList)\
-        .join(UserList)\
+        .outerjoin(DistributorList)\
+        .outerjoin(UserList)\
         .filter(List_.id == list_id)\
         .group_by(List_.id, List_.name)\
         .first()
@@ -69,13 +69,32 @@ def check_list_exists(list_id: int):
     return db.session.query(List_).filter(List_.id == list_id).first()
 
 
-def update_list(list_id: int, lists_load):
+def update_list(list_id: int, list_data: dict):
     '''Update list'''
 
     if not check_list_exists(list_id):
         raise HTTPException('List not found')
 
-    db.session.merge(lists_load)
+    # Delete old distributors ids
+    db.session.execute(delete(DistributorList).where(DistributorList.list_id == list_id))
+
+    # Delete old users ids
+    db.session.execute(delete(UserList).where(UserList.list_id == list_id))
+
+    # Creation of distributors_ids and users_ids
+    if 'distributors_ids' in list_data and len(list_data['distributors_ids']):
+        distributors_ids = list_data.pop('distributors_ids')
+        distributors_ids = [DistributorList(
+            distributor_id=distributor_id, list_id=list_id) for distributor_id in distributors_ids]
+        db.session.add_all(distributors_ids)
+
+    if 'users_ids' in list_data and len(list_data['users_ids']):
+        users_ids = list_data.pop('users_ids')
+        users_ids = [UserList(user_id=user_id, list_id=list_id)
+                     for user_id in users_ids]
+        db.session.add_all(users_ids)
+
+    db.session.merge(List_(**list_data))
     db.session.commit()
 
 

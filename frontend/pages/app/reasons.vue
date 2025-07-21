@@ -130,6 +130,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { $ability } = useNuxtApp();
 const { t } = useI18n();
 
 definePageMeta({
@@ -182,6 +183,10 @@ watch(perPage, async () => {
 })
 
 onBeforeMount(async () => {
+  if (!$ability.can('read', 'reasons')) {
+    navigateTo(history.state?.back || '/login');
+    return;
+  }
   await getReasons();
 })
 

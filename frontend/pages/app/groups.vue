@@ -29,19 +29,19 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="createGroup">
+        <v-form ref="createForm" v-model="createModel" @submit.prevent="createGroup">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('groups.name')"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('groups.name')" :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col v-if="isAdmin" cols="12">
               <v-autocomplete v-model="form.distributorId" :label="$t('distributors.title')" :items="distributors"
-                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable />
+                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable :rules="[distributorRequired]" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.usersIds" :label="$t('users.title', 2)" :items="users" item-title="fullName"
                 item-value="id" hide-details="auto" @update:search="getUsers" clearable multiple chips
-                :readonly="isAdmin && !form.distributorId" />
+                :readonly="isAdmin && !form.distributorId" :rules="[usersRequired]"/>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -65,19 +65,19 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="updateGroup">
+        <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateGroup">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('groups.name')"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('groups.name')" :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col v-if="isAdmin" cols="12">
               <v-autocomplete v-model="form.distributorId" :label="$t('distributors.title')" :items="distributors"
-                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable />
+                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable :rules="[distributorRequired]"/>
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.usersIds" :label="$t('users.title', 2)" :items="users" item-title="fullName"
                 item-value="id" hide-details="auto" @update:search="getUsers" clearable multiple chips
-                :readonly="isAdmin && !form.distributorId" />
+                :readonly="isAdmin && !form.distributorId" :rules="[usersRequired]"/>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -150,7 +150,7 @@
         <v-data-table-server :items="itemsPermissions" :headers="headersPermissions" :page="pagePermissions"
           :items-per-page="perPagePermissions" :items-length="totalPermissions"
           :items-per-page-options="itemsPerPageOptions" @update:page="v => pagePermissions = v"
-          @update:itemsPerPage="v => perPage = v" :disable-sort="true" density="compact">
+          @update:itemsPerPage="v => perPagePermissions = v" :disable-sort="true" density="compact">
           <template v-slot:item.moduleName="{ item }">
             <span class="text-capitalize">{{ item.moduleName }}</span>
           </template>
@@ -186,6 +186,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { $ability } = useNuxtApp();
 const { profile } = useProfile();
 const { t } = useI18n();
 
@@ -218,6 +219,10 @@ const totalPermissions = ref(15);
 
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
+const createModel = ref(false);
+const updateModel = ref(false);
+const createForm = ref();
+const updateForm = ref();
 const permissionsDialog = ref(false);
 const form = ref({
   name: '',
@@ -267,22 +272,24 @@ watch(createDialog, async (val) => {
     } else {
       await getUsers();
     }
-  } else resetForm();
+  } else {
+    createForm.value.reset();
+    resetForm();
+  }
 })
 
 watch(updateDialog, async (val) => {
   if (val) {
     if (isAdmin.value) await getDistributors(form.value.distributorName);
     await getUsers();
-  } else resetForm();
+  } else {
+    updateForm.value.reset();
+    resetForm();
+  }
 })
 
 watch(() => form.value.distributorId, async (val) => {
   if (val) await getUsers();
-})
-
-watch(updateDialog, (val) => {
-  if (!val) { resetForm() }
 })
 
 watch(page, async () => {
@@ -293,13 +300,20 @@ watch(perPage, async () => {
   await getGroups();
 })
 
-onBeforeMount(async () => {
-  await getGroups();
+watch(pagePermissions, async () => {
+  await getPermissions();
 })
 
-onMounted(() => {
-  console.log({ isAdmin: isAdmin.value })
-  console.log({ tableHeaders: tableHeaders.value })
+watch(perPagePermissions, async () => {
+  await getPermissions();
+})
+
+onBeforeMount(async () => {
+  if (!$ability.can('read', 'groups')) {
+    navigateTo(history.state?.back || '/login');
+    return;
+  }
+  await getGroups();
 })
 
 const resetForm = () => {
@@ -342,6 +356,7 @@ const getGroup = async (id) => {
 
 const createGroup = async () => {
   try {
+    if (!createModel.value) return;
     const response = await $api('/api/groups/', {
       method: 'POST',
       body: form.value
@@ -356,6 +371,7 @@ const createGroup = async () => {
 
 const updateGroup = async () => {
   try {
+    if (!updateModel.value) return;
     const response = await $api(`/api/groups/${form.value.id}`, {
       method: 'PUT',
       body: form.value
@@ -394,6 +410,7 @@ const doSearch = async () => {
 
 const getDistributors = async (search) => {
   try {
+    if (!createDialog.value && !updateDialog.value) return;
     const data = await $api('/api/distributors/', {
       query: {
         search,
@@ -410,6 +427,7 @@ const getDistributors = async (search) => {
 
 const getUsers = async (search) => {
   try {
+    if (!createDialog.value && !updateDialog.value) return;
     let data;
     if (form.value.distributorId) {
       data = await $api(`/api/distributors/${form.value.distributorId}/users`, {
@@ -441,8 +459,8 @@ const getPermissions = async (search) => {
     const data = await $api(`/api/permissions/groups/${form.value.id}`, {
       query: {
         search,
-        page: 1,
-        perPage: 15
+        page: pagePermissions.value,
+        perPage: perPagePermissions.value
       },
       method: 'GET'
     })
@@ -465,5 +483,10 @@ const updatePermissions = async (v, item, action) => {
     console.log(err);
   }
 }
+
+// Rules
+const nameRequired = (v) => !!v || t('groups.rules.nameRequired');
+const distributorRequired = (v) => !!v || t('groups.rules.distributorRequired');
+const usersRequired = (v) => (v && v.length > 0) || t('groups.rules.usersRequired');
 
 </script>

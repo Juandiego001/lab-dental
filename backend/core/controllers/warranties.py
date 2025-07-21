@@ -1,3 +1,4 @@
+from flask_jwt_extended import jwt_required
 from core.app import db
 from core.services import warranties
 from apiflask import APIBlueprint, abort
@@ -12,6 +13,7 @@ bp = APIBlueprint('warranties', __name__)
 @bp.get('/')
 @bp.input(Pagination, location='query')
 @bp.output(WarrantiesOut)
+@jwt_required()
 def get_warranties(query_data):
     '''Get warranties'''
 
@@ -26,6 +28,7 @@ def get_warranties(query_data):
 
 @bp.get('/<int:warranty_id>')
 @bp.output(WarrantyOut)
+@jwt_required()
 def get_warranty(warranty_id):
     '''Get warranty'''
 
@@ -37,6 +40,7 @@ def get_warranty(warranty_id):
 
 @bp.post('/')
 @bp.input(WarrantyInCreate, arg_name='warranty')
+@jwt_required()
 def create_warranties(warranty):
     '''Create warranties'''
 
@@ -52,6 +56,7 @@ def create_warranties(warranty):
 @bp.put('/<int:warranty_id>')
 @bp.input(WarrantyInUpdate)
 @bp.output(Message)
+@jwt_required()
 def update_warranties(warranty_id, json_data):
     '''Update warranties'''
     try:
@@ -64,6 +69,7 @@ def update_warranties(warranty_id, json_data):
 
 @bp.delete('/<int:warranty_id>')
 @bp.output(Message)
+@jwt_required()
 def delete_warranties(warranty_id):
     '''Delete warranties'''
 

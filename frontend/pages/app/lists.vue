@@ -6,6 +6,9 @@
         <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
+          <template v-slot:item.isMain="{ item }">
+            <v-icon v-if="item.isMain" icon="mdi-check-bold" color="success"></v-icon>
+          </template>
           <template v-slot:item.option="{ item }">
             <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getList(item.id)"></v-btn>
             <span class="mx-2"></span>
@@ -141,10 +144,8 @@ import { ref, computed, watch, onBeforeMount, useTemplateRef, toRefs } from 'vue
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
-import { useDate } from 'vuetify'
-
+const { $ability } = useNuxtApp();
 const { t } = useI18n();
-const date = useDate();
 
 definePageMeta({
   layout: 'app',
@@ -166,8 +167,6 @@ const perPage = ref(15);
 const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
-const showPicker = ref(false);
-const selectedDate = ref(null);
 const form = ref({
   name: '',
   distributorsIds: [],
@@ -185,6 +184,7 @@ const itemsPerPageOptions = computed(() => [
 const headers = computed(() => [
   { title: 'Id', key: 'id', align: 'center', sortable: false },
   { title: t('lists.name'), key: 'name', align: 'center', sortable: false },
+  { title: t('lists.isMain'), key: 'isMain', align: 'center', sortable: false },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
@@ -215,6 +215,10 @@ watch(perPage, async () => {
 })
 
 onBeforeMount(async () => {
+  if (!$ability.can('read', 'lists')) {
+    navigateTo(history.state?.back || '/login');
+    return;
+  }
   await getLists();
 })
 

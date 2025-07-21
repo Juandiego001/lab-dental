@@ -1,3 +1,4 @@
+from flask_jwt_extended import jwt_required
 from core.app import db
 from core.services import equipments
 from apiflask import APIBlueprint, abort
@@ -11,6 +12,7 @@ bp = APIBlueprint('equipments', __name__)
 @bp.get('/')
 @bp.input(Pagination, location='query')
 @bp.output(EquipmentsOut)
+@jwt_required()
 def get_equipments(query_data):
     '''Get equipments'''
 
@@ -25,6 +27,7 @@ def get_equipments(query_data):
 
 @bp.get('/<int:equipment_id>')
 @bp.output(EquipmentOut)
+@jwt_required()
 def get_equipment(equipment_id):
     '''Get equipment'''
 
@@ -36,6 +39,7 @@ def get_equipment(equipment_id):
 
 @bp.post('/')
 @bp.input(EquipmentInCreate, arg_name='equipment')
+@jwt_required()
 def create_equipments(equipment):
     '''Create equipments'''
 
@@ -51,6 +55,7 @@ def create_equipments(equipment):
 @bp.put('/<int:equipment_id>')
 @bp.input(EquipmentInUpdate)
 @bp.output(Message)
+@jwt_required()
 def update_equipments(equipment_id, json_data):
     '''Update equipment'''
 
@@ -65,6 +70,7 @@ def update_equipments(equipment_id, json_data):
 
 @bp.delete('/<int:equipment_id>')
 @bp.output(Message)
+@jwt_required()
 def delete_equipments(equipment_id):
     '''Delete equipments'''
 

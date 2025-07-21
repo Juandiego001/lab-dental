@@ -6,7 +6,7 @@ from core.schemas.utils import BaseSchema
 
 class DistributorIn(BaseSchema):
     id = fields.Integer()
-    name = fields.String()
+    name = fields.String(allow_none=False, validate=lambda v: v != '')
     status = fields.String(load_default='ACTIVE')
 
 

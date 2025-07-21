@@ -1,3 +1,4 @@
+from flask_jwt_extended import jwt_required
 from core.app import db
 from core.services import locations
 from apiflask import APIBlueprint, abort
@@ -11,6 +12,7 @@ bp = APIBlueprint('locations', __name__)
 @bp.get('/countries')
 @bp.input(Pagination, location='query')
 @bp.output(LocationsOut)
+@jwt_required()
 def get_countries(query_data):
     '''Get countries'''
 
@@ -25,6 +27,7 @@ def get_countries(query_data):
 @bp.get('/states/<string:country_id>')
 @bp.input(Pagination, location='query')
 @bp.output(LocationsOut)
+@jwt_required()
 def get_states(query_data, country_id):
     '''Get states'''
 
@@ -41,6 +44,7 @@ def get_states(query_data, country_id):
 @bp.get('/cities/<string:state_id>')
 @bp.input(Pagination, location='query')
 @bp.output(LocationsOut)
+@jwt_required()
 def get_cities(query_data, state_id):
     '''Get cities'''
 

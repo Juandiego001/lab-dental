@@ -132,6 +132,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { $ability } = useNuxtApp();
 const { t } = useI18n();
 
 definePageMeta({
@@ -188,6 +189,13 @@ watch(page, async () => {
 
 watch(perPage, async () => {
   await getParts();
+})
+
+onBeforeMount(async () => {
+  if (!$ability.can('read', 'parts')) {
+    navigateTo(history.state?.back || '/login');
+    return;
+  }
 })
 
 const resetForm = () => {

@@ -29,10 +29,11 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="createSite">
+        <v-form ref="createForm" v-model="createModel" @submit.prevent="createSite">
           <v-row>
             <v-col cols="12">
-              <v-radio-group v-model="form.companyType" :label="$t('sites.create.companyType')" hide-details="auto" inline>
+              <v-radio-group v-model="form.companyType" :label="$t('sites.create.companyType')" hide-details="auto"
+                inline>
                 <v-radio :label="$t('distributors.title', 2)" value="distributors"></v-radio>
                 <v-radio :label="$t('clients.title', 2)" value="clients"></v-radio>
               </v-radio-group>
@@ -40,32 +41,38 @@
             <template v-if="isAdmin && form.companyType === 'distributors'">
               <v-col cols="12">
                 <v-autocomplete v-model="form.distributorId" :label="$t('distributors.title')" :items="distributors"
-                  item-title="name" item-value="id" hide-details="auto" clearable @update:search="getDistributors" />
+                  item-title="name" item-value="id" hide-details="auto" clearable @update:search="getDistributors"
+                  :rules="[distributorRequired]" />
               </v-col>
             </template>
             <template v-else-if="form.companyType === 'clients'">
               <v-col cols="12">
                 <v-autocomplete v-model="form.clientId" :label="$t('clients.title')" :items="clients" item-title="name"
-                  item-value="id" hide-details="auto" clearable @update:search="getClients" />
+                  item-value="id" hide-details="auto" clearable @update:search="getClients" :rules="[clientRequired]" />
               </v-col>
             </template>
             <v-col cols="12">
               <v-autocomplete v-model="form.countryId" :label="$t('countries')" :items="countries" item-title="name"
-                item-value="id" hide-details="auto" @update:search="getCountries" clearable />
+                item-value="id" hide-details="auto" @update:search="getCountries" clearable
+                :rules="[countryRequired]" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.stateId" :label="$t('states')" :items="states" item-title="name"
-                item-value="id" hide-details="auto" @update:search="getStates" clearable :readonly="!form.countryId" />
+                item-value="id" hide-details="auto" @update:search="getStates" clearable :readonly="!form.countryId"
+                :rules="[stateRequired]" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.cityId" :label="$t('cities')" :items="cities" item-title="name"
-                item-value="id" hide-details="auto" @update:search="getCities" :readonly="!form.stateId" />
+                item-value="id" hide-details="auto" @update:search="getCities" :readonly="!form.stateId"
+                :rules="[cityRequired]" />
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.description" hide-details="auto" :label="$t('sites.address')"></v-text-field>
+              <v-text-field v-model="form.description" hide-details="auto" :label="$t('sites.address')"
+                :rules="[addressRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('sites.name')"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('sites.name')"
+                :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -89,10 +96,11 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="updateSite">
+        <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateSite">
           <v-row>
             <v-col cols="12">
-              <v-radio-group v-model="form.companyType" :label="$t('sites.create.companyType')" hide-details="auto" inline>
+              <v-radio-group v-model="form.companyType" :label="$t('sites.create.companyType')" hide-details="auto"
+                inline>
                 <v-radio :label="$t('distributors.title', 2)" value="distributors"></v-radio>
                 <v-radio :label="$t('clients.title', 2)" value="clients"></v-radio>
               </v-radio-group>
@@ -100,32 +108,38 @@
             <template v-if="isAdmin && form.companyType === 'distributors'">
               <v-col cols="12">
                 <v-autocomplete v-model="form.distributorId" :label="$t('distributors.title')" :items="distributors"
-                  item-title="name" item-value="id" hide-details="auto" clearable @update:search="getDistributors" />
+                  item-title="name" item-value="id" hide-details="auto" clearable @update:search="getDistributors"
+                  :rules="[distributorRequired]" />
               </v-col>
             </template>
             <template v-else-if="form.companyType === 'clients'">
               <v-col cols="12">
                 <v-autocomplete v-model="form.clientId" :label="$t('clients.title')" :items="clients" item-title="name"
-                  item-value="id" hide-details="auto" clearable @update:search="getClients" />
+                  item-value="id" hide-details="auto" clearable @update:search="getClients" :rules="[clientRequired]" />
               </v-col>
             </template>
             <v-col cols="12">
               <v-autocomplete v-model="form.countryId" :label="$t('countries')" :items="countries" item-title="name"
-                item-value="id" hide-details="auto" @update:search="getCountries" clearable />
+                item-value="id" hide-details="auto" @update:search="getCountries" clearable
+                :rules="[countryRequired]" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.stateId" :label="$t('states')" :items="states" item-title="name"
-                item-value="id" hide-details="auto" @update:search="getStates" clearable :readonly="!form.countryId" />
+                item-value="id" hide-details="auto" @update:search="getStates" clearable :readonly="!form.countryId"
+                :rules="[stateRequired]" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.cityId" :label="$t('cities')" :items="cities" item-title="name"
-                item-value="id" hide-details="auto" @update:search="getCities" :readonly="!form.stateId" />
+                item-value="id" hide-details="auto" @update:search="getCities" :readonly="!form.stateId"
+                :rules="[cityRequired]" />
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.description" hide-details="auto" :label="$t('sites.address')"></v-text-field>
+              <v-text-field v-model="form.description" hide-details="auto" :label="$t('sites.address')"
+                :rules="[addressRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('sites.name')"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('sites.name')"
+                :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -191,6 +205,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { $ability } = useNuxtApp();
 const { profile } = useProfile();
 const { t } = useI18n();
 
@@ -220,6 +235,10 @@ const perPage = ref(15);
 const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
+const createModel = ref(false);
+const updateModel = ref(false);
+const createForm = ref();
+const updateForm = ref();
 const form = ref({
   companyType: 'distributors',
   distributorId: null,
@@ -259,7 +278,8 @@ watch(createDialog, async (val) => {
     await getClients();
     await getCountries();
   } else {
-    resetForm()
+    createForm.value.reset();
+    resetForm();
   }
 })
 
@@ -269,7 +289,8 @@ watch(updateDialog, async (val) => {
     await getClients(form.value.clientName);
     await getCountries(form.value.countryName);
   } else {
-    resetForm()
+    updateForm.value.reset();
+    resetForm();
   }
 })
 
@@ -310,6 +331,10 @@ watch(perPage, async () => {
 })
 
 onBeforeMount(async () => {
+  if (!$ability.can('read', 'sites')) {
+    navigateTo(history.state?.back || '/login');
+    return;
+  }
   await getSites();
 })
 
@@ -446,12 +471,12 @@ const getSite = async (id) => {
 
 const createSite = async () => {
   try {
+    if (!createModel.value) return;
     const response = await $api('/api/sites/', {
       method: 'POST',
       body: form.value
     })
     await getSites()
-    resetForm()
     createDialog.value = false
   } catch (err) {
     console.log(err)
@@ -460,12 +485,12 @@ const createSite = async () => {
 
 const updateSite = async () => {
   try {
+    if (!updateModel.value) return;
     const response = await $api(`/api/sites/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
     await getSites()
-    resetForm()
     updateDialog.value = false
   } catch (err) {
     console.log(err)
@@ -491,5 +516,14 @@ const doSearch = async () => {
     console.log(err)
   }
 }
+
+// Rules
+const distributorRequired = (v) => !!v || t('sites.rules.distributorRequired');
+const clientRequired = (v) => !!v || t('sites.rules.clientRequired');
+const countryRequired = (v) => !!v || t('sites.rules.countryRequired');
+const stateRequired = (v) => !!v || t('sites.rules.stateRequired');
+const cityRequired = (v) => !!v || t('sites.rules.cityRequired');
+const addressRequired = (v) => !!v || t('sites.rules.addressRequired');
+const nameRequired = (v) => !!v || t('sites.rules.nameRequired');
 
 </script>

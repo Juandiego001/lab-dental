@@ -111,7 +111,7 @@ def update_group(group_id: int, json_data: tuple[Group, list]):
     # Delete users from group
     db.session.execute(delete(UserGroup).where(UserGroup.group_id == group_id))
 
-    # Inser users in group again
+    # Insert users in group again
     user_groups = [UserGroup(group_id=group_id, user_id=user_id) for user_id in users_ids]
     db.session.add_all(user_groups)
 

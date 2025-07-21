@@ -28,17 +28,20 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="createClient">
+        <v-form ref="createForm" v-model="createModel" @submit.prevent="createClient">
           <v-row>
             <v-col v-if="isAdmin" cols="12">
               <v-autocomplete v-model="form.distributorId" hide-details="auto" :label="$t('distributors.title')"
-                :items="distributors" item-title="name" item-value="id" @update:search="getDistributors" />
+                :items="distributors" item-title="name" item-value="id" @update:search="getDistributors"
+                :rules="[distributorRequired]" />
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('clients.name')"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('clients.name')"
+                :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.phone" hide-details="auto" :label="$t('clients.phone')"></v-text-field>
+              <v-text-field v-model="form.phone" hide-details="auto" :label="$t('clients.phone')"
+                :rules="[phoneRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -62,17 +65,20 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="updateClient">
+        <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateClient">
           <v-row>
             <v-col v-if="isAdmin" cols="12">
               <v-autocomplete v-model="form.distributorId" hide-details="auto" :label="$t('distributors.title')"
-                :items="distributors" item-title="name" item-value="id" @update:search="getDistributors" />
+                :items="distributors" item-title="name" item-value="id" @update:search="getDistributors"
+                :rules="[distributorRequired]" />
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('clients.name')"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('clients.name')"
+                :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.phone" hide-details="auto" :label="$t('clients.phone')"></v-text-field>
+              <v-text-field v-model="form.phone" hide-details="auto" :label="$t('clients.phone')"
+                :rules="[phoneRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -138,6 +144,8 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { $ability } = useNuxtApp();
+const { history } = useRouter().options
 const { profile } = useProfile();
 const { t } = useI18n();
 
@@ -160,6 +168,10 @@ const perPage = ref(15);
 const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
+const createModel = ref(false);
+const updateModel = ref(false);
+const createForm = ref();
+const updateForm = ref();
 const form = ref({
   distributorId: '',
   distributorName: '',
@@ -189,20 +201,26 @@ const headers = computed(() => {
 
   return [
     { title: 'Id', key: 'id', sortable: false },
-      { title: t('clients.name'), key: 'name', sortable: false },
-      { title: t('clients.phone'), key: 'phone', sortable: false },
-      { title: t('options'), key: 'option', align: 'center', sortable: false }
+    { title: t('clients.name'), key: 'name', sortable: false },
+    { title: t('clients.phone'), key: 'phone', sortable: false },
+    { title: t('options'), key: 'option', align: 'center', sortable: false }
   ]
 })
 
 watch(createDialog, async (val) => {
-  if (val) { if (isAdmin.value) await getDistributors(); }
-  else resetForm();
+  if (val && isAdmin.value) await getDistributors();
+  else {
+    createForm.value.reset();
+    resetForm();
+  }
 })
 
 watch(updateDialog, async (val) => {
-  if (val) { if (isAdmin.value) await getDistributors(form.value.distributorName); }
-  else resetForm();
+  if (val && isAdmin.value) await getDistributors(form.value.distributorName);
+  else {
+    updateForm.value.reset();
+    resetForm();
+  }
 })
 
 watch(page, async () => {
@@ -214,6 +232,10 @@ watch(perPage, async () => {
 })
 
 onBeforeMount(async () => {
+  if (!$ability.can('read', 'clients')) {
+    navigateTo(history.state?.back || '/login');
+    return;
+  }
   await getClients();
 })
 
@@ -227,6 +249,7 @@ const resetForm = () => {
 
 const getDistributors = async (search) => {
   try {
+    if (!createDialog.value && !updateDialog.value) return;
     const data = await $api('/api/distributors/', {
       query: {
         search,
@@ -272,13 +295,13 @@ const getClient = async (id) => {
 
 const createClient = async () => {
   try {
+    if (!createModel.value) return;
     const response = await $api('/api/clients/', {
       method: 'POST',
       body: form.value
     })
     await getClients()
     createDialog.value = false
-    resetForm()
   } catch (err) {
     console.log(err)
   }
@@ -286,13 +309,13 @@ const createClient = async () => {
 
 const updateClient = async () => {
   try {
+    if (!updateModel.value) return;
     const response = await $api(`/api/clients/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
     await getClients()
     updateDialog.value = false
-    resetForm()
   } catch (err) {
     console.log(err)
   }
@@ -321,5 +344,10 @@ const doSearch = async () => {
     console.log(err)
   }
 }
+
+// Rules
+const distributorRequired = (v) => !!v || t('clients.rules.distributorRequired');
+const nameRequired = (v) => !!v || t('clients.rules.nameRequired');
+const phoneRequired = (v) => !!v || t('clients.rules.phoneRequired');
 
 </script>

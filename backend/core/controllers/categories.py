@@ -1,3 +1,4 @@
+from flask_jwt_extended import jwt_required
 from core.app import db
 from core.services import categories
 from apiflask import APIBlueprint, abort
@@ -11,6 +12,7 @@ bp = APIBlueprint('categories', __name__)
 @bp.get('/')
 @bp.input(Pagination, location='query')
 @bp.output(CategoriesOut)
+@jwt_required()
 def get_categories(query_data):
     '''Get categories'''
 
@@ -25,6 +27,7 @@ def get_categories(query_data):
 
 @bp.get('/<int:category_id>')
 @bp.output(CategoryOut)
+@jwt_required()
 def get_category(category_id):
     '''Get category'''
 
@@ -36,6 +39,7 @@ def get_category(category_id):
 
 @bp.post('/')
 @bp.input(CategoryInCreate, arg_name='category')
+@jwt_required()
 def create_categories(category):
     '''Create categories'''
 
@@ -51,6 +55,7 @@ def create_categories(category):
 @bp.put('/<int:category_id>')
 @bp.input(CategoryInUpdate)
 @bp.output(Message)
+@jwt_required()
 def update_categories(category_id, json_data):
     '''Update category'''
     try:
@@ -63,6 +68,7 @@ def update_categories(category_id, json_data):
 
 @bp.delete('/<int:category_id>')
 @bp.output(Message)
+@jwt_required()
 def delete_categories(category_id):
     '''Delete categories'''
 

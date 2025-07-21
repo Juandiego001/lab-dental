@@ -28,29 +28,32 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="createUser">
+        <v-form ref="createForm" v-model="createModel" @submit.prevent="createUser">
           <v-row>
             <v-col v-if="isAdmin" cols="12">
               <v-select v-model="form.role" item-title="title" item-value="value" hide-details="auto"
-                :label="$t('users.role.title')" :items="usersRoles"></v-select>
+                :label="$t('users.role.title')" :items="usersRoles" :rules="[roleRequired]"></v-select>
             </v-col>
             <v-col v-if="isAdmin && form.role === 'DISTRIBUTOR'" cols="12">
               <v-autocomplete v-model="form.distributorId" hide-details="auto" :label="$t('distributors.title')"
-                :items="distributors" item-title="name" item-value="id" @update:search="getDistributors" clearable />
+                :items="distributors" item-title="name" item-value="id" @update:search="getDistributors" clearable
+                :rules="[distributorRequired]" />
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.fullName" hide-details="auto" :label="$t('users.fullName')"></v-text-field>
+              <v-text-field v-model="form.fullName" hide-details="auto" :label="$t('users.fullName')"
+                :rules="[fullNameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.username" hide-details="auto" :label="$t('users.username')"></v-text-field>
+              <v-text-field v-model="form.username" hide-details="auto" :label="$t('users.username')"
+                :rules="[usernameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.email" type="email" hide-details="auto"
-              :label="$t('users.email')"></v-text-field>
+              <v-text-field v-model="form.email" type="email" hide-details="auto" :label="$t('users.email')"
+                :rules="[emailRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.password" type="password" hide-details="auto" label="Password"
-                autocomplete="off"></v-text-field>
+                autocomplete="off" :rules="[passwordRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -74,29 +77,32 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="updateUser">
+        <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateUser">
           <v-row>
             <v-col v-if="isAdmin" cols="12">
               <v-select v-model="form.role" hide-details="auto" :items="usersRoles" item-title="title"
-                item-value="value" :label="$t('users.role.title')" />
+                item-value="value" :label="$t('users.role.title')" :rules="[roleRequired]" />
             </v-col>
             <v-col v-if="isAdmin && form.role === 'DISTRIBUTOR'" cols="12">
               <v-autocomplete v-model="form.distributorId" hide-details="auto" :label="$t('distributors.title')"
-                :items="distributors" item-title="name" item-value="id" @update:search="getDistributors" clearable />
+                :items="distributors" item-title="name" item-value="id" @update:search="getDistributors" clearable
+                :rules="[distributorRequired]" />
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.fullName" hide-details="auto" :label="$t('users.fullName')"></v-text-field>
+              <v-text-field v-model="form.fullName" hide-details="auto" :label="$t('users.fullName')"
+                :rules="[fullNameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.username" hide-details="auto" :label="$t('users.username')"></v-text-field>
+              <v-text-field v-model="form.username" hide-details="auto" :label="$t('users.username')"
+                :rules="[usernameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.email" type="email" hide-details="auto"
-                :label="$t('users.email')"></v-text-field>
+              <v-text-field v-model="form.email" type="email" hide-details="auto" :label="$t('users.email')"
+                :rules="[emailRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.password" type="password" hide-details="auto"
-                :label="$t('users.password')" autocomplete="off"></v-text-field>
+              <v-text-field v-model="form.password" type="password" hide-details="auto" :label="$t('users.password')"
+                autocomplete="off"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -162,6 +168,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { $ability } = useNuxtApp();
 const { profile } = useProfile();
 const { t } = useI18n();
 
@@ -184,6 +191,10 @@ const perPage = ref(15);
 const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
+const createModel = ref(false);
+const updateModel = ref(false);
+const createForm = ref();
+const updateForm = ref();
 const form = ref({
   distributorId: null,
   distributorName: '',
@@ -192,6 +203,8 @@ const form = ref({
   email: '',
   role: ''
 })
+
+const isAdmin = computed(() => profile.value.role === 'ADMIN');
 
 const itemsPerPageOptions = computed(() => [
   { value: 15, title: '15' },
@@ -215,12 +228,18 @@ const usersRoles = computed(() => [
 
 watch(createDialog, async (val) => {
   if (val) { if (isAdmin.value) await getDistributors(); }
-  else resetForm();
+  else {
+    createForm.value.reset();
+    resetForm();
+  }
 })
 
 watch(updateDialog, async (val) => {
   if (val) { if (isAdmin.value) await getDistributors(form.value.distributorName); }
-  else resetForm();
+  else {
+    updateForm.value.reset();
+    resetForm();
+  }
 })
 
 watch(() => form.value.role, async (val) => {
@@ -236,10 +255,12 @@ watch(perPage, async () => {
 })
 
 onBeforeMount(async () => {
+  if (!$ability.can('read', 'users')) {
+    navigateTo(history.state?.back || '/login');
+    return;
+  }
   await getUsers();
 })
-
-const isAdmin = computed(() => profile.value.role === 'ADMIN');
 
 const resetForm = () => {
   form.value = {
@@ -290,9 +311,6 @@ const getUser = async (id) => {
     const user = await $api(`/api/users/${id}`, {
       method: 'GET'
     })
-
-    console.log({ user });
-
     form.value = user
     nextTick(() => updateDialog.value = true);
   } catch (err) {
@@ -302,13 +320,13 @@ const getUser = async (id) => {
 
 const createUser = async () => {
   try {
+    if (!createModel.value) return;
     const response = await $api('/api/users/', {
       method: 'POST',
       body: form.value
     })
     await getUsers()
     createDialog.value = false
-    resetForm()
   } catch (err) {
     console.log(err)
   }
@@ -316,13 +334,13 @@ const createUser = async () => {
 
 const updateUser = async () => {
   try {
+    if (!updateModel.value) return;
     const response = await $api(`/api/users/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
     await getUsers()
     updateDialog.value = false
-    resetForm()
   } catch (err) {
     console.log(err)
   }
@@ -351,5 +369,13 @@ const doSearch = async () => {
     console.log(err)
   }
 }
+
+// Rules
+const roleRequired = (v) => !!v || t('users.rules.roleRequired');
+const distributorRequired = (v) => !!v || t('users.rules.distributorRequired');
+const fullNameRequired = (v) => !!v || t('users.rules.fullNameRequired');
+const usernameRequired = (v) => !!v || t('users.rules.usernameRequired');
+const emailRequired = (v) => !!v || t('users.rules.emailRequired');
+const passwordRequired = (v) => !!v || t('users.rules.passwordRequired');
 
 </script>

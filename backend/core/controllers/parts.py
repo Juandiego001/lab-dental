@@ -1,3 +1,4 @@
+from flask_jwt_extended import jwt_required
 from core.app import db
 from core.services import parts
 from apiflask import APIBlueprint, abort
@@ -11,6 +12,7 @@ bp = APIBlueprint('parts', __name__)
 @bp.get('/')
 @bp.input(Pagination, location='query')
 @bp.output(PartsOut)
+@jwt_required()
 def get_parts(query_data):
     '''Get parts'''
 
@@ -25,6 +27,7 @@ def get_parts(query_data):
 
 @bp.get('/<int:part_id>')
 @bp.output(PartOut)
+@jwt_required()
 def get_part(part_id):
     '''Get part'''
 
@@ -36,6 +39,7 @@ def get_part(part_id):
 
 @bp.post('/')
 @bp.input(PartInCreate, arg_name='part')
+@jwt_required()
 def create_parts(part):
     '''Create parts'''
 
@@ -51,6 +55,7 @@ def create_parts(part):
 @bp.put('/<int:part_id>')
 @bp.input(PartInUpdate)
 @bp.output(Message)
+@jwt_required()
 def update_parts(part_id, json_data):
     '''Update part'''
 
@@ -64,6 +69,7 @@ def update_parts(part_id, json_data):
 
 @bp.delete('/<int:part_id>')
 @bp.output(Message)
+@jwt_required()
 def delete_parts(part_id):
     '''Delete parts'''
 

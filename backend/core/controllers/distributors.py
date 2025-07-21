@@ -1,4 +1,3 @@
-from core.app import db
 from core.schemas.users import UsersOut
 from core.services import distributors
 from apiflask import APIBlueprint, abort

@@ -8,12 +8,14 @@
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
           <template v-slot:item.installedDate="{ item }">{{ date.format(item.installedDate, 'fullDate') }}</template>
           <template v-slot:item.option="{ item }">
-            <v-btn class="my-2 bg-primary me-2" size="small" icon="mdi-pencil"
-              @click="getInstallation(item.id)"></v-btn>
-            <v-btn class="my-2 bg-red me-2" size="small" icon="mdi-trash-can" @click="form.id = item.id"></v-btn>
-            <v-btn class="my-2 bg-teal-darken-4 me-2" size="small" icon="mdi-check-bold"
+            <v-btn v-if="$ability.can('update', 'installations')" class="my-2 bg-primary me-2" size="small"
+              icon="mdi-pencil" @click="getInstallation(item.id)"></v-btn>
+            <v-btn v-if="$ability.can('delete', 'installations')" class="my-2 bg-red me-2" size="small"
+              icon="mdi-trash-can" @click="form.id = item.id"></v-btn>
+            <v-btn v-if="isAdmin" class="my-2 bg-teal-darken-4 me-2" size="small" icon="mdi-check-bold"
               @click="form.id = item.id"></v-btn>
-            <v-btn class="my-2 bg-red-darken-4 me-2" size="small" icon="mdi-cancel" @click="form.id = item.id"></v-btn>
+            <v-btn v-if="isAdmin" class="my-2 bg-red-darken-4 me-2" size="small" icon="mdi-cancel"
+              @click="form.id = item.id"></v-btn>
           </template>
         </v-data-table-server>
       </v-card-text>
@@ -31,52 +33,56 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="createInstallation">
+        <v-form ref="createForm" v-model="createModel" @submit.prevent="createInstallation">
           <v-row>
             <v-col cols="12">
               <v-autocomplete v-model="form.equipmentId" :label="$t('equipments.title')" :items="equipments"
-                item-title="serialModel" item-value="id" hide-details="auto" @update:search="getEquipments" clearable />
+                item-title="serialModel" item-value="id" hide-details="auto" @update:search="getEquipments" clearable
+                :rules="[equipmentRequired]" />
             </v-col>
-            <v-col cols="12">
+            <v-col v-if="isAdmin" cols="12">
               <v-autocomplete v-model="form.distributorId" :label="$t('distributors.title')" :items="distributors"
-                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable />
+                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable
+                :rules="[distributorRequired]" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.siteDistributorId"
                 :label="`${$t('sites.title')} ${$t('distributors.title')}`" :items="distributorsSites" item-title="name"
-                item-value="id" hide-details="auto" @update:search="getDistributorsSites" clearable :readonly="!form.distributorId" />
+                item-value="id" hide-details="auto" @update:search="getDistributorsSites" clearable
+                :readonly="isAdmin && !form.distributorId" :rules="[siteDistributorRequired]" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.clientId" :label="$t('clients.title')" :items="clients" item-title="name"
-                item-value="id" hide-details="auto" @update:search="getClients" clearable :readonly="!form.distributorId" />
+                item-value="id" hide-details="auto" @update:search="getClients" clearable
+                :readonly="isAdmin && !form.distributorId" :rules="[clientRequired]" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.siteClientId" :label="`${$t('sites.title')} ${$t('clients.title')}`"
                 :items="clientsSites" item-title="name" item-value="id" hide-details="auto"
-                @update:search="getClientsSites" clearable :readonly="!form.clientId" />
+                @update:search="getClientsSites" clearable :readonly="!form.clientId" :rules="[siteClientRequired]" />
             </v-col>
             <v-col cols="12">
               <v-menu v-model="showPicker" :close-on-content-click="false" transition="scale-transition" offset-y
                 full-width max-width="290px" min-width="290px">
                 <template v-slot:activator="{ props }">
                   <v-text-field v-model="form.installedDate" :label="$t('installations.installedDate')" readonly
-                    hide-details="auto" v-bind="props"></v-text-field>
+                    hide-details="auto" v-bind="props" :rules="[installedDateRequired]"></v-text-field>
                 </template>
-                <v-date-picker v-model="selectedDate" title="" hide-header
-                  @update:model-value="showPicker = false" :max="todayDate"></v-date-picker>
+                <v-date-picker v-model="selectedDate" title="" hide-header @update:model-value="showPicker = false"
+                  :max="todayDate"></v-date-picker>
               </v-menu>
             </v-col>
             <v-col cols="12">
               <v-file-input v-model="formatPicture" :prepend-icon="null" prepend-inner-icon="mdi-paperclip"
-                hide-details="auto" :label="$t('installations.formatPicture')" chips />
+                hide-details="auto" :label="$t('installations.formatPicture')" chips :rules="[formatPictureRequired]" />
             </v-col>
             <v-col cols="12">
               <v-file-input v-model="serialPicture" :prepend-icon="null" prepend-inner-icon="mdi-paperclip"
-                hide-details="auto" :label="$t('installations.serialPicture')" chips />
+                hide-details="auto" :label="$t('installations.serialPicture')" chips :rules="[serialPictureRequired]" />
             </v-col>
             <v-col cols="12">
               <v-file-input v-model="installationPictures" :prepend-icon="null" prepend-inner-icon="mdi-paperclip"
-                hide-details="auto" :label="$t('installations.installationPictures')" multiple chips>
+                hide-details="auto" :label="$t('installations.installationPictures')" multiple chips :rules="[installationPicturesRequired]">
                 <template v-slot:selection="{ fileNames }">
                   <v-chip v-for="fileName in fileNames" :key="fileName" size="small" label>
                     {{ fileName }}
@@ -106,39 +112,41 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="updateInstallation">
+        <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateInstallation">
           <v-row>
             <v-col cols="12">
               <v-autocomplete v-model="form.equipmentId" :label="$t('equipments.title')" :items="equipments"
-                item-title="serialModel" item-value="id" hide-details="auto" @update:search="getEquipments" clearable />
+                item-title="serialModel" item-value="id" hide-details="auto" @update:search="getEquipments" clearable :rules="[equipmentRequired]" />
             </v-col>
-            <v-col cols="12">
+            <v-col v-if="isAdmin" cols="12">
               <v-autocomplete v-model="form.distributorId" :label="$t('distributors.title')" :items="distributors"
-                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable />
+                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable :rules="[distributorRequired]" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.siteDistributorId"
                 :label="`${$t('sites.title')} ${$t('distributors.title')}`" :items="distributorsSites" item-title="name"
-                item-value="id" hide-details="auto" @update:search="getDistributorsSites" clearable :readonly="!form.distributorId" />
+                item-value="id" hide-details="auto" @update:search="getDistributorsSites" clearable
+                :readonly="isAdmin && !form.distributorId" :rules="[siteDistributorRequired]" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.clientId" :label="$t('clients.title')" :items="clients" item-title="name"
-                item-value="id" hide-details="auto" @update:search="getClients" clearable :readonly="!form.distributorId" />
+                item-value="id" hide-details="auto" @update:search="getClients" clearable
+                :readonly="isAdmin && !form.distributorId" :rules="[clientRequired]" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.siteClientId" :label="`${$t('sites.title')} ${$t('clients.title')}`"
                 :items="clientsSites" item-title="name" item-value="id" hide-details="auto"
-                @update:search="getClientsSites" clearable :readonly="!form.clientId" />
+                @update:search="getClientsSites" clearable :readonly="!form.clientId" :rules="[siteClientRequired]" />
             </v-col>
             <v-col cols="12">
               <v-menu v-model="showPicker" :close-on-content-click="false" transition="scale-transition" offset-y
                 full-width max-width="290px" min-width="290px">
                 <template v-slot:activator="{ props }">
                   <v-text-field v-model="form.installedDate" :label="$t('installations.installedDate')" readonly
-                    hide-details="auto" v-bind="props"></v-text-field>
+                    hide-details="auto" v-bind="props" :rules="[installedDateRequired]"></v-text-field>
                 </template>
-                <v-date-picker v-model="selectedDate" title="" hide-header
-                  @update:model-value="showPicker = false" :max="todayDate"></v-date-picker>
+                <v-date-picker v-model="selectedDate" title="" hide-header @update:model-value="showPicker = false"
+                  :max="todayDate"></v-date-picker>
               </v-menu>
             </v-col>
             <v-col class="text-end">
@@ -200,12 +208,13 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onBeforeMount, useTemplateRef, toRefs } from 'vue'
+import { ref, computed, watch, onBeforeMount, toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
 import { useDate } from 'vuetify'
-
+const { $ability } = useNuxtApp();
+const { profile } = useProfile();
 const { t } = useI18n();
 const date = useDate();
 
@@ -232,6 +241,10 @@ const perPage = ref(15);
 const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
+const createModel = ref(false);
+const updateModel = ref(false);
+const createForm = ref();
+const updateForm = ref();
 const formatPicture = ref(null);
 const serialPicture = ref(null);
 const installationPictures = ref(null);
@@ -250,6 +263,8 @@ const form = ref({
   siteClientName: '',
   installedDate: null,
 })
+
+const isAdmin = computed(() => profile.value.role === 'ADMIN');
 
 const todayDate = computed(() => (new Date()).toISOString().split('T')[0])
 
@@ -270,9 +285,14 @@ const headers = computed(() => [
 watch(createDialog, async (val) => {
   if (val) {
     await getEquipments();
-    await getDistributors();
-    await getClients();
+    if (isAdmin.value) {
+      await getDistributors();
+    } else {
+      await getDistributorsSites();
+      await getClients();
+    }
   } else {
+    createForm.value.reset();
     resetForm();
   }
 })
@@ -280,9 +300,13 @@ watch(createDialog, async (val) => {
 watch(updateDialog, async (val) => {
   if (val) {
     await getEquipments(form.value.equipmentSerialModel);
-    await getDistributors(form.value.distributorName);
+    if (isAdmin.value) {
+      await getDistributors(form.value.distributorName);
+    }
+    await getDistributorsSites(form.value.siteDistributorName);
     await getClients(form.value.clientName);
   } else {
+    updateForm.value.reset();
     resetForm();
   }
 })
@@ -343,6 +367,10 @@ watch(selectedDate, async (val) => {
 })
 
 onBeforeMount(async () => {
+  if (!$ability.can('read', 'installations')) {
+    navigateTo(history.state?.back || '/login');
+    return;
+  }
   await getInstallations();
 })
 
@@ -360,6 +388,7 @@ const resetForm = () => {
 
 const getEquipments = async (search) => {
   try {
+    if (!createDialog.value && !updateDialog.value) return;
     const data = await $api('/api/equipments/', {
       query: {
         search,
@@ -376,6 +405,7 @@ const getEquipments = async (search) => {
 
 const getDistributors = async (search) => {
   try {
+    if (!createDialog.value && !updateDialog.value) return;
     const data = await $api('/api/distributors/', {
       query: {
         search,
@@ -392,7 +422,11 @@ const getDistributors = async (search) => {
 
 const getDistributorsSites = async (search) => {
   try {
-    const data = await $api(`/api/sites/distributors/${form.value.distributorId}`, {
+    console.log({ createDialog: createDialog.value });
+    console.log({ updateDialog: updateDialog.value });
+    // if (!createDialog.value && !updateDialog.value) return;
+    if (!form.value.distributorId && !profile.value.distributor_id) return;
+    const data = await $api(`/api/sites/distributors/${form.value.distributorId || profile.value.distributor_id}`, {
       query: {
         search,
         page: page.value,
@@ -408,8 +442,9 @@ const getDistributorsSites = async (search) => {
 
 const getClients = async (search) => {
   try {
-    if (!form.value.distributorId) return;
-    const data = await $api(`/api/distributors/${form.value.distributorId}/clients`, {
+    if (!createDialog.value && !updateDialog.value) return;
+    if (!form.value.distributorId && !profile.value.distributor_id) return;
+    const data = await $api(`/api/distributors/${form.value.distributorId || profile.value.distributor_id}/clients`, {
       query: {
         search,
         page: page.value,
@@ -425,6 +460,8 @@ const getClients = async (search) => {
 
 const getClientsSites = async (search) => {
   try {
+    // if (!createDialog.value && !updateDialog.value) return;
+    if (!form.value.clientId) return;
     const data = await $api(`/api/sites/clients/${form.value.clientId}`, {
       query: {
         search,
@@ -473,6 +510,7 @@ const getInstallation = async (id) => {
 
 const createInstallation = async () => {
   try {
+    if (!createModel.value) return;
     const formData = new FormData();
     formData.append('formatPicture', formatPicture.value);
     formData.append('serialPicture', serialPicture.value);
@@ -483,6 +521,10 @@ const createInstallation = async () => {
 
     for (const [key, value] of Object.entries(form.value)) {
       formData.append(key, value);
+    }
+
+    if (!form.value.distributorId) {
+      formData.set('distributorId', profile.value.distributor_id);
     }
 
     const response = await $api('/api/installations/', {
@@ -498,6 +540,7 @@ const createInstallation = async () => {
 
 const updateInstallation = async () => {
   try {
+    if (!updateModel.value) return;
     const response = await $api(`/api/installations/${form.value.id}`, {
       method: 'PUT',
       body: form.value
@@ -532,5 +575,16 @@ const doSearch = async () => {
     console.log(err)
   }
 }
+
+// Rules
+const equipmentRequired = (v) => !!v || t('installations.rules.equipmentRequired');
+const distributorRequired = (v) => !!v || t('installations.rules.distributorRequired');
+const siteDistributorRequired = (v) => !!v || t('installations.rules.siteDistributorRequired');
+const clientRequired = (v) => !!v || t('installations.rules.clientRequired');
+const siteClientRequired = (v) => !!v || t('installations.rules.siteClientRequired');
+const installedDateRequired = (v) => !!v || t('installations.rules.installedDateRequired');
+const formatPictureRequired = (v) => !!v || t('installations.rules.formatPictureRequired');
+const serialPictureRequired = (v) => !!v || t('installations.rules.serialPictureRequired');
+const installationPicturesRequired = (v) => (v && v.length > 0) || t('installations.rules.installationPicturesRequired');
 
 </script>

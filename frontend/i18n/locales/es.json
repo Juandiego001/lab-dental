@@ -200,6 +200,9 @@
       "title": "Buscar distribuidor",
       "message": "Buscar distribuidor por nombre o ID",
       "fields": "Nombre o id"
+    },
+    "rules": {
+      "nameRequired": "El nombre es requerido"
     }
   },
   "sites": {
@@ -224,6 +227,15 @@
       "title": "Buscar sede",
       "message": "Buscar sede por nombre o ID",
       "fields": "Nombre o id"
+    },
+    "rules": {
+      "distributorRequired": "El distribuidor es requerido",
+      "clientRequired": "El cliente es requerido",
+      "countryRequired": "El país es requerido",
+      "stateRequired": "El estado es requerido",
+      "cityRequired": "La ciudad es requerida",
+      "addressRequired": "La dirección es requerida",
+      "nameRequired": "El nombre es requerido"
     }
   },
   "clients": {
@@ -245,6 +257,11 @@
       "title": "Buscar cliente",
       "message": "Buscar cliente por nombre o ID",
       "fields": "Nombre o id"
+    },
+    "rules": {
+      "distributorRequired": "El distribuidor es requerido",
+      "nameRequired": "El nombre es requerido",
+      "phoneRequired": "El teléfono es requerido"
     }
   },
   "users": {
@@ -272,6 +289,14 @@
       "title": "Buscar usuario",
       "message": "Buscar usuario por nombre completo, nombre de usuario, correo o ID",
       "fields": "Nombre completo, nombre de usuario, correo o id"
+    },
+    "rules": {
+      "roleRequired": "El rol es requerido",
+      "distributorRequired": "El distribuidor es requerido",
+      "fullNameRequired": "El nombre completo es requerido",
+      "usernameRequired": "El nombre de usuario es requerido",
+      "emailRequired": "El email es requerido",
+      "passwordRequired": "La contraseña es requerida"
     }
   },
   "modules": {
@@ -301,6 +326,11 @@
       "create": "Crear",
       "update": "Actualizar",
       "delete": "Eliminar"
+    },
+    "rules": {
+      "nameRequired": "El nombre es requerido",
+      "distributorRequired": "El distribuidor es requerido",
+      "usersRequired": "Por lo menos un usuario es requerido"
     }
   },
   "brands": {
@@ -321,6 +351,10 @@
       "title": "Buscar marca",
       "message": "Buscar marcas por nombre, slug o ID",
       "fields": "Nombre, slug o id"
+    },
+    "rules": {
+      "nameRequired": "El nombre es requerido",
+      "slugRequired": "El slug es requerido"
     }
   },
   "categories": {
@@ -341,6 +375,10 @@
       "title": "Buscar categoría",
       "message": "Buscar categorías por nombre, slug o ID",
       "fields": "Nombre, slug o id"
+    },
+    "rules": {
+      "nameRequired": "El nombre es requerido",
+      "slugRequired": "El slug es requerido"
     }
   },
   "equipments": {
@@ -361,6 +399,12 @@
       "title": "Buscar equipo",
       "message": "Buscar equipos por serial, modelo o ID",
       "fields": "Serial, modelo o id"
+    },
+    "rules": {
+      "brandRequired": "La marca es requerida",
+      "categoryRequired": "La categoría es requerida",
+      "serialRequired": "El serial es requerido",
+      "modelRequired": "El modelo es requerido"
     }
   },
   "parts": {
@@ -474,6 +518,7 @@
     "distributors": "Distribuidores",
     "users": "Usuarios",
     "slug": "Slug",
+    "isMain": "¿Es Principal?",
     "create": {
       "title": "Crear lista"
     },
