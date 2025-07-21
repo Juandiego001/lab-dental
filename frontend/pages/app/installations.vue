@@ -422,9 +422,6 @@ const getDistributors = async (search) => {
 
 const getDistributorsSites = async (search) => {
   try {
-    console.log({ createDialog: createDialog.value });
-    console.log({ updateDialog: updateDialog.value });
-    // if (!createDialog.value && !updateDialog.value) return;
     if (!form.value.distributorId && !profile.value.distributor_id) return;
     const data = await $api(`/api/sites/distributors/${form.value.distributorId || profile.value.distributor_id}`, {
       query: {

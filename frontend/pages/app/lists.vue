@@ -31,19 +31,21 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="createList">
+        <v-form ref="createForm" v-model="createModel" @submit.prevent="createList">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('lists.name')"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('lists.name')"
+                :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.distributorsIds" :label="$t('lists.distributors')" :items="distributors"
                 item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable
-                multiple chips />
+                multiple chips :rules="[distributorsRequired]" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.usersIds" :label="$t('lists.users')" :items="users" item-title="fullName"
-                item-value="id" hide-details="auto" @update:search="getUsers" clearable multiple chips />
+                item-value="id" hide-details="auto" @update:search="getUsers" clearable multiple chips
+                :rules="[usersRequired]" />
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -67,19 +69,21 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="updateList">
+        <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateList">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('lists.name')"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('lists.name')"
+                :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.distributorsIds" :label="$t('lists.distributors')" :items="distributors"
                 item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable
-                multiple chips />
+                multiple chips :rules="[distributorsRequired]" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.usersIds" :label="$t('lists.users')" :items="users" item-title="fullName"
-                item-value="id" hide-details="auto" @update:search="getUsers" clearable multiple chips />
+                item-value="id" hide-details="auto" @update:search="getUsers" clearable multiple chips
+                :rules="[usersRequired]" />
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -167,6 +171,10 @@ const perPage = ref(15);
 const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
+const createModel = ref(false);
+const updateModel = ref(false);
+const createForm = ref();
+const updateForm = ref();
 const form = ref({
   name: '',
   distributorsIds: [],
@@ -193,6 +201,7 @@ watch(createDialog, async (val) => {
     await getDistributors();
     await getUsers();
   } else {
+    createForm.value.reset();
     resetForm()
   }
 })
@@ -202,6 +211,7 @@ watch(updateDialog, async (val) => {
     await getDistributors();
     await getUsers();
   } else {
+    updateForm.value.reset();
     resetForm()
   }
 })
@@ -294,6 +304,7 @@ const getList = async (id) => {
 
 const createList = async () => {
   try {
+    if (!createModel.value) return;
     const response = await $api('/api/lists/', {
       method: 'POST',
       body: form.value
@@ -308,6 +319,7 @@ const createList = async () => {
 
 const updateList = async () => {
   try {
+    if (!updateModel.value) return;
     const response = await $api(`/api/lists/${form.value.id}`, {
       method: 'PUT',
       body: form.value
@@ -343,5 +355,10 @@ const doSearch = async () => {
     console.log(err)
   }
 }
+
+// Rules
+const nameRequired = (v) => !!v || t('lists.rules.nameRequired');
+const distributorsRequired = (v) => (v && v.length > 0) || t('lists.rules.distributorsRequired');
+const usersRequired = (v) => (v && v.length > 0) || t('lists.rules.usersRequired');
 
 </script>

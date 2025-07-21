@@ -28,16 +28,16 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="createManual">
+        <v-form ref="createForm" v-model="createModel" @submit.prevent="createManual">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('manuals.name')"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('manuals.name')" :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-file-input v-model="form.file" hide-details="auto" :label="$t('manuals.file')"></v-file-input>
+              <v-file-input v-model="form.file" hide-details="auto" :label="$t('manuals.file')" :rules="[fileRequired]"></v-file-input>
             </v-col>
             <v-col cols="12">
-              <v-select v-model="form.manualType" hide-details="auto" :label="$t('manuals.type')"></v-select>
+              <v-select v-model="form.manualType" hide-details="auto" :label="$t('manuals.type')" :rules="[typeRequired]"></v-select>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -61,16 +61,16 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="updateManual">
+        <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateManual">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('manuals.name')"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('manuals.name')" :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.file" hide-details="auto" :label="$t('manuals.file')"></v-text-field>
+              <v-text-field v-model="form.file" hide-details="auto" :label="$t('manuals.file')" :rules="[fileRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-select v-model="form.manualType" hide-details="auto" :label="$t('manuals.manualType')"></v-select>
+              <v-select v-model="form.manualType" hide-details="auto" :label="$t('manuals.manualType')" :rules="[typeRequired]"></v-select>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -157,6 +157,10 @@ const perPage = ref(15);
 const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
+const createModel = ref(false);
+const updateModel = ref(false);
+const createForm = ref();
+const updateForm = ref();
 const form = ref({
   id: '',
   name: '',
@@ -228,6 +232,7 @@ const getManual = async (id) => {
 
 const createManual = async () => {
   try {
+    if (!createModel.value) return;
     const response = await $api('/api/manuals/', {
       method: 'POST',
       body: form.value
@@ -241,6 +246,7 @@ const createManual = async () => {
 
 const updateManual = async () => {
   try {
+    if (!updateModel.value) return;
     const response = await $api(`/api/manuals/${form.value.id}`, {
       method: 'PUT',
       body: form.value
@@ -253,11 +259,15 @@ const updateManual = async () => {
 }
 
 const deleteManual = async () => {
-  const response = await $api(`/api/manuals/${form.value.id}`, {
-    method: 'DELETE'
-  })
-  await getManuals()
-  deleteDialog.value = false
+  try {
+    const response = await $api(`/api/manuals/${form.value.id}`, {
+      method: 'DELETE'
+    })
+    await getManuals()
+    deleteDialog.value = false
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 const doSearch = async () => {
@@ -270,5 +280,10 @@ const doSearch = async () => {
     console.log(err)
   }
 }
+
+// Rules
+const nameRequired = (v) => !!v || t('manuals.rules.nameRequired');
+const fileRequired = (v) => !!v || t('manuals.rules.fileRequired');
+const typeRequired = (v) => !!v || t('manuals.rules.typeRequired');
 
 </script>

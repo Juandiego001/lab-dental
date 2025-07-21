@@ -426,6 +426,10 @@
       "title": "Search part",
       "message": "Search part by serial or ID",
       "fields": "Serial or id"
+    },
+    "rules": {
+      "serialRequired": "The serial is required",
+      "descriptionRequired": "The description is required"
     }
   },
   "installations": {
@@ -480,6 +484,10 @@
       "title": "Search reason",
       "message": "Search reason by name, slug or ID",
       "fields": "Name, slug or id"
+    },
+    "rules": {
+      "nameRequired": "The name is required",
+      "slugRequired": "The slug is required"
     }
   },
   "warranties": {
@@ -501,6 +509,11 @@
       "title": "Search warranty",
       "message": "Search warranty by invoice or ID",
       "fields": "Invoice or id"
+    },
+    "rules": {
+      "invoiceRequired": "The invoice is required",
+      "problemDescriptionRequired": "The problem description is required",
+      "solutionDescriptionRequired": "The solution description is required"
     }
   },
   "manuals": {
@@ -522,6 +535,11 @@
       "title": "Search manual",
       "message": "Search manual by name, type or ID",
       "fields": "Name, type or id"
+    },
+    "rules": {
+      "nameRequired": "The name is required",
+      "fileRequired": "The file is required",
+      "typeRequired": "The type is required"
     }
   },
   "lists": {
@@ -545,6 +563,11 @@
       "title": "Search list",
       "message": "Search list by name, type or ID",
       "fields": "Name, type or ID"
+    },
+    "rules": {
+      "nameRequired": "The name is required",
+      "distributorsRequired": "At least one distributor is required",
+      "usersRequired": "At least one user is required"
     }
   },
   "countries": "Country | Countries",

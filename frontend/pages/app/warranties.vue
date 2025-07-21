@@ -28,18 +28,18 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="createWarranty">
+        <v-form ref="createForm" v-model="createModel" @submit.prevent="createWarranty">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.invoice" hide-details="auto" :label="$t('warranties.invoice')"></v-text-field>
+              <v-text-field v-model="form.invoice" hide-details="auto" :label="$t('warranties.invoice')" :rules="[invoiceRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.problemDescription" hide-details="auto"
-                :label="$t('warranties.problemDescription')"></v-text-field>
+                :label="$t('warranties.problemDescription')" :rules="[problemDescriptionRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.solutionDescription" hide-details="auto"
-                :label="$t('warranties.solutionDescription')"></v-text-field>
+                :label="$t('warranties.solutionDescription')" :rules="[solutionDescriptionRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -63,7 +63,7 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="updateWarranty">
+        <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateWarranty">
           <v-row>
             <v-col cols="12">
               <v-text-field v-model="form.invoice" hide-details="auto" label="Full name"></v-text-field>
@@ -162,6 +162,10 @@ const perPage = ref(15);
 const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
+const createModel = ref(false);
+const updateModel = ref(false);
+const createForm = ref();
+const updateForm = ref();
 const form = ref({
   id: '',
   invoice: '',
@@ -186,6 +190,22 @@ const headers = computed(() => [
   { title: t('warranties.solutionDescription'), key: 'solutionDescription', sortable: false },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
+
+watch(createDialog, async (val) => {
+  if (val) {}
+  else {
+    createForm.value.reset();
+    resetForm();
+  }
+})
+
+watch(updateDialog, async (val) => {
+  if (val) {}
+  else {
+    updateForm.value.reset();
+    resetForm();
+  }
+})
 
 watch(page, async () => {
   await getEquipments();
@@ -246,12 +266,12 @@ const getWarranty = async (id) => {
 
 const createWarranty = async () => {
   try {
+    if (!createModel.value) return;
     const response = await $api('/api/warranties/', {
       method: 'POST',
       body: form.value
     })
     await getWarranties()
-    resetForm()
     createDialog.value = false
   } catch (err) {
     console.log(err)
@@ -260,12 +280,12 @@ const createWarranty = async () => {
 
 const updateWarranty = async () => {
   try {
+    if (!updateModel.value) return;
     const response = await $api(`/api/warranties/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
     await getWarranties()
-    resetForm()
     updateDialog.value = false
   } catch (err) {
     console.log(err)
@@ -273,12 +293,16 @@ const updateWarranty = async () => {
 }
 
 const deleteWarranty = async () => {
-  const response = await $api(`/api/warranties/${form.value.id}`, {
-    method: 'DELETE'
-  })
-  await getWarranties()
-  resetForm()
-  deleteDialog.value = false
+  try {
+    const response = await $api(`/api/warranties/${form.value.id}`, {
+      method: 'DELETE'
+    })
+    await getWarranties()
+    resetForm()
+    deleteDialog.value = false
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 const doSearch = async () => {
@@ -291,5 +315,10 @@ const doSearch = async () => {
     console.log(err)
   }
 }
+
+// Rules
+const invoiceRequired = (v) => !!v || t('warranties.rules.invoiceRequired');
+const problemDescriptionRequired = (v) => !!v || t('warranties.rules.problemDescriptionRequired');
+const solutionDescriptionRequired = (v) => !!v || t('warranties.rules.solutionDescriptionRequired');
 
 </script>

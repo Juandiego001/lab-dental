@@ -28,13 +28,13 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="createReason">
+        <v-form ref="createForm" v-model="createModel" @submit.prevent="createReason">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('reasons.name')"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('reasons.name')" :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('reasons.slug')"></v-text-field>
+              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('reasons.slug')" :rules="[slugRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -58,13 +58,13 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="updateReason">
+        <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateReason">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('reasons.name')"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('reasons.name')" :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('reasons.slug')"></v-text-field>
+              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('reasons.slug')" :rules="[slugRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -151,6 +151,10 @@ const perPage = ref(15);
 const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
+const createModel = ref(false);
+const updateModel = ref(false);
+const createForm = ref(false);
+const updateForm = ref(false);
 const form = ref({
   id: '',
   name: '',
@@ -173,6 +177,22 @@ const headers = computed(() => [
   { title: t('reasons.slug'), key: 'slug', sortable: false },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
+
+watch(createDialog, async (val) => {
+  if (val) {}
+  else {
+    createForm.value.reset();
+    resetForm();
+  }
+})
+
+watch(updateDialog, async (val) => {
+  if (val) {}
+  else {
+    updateForm.value.reset();
+    resetForm();
+  }
+})
 
 watch(page, async () => {
   await getReasons();
@@ -232,12 +252,12 @@ const getReason = async (id) => {
 
 const createReason = async () => {
   try {
+    if (!createModel.value) return;
     const response = await $api('/api/reasons/', {
       method: 'POST',
       body: form.value
     })
     await getReasons()
-    resetForm()
     createDialog.value = false
   } catch (err) {
     console.log(err)
@@ -246,12 +266,12 @@ const createReason = async () => {
 
 const updateReason = async () => {
   try {
+    if (!updateModel.value) return;
     const response = await $api(`/api/reasons/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
     await getReasons()
-    resetForm()
     updateDialog.value = false
   } catch (err) {
     console.log(err)
@@ -259,12 +279,16 @@ const updateReason = async () => {
 }
 
 const deleteReason = async () => {
-  const response = await $api(`/api/reasons/${form.value.id}`, {
-    method: 'DELETE'
-  })
-  await getReasons()
-  resetForm()
-  deleteDialog.value = false
+  try {
+    const response = await $api(`/api/reasons/${form.value.id}`, {
+      method: 'DELETE'
+    })
+    await getReasons()
+    resetForm()
+    deleteDialog.value = false
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 const doSearch = async () => {
@@ -277,5 +301,9 @@ const doSearch = async () => {
     console.log(err)
   }
 }
+
+// Rules
+const nameRequired = (v) => !!v || t('reasons.rules.nameRequired');
+const slugRequired = (v) => !!v || t('reasons.rules.slugRequired');
 
 </script>

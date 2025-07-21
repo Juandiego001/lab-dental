@@ -28,14 +28,15 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="createPart">
+        <v-form ref="createForm" v-model="createModel" @submit.prevent="createPart">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.serial" hide-details="auto" :label="$t('parts.serial')"></v-text-field>
+              <v-text-field v-model="form.serial" hide-details="auto" :label="$t('parts.serial')"
+                :rules="[serialRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.description" hide-details="auto"
-                :label="$t('parts.description')"></v-text-field>
+              <v-text-field v-model="form.description" hide-details="auto" :label="$t('parts.description')"
+                :rules="[descriptionRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -59,14 +60,15 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="updatePart">
+        <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updatePart">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.serial" hide-details="auto" :label="$t('parts.serial')"></v-text-field>
+              <v-text-field v-model="form.serial" hide-details="auto" :label="$t('parts.serial')"
+                :rules="[serialRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.description" hide-details="auto"
-                :label="$t('parts.description')"></v-text-field>
+              <v-text-field v-model="form.description" hide-details="auto" :label="$t('parts.description')"
+                :rules="[descriptionRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -154,6 +156,10 @@ const perPage = ref(15);
 const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
+const createModel = ref(false);
+const updateModel = ref(false);
+const createForm = ref();
+const updateForm = ref();
 const form = ref({
   id: '',
   equipmentId: '',
@@ -179,8 +185,20 @@ const headers = computed(() => [
   { title: t('options'), key: 'option', align: 'center' }
 ])
 
-watch(createDialog, async () => {
-  await getEquipments();
+watch(createDialog, async (val) => {
+  if (val) await getEquipments();
+  else {
+    createForm.value.reset();
+    resetForm();
+  }
+})
+
+watch(updateDialog, async (val) => {
+  if (val) await getEquipments();
+  else {
+    updateForm.value.reset();
+    resetForm();
+  }
 })
 
 watch(page, async () => {
@@ -220,7 +238,7 @@ const getEquipments = async () => {
       },
       method: 'GET'
     })
-    brands.value = data.items
+    equipments.value = data.items
   } catch (err) {
     console.log(err);
   }
@@ -256,6 +274,7 @@ const getPart = async (id) => {
 
 const createPart = async () => {
   try {
+    if (!createModel.value) return;
     const response = await $api('/api/parts/', {
       method: 'POST',
       body: form.value
@@ -270,6 +289,7 @@ const createPart = async () => {
 
 const updatePart = async () => {
   try {
+    if (!updateModel.value) return;
     const response = await $api(`/api/parts/${form.value.id}`, {
       method: 'PUT',
       body: form.value
@@ -283,12 +303,16 @@ const updatePart = async () => {
 }
 
 const deletePart = async () => {
-  const response = await $api(`/api/parts/${form.value.id}`, {
-    method: 'DELETE'
-  })
-  await getEquipments()
-  resetForm()
-  deleteDialog.value = false
+  try {
+    const response = await $api(`/api/parts/${form.value.id}`, {
+      method: 'DELETE'
+    })
+    await getEquipments()
+    resetForm()
+    deleteDialog.value = false
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 const doSearch = async () => {
@@ -301,5 +325,9 @@ const doSearch = async () => {
     console.log(err)
   }
 }
+
+// Rules
+const serialRequired = (v) => !!v || t('parts.rules.serialRequired');
+const descriptionRequired = (v) => !!v || t('parts.rules.descriptionRequired');
 
 </script>
