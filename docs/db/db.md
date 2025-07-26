@@ -25,7 +25,9 @@
 
         ADDRESSES {
             int id PK, UK "AUTO_INCREMENT, NN"
-            int city_id "NN"
+            int country_id "NN"
+            int state_id
+            int city_id
             string description "NN"
             string zip_code "NN"
             string status "NN"
@@ -182,6 +184,7 @@
             int client_id FK "NN"
             int site_client_id FK "NN"
             int user_id FK "NN"
+            string serial "NN"
             date installed_date "NN"
             string status "NN"
             date created_at "NN"

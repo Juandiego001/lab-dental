@@ -62,7 +62,7 @@ def update_equipments(equipment_id, json_data):
     try:
         db.session.merge(json_data)
         db.session.commit()
-        return {'message': 'Equipment updated successfuly'}
+        return {'message': 'Equipment updated successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))
@@ -76,7 +76,7 @@ def delete_equipments(equipment_id):
 
     try:
         equipments.delete_equipment(equipment_id)
-        return {'message': 'Equipment deleted successfuly'}
+        return {'message': 'Equipment deleted successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))

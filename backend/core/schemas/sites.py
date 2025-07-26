@@ -10,7 +10,11 @@ class SiteIn(BaseSchema):
         data_key='distributorId', required=False, allow_none=True)
     client_id = fields.Integer(
         data_key='clientId', required=False, allow_none=True)
-    city_id = fields.Integer(data_key='cityId')
+    country_id = fields.Integer(data_key='countryId')
+    state_id = fields.Integer(
+        required=False, allow_none=True, data_key='stateId')
+    city_id = fields.Integer(
+        required=False, allow_none=True, data_key='cityId')
     description = fields.String()
     name = fields.String()
     status = fields.String(load_default='ACTIVE')
@@ -32,9 +36,11 @@ class SiteInCreate(SiteIn):
 
     @post_load
     def make_object(self, data: dict, **kwargs):
+        country_id = data.pop('country_id')
+        state_id = data.pop('state_id')
         city_id = data.pop('city_id')
         description = data.pop('description')
-        return Address(city_id=city_id, description=description), Site(**data)
+        return Address(country_id=country_id, state_id=state_id, city_id=city_id, description=description), Site(**data)
 
 
 class SiteInUpdate(SiteIn):
@@ -57,9 +63,11 @@ class SiteInUpdate(SiteIn):
     @post_load
     def make_object(self, data: dict, **kwargs):
         address_id = data.pop('address_id')
+        country_id = data.pop('country_id')
+        state_id = data.pop('state_id')
         city_id = data.pop('city_id')
         description = data.pop('description')
-        return Address(id=address_id, city_id=city_id, description=description), Site(**data)
+        return Address(id=address_id, country_id=country_id, state_id=state_id, city_id=city_id, description=description), Site(**data)
 
 
 class SiteOut(BaseSchema):
@@ -72,10 +80,10 @@ class SiteOut(BaseSchema):
     status = fields.String()
     country_id = fields.Integer(data_key='countryId')
     country_name = fields.String(data_key='countryName')
-    state_id = fields.Integer(data_key='stateId')
-    state_name = fields.String(data_key='stateName')
-    city_id = fields.Integer(data_key='cityId')
-    city_name = fields.String(data_key='cityName')
+    state_id = fields.Integer(required=False, data_key='stateId')
+    state_name = fields.String(required=False, data_key='stateName')
+    city_id = fields.Integer(required=False, data_key='cityId')
+    city_name = fields.String(required=False, data_key='cityName')
     client_name = fields.String(data_key='clientName')
     distributor_name = fields.String(data_key='distributorName')
     created_at = fields.DateTime(data_key='createdAt')

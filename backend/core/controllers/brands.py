@@ -61,7 +61,7 @@ def update_brands(brand_id, json_data):
     '''Update brand'''
     try:
         brands.update_brand(brand_id, json_data)
-        return {'message': 'Brand updated successfuly'}
+        return {'message': 'Brand updated successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))
@@ -75,7 +75,7 @@ def delete_brands(brand_id):
 
     try:
         brands.delete_brand(brand_id)
-        return {'message': 'Brand deleted successfuly'}
+        return {'message': 'Brand deleted successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))

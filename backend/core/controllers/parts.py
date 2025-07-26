@@ -61,7 +61,7 @@ def update_parts(part_id, json_data):
 
     try:
         parts.update_part(part_id, json_data)
-        return {'message': 'Part updated successfuly'}
+        return {'message': 'Part updated successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))
@@ -75,7 +75,7 @@ def delete_parts(part_id):
 
     try:
         parts.delete_part(part_id)
-        return {'message': 'Part deleted successfuly'}
+        return {'message': 'Part deleted successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))

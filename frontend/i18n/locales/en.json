@@ -233,7 +233,6 @@
       "clientRequired": "The client is required",
       "countryRequired": "The country is required",
       "stateRequired": "The state is required",
-      "cityRequired": "The city is required",
       "addressRequired": "The address is required",
       "nameRequired": "The name is required"
     }
@@ -435,6 +434,7 @@
   "installations": {
     "title": "Installation | Installations",
     "installedAt": "Installed At",
+    "serial": "Serial",
     "installedDate": "Installed Date",
     "formatPicture": "Format picture",
     "serialPicture": "Serial picture",
@@ -460,6 +460,7 @@
       "siteDistributorRequired": "The distributor site is required",
       "clientRequired": "The client is required",
       "siteClientRequired": "The client site is required",
+      "serialRequired": "The serial is required",
       "installedDateRequired": "The installed date is required",
       "formatPictureRequired": "The format picture is required",
       "serialPictureRequired": "The serial picture is required",

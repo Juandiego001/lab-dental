@@ -12,7 +12,7 @@ def login(email: str, password: str):
 
     user = db.session.query(User).filter(User.email == email).first()
     if not user or not checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
-        raise HTTPException('User or password incorrect')
+        raise HTTPException('Incorrect username or password')
     return user
 
 

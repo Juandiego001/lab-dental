@@ -56,6 +56,7 @@ const logIn = async () => {
     navigateTo('/app');
   } catch (err) {
     console.log(err);
+    show(err, 'error');
   }
 }
 </script>

@@ -136,6 +136,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { show } = useSnackbar();
 const { $ability } = useNuxtApp();
 const { t } = useI18n();
 
@@ -214,7 +215,8 @@ const getManuals = async () => {
     items.value = data.items
     total.value = data.total
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -226,7 +228,8 @@ const getManual = async (id) => {
     form.value = user
     updateDialog.value = true
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -240,7 +243,8 @@ const createManual = async () => {
     await getManuals()
     createDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -254,7 +258,8 @@ const updateManual = async () => {
     await getManuals()
     updateDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -266,7 +271,8 @@ const deleteManual = async () => {
     await getManuals()
     deleteDialog.value = false
   } catch (err) {
-    console.log(err);
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');;
   }
 }
 
@@ -277,7 +283,8 @@ const doSearch = async () => {
     await getManuals()
     searchDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 

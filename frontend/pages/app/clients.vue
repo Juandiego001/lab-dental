@@ -144,6 +144,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { show } = useSnackbar();
 const { $ability } = useNuxtApp();
 const { history } = useRouter().options
 const { profile } = useProfile();
@@ -223,6 +224,10 @@ watch(updateDialog, async (val) => {
   }
 })
 
+watch(deleteDialog, async (val) => {
+  if (!val) resetForm();
+})
+
 watch(page, async () => {
   await getClients();
 })
@@ -260,7 +265,8 @@ const getDistributors = async (search) => {
     })
     distributors.value = data.items;
   } catch (err) {
-    console.log(err);
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -277,7 +283,8 @@ const getClients = async () => {
     items.value = data.items;
     total.value = data.total
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -289,48 +296,54 @@ const getClient = async (id) => {
     form.value = client
     nextTick(() => updateDialog.value = true);
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
 const createClient = async () => {
   try {
     if (!createModel.value) return;
-    const response = await $api('/api/clients/', {
+    const { message } = await $api('/api/clients/', {
       method: 'POST',
       body: form.value
     })
+    show(message, 'success');
     await getClients()
     createDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
 const updateClient = async () => {
   try {
     if (!updateModel.value) return;
-    const response = await $api(`/api/clients/${form.value.id}`, {
+    const { message } = await $api(`/api/clients/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
+    show(message, 'success');
     await getClients()
     updateDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
 const deleteClient = async () => {
   try {
-    const response = await $api(`/api/clients/${form.value.id}`, {
+    const { message } = await $api(`/api/clients/${form.value.id}`, {
       method: 'DELETE'
     })
+    show(message, 'success');
     await getClients()
     deleteDialog.value = false
-    resetForm()
   } catch (err) {
-    console.log(err);
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -341,7 +354,8 @@ const doSearch = async () => {
     await getClients()
     searchDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 

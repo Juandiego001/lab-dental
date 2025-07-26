@@ -78,7 +78,7 @@ def update_list(list_id, json_data):
 
     try:
         lists.update_list(list_id, json_data)
-        return {'message': 'List updated successfuly'}
+        return {'message': 'List updated successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))
@@ -92,7 +92,7 @@ def delete_list(list_id):
 
     try:
         lists.delete_list(list_id)
-        return {'message': 'List deleted successfuly'}
+        return {'message': 'List deleted successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))

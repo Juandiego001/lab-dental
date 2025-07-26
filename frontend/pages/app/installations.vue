@@ -62,6 +62,10 @@
                 @update:search="getClientsSites" clearable :readonly="!form.clientId" :rules="[siteClientRequired]" />
             </v-col>
             <v-col cols="12">
+              <v-text-field v-model="form.serial" :label="$t('installations.serial')" hide-details="auto"
+                :rules="[serialRequired]"></v-text-field>
+            </v-col>
+            <v-col cols="12">
               <v-menu v-model="showPicker" :close-on-content-click="false" transition="scale-transition" offset-y
                 full-width max-width="290px" min-width="290px">
                 <template v-slot:activator="{ props }">
@@ -82,7 +86,8 @@
             </v-col>
             <v-col cols="12">
               <v-file-input v-model="installationPictures" :prepend-icon="null" prepend-inner-icon="mdi-paperclip"
-                hide-details="auto" :label="$t('installations.installationPictures')" multiple chips :rules="[installationPicturesRequired]">
+                hide-details="auto" :label="$t('installations.installationPictures')" multiple chips
+                :rules="[installationPicturesRequired]">
                 <template v-slot:selection="{ fileNames }">
                   <v-chip v-for="fileName in fileNames" :key="fileName" size="small" label>
                     {{ fileName }}
@@ -116,11 +121,13 @@
           <v-row>
             <v-col cols="12">
               <v-autocomplete v-model="form.equipmentId" :label="$t('equipments.title')" :items="equipments"
-                item-title="serialModel" item-value="id" hide-details="auto" @update:search="getEquipments" clearable :rules="[equipmentRequired]" />
+                item-title="serialModel" item-value="id" hide-details="auto" @update:search="getEquipments" clearable
+                :rules="[equipmentRequired]" />
             </v-col>
             <v-col v-if="isAdmin" cols="12">
               <v-autocomplete v-model="form.distributorId" :label="$t('distributors.title')" :items="distributors"
-                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable :rules="[distributorRequired]" />
+                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable
+                :rules="[distributorRequired]" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.siteDistributorId"
@@ -137,6 +144,10 @@
               <v-autocomplete v-model="form.siteClientId" :label="`${$t('sites.title')} ${$t('clients.title')}`"
                 :items="clientsSites" item-title="name" item-value="id" hide-details="auto"
                 @update:search="getClientsSites" clearable :readonly="!form.clientId" :rules="[siteClientRequired]" />
+            </v-col>
+            <v-col cols="12">
+              <v-text-field v-model="form.serial" :label="$t('installations.serial')" hide-details="auto"
+                :rules="[serialRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
               <v-menu v-model="showPicker" :close-on-content-click="false" transition="scale-transition" offset-y
@@ -213,6 +224,7 @@ import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
 import { useDate } from 'vuetify'
+const { show } = useSnackbar();
 const { $ability } = useNuxtApp();
 const { profile } = useProfile();
 const { t } = useI18n();
@@ -261,6 +273,7 @@ const form = ref({
   clientName: '',
   siteClientId: '',
   siteClientName: '',
+  serial: '',
   installedDate: null,
 })
 
@@ -278,6 +291,7 @@ const itemsPerPageOptions = computed(() => [
 const headers = computed(() => [
   { title: 'Id', key: 'id', align: 'center', sortable: false },
   { title: t('equipments.title'), key: 'equipmentSerialModel', align: 'center', sortable: false },
+  { title: t('installations.serial'), key: 'serial', align: 'center', sortable: false },
   { title: t('installations.installedDate'), key: 'installedDate', align: 'center', sortable: false },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
@@ -382,6 +396,7 @@ const resetForm = () => {
     siteDistributorId: '',
     clientId: '',
     siteClientId: '',
+    serial: '',
     installedDate: null,
   }
 }
@@ -399,7 +414,8 @@ const getEquipments = async (search) => {
     })
     equipments.value = data.items
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -416,7 +432,8 @@ const getDistributors = async (search) => {
     })
     distributors.value = data.items
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -433,7 +450,8 @@ const getDistributorsSites = async (search) => {
     })
     distributorsSites.value = data.items
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -451,7 +469,8 @@ const getClients = async (search) => {
     })
     clients.value = data.items
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -469,7 +488,8 @@ const getClientsSites = async (search) => {
     })
     clientsSites.value = data.items
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -486,7 +506,8 @@ const getInstallations = async () => {
     items.value = data.items
     total.value = data.total
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -501,7 +522,8 @@ const getInstallation = async (id) => {
       updateDialog.value = true
     });
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -531,7 +553,8 @@ const createInstallation = async () => {
     await getInstallations()
     createDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -545,7 +568,8 @@ const updateInstallation = async () => {
     await getInstallations()
     updateDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -558,7 +582,8 @@ const deleteInstallation = async () => {
     deleteDialog.value = false
     resetForm();
   } catch (err) {
-    console.log(err);
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');;
   }
 }
 
@@ -569,7 +594,8 @@ const doSearch = async () => {
     await getInstallations()
     searchDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -579,6 +605,7 @@ const distributorRequired = (v) => !!v || t('installations.rules.distributorRequ
 const siteDistributorRequired = (v) => !!v || t('installations.rules.siteDistributorRequired');
 const clientRequired = (v) => !!v || t('installations.rules.clientRequired');
 const siteClientRequired = (v) => !!v || t('installations.rules.siteClientRequired');
+const serialRequired = (v) => !!v || t('installations.rules.serialRequired');
 const installedDateRequired = (v) => !!v || t('installations.rules.installedDateRequired');
 const formatPictureRequired = (v) => !!v || t('installations.rules.formatPictureRequired');
 const serialPictureRequired = (v) => !!v || t('installations.rules.serialPictureRequired');

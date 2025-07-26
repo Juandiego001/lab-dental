@@ -104,7 +104,7 @@ def update_distributors(distributor_id, json_data):
     '''Update distributor'''
     try:
         distributors.update_distributor(distributor_id, json_data)
-        return {'message': 'Distributor updated successfuly'}
+        return {'message': 'Distributor updated successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))
@@ -118,7 +118,7 @@ def delete_distributors(distributor_id):
 
     try:
         distributors.delete_distributor(distributor_id)
-        return {'message': 'Distributor deleted successfuly'}
+        return {'message': 'Distributor deleted successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))

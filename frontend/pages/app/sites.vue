@@ -63,8 +63,7 @@
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.cityId" :label="$t('cities')" :items="cities" item-title="name"
-                item-value="id" hide-details="auto" @update:search="getCities" :readonly="!form.stateId"
-                :rules="[cityRequired]" />
+                item-value="id" hide-details="auto" @update:search="getCities" :readonly="!form.stateId" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.description" hide-details="auto" :label="$t('sites.address')"
@@ -130,8 +129,7 @@
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.cityId" :label="$t('cities')" :items="cities" item-title="name"
-                item-value="id" hide-details="auto" @update:search="getCities" :readonly="!form.stateId"
-                :rules="[cityRequired]" />
+                item-value="id" hide-details="auto" @update:search="getCities" :readonly="!form.stateId" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.description" hide-details="auto" :label="$t('sites.address')"
@@ -205,6 +203,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { show } = useSnackbar();
 const { $ability } = useNuxtApp();
 const { profile } = useProfile();
 const { t } = useI18n();
@@ -245,10 +244,10 @@ const form = ref({
   clientId: null,
   distributorName: '',
   clientName: '',
-  cityId: '',
-  cityName: '',
-  stateId: '',
-  stateName: '',
+  cityId: null,
+  cityName: null,
+  stateId: null,
+  stateName: null,
   countryId: '',
   countryName: '',
   addressId: '',
@@ -300,12 +299,12 @@ watch(() => form.value.countryId, async (val) => {
     else await getStates(form.value.stateName);
     nextTick(() => {
       if (form.value.stateId && !(states.value.map(e => e.id)).includes(form.value.stateId)) {
-        form.value.stateId = '';
-        form.value.stateName = '';
+        form.value.stateId = null;
+        form.value.stateName = null;
       }
     })
   }
-  else { form.value.stateId = ''; form.value.stateName = '' }
+  else { form.value.stateId = null; form.value.stateName = null }
 })
 
 watch(() => form.value.stateId, async (val) => {
@@ -314,12 +313,16 @@ watch(() => form.value.stateId, async (val) => {
     else await getCities(form.value.cityName);
     nextTick(() => {
       if (form.value.cityId && !(cities.value.map(e => e.id)).includes(form.value.cityId)) {
-        form.value.cityId = '';
-        form.value.cityName = '';
+        form.value.cityId = null;
+        form.value.cityName = null;
       }
     })
   }
-  else { form.value.cityId = ''; form.value.cityName = ''; }
+  else { form.value.cityId = null; form.value.cityName = null; }
+})
+
+watch(deleteDialog, async (val) => {
+  if (!val) resetForm();
 })
 
 watch(page, async () => {
@@ -346,10 +349,10 @@ const resetForm = () => {
     companyType: 'distributors',
     distributorId: null,
     clientId: null,
-    cityId: '',
-    cityName: '',
-    stateId: '',
-    stateName: '',
+    cityId: null,
+    cityName: null,
+    stateId: null,
+    stateName: null,
     countryId: '',
     countryName: '',
     addressId: '',
@@ -370,7 +373,8 @@ const getDistributors = async (search) => {
     })
     distributors.value = data.items
   } catch (err) {
-    console.log(err);
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -386,7 +390,8 @@ const getClients = async (search) => {
     })
     clients.value = data.items
   } catch (err) {
-    console.log(err);
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -402,7 +407,8 @@ const getCountries = async (search) => {
     })
     countries.value = data.items
   } catch (err) {
-    console.log(err);
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -419,7 +425,8 @@ const getStates = async (search) => {
     })
     states.value = data.items
   } catch (err) {
-    console.log(err);
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -436,7 +443,8 @@ const getCities = async (search) => {
     })
     cities.value = data.items
   } catch (err) {
-    console.log(err);
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -453,7 +461,8 @@ const getSites = async () => {
     items.value = data.items
     total.value = data.total
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -465,45 +474,55 @@ const getSite = async (id) => {
     form.value = site
     nextTick(() => updateDialog.value = true);
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
 const createSite = async () => {
   try {
     if (!createModel.value) return;
-    const response = await $api('/api/sites/', {
+    const { message } = await $api('/api/sites/', {
       method: 'POST',
       body: form.value
     })
+    show(message, 'success');
     await getSites()
     createDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
 const updateSite = async () => {
   try {
     if (!updateModel.value) return;
-    const response = await $api(`/api/sites/${form.value.id}`, {
+    const { message } = await $api(`/api/sites/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
+    show(message, 'success');
     await getSites()
     updateDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
 const deleteSite = async () => {
-  const response = await $api(`/api/sites/${form.value.id}`, {
-    method: 'DELETE'
-  })
-  await getSites()
-  resetForm()
-  deleteDialog.value = false
+  try {
+    const { message } = await $api(`/api/sites/${form.value.id}`, {
+      method: 'DELETE'
+    })
+    show(message, 'success');
+    await getSites()
+    deleteDialog.value = false
+  } catch (err) {
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
+  }
 }
 
 const doSearch = async () => {
@@ -513,7 +532,8 @@ const doSearch = async () => {
     await getSites()
     searchDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -522,7 +542,6 @@ const distributorRequired = (v) => !!v || t('sites.rules.distributorRequired');
 const clientRequired = (v) => !!v || t('sites.rules.clientRequired');
 const countryRequired = (v) => !!v || t('sites.rules.countryRequired');
 const stateRequired = (v) => !!v || t('sites.rules.stateRequired');
-const cityRequired = (v) => !!v || t('sites.rules.cityRequired');
 const addressRequired = (v) => !!v || t('sites.rules.addressRequired');
 const nameRequired = (v) => !!v || t('sites.rules.nameRequired');
 

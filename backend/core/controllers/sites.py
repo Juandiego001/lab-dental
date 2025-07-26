@@ -63,7 +63,11 @@ def get_site(site_id):
     '''Get site'''
 
     try:
-        return sites.get_site_by_id(site_id)
+        result = sites.get_site_by_id(site_id)
+
+        print(result)
+
+        return result
     except Exception as ex:
         abort(500, str(ex))
 
@@ -107,7 +111,7 @@ def update_sites(site_id, site_and_address):
         db.session.merge(address)
         db.session.merge(site)
         db.session.commit()
-        return {'message': 'Site registered successfully'}
+        return {'message': 'Site updated successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))
@@ -121,7 +125,7 @@ def delete_sites(site_id):
 
     try:
         sites.delete_site(site_id)
-        return {'message': 'Site deleted successfuly'}
+        return {'message': 'Site deleted successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))

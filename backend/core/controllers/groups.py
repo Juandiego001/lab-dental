@@ -63,7 +63,7 @@ def update_groups(group_id, json_data):
 
     try:
         groups.update_group(group_id, json_data)
-        return {'message': 'Group updated successfuly'}
+        return {'message': 'Group updated successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))
@@ -77,7 +77,7 @@ def delete_groups(group_id):
 
     try:
         groups.delete_group(group_id)
-        return {'message': 'Group deleted successfuly'}
+        return {'message': 'Group deleted successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))

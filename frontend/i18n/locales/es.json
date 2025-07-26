@@ -233,7 +233,6 @@
       "clientRequired": "El cliente es requerido",
       "countryRequired": "El país es requerido",
       "stateRequired": "El estado es requerido",
-      "cityRequired": "La ciudad es requerida",
       "addressRequired": "La dirección es requerida",
       "nameRequired": "El nombre es requerido"
     }
@@ -434,6 +433,7 @@
   "installations": {
     "title": "Instalación | Instalaciones",
     "installedAt": "Instalado en",
+    "serial": "Serial",
     "installedDate": "Fecha de instalación",
     "formatPicture": "Foto de formato",
     "serialPicture": "Foto de serial",
@@ -459,6 +459,7 @@
       "siteDistributorRequired": "La sede del distribuidor es requerida",
       "clientRequired": "El cliente es requerido",
       "siteClientRequired": "La sede del cliente es requerida",
+      "serialRequired": "El serial es requerido",
       "installedDateRequired": "La fecha de instalación es requerida",
       "formatPictureRequired": "La imagen del formato es requerida",
       "serialPictureRequired": "La imagen del serial es requerida",

@@ -147,6 +147,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { show } = useSnackbar();
 const { $ability } = useNuxtApp();
 const { t } = useI18n();
 
@@ -266,7 +267,8 @@ const getBrands = async (search) => {
     })
     brands.value = data.items
   } catch (err) {
-    console.log(err);
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');;
   }
 }
 
@@ -283,7 +285,8 @@ const getCategories = async (search) => {
     })
     categories.value = data.items
   } catch (err) {
-    console.log(err);
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');;
   }
 }
 
@@ -300,7 +303,8 @@ const getEquipments = async () => {
     items.value = data.items
     total.value = data.total
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -312,7 +316,8 @@ const getEquipment = async (id) => {
     form.value = data
     updateDialog.value = true
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -327,7 +332,8 @@ const createEquipment = async () => {
     createDialog.value = false
     resetForm()
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -342,7 +348,8 @@ const updateEquipment = async () => {
     updateDialog.value = false
     resetForm()
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -355,7 +362,8 @@ const deleteEquipment = async () => {
     deleteDialog.value = false
     resetForm()
   } catch (err) {
-    console.log(err);
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');;
   }
 }
 
@@ -366,7 +374,8 @@ const doSearch = async () => {
     await getEquipments()
     searchDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 

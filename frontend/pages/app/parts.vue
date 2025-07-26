@@ -134,6 +134,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { show } = useSnackbar();
 const { $ability } = useNuxtApp();
 const { t } = useI18n();
 
@@ -240,7 +241,8 @@ const getEquipments = async () => {
     })
     equipments.value = data.items
   } catch (err) {
-    console.log(err);
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');;
   }
 }
 
@@ -256,7 +258,8 @@ const getParts = async () => {
     })
     items.value = data.items
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -268,7 +271,8 @@ const getPart = async (id) => {
     form.value = user
     updateDialog.value = true
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -283,7 +287,8 @@ const createPart = async () => {
     resetForm()
     createDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -298,7 +303,8 @@ const updatePart = async () => {
     resetForm()
     updateDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -311,7 +317,8 @@ const deletePart = async () => {
     resetForm()
     deleteDialog.value = false
   } catch (err) {
-    console.log(err);
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');;
   }
 }
 
@@ -322,7 +329,8 @@ const doSearch = async () => {
     await getEquipments()
     searchDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 

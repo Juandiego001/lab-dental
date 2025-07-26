@@ -62,7 +62,7 @@ def update_clients(client_id, json_data):
     '''Update client'''
     try:
         clients.update_client(client_id, json_data)
-        return {'message': 'Client updated successfuly'}
+        return {'message': 'Client updated successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))
@@ -76,7 +76,7 @@ def delete_clients(client_id):
 
     try:
         clients.delete_client(client_id)
-        return {'message': 'Client deleted successfuly'}
+        return {'message': 'Client deleted successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))

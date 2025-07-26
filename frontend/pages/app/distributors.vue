@@ -126,6 +126,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { show } = useSnackbar();
 const { $ability } = useNuxtApp();
 const { t } = useI18n();
 
@@ -182,6 +183,10 @@ watch(updateDialog, (val) => {
   }
 })
 
+watch(deleteDialog, (val) => {
+  if (!val) resetForm();
+})
+
 watch(page, async () => {
   await getDistributors();
 })
@@ -217,7 +222,8 @@ const getDistributors = async () => {
     items.value = data.items
     total.value = data.total
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -229,45 +235,56 @@ const getDistributor = async (id) => {
     form.value = user
     updateDialog.value = true
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
 const createDistributor = async () => {
   try {
     if (!createModel.value) return;
-    const response = await $api('/api/distributors/', {
+    const { message } = await $api('/api/distributors/', {
       method: 'POST',
       body: form.value
     })
+
+    show(message, 'success');
     await getDistributors()
     createDialog.value = false;
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
 const updateDistributor = async () => {
   try {
     if (!updateModel.value) return;
-    const response = await $api(`/api/distributors/${form.value.id}`, {
+    const { message } = await $api(`/api/distributors/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
+    show(message, 'success');
     await getDistributors()
     updateDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
 const deleteDistributor = async () => {
-  const response = await $api(`/api/distributors/${form.value.id}`, {
-    method: 'DELETE'
-  })
-  await getDistributors()
-  resetForm()
-  deleteDialog.value = false
+  try {
+    const { message } = await $api(`/api/distributors/${form.value.id}`, {
+      method: 'DELETE'
+    })
+    show(message, 'success');
+    await getDistributors();
+    deleteDialog.value = false;
+  } catch (err) {
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
+  }
 }
 
 const doSearch = async () => {
@@ -277,7 +294,8 @@ const doSearch = async () => {
     await getDistributors()
     searchDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 

@@ -32,16 +32,18 @@
         <v-form ref="createForm" v-model="createModel" @submit.prevent="createGroup">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('groups.name')" :rules="[nameRequired]"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('groups.name')"
+                :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col v-if="isAdmin" cols="12">
               <v-autocomplete v-model="form.distributorId" :label="$t('distributors.title')" :items="distributors"
-                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable :rules="[distributorRequired]" />
+                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable
+                :rules="[distributorRequired]" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.usersIds" :label="$t('users.title', 2)" :items="users" item-title="fullName"
                 item-value="id" hide-details="auto" @update:search="getUsers" clearable multiple chips
-                :readonly="isAdmin && !form.distributorId" :rules="[usersRequired]"/>
+                :readonly="isAdmin && !form.distributorId" :rules="[usersRequired]" />
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -68,16 +70,18 @@
         <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateGroup">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('groups.name')" :rules="[nameRequired]"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('groups.name')"
+                :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col v-if="isAdmin" cols="12">
               <v-autocomplete v-model="form.distributorId" :label="$t('distributors.title')" :items="distributors"
-                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable :rules="[distributorRequired]"/>
+                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable
+                :rules="[distributorRequired]" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.usersIds" :label="$t('users.title', 2)" :items="users" item-title="fullName"
                 item-value="id" hide-details="auto" @update:search="getUsers" clearable multiple chips
-                :readonly="isAdmin && !form.distributorId" :rules="[usersRequired]"/>
+                :readonly="isAdmin && !form.distributorId" :rules="[usersRequired]" />
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -186,6 +190,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { show } = useSnackbar();
 const { $ability } = useNuxtApp();
 const { profile } = useProfile();
 const { t } = useI18n();
@@ -292,6 +297,10 @@ watch(() => form.value.distributorId, async (val) => {
   if (val) await getUsers();
 })
 
+watch(deleteDialog, async (val) => {
+  if (!val) resetForm();
+})
+
 watch(page, async () => {
   await getGroups();
 })
@@ -338,7 +347,8 @@ const getGroups = async () => {
     items.value = data.items
     total.value = data.total
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -350,50 +360,54 @@ const getGroup = async (id) => {
     form.value = data
     updateDialog.value = true
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
 const createGroup = async () => {
   try {
     if (!createModel.value) return;
-    const response = await $api('/api/groups/', {
+    const { message } = await $api('/api/groups/', {
       method: 'POST',
       body: form.value
     })
+    show(message, 'success');
     await getGroups()
     createDialog.value = false
-    resetForm()
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
 const updateGroup = async () => {
   try {
     if (!updateModel.value) return;
-    const response = await $api(`/api/groups/${form.value.id}`, {
+    const { message } = await $api(`/api/groups/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
+    show(message, 'success');
     await getGroups()
     updateDialog.value = false
-    resetForm()
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
 const deleteGroup = async () => {
   try {
-    const response = await $api(`/api/groups/${form.value.id}`, {
+    const { message } = await $api(`/api/groups/${form.value.id}`, {
       method: 'DELETE'
     })
+    show(message, 'success');
     await getGroups()
     deleteDialog.value = false
-    resetForm()
   } catch (err) {
-    console.log(err);
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -404,7 +418,8 @@ const doSearch = async () => {
     await getGroups()
     searchDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -421,7 +436,8 @@ const getDistributors = async (search) => {
     })
     distributors.value = data.items
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -450,7 +466,8 @@ const getUsers = async (search) => {
     }
     users.value = data.items
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -468,19 +485,22 @@ const getPermissions = async (search) => {
     itemsPermissions.value = data.items
     totalPermissions.value = data.total
   } catch (err) {
-    console.log(err);
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
 const updatePermissions = async (v, item, action) => {
   try {
     item[action] = v;
-    const response = await $api('/api/permissions/', {
+    const { message } = await $api('/api/permissions/', {
       method: 'PUT',
       body: item
     })
+    show(message, 'success');
   } catch (err) {
-    console.log(err);
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 

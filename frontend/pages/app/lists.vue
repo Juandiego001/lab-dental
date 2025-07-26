@@ -148,6 +148,7 @@ import { ref, computed, watch, onBeforeMount, useTemplateRef, toRefs } from 'vue
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { show } = useSnackbar();
 const { $ability } = useNuxtApp();
 const { t } = useI18n();
 
@@ -253,7 +254,8 @@ const getDistributors = async (search) => {
     })
     distributors.value = data.items
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -269,7 +271,8 @@ const getUsers = async (search) => {
     })
     users.value = data.items
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -286,7 +289,8 @@ const getLists = async () => {
     items.value = data.items
     total.value = data.total
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -298,7 +302,8 @@ const getList = async (id) => {
     form.value = data
     updateDialog.value = true
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -313,7 +318,8 @@ const createList = async () => {
     createDialog.value = false
     resetForm()
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -328,7 +334,8 @@ const updateList = async () => {
     updateDialog.value = false
     resetForm()
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -341,7 +348,8 @@ const deleteList = async () => {
     deleteDialog.value = false
     resetForm()
   } catch (err) {
-    console.log(err);
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');;
   }
 }
 
@@ -352,7 +360,8 @@ const doSearch = async () => {
     await getLists()
     searchDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 

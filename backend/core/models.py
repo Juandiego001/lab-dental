@@ -1,7 +1,7 @@
 import enum
 from core.app import db
 from bcrypt import checkpw
-from sqlalchemy import Enum
+from sqlalchemy import Column, Enum, Index
 from sqlalchemy import BigInteger, String, DateTime, ForeignKey, Boolean
 from datetime import datetime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -44,7 +44,9 @@ class Address(db.Model):
     __tablename__ = "addresses"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    city_id: Mapped[int] = mapped_column(ForeignKey('cities.id'), nullable=False)
+    country_id: Mapped[int] = mapped_column(ForeignKey('countries.id'), nullable=False)
+    state_id: Mapped[int] = mapped_column(ForeignKey('states.id'), nullable=True)
+    city_id: Mapped[int] = mapped_column(ForeignKey('cities.id'), nullable=True)
     description: Mapped[str] = mapped_column(String(100), nullable=False)
     zip_code: Mapped[str] = mapped_column(String(40), nullable=True)
     status: Mapped[str] = mapped_column(String(20), 
@@ -162,11 +164,18 @@ class DistributorList(db.Model):
 
 class User(db.Model):
     __tablename__ = "users"
+    __table_args__ = (
+        Index(
+            'unique_email_status',  # Index name
+            'email', 'status',  # Columns which are part of the index
+        unique=True,
+        postgresql_where=Column('status') == 'ACTIVE'), 
+    )
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     full_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    username: Mapped[str] = mapped_column(String(20), nullable=True, unique=True)
-    email: Mapped[str] = mapped_column(String(450), nullable=True, unique=True)
+    username: Mapped[str] = mapped_column(String(20), nullable=True)
+    email: Mapped[str] = mapped_column(String(450), nullable=True)
     password: Mapped[str] = mapped_column(String, nullable=False)
     role: Mapped[str] = mapped_column(String(20), nullable=False)
     status: Mapped[str] = mapped_column(String(20), 
@@ -455,6 +464,7 @@ class Installation(db.Model):
     client_id: Mapped[int] = mapped_column(ForeignKey('clients.id'), nullable=False)
     site_client_id: Mapped[int] = mapped_column(ForeignKey('sites.id'), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    serial: Mapped[str] = mapped_column(String(), nullable=False)
     installed_date: Mapped[datetime] = mapped_column(DateTime(), nullable=False)
     status: Mapped[str] = mapped_column(String(20), 
                                         nullable=False,

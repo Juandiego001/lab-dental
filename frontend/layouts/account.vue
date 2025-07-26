@@ -1,8 +1,8 @@
 <template>
-    <v-app>
-        <NavBar />
-        <NuxtPage />
-    </v-app>
+  <v-app>
+    <NavBar />
+    <NuxtPage />
+  </v-app>
 </template>
 
 <script>

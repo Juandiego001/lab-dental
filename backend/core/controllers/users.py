@@ -122,7 +122,7 @@ def update_users(user_id, json_data):
     '''Update user'''
     try:
         users.update_user(user_id, json_data)
-        return {'message': 'User updated successfuly'}
+        return {'message': 'User updated successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))
@@ -136,7 +136,7 @@ def delete_users(user_id):
 
     try:
         users.delete_user(user_id)
-        return {'message': 'User deleted successfuly'}
+        return {'message': 'User deleted successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))

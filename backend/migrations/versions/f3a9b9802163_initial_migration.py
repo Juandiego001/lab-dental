@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: 34f657b8294c
+Revision ID: f3a9b9802163
 Revises: 
-Create Date: 2025-06-30 21:42:05.448913
+Create Date: 2025-07-25 23:10:32.446347
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '34f657b8294c'
+revision = 'f3a9b9802163'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -89,10 +89,11 @@ def upgrade():
     sa.Column('status', sa.String(length=20), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('email'),
-    sa.UniqueConstraint('username')
+    sa.PrimaryKeyConstraint('id')
     )
+    with op.batch_alter_table('users', schema=None) as batch_op:
+        batch_op.create_index('unique_email_status', ['email', 'status'], unique=True, postgresql_where=sa.text("status = 'ACTIVE'"))
+
     op.create_table('clients',
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('distributor_id', sa.BigInteger(), nullable=False),
@@ -246,13 +247,17 @@ def upgrade():
     )
     op.create_table('addresses',
     sa.Column('id', sa.BigInteger(), nullable=False),
-    sa.Column('city_id', sa.BigInteger(), nullable=False),
+    sa.Column('country_id', sa.BigInteger(), nullable=False),
+    sa.Column('state_id', sa.BigInteger(), nullable=True),
+    sa.Column('city_id', sa.BigInteger(), nullable=True),
     sa.Column('description', sa.String(length=100), nullable=False),
     sa.Column('zip_code', sa.String(length=40), nullable=True),
     sa.Column('status', sa.String(length=20), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['city_id'], ['cities.id'], ),
+    sa.ForeignKeyConstraint(['country_id'], ['countries.id'], ),
+    sa.ForeignKeyConstraint(['state_id'], ['states.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('sites',
@@ -279,6 +284,7 @@ def upgrade():
     sa.Column('client_id', sa.BigInteger(), nullable=False),
     sa.Column('site_client_id', sa.BigInteger(), nullable=False),
     sa.Column('user_id', sa.BigInteger(), nullable=False),
+    sa.Column('serial', sa.String(), nullable=False),
     sa.Column('installed_date', sa.DateTime(), nullable=False),
     sa.Column('status', sa.String(length=20), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
@@ -342,6 +348,9 @@ def downgrade():
     op.drop_table('equipments')
     op.drop_table('distributors_lists')
     op.drop_table('clients')
+    with op.batch_alter_table('users', schema=None) as batch_op:
+        batch_op.drop_index('unique_email_status', postgresql_where=sa.text("status = 'ACTIVE'"))
+
     op.drop_table('users')
     op.drop_table('modules')
     op.drop_table('manuals_types')

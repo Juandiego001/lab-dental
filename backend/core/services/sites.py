@@ -78,20 +78,20 @@ def get_site_by_id(site_id: int):
         *Site.__table__.c,
         Address.id.label('address_id'),
         Address.description.label('description'),
-        Address.city_id.label('city_id'),
-        City.state_id.label('state_id'),
+        City.id.label('city_id'),
         City.name.label('city_name'),
-        State.country_id.label('country_id'),
+        State.id.label('state_id'),
         State.name.label('state_name'),
+        Country.id.label('country_id'),
         Country.name.label('country_name'),
         Client.name.label('client_name'),
         Distributor.name.label('distributor_name')
     )\
         .select_from(Site)\
         .join(Address)\
-        .join(City)\
-        .join(State)\
-        .join(Country)\
+        .outerjoin(City, Address.city_id == City.id)\
+        .outerjoin(State, Address.state_id == State.id)\
+        .join(Country, Address.country_id == Country.id)\
         .outerjoin(Site.client)\
         .outerjoin(Site.distributor)\
         .filter(Site.id == site_id)\

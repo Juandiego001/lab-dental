@@ -168,6 +168,7 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
+const { show } = useSnackbar();
 const { $ability } = useNuxtApp();
 const { profile } = useProfile();
 const { t } = useI18n();
@@ -246,6 +247,10 @@ watch(() => form.value.role, async (val) => {
   if (updateDialog.value) form.value.distributorId = null;
 })
 
+watch(deleteDialog, async (val) => {
+  if (!val) resetForm();
+})
+
 watch(page, async () => {
   await getUsers();
 })
@@ -285,7 +290,8 @@ const getDistributors = async (search) => {
     })
     distributors.value = data.items
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -302,7 +308,8 @@ const getUsers = async () => {
     items.value = data.items
     total.value = data.total
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -314,48 +321,54 @@ const getUser = async (id) => {
     form.value = user
     nextTick(() => updateDialog.value = true);
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
 const createUser = async () => {
   try {
     if (!createModel.value) return;
-    const response = await $api('/api/users/', {
+    const { message } = await $api('/api/users/', {
       method: 'POST',
       body: form.value
     })
+    show(message, 'success');
     await getUsers()
     createDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
 const updateUser = async () => {
   try {
     if (!updateModel.value) return;
-    const response = await $api(`/api/users/${form.value.id}`, {
+    const { message } = await $api(`/api/users/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
+    show(message, 'success');
     await getUsers()
     updateDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
 const deleteUser = async () => {
   try {
-    const response = await $api(`/api/users/${form.value.id}`, {
+    const { message } = await $api(`/api/users/${form.value.id}`, {
       method: 'DELETE'
     })
+    show(message, 'success');
     await getUsers()
     deleteDialog.value = false
-    resetForm()
   } catch (err) {
-    console.log(err);
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 
@@ -366,7 +379,8 @@ const doSearch = async () => {
     await getUsers()
     searchDialog.value = false
   } catch (err) {
-    console.log(err)
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
   }
 }
 

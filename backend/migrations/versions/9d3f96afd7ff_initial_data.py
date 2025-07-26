@@ -1,8 +1,8 @@
 """Initial data
 
-Revision ID: 409b7f6f52d0
-Revises: 34f657b8294c
-Create Date: 2025-06-30 21:42:20.673700
+Revision ID: 9d3f96afd7ff
+Revises: f3a9b9802163
+Create Date: 2025-07-25 23:10:44.478698
 
 """
 from alembic import op
@@ -15,8 +15,8 @@ import pandas as pd
 
 
 # revision identifiers, used by Alembic.
-revision = '409b7f6f52d0'
-down_revision = '34f657b8294c'
+revision = '9d3f96afd7ff'
+down_revision = 'f3a9b9802163'
 branch_labels = None
 depends_on = None
 
@@ -115,7 +115,7 @@ def upgrade():
         Module(name='brands'),
         Module(name='reasons'),
         Module(name='parts'),
-        ]
+    ]
     db.session.add_all(modules)
     db.session.flush()
 

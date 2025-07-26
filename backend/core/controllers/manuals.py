@@ -60,7 +60,7 @@ def update_manuals(manual_id, json_data):
     '''Update manuals'''
     try:
         manuals.update_manual(manual_id, json_data)
-        return {'message': 'Manual updated successfuly'}
+        return {'message': 'Manual updated successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))
@@ -74,7 +74,7 @@ def delete_manuals(manual_id):
 
     try:
         manuals.delete_manual(manual_id)
-        return {'message': 'Manual deleted successfuly'}
+        return {'message': 'Manual deleted successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))

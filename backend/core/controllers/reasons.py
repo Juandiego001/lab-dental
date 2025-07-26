@@ -61,7 +61,7 @@ def update_reasons(reason_id, json_data):
 
     try:
         reasons.update_reason(reason_id, json_data)
-        return {'message': 'Reason updated successfuly'}
+        return {'message': 'Reason updated successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))
@@ -75,7 +75,7 @@ def delete_reasons(reason_id):
 
     try:
         reasons.delete_reason(reason_id)
-        return {'message': 'Reason deleted successfuly'}
+        return {'message': 'Reason deleted successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))

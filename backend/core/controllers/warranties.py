@@ -61,7 +61,7 @@ def update_warranties(warranty_id, json_data):
     '''Update warranties'''
     try:
         warranties.update_warranty(warranty_id, json_data)
-        return {'message': 'Warranty updated successfuly'}
+        return {'message': 'Warranty updated successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))
@@ -75,7 +75,7 @@ def delete_warranties(warranty_id):
 
     try:
         warranties.delete_warranty(warranty_id)
-        return {'message': 'Warranty deleted successfuly'}
+        return {'message': 'Warranty deleted successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))

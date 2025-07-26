@@ -60,7 +60,7 @@ def update_categories(category_id, json_data):
     '''Update category'''
     try:
         categories.update_category(category_id, json_data)
-        return {'message': 'Category updated successfuly'}
+        return {'message': 'Category updated successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))
@@ -74,7 +74,7 @@ def delete_categories(category_id):
 
     try:
         categories.delete_category(category_id)
-        return {'message': 'Category deleted successfuly'}
+        return {'message': 'Category deleted successfully'}
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))

@@ -1,5 +1,5 @@
 from bcrypt import hashpw, gensalt
-from sqlalchemy import or_
+from sqlalchemy import and_, or_
 from core.app import db
 from core.models import User
 from apiflask import Schema, abort, fields
@@ -31,7 +31,7 @@ class UserInCreate(UserIn):
         '''Check if there is already a user with the username or the email given'''
 
         user = db.session.query(User)\
-            .filter(or_(User.email == data['email'], User.username == data['username']))\
+            .filter(and_(or_(User.email == data['email'], User.username == data['username']), User.status == 'ACTIVE'))\
             .first()
 
         if user:
@@ -74,15 +74,15 @@ class UserInUpdate(UserIn):
         user_exists = None
         if current_user.email != data['email'] and current_user.email != data['username']:
             user_exists = db.session.query(User)\
-                .filter(or_(User.email == data['email'], User.username == data['username']))\
+                .filter(and_(or_(User.email == data['email'], User.username == data['username']), User.status == 'ACTIVE'))\
                 .first()
         elif current_user.email != data['email']:
             user_exists = db.session.query(User)\
-                .filter(User.email == data['email'])\
+                .filter(and_(User.email == data['email'], User.status == 'ACTIVE'))\
                 .first()
         elif current_user.username != data['username']:
             user_exists = db.session.query(User)\
-                .filter(User.username == data['username'])\
+                .filter(and_(User.username == data['username'], User.status == 'ACTIVE'))\
                 .first()
 
         if user_exists:
