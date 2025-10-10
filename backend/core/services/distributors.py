@@ -2,7 +2,7 @@ import re
 import unicodedata
 from core.app import db
 from core.models import Client, Distributor, DistributorList, List_, User, UserList
-from sqlalchemy import or_, and_
+from sqlalchemy import delete, func, or_, and_, select
 from werkzeug.exceptions import HTTPException
 
 
@@ -121,6 +121,23 @@ def update_distributor(distributor_id: int, distributor_load):
 
 def delete_distributor(distributor_id: int):
     '''Delete distributor'''
+
+    distributor_list_subquery = db.session.query(DistributorList.list_id).filter(DistributorList.distributor_id == distributor_id).subquery()
+
+    lists_ = db.session.query(
+        List_.id.label('list_id'),
+        func.array_agg(DistributorList.distributor_id).label('distributors')
+      )\
+      .select_from(List_)\
+      .join(DistributorList)\
+      .join(Distributor)\
+      .filter(Distributor.status == 'ACTIVE', List_.id.in_(select(distributor_list_subquery)))\
+      .group_by(List_.id)\
+      .all()
+
+    unique_lists = [each_list.list_id for each_list in lists_ if len(each_list.distributors) == 1]
+    for list_id in unique_lists:
+        db.session.merge(List_(id=list_id, status='INACTIVE'))
 
     db.session.merge(Distributor(id=distributor_id, status='INACTIVE'))
     db.session.commit()

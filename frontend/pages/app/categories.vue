@@ -7,20 +7,20 @@
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
           <template v-slot:item.option="{ item }">
-            <v-btn v-if="$ability.can('update', 'categories')" class="my-2 bg-primary" size="small" icon="mdi-pencil"
-              @click="getCategory(item.id)"></v-btn>
-            <span class="mx-2"></span>
-            <v-btn v-if="$ability.can('delete', 'categories')" class="my-2 bg-red" size="small" icon="mdi-trash-can"
-              @click="form.id = item.id; deleteDialog = true"></v-btn>
+            <div class="d-flex align-center justify-center ga-2">
+              <v-btn v-if="$ability.can('update', 'categories')" class="my-2 bg-primary" size="small" icon="mdi-pencil"
+                @click="getCategory(item.id)"></v-btn>
+              <v-btn v-if="$ability.can('delete', 'categories')" class="my-2 bg-red" size="small" icon="mdi-trash-can"
+                @click="form.id = item.id; deleteDialog = true"></v-btn>
+            </div>
           </template>
-
         </v-data-table-server>
       </v-card-text>
     </v-card>
   </v-container>
 
   <!-- Create Dialog -->
-  <v-dialog v-model="createDialog" max-width="500" persistent>
+  <v-dialog v-model="createDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -33,10 +33,12 @@
         <v-form ref="createForm" v-model="createModel" @submit.prevent="createCategory">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('categories.name')" :rules="[nameRequired]"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('categories.name')"
+                :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('categories.slug')" :rules="[slugRequired]"></v-text-field>
+              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('categories.slug')"
+                :rules="[slugRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -51,7 +53,7 @@
   </v-dialog>
 
   <!-- Update Dialog -->
-  <v-dialog v-model="updateDialog" max-width="500" persistent>
+  <v-dialog v-model="updateDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -64,10 +66,12 @@
         <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateCategory">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('categories.name')" :rules="[nameRequired]"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('categories.name')"
+                :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('categories.slug')" :rules="[slugRequired]"></v-text-field>
+              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('categories.slug')"
+                :rules="[slugRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -81,7 +85,7 @@
   </v-dialog>
 
   <!-- Delete Dialog -->
-  <v-dialog v-model="deleteDialog" max-width="500" persistent>
+  <v-dialog v-model="deleteDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -101,7 +105,7 @@
   </v-dialog>
 
   <!-- Search Dialog -->
-  <v-dialog v-model="searchDialog" max-width="500" persistent>
+  <v-dialog v-model="searchDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -174,9 +178,9 @@ const itemsPerPageOptions = computed(() => [
 
 const headers = computed(() => {
   const defaultHeaders = [
-    { title: 'Id', key: 'id', sortable: false },
-    { title: t('categories.name'), key: 'name', sortable: false },
-    { title: t('categories.slug'), key: 'slug', sortable: false }
+    { title: 'Id', key: 'id', align: 'center', sortable: false },
+    { title: t('categories.name'), key: 'name', align: 'center', sortable: false },
+    { title: t('categories.slug'), key: 'slug', align: 'center', sortable: false }
   ];
 
   if ($ability.can('update', 'categories') || $ability.can('delete', 'categories')) {
@@ -198,6 +202,10 @@ watch(updateDialog, (val) => {
     updateForm.value.reset();
     resetForm();
   }
+})
+
+watch(deleteDialog, async (val) => {
+  if (!val) resetForm();
 })
 
 watch(page, async () => {
@@ -257,13 +265,13 @@ const getCategory = async (id) => {
 const createCategory = async () => {
   try {
     if (!createModel.value) return;
-    const response = await $api('/api/categories/', {
+    const { message } = await $api('/api/categories/', {
       method: 'POST',
       body: form.value
     })
+    show(message, 'success');
     await getCategories()
     createDialog.value = false
-    resetForm()
   } catch (err) {
     const errorMessage = err.data?.message || err;
     show(errorMessage, 'error');
@@ -273,13 +281,13 @@ const createCategory = async () => {
 const updateCategory = async () => {
   try {
     if (!updateModel.value) return;
-    const response = await $api(`/api/categories/${form.value.id}`, {
+    const { message } = await $api(`/api/categories/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
+    show(message, 'success');
     await getCategories()
     updateDialog.value = false
-    resetForm()
   } catch (err) {
     const errorMessage = err.data?.message || err;
     show(errorMessage, 'error');
@@ -288,9 +296,10 @@ const updateCategory = async () => {
 
 const deleteCategory = async () => {
   try {
-    const response = await $api(`/api/categories/${this.form.id}`, {
+    const { message } = await $api(`/api/categories/${this.form.id}`, {
       method: 'DELETE'
     })
+    show(message, 'success');
     await getCategories()
     deleteDialog.value = false
     resetForm()

@@ -1,9 +1,9 @@
 import re
 import unicodedata
 from core.app import db
-from sqlalchemy import or_, and_, func, delete
+from sqlalchemy import case, or_, and_, func, delete
 from werkzeug.exceptions import HTTPException
-from core.models import List_, DistributorList, UserList
+from core.models import Distributor, List_, DistributorList, User, UserList
 
 
 def get_lists(search: str, page: int, per_page: int):
@@ -11,8 +11,7 @@ def get_lists(search: str, page: int, per_page: int):
 
     query = List_.status == 'ACTIVE'
     if search:
-        query = and_(List_.status == 'ACTIVE',
-                     or_(List_.name.ilike(f'%{search}%')))
+        query = and_(query, List_.name.ilike(f'%{search}%'))
 
     return db.paginate(db.session.query(List_).filter(query).order_by(List_.id.desc()),
                        page=page, per_page=per_page, count=True)
@@ -22,12 +21,14 @@ def get_list_by_id(list_id: int):
     '''Get list by lists id'''
 
     return db.session.query(
-        List_.id, List_.name, func.array_agg(
-            DistributorList.distributor_id).label('distributors_ids'),
-        func.array_agg(UserList.user_id).label('users_ids'))\
+        *List_.__table__.c,
+        func.array_agg(case((Distributor.status == 'ACTIVE', Distributor.id), else_=None)).label('distributors_ids'),
+        func.array_agg(case((User.status == 'ACTIVE', User.id), else_=None)).label('users_ids'))\
         .select_from(List_)\
         .outerjoin(DistributorList)\
+        .outerjoin(Distributor, DistributorList .distributor_id == Distributor.id)\
         .outerjoin(UserList)\
+        .outerjoin(User, UserList.user_id == User.id)\
         .filter(List_.id == list_id)\
         .group_by(List_.id, List_.name)\
         .first()

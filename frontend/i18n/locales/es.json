@@ -453,6 +453,13 @@
       "message": "Buscar instalaciones por lugar de instalación, fecha de instalación o ID",
       "fields": "Instalado en, fecha de instalación o id"
     },
+    "approval": {
+      "title": "Aprobar instalación"
+    },
+    "reject": {
+      "title": "Comentarios de rechazo",
+      "description": "Agrega los motivos de rechazo..."
+    },
     "rules": {
       "equipmentRequired": "El equipo es requerido",
       "distributorRequired": "El distribuidor es requerido",
@@ -574,6 +581,8 @@
   "states": "Estado | Estados",
   "cities": "Ciudad | Ciudades",
   "confirm": "Confirmar",
+  "approve": "Aprobar",
+  "reject": "Rechazar",
   "email": "Correo",
   "password": "Contraseña",
   "phone": "Teléfono",

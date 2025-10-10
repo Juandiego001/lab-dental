@@ -1,5 +1,5 @@
 from apiflask import APIBlueprint, abort
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, current_user
 from core.models import Permission
 from core.schemas.permissions import PermissionIn, PermissionsGroupOut
 from core.schemas.utils import Pagination
@@ -26,6 +26,7 @@ def get_permissions_by_group_id(group_id: int, query_data):
 
     try:
         results, total = permissions.get_permissions_by_group_id(
+            current_user,
             group_id,
             query_data['search'],
             query_data['page'],
@@ -49,24 +50,3 @@ def update_permissions_by_group_id(permission_obj: Permission):
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))
-
-
-@bp.post('/')
-@jwt_required()
-def create_permissions():
-    '''Create permissions'''
-    pass
-
-
-@bp.put('/')
-@jwt_required()
-def update_permissions():
-    '''Update permissions'''
-    pass
-
-
-@bp.delete('/')
-@jwt_required()
-def delete_permissions():
-    '''Delete permissions'''
-    pass

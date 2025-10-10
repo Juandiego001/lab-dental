@@ -10,10 +10,11 @@
             <v-icon v-if="item.isMain" icon="mdi-check-bold" color="success"></v-icon>
           </template>
           <template v-slot:item.option="{ item }">
-            <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getList(item.id)"></v-btn>
-            <span class="mx-2"></span>
-            <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
-              @click="form.id = item.id; deleteDialog = true"></v-btn>
+            <div class="d-flex justify-center align-center ga-2">
+              <v-btn class="my-2 bg-primary" size="x-small" icon="mdi-pencil" @click="getList(item.id)"></v-btn>
+              <v-btn v-if="!item.isMain" class="my-2 bg-red" size="small" icon="mdi-trash-can"
+                @click="form.id = item.id; deleteDialog = true"></v-btn>
+            </div>
           </template>
         </v-data-table-server>
       </v-card-text>
@@ -21,7 +22,7 @@
   </v-container>
 
   <!-- Create Dialog -->
-  <v-dialog v-model="createDialog" max-width="500" persistent>
+  <v-dialog v-model="createDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -59,7 +60,7 @@
   </v-dialog>
 
   <!-- Update Dialog -->
-  <v-dialog v-model="updateDialog" max-width="500" persistent>
+  <v-dialog v-model="updateDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -73,19 +74,19 @@
           <v-row>
             <v-col cols="12">
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('lists.name')"
-                :rules="[nameRequired]"></v-text-field>
+                :rules="[nameRequired]" :readonly="form.isMain"></v-text-field>
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.distributorsIds" :label="$t('lists.distributors')" :items="distributors"
-                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable
-                multiple chips :rules="[distributorsRequired]" />
+                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" :clearable="!form.isMain"
+                multiple chips :rules="[distributorsRequired]" :readonly="form.isMain" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.usersIds" :label="$t('lists.users')" :items="users" item-title="fullName"
-                item-value="id" hide-details="auto" @update:search="getUsers" clearable multiple chips
-                :rules="[usersRequired]" />
+                item-value="id" hide-details="auto" @update:search="getUsers" :clearable="!form.isMain" multiple chips
+                :rules="[usersRequired]" :readonly="form.isMain" />
             </v-col>
-            <v-col class="text-end">
+            <v-col v-if="!form.isMain" class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
               <span class="mx-1"></span>
               <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
@@ -97,13 +98,13 @@
   </v-dialog>
 
   <!-- Delete Dialog -->
-  <v-dialog v-model="deleteDialog" max-width="500" persistent>
+  <v-dialog v-model="deleteDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('lists.delete.title') }}
           <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="deleteDialog = false"></v-btn>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="deleteDialog = false"></v-btn>
         </v-row>
       </v-card-title>
       <v-card-text class="text-center py-6">
@@ -116,13 +117,13 @@
   </v-dialog>
 
   <!-- Search Dialog -->
-  <v-dialog v-model="searchDialog" max-width="500" persistent>
+  <v-dialog v-model="searchDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('lists.search.title') }}
           <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="searchDialog = false"></v-btn>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="searchDialog = false"></v-btn>
         </v-row>
       </v-card-title>
       <v-card-text>
@@ -215,6 +216,10 @@ watch(updateDialog, async (val) => {
     updateForm.value.reset();
     resetForm()
   }
+})
+
+watch(deleteDialog, async (val) => {
+  if (!val) resetForm();
 })
 
 watch(page, async () => {
@@ -310,13 +315,13 @@ const getList = async (id) => {
 const createList = async () => {
   try {
     if (!createModel.value) return;
-    const response = await $api('/api/lists/', {
+    const { message } = await $api('/api/lists/', {
       method: 'POST',
       body: form.value
     })
+    show(message, 'success');
     await getLists()
     createDialog.value = false
-    resetForm()
   } catch (err) {
     const errorMessage = err.data?.message || err;
     show(errorMessage, 'error');
@@ -326,13 +331,13 @@ const createList = async () => {
 const updateList = async () => {
   try {
     if (!updateModel.value) return;
-    const response = await $api(`/api/lists/${form.value.id}`, {
+    const { message } = await $api(`/api/lists/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
+    show(message, 'success');
     await getLists()
     updateDialog.value = false
-    resetForm()
   } catch (err) {
     const errorMessage = err.data?.message || err;
     show(errorMessage, 'error');
@@ -341,12 +346,12 @@ const updateList = async () => {
 
 const deleteList = async () => {
   try {
-    const response = await $api(`/api/lists/${form.value.id}`, {
+    const { message } = await $api(`/api/lists/${form.value.id}`, {
       method: 'DELETE'
     })
+    show(message, 'success');
     await getLists()
     deleteDialog.value = false
-    resetForm()
   } catch (err) {
     const errorMessage = err.data?.message || err;
     show(errorMessage, 'error');;

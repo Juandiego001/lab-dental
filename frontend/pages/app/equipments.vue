@@ -7,10 +7,11 @@
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
           <template v-slot:item.option="{ item }">
-            <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getEquipment(item.id)"></v-btn>
-            <span class="mx-2"></span>
-            <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
-              @click="form.id = item.id; deleteDialog = true"></v-btn>
+            <div class="d-flex align-center justify-center ga-2">
+              <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getEquipment(item.id)"></v-btn>
+              <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
+                @click="form.id = item.id; deleteDialog = true"></v-btn>
+            </div>
           </template>
         </v-data-table-server>
       </v-card-text>
@@ -18,7 +19,7 @@
   </v-container>
 
   <!-- Create Dialog -->
-  <v-dialog v-model="createDialog" max-width="500" persistent>
+  <v-dialog v-model="createDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -36,13 +37,16 @@
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.categoryId" :label="$t('categories.title', 1)" :items="categories"
-                item-title="name" item-value="id" hide-details="auto" @update:search="getCategories" :rules="[categoryRequired]" />
+                item-title="name" item-value="id" hide-details="auto" @update:search="getCategories"
+                :rules="[categoryRequired]" />
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.serial" hide-details="auto" :label="$t('equipments.serial')" :rules="[serialRequired]"></v-text-field>
+              <v-text-field v-model="form.serial" hide-details="auto" :label="$t('equipments.serial')"
+                :rules="[serialRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.model" hide-details="auto" :label="$t('equipments.model')" :rules="[modelRequired]"></v-text-field>
+              <v-text-field v-model="form.model" hide-details="auto" :label="$t('equipments.model')"
+                :rules="[modelRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -56,7 +60,7 @@
   </v-dialog>
 
   <!-- Update Dialog -->
-  <v-dialog v-model="updateDialog" max-width="500" persistent>
+  <v-dialog v-model="updateDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -74,13 +78,16 @@
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.categoryId" :label="$t('categories.title', 1)" :items="categories"
-                item-title="name" item-value="id" hide-details="auto" @update:search="getCategories" clearable :rules="[categoryRequired]" />
+                item-title="name" item-value="id" hide-details="auto" @update:search="getCategories" clearable
+                :rules="[categoryRequired]" />
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.serial" hide-details="auto" :label="$t('equipments.serial')" :rules="[serialRequired]"></v-text-field>
+              <v-text-field v-model="form.serial" hide-details="auto" :label="$t('equipments.serial')"
+                :rules="[serialRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.model" hide-details="auto" :label="$t('equipments.model')" :rules="[modelRequired]"></v-text-field>
+              <v-text-field v-model="form.model" hide-details="auto" :label="$t('equipments.model')"
+                :rules="[modelRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -94,7 +101,7 @@
   </v-dialog>
 
   <!-- Delete Dialog -->
-  <v-dialog v-model="deleteDialog" max-width="500" persistent>
+  <v-dialog v-model="deleteDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -114,7 +121,7 @@
   </v-dialog>
 
   <!-- Search Dialog -->
-  <v-dialog v-model="searchDialog" max-width="500" persistent>
+  <v-dialog v-model="searchDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -193,11 +200,11 @@ const itemsPerPageOptions = computed(() => [
 
 const headers = computed(() => {
   const defaultHeaders = [
-    { title: 'Id', key: 'id', sortable: false },
-    { title: t('brands.title', 1), key: 'brandName', sortable: false },
-    { title: t('categories.title', 1), key: 'categoryName', sortable: false },
-    { title: t('equipments.serial'), key: 'serial', sortable: false },
-    { title: t('equipments.model'), key: 'model', sortable: false }
+    { title: 'Id', key: 'id', align: 'center', sortable: false },
+    { title: t('brands.title', 1), key: 'brandName', align: 'center', sortable: false },
+    { title: t('categories.title', 1), key: 'categoryName', align: 'center', sortable: false },
+    { title: t('equipments.serial'), key: 'serial', align: 'center', sortable: false },
+    { title: t('equipments.model'), key: 'model', align: 'center', sortable: false }
   ]
 
   if ($ability.can('update', 'equipments') || $ability.can('delete', 'equipments')) {
@@ -225,6 +232,10 @@ watch(updateDialog, async (val) => {
     updateForm.value.reset();
     resetForm();
   }
+})
+
+watch(deleteDialog, async (val) => {
+  if (!val) resetForm();
 })
 
 watch(page, async () => {
@@ -324,13 +335,13 @@ const getEquipment = async (id) => {
 const createEquipment = async () => {
   if (!createModel.value) return;
   try {
-    const response = await $api('/api/equipments/', {
+    const { message } = await $api('/api/equipments/', {
       method: 'POST',
       body: form.value
     })
+    show(message, 'success');
     await getEquipments()
     createDialog.value = false
-    resetForm()
   } catch (err) {
     const errorMessage = err.data?.message || err;
     show(errorMessage, 'error');
@@ -340,13 +351,13 @@ const createEquipment = async () => {
 const updateEquipment = async () => {
   try {
     if (!updateModel.value) return;
-    const response = await $api(`/api/equipments/${form.value.id}`, {
+    const { message } = await $api(`/api/equipments/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
+    show(message, 'success');
     await getEquipments()
     updateDialog.value = false
-    resetForm()
   } catch (err) {
     const errorMessage = err.data?.message || err;
     show(errorMessage, 'error');
@@ -355,12 +366,12 @@ const updateEquipment = async () => {
 
 const deleteEquipment = async () => {
   try {
-    const response = await $api(`/api/equipments/${form.value.id}`, {
+    const { message } = await $api(`/api/equipments/${form.value.id}`, {
       method: 'DELETE'
     })
+    show(message, 'success');
     await getEquipments()
     deleteDialog.value = false
-    resetForm()
   } catch (err) {
     const errorMessage = err.data?.message || err;
     show(errorMessage, 'error');;

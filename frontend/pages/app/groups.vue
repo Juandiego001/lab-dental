@@ -7,11 +7,13 @@
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
           <template v-slot:item.option="{ item }">
-            <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getGroup(item.id)"></v-btn>
-            <v-btn class="my-2 mx-2 bg-secondary" size="small" icon="mdi-shield-edit"
-              @click="form.id = item.id; getPermissions()"></v-btn>
-            <v-btn v-if="item.id !== 1" class="my-2 bg-red" size="small" icon="mdi-trash-can"
-              @click="form.id = item.id; deleteDialog = true"></v-btn>
+            <div class="d-flex align-center justify-center ga-2">
+              <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getGroup(item.id)"></v-btn>
+              <v-btn class="my-2 mx-2 bg-secondary" size="small" icon="mdi-shield-edit"
+                @click="form.id = item.id; getPermissions()"></v-btn>
+              <v-btn v-if="item.id !== 1" class="my-2 bg-red" size="small" icon="mdi-trash-can"
+                @click="form.id = item.id; deleteDialog = true"></v-btn>
+            </div>
           </template>
         </v-data-table-server>
       </v-card-text>
@@ -19,7 +21,7 @@
   </v-container>
 
   <!-- Create Dialog -->
-  <v-dialog v-model="createDialog" max-width="500" persistent>
+  <v-dialog v-model="createDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -57,7 +59,7 @@
   </v-dialog>
 
   <!-- Update Dialog -->
-  <v-dialog v-model="updateDialog" max-width="500" persistent>
+  <v-dialog v-model="updateDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -95,7 +97,7 @@
   </v-dialog>
 
   <!-- Delete Dialog -->
-  <v-dialog v-model="deleteDialog" max-width="500" persistent>
+  <v-dialog v-model="deleteDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -114,7 +116,7 @@
   </v-dialog>
 
   <!-- Search Dialog -->
-  <v-dialog v-model="searchDialog" max-width="500" persistent>
+  <v-dialog v-model="searchDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -161,22 +163,22 @@
           <template v-slot:item.read="{ item }">
             <v-checkbox-btn color="primary" :model-value="item.read" :ripple="false" hide-details="auto"
               density="compact" @update:modelValue="v => updatePermissions(v, item, 'read')"
-              :disabled="form.id === 1" />
+              :disabled="disablePermission(item, 'read')" />
           </template>
           <template v-slot:item.create="{ item }">
             <v-checkbox-btn color="primary" :model-value="item.create" :ripple="false" hide-details="auto"
               density="compact" @update:modelValue="v => updatePermissions(v, item, 'create')"
-              :disabled="form.id === 1" />
+              :disabled="disablePermission(item, 'create')" />
           </template>
           <template v-slot:item.update="{ item }">
             <v-checkbox-btn color="primary" :model-value="item.update" :ripple="false" hide-details="auto"
               density="compact" @update:modelValue="v => updatePermissions(v, item, 'update')"
-              :disabled="form.id === 1" />
+              :disabled="disablePermission(item, 'update')" />
           </template>
           <template v-slot:item.delete="{ item }">
             <v-checkbox-btn color="primary" :model-value="item.delete" :ripple="false" hide-details="auto"
               density="compact" @update:modelValue="v => updatePermissions(v, item, 'delete')"
-              :disabled="form.id === 1" />
+              :disabled="disablePermission(item, 'delete')" />
           </template>
         </v-data-table-server>
       </v-card-text>
@@ -248,26 +250,26 @@ const itemsPerPageOptions = computed(() => [
 const tableHeaders = computed(() => {
   if (isAdmin.value) {
     return [
-      { title: 'Id', key: 'id', sortable: false },
-      { title: t('groups.name'), key: 'name', sortable: false },
-      { title: t('distributors.title'), key: 'distributorName', sortable: false },
+      { title: 'Id', key: 'id', align: 'center', sortable: false },
+      { title: t('groups.name'), key: 'name', align: 'center', sortable: false },
+      { title: t('distributors.title'), key: 'distributorName', align: 'center', sortable: false },
       { title: t('options'), key: 'option', align: 'center', sortable: false }
     ]
   }
 
   return [
-    { title: 'Id', key: 'id', align: 'center', sortable: false },
+    { title: 'Id', key: 'id', align: 'center', align: 'center', sortable: false },
     { title: t('groups.name'), key: 'name', align: 'center', sortable: false },
     { title: t('options'), key: 'option', align: 'center', sortable: false }
   ]
 })
 
 const headersPermissions = computed(() => [
-  { title: t('modules.title'), key: 'moduleName', sortable: false },
-  { title: t('groups.permissions.read'), key: 'read', sortable: false },
-  { title: t('groups.permissions.create'), key: 'create', sortable: false },
-  { title: t('groups.permissions.update'), key: 'update', sortable: false },
-  { title: t('groups.permissions.delete'), key: 'delete', sortable: false }
+  { title: t('modules.title'), key: 'moduleName', align: 'center', sortable: false },
+  { title: t('groups.permissions.read'), key: 'read', align: 'center', sortable: false },
+  { title: t('groups.permissions.create'), key: 'create', align: 'center', sortable: false },
+  { title: t('groups.permissions.update'), key: 'update', align: 'center', sortable: false },
+  { title: t('groups.permissions.delete'), key: 'delete', align: 'center', sortable: false }
 ])
 
 watch(createDialog, async (val) => {
@@ -502,6 +504,14 @@ const updatePermissions = async (v, item, action) => {
     const errorMessage = err.data?.message || err;
     show(errorMessage, 'error');
   }
+}
+
+const disablePermission = (permission, action) => {
+  if (form.value.id == 1) return true;
+  if (!isAdmin.value &&
+    ['equipments', 'forums', 'manuals', 'parts'].includes(permission.moduleName) &&
+    ['create', 'update', 'delete'].includes(action)) return true;
+  return false;
 }
 
 // Rules

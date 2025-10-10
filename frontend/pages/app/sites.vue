@@ -7,11 +7,12 @@
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
           <template v-slot:item.option="{ item }">
-            <v-btn v-if="$ability.can('update', 'sites')" class="my-2 bg-primary" size="small" icon="mdi-pencil"
-              @click="getSite(item.id)"></v-btn>
-            <span class="mx-2"></span>
-            <v-btn v-if="$ability.can('delete', 'sites')" class="my-2 bg-red" size="small" icon="mdi-trash-can"
-              @click="form.id = item.id; deleteDialog = true"></v-btn>
+            <div class="d-flex align-center justify-center ga-2">
+              <v-btn v-if="$ability.can('update', 'sites')" class="my-2 bg-primary" size="small" icon="mdi-pencil"
+                @click="getSite(item.id)"></v-btn>
+              <v-btn v-if="$ability.can('delete', 'sites')" class="my-2 bg-red" size="small" icon="mdi-trash-can"
+                @click="form.id = item.id; deleteDialog = true"></v-btn>
+            </div>
           </template>
         </v-data-table-server>
       </v-card-text>
@@ -19,7 +20,7 @@
   </v-container>
 
   <!-- Create Dialog -->
-  <v-dialog v-model="createDialog" max-width="500" persistent>
+  <v-dialog v-model="createDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -85,7 +86,7 @@
   </v-dialog>
 
   <!-- Update Dialog -->
-  <v-dialog v-model="updateDialog" max-width="500" persistent>
+  <v-dialog v-model="updateDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -151,7 +152,7 @@
   </v-dialog>
 
   <!-- Delete Dialog -->
-  <v-dialog v-model="deleteDialog" max-width="500" persistent>
+  <v-dialog v-model="deleteDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -170,7 +171,7 @@
   </v-dialog>
 
   <!-- Search Dialog -->
-  <v-dialog v-model="searchDialog" max-width="500" persistent>
+  <v-dialog v-model="searchDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -265,10 +266,10 @@ const itemsPerPageOptions = computed(() => [
 ])
 
 const headers = computed(() => [
-  { title: 'Id', key: 'id', sortable: false },
-  { title: t('sites.name'), key: 'name', sortable: false },
-  { title: t('sites.distributorClient'), key: 'distributorClient', sortable: false },
-  { title: t('options'), key: 'option', align: 'center', sortable: false }
+  { title: 'Id', key: 'id', align: 'center', sortable: false },
+  { title: t('sites.name'), key: 'name', align: 'center', sortable: false },
+  { title: t('sites.distributorClient'), key: 'distributorClient', align: 'center', sortable: false },
+  { title: t('options'), key: 'option', align: 'center', align: 'center', sortable: false }
 ])
 
 watch(createDialog, async (val) => {

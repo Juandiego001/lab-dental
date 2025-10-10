@@ -454,6 +454,13 @@
       "message": "Search installations by installed at, installed date or ID",
       "fields": "Installed at, installed date or ID"
     },
+    "approval": {
+      "title": "Approve installation"
+    },
+    "reject": {
+      "title": "Reject comments",
+      "description": "Add the reasons for rejection..."
+    },
     "rules": {
       "equipmentRequired": "The equipment is required",
       "distributorRequired": "The distributor is required",
@@ -575,6 +582,8 @@
   "states": "State | States",
   "cities": "City | Cities",
   "confirm": "Confirm",
+  "approve": "Approve",
+  "reject": "Reject",
   "email": "Email",
   "password": "Password",
   "phone": "Phone",

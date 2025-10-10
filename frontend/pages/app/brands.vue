@@ -7,11 +7,12 @@
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
           <template v-slot:item.option="{ item }">
-            <v-btn v-if="$ability.can('update', 'brands')" class="my-2 bg-primary" size="small" icon="mdi-pencil"
-              @click="getBrand(item.id)"></v-btn>
-            <span class="mx-2"></span>
-            <v-btn v-if="$ability.can('delete', 'brands')" class="my-2 bg-red" size="small" icon="mdi-trash-can"
-              @click="form.id = item.id; deleteDialog = true"></v-btn>
+            <div class="d-flex align-center justify-center ga-2">
+              <v-btn v-if="$ability.can('update', 'brands')" class="my-2 bg-primary" size="small" icon="mdi-pencil"
+                @click="getBrand(item.id)"></v-btn>
+              <v-btn v-if="$ability.can('delete', 'brands')" class="my-2 bg-red" size="small" icon="mdi-trash-can"
+                @click="form.id = item.id; deleteDialog = true"></v-btn>
+            </div>
           </template>
 
         </v-data-table-server>
@@ -20,7 +21,7 @@
   </v-container>
 
   <!-- Create Dialog -->
-  <v-dialog v-model="createDialog" max-width="500" persistent>
+  <v-dialog v-model="createDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -52,7 +53,7 @@
   </v-dialog>
 
   <!-- Update Dialog -->
-  <v-dialog v-model="updateDialog" max-width="500" persistent>
+  <v-dialog v-model="updateDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -84,7 +85,7 @@
   </v-dialog>
 
   <!-- Delete Dialog -->
-  <v-dialog v-model="deleteDialog" max-width="500" persistent>
+  <v-dialog v-model="deleteDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -103,7 +104,7 @@
   </v-dialog>
 
   <!-- Search Dialog -->
-  <v-dialog v-model="searchDialog" max-width="500" persistent>
+  <v-dialog v-model="searchDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -177,9 +178,9 @@ const itemsPerPageOptions = computed(() => [
 const headers = computed(() => {
 
   const defaultHeaders = [
-    { title: 'Id', key: 'id', sortable: false },
-    { title: t('brands.name'), key: 'name', sortable: false },
-    { title: t('brands.slug'), key: 'slug', sortable: false },
+    { title: 'Id', key: 'id', align: 'center', sortable: false },
+    { title: t('brands.name'), key: 'name', align: 'center', sortable: false },
+    { title: t('brands.slug'), key: 'slug', align: 'center', sortable: false },
   ]
 
   if ($ability.can('update', 'brands') || $ability.can('delete', 'brands')) {
@@ -201,6 +202,10 @@ watch(updateDialog, (val) => {
     updateForm.value.reset();
     resetForm();
   }
+})
+
+watch(deleteDialog, async (val) => {
+  if (!val) resetForm();
 })
 
 watch(page, async () => {
@@ -260,10 +265,11 @@ const getBrand = async (id) => {
 const createBrand = async () => {
   try {
     if (!createModel.value) return;
-    const response = await $api('/api/brands/', {
+    const { message } = await $api('/api/brands/', {
       method: 'POST',
       body: form.value
     })
+    show(message, 'success');
     await getBrands()
     createDialog.value = false
   } catch (err) {
@@ -275,10 +281,11 @@ const createBrand = async () => {
 const updateBrand = async () => {
   try {
     if (!updateModel.value) return;
-    const response = await $api(`/api/brands/${form.value.id}`, {
+    const { message } = await $api(`/api/brands/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
+    show(message, 'success');
     await getBrands()
     updateDialog.value = false
   } catch (err) {
@@ -289,12 +296,12 @@ const updateBrand = async () => {
 
 const deleteBrand = async () => {
   try {
-    const response = await $api(`/api/brands/${form.value.id}`, {
+    const { message } = await $api(`/api/brands/${form.value.id}`, {
       method: 'DELETE'
     })
+    show(message, 'success');
     await getBrands()
     deleteDialog.value = false
-    resetForm()
   } catch (err) {
     const errorMessage = err.data?.message || err;
     show(errorMessage, 'error');;

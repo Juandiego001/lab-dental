@@ -4,8 +4,70 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Register Installation Notification</title>
+  <style>
+    * {
+      padding: 0;
+      border: none;
+      margin: 0;
+      font-family: 'system-ui';
+    }
+  </style>
 </head>
 <body>
-  
+  <table
+    style="width: 100%;
+      max-width: 800px;
+      margin-top: 1rem;
+      margin-left: auto;
+      margin-right: auto;
+      box-sizing: border-box;">
+    <tr style="text-align: center;">
+      <td style="background-color: rgb(0,48,73); padding: 1rem;">
+        <img src="cid:logo_soe" alt="SOE Latam" />
+      </td>
+    </tr>
+
+    <tr>
+      <td style="padding: 1rem;">
+        <p style="margin-bottom: 1rem;">Hola administrador,</p>
+
+        <p>Se ha registrado una nueva instalación en el sistema. Los detalles son los siguientes:</p>
+
+        <ul style="padding-left: 1.75rem; margin-top: 0.5rem; margin-bottom: 1rem;">
+          <li>ID <span style="font-weight: bold;">#{{ id }}.</span></li>
+          <li>Equipment: <span style="font-weight: bold;">{{ equipment }}.</span></li>
+          <li>Serial: <span style="font-weight: bold;">{{ serial }}.</span></li>
+          <li>Installed date: <span style="font-weight: bold;">{{ installed_date }}.</span></li>
+          <li>Distributor: <span style="font-weight: bold;">{{ distributor }}.</span></li>
+          <li>Client: <span style="font-weight: bold;">{{ client }}.</span></li>
+        </ul>
+
+        <p>
+          Haga click
+          <a style="text-decoration: none; font-weight: bold; color: black;" href="{{ app_url }}">
+            aquí
+          </a>
+          para dirigirse a la aplicación.
+        </p>
+
+        <p style="margin-top: 1rem;">Saludos cordiales,</p>
+        <p>SOE Latam.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td
+        style="
+          border-top: 0.25px solid lightgray;
+          font-size: 10px;
+          color: gray;
+          text-align: center;
+          padding-top: 1rem;
+        "
+      >
+        © Snapon SOE Latam 2025. All rights reserved.
+      </td>
+    </tr>
+  </table>
 </body>
 </html>

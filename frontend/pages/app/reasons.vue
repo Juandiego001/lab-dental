@@ -7,10 +7,11 @@
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
           <template v-slot:item.option="{ item }">
-            <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getReason(item.id)"></v-btn>
-            <span class="mx-2"></span>
-            <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
-              @click="form.id = item.id; deleteDialog = true"></v-btn>
+            <div class="d-flex align-center justify-center ga-2">
+              <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getReason(item.id)"></v-btn>
+              <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
+                @click="form.id = item.id; deleteDialog = true"></v-btn>
+            </div>
           </template>
         </v-data-table-server>
       </v-card-text>
@@ -18,7 +19,7 @@
   </v-container>
 
   <!-- Create Dialog -->
-  <v-dialog v-model="createDialog" max-width="500" persistent>
+  <v-dialog v-model="createDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -31,10 +32,12 @@
         <v-form ref="createForm" v-model="createModel" @submit.prevent="createReason">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('reasons.name')" :rules="[nameRequired]"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('reasons.name')"
+                :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('reasons.slug')" :rules="[slugRequired]"></v-text-field>
+              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('reasons.slug')"
+                :rules="[slugRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -48,7 +51,7 @@
   </v-dialog>
 
   <!-- Update Dialog -->
-  <v-dialog v-model="updateDialog" max-width="500" persistent>
+  <v-dialog v-model="updateDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -61,10 +64,12 @@
         <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateReason">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('reasons.name')" :rules="[nameRequired]"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('reasons.name')"
+                :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('reasons.slug')" :rules="[slugRequired]"></v-text-field>
+              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('reasons.slug')"
+                :rules="[slugRequired]"></v-text-field>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -78,7 +83,7 @@
   </v-dialog>
 
   <!-- Delete Dialog -->
-  <v-dialog v-model="deleteDialog" max-width="500" persistent>
+  <v-dialog v-model="deleteDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -97,7 +102,7 @@
   </v-dialog>
 
   <!-- Search Dialog -->
-  <v-dialog v-model="searchDialog" max-width="500" persistent>
+  <v-dialog v-model="searchDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -173,14 +178,14 @@ const itemsPerPageOptions = computed(() => [
 ])
 
 const headers = computed(() => [
-  { title: 'Id', key: 'id', sortable: false },
-  { title: t('reasons.name'), key: 'name', sortable: false },
-  { title: t('reasons.slug'), key: 'slug', sortable: false },
+  { title: 'Id', key: 'id', align: 'center', sortable: false },
+  { title: t('reasons.name'), key: 'name', align: 'center', sortable: false },
+  { title: t('reasons.slug'), key: 'slug', align: 'center', sortable: false },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
 watch(createDialog, async (val) => {
-  if (val) {}
+  if (val) { }
   else {
     createForm.value.reset();
     resetForm();
@@ -188,11 +193,15 @@ watch(createDialog, async (val) => {
 })
 
 watch(updateDialog, async (val) => {
-  if (val) {}
+  if (val) { }
   else {
     updateForm.value.reset();
     resetForm();
   }
+})
+
+watch(deleteDialog, async (val) => {
+  if (!val) resetForm();
 })
 
 watch(page, async () => {
@@ -256,10 +265,11 @@ const getReason = async (id) => {
 const createReason = async () => {
   try {
     if (!createModel.value) return;
-    const response = await $api('/api/reasons/', {
+    const { message } = await $api('/api/reasons/', {
       method: 'POST',
       body: form.value
     })
+    show(message, 'success');
     await getReasons()
     createDialog.value = false
   } catch (err) {
@@ -271,10 +281,11 @@ const createReason = async () => {
 const updateReason = async () => {
   try {
     if (!updateModel.value) return;
-    const response = await $api(`/api/reasons/${form.value.id}`, {
+    const { message } = await $api(`/api/reasons/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
+    show(message, 'success');
     await getReasons()
     updateDialog.value = false
   } catch (err) {
@@ -285,15 +296,15 @@ const updateReason = async () => {
 
 const deleteReason = async () => {
   try {
-    const response = await $api(`/api/reasons/${form.value.id}`, {
+    const { message } = await $api(`/api/reasons/${form.value.id}`, {
       method: 'DELETE'
     })
+    show(message, 'success');
     await getReasons()
-    resetForm()
     deleteDialog.value = false
   } catch (err) {
     const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');;
+    show(errorMessage, 'error');
   }
 }
 

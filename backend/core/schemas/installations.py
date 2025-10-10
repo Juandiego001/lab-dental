@@ -1,7 +1,5 @@
-from bcrypt import hashpw, gensalt
-from core.models import Installation
+from datetime import datetime
 from apiflask import Schema, fields
-from marshmallow import post_load, pre_load
 from core.schemas.utils import BaseSchema
 
 
@@ -16,7 +14,8 @@ class InstallationIn(BaseSchema):
     installed_date = fields.String(data_key='installedDate')
     format_picture = fields.File(data_key='formatPicture')
     serial_picture = fields.File(data_key='serialPicture')
-    installation_pictures = fields.List(fields.File(), data_key='installationPictures')
+    installation_pictures = fields.List(
+        fields.File(), data_key='installationPictures')
     status = fields.String(load_default='ACTIVE')
 
 
@@ -25,9 +24,12 @@ class InstallationInCreate(InstallationIn):
 
 
 class InstallationInUpdate(InstallationIn):
-    @post_load
-    def make_object(self, data, **kwargs):
-        return Installation(**data)
+    pass
+
+
+class FileOut(BaseSchema):
+    name = fields.String()
+    path = fields.String()
 
 
 class InstallationOut(BaseSchema):
@@ -44,12 +46,40 @@ class InstallationOut(BaseSchema):
     site_client_name = fields.String(data_key='siteClientName')
     serial = fields.String(data_key='serial')
     installed_date = fields.String(data_key='installedDate')
-    format_picture = fields.File(date_key='formatPicture')
-    serial_picture = fields.File(date_key='serialPicture')
-    installation_pictures = fields.File(date_key='installationPictures')
+    installation_serial_file = fields.Dict(data_key='installationSerialFile')
+    installation_format_file = fields.Dict(data_key='installationFormatFile')
+    installation_evidences_files = fields.List(fields.Dict, data_key='installationEvidencesFiles')
     status = fields.String()
 
 
-class InstallationsOut(Schema):
+class InstallationCreatedNotification(BaseSchema):
+    id = fields.Integer()
+    equipment_serial_model = fields.String(data_key='equipment')
+    distributor_name = fields.String(data_key='distributor')
+    client_name = fields.String(data_key='client')
+    serial = fields.String()
+    installed_date = fields.Function(lambda row: row.installed_date.strftime('%B %d, %Y'))
+    installation_serial_file = fields.Dict(data_key='serial_file')
+    installation_format_file = fields.Dict(data_key='format_file')
+    installation_evidences_files = fields.List(fields.Dict, data_key='evidences_files')
+
+
+class InstallationApprovedNotification(BaseSchema):
+    id = fields.Integer()
+    equipment_serial_model = fields.String(data_key='equipment')
+    distributor_id = fields.String()
+    distributor_name = fields.String(data_key='distributor')
+    site_distributor_name = fields.String(data_key='distributor_site')
+    client_name = fields.String(data_key='client')
+    site_client_name = fields.String(data_key='client_site')
+    serial = fields.String()
+    installed_date = fields.Function(lambda row: row.installed_date.strftime('%B %d, %Y'))
+
+
+class InstallationsOut(BaseSchema):
     items = fields.List(fields.Nested(InstallationOut))
     total = fields.Integer()
+
+
+class InstallationRejectCommentsIn(BaseSchema):
+    reject_comments = fields.String(data_key='rejectComments')

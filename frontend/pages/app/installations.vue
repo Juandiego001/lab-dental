@@ -1,29 +1,42 @@
 <template>
   <v-container fluid class="fill-height align-start">
-    <v-card width="100%" flat>
+    <v-card class="d-flex flex-column" width="100%" height="100%" flat>
       <v-card-title>{{ $t('installations.title', 2) }}</v-card-title>
       <v-card-text>
         <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
+          <template v-slot:item.serial="{ item }">
+            <span :class="`rounded-lg py-1 px-2
+                ${item.status === 'ACTIVE' && 'bg-primary'}
+                ${item.status === 'APPROVED' && 'bg-success'}
+                ${item.status === 'REJECTED' && 'bg-error'}
+              `">
+              {{ item.serial }}
+            </span>
+          </template>
           <template v-slot:item.installedDate="{ item }">{{ date.format(item.installedDate, 'fullDate') }}</template>
           <template v-slot:item.option="{ item }">
             <v-btn v-if="$ability.can('update', 'installations')" class="my-2 bg-primary me-2" size="small"
-              icon="mdi-pencil" @click="getInstallation(item.id)"></v-btn>
+              icon="mdi-pencil" @click="getInstallation(item.id, true)"></v-btn>
             <v-btn v-if="$ability.can('delete', 'installations')" class="my-2 bg-red me-2" size="small"
               icon="mdi-trash-can" @click="form.id = item.id"></v-btn>
-            <v-btn v-if="isAdmin" class="my-2 bg-teal-darken-4 me-2" size="small" icon="mdi-check-bold"
-              @click="form.id = item.id"></v-btn>
-            <v-btn v-if="isAdmin" class="my-2 bg-red-darken-4 me-2" size="small" icon="mdi-cancel"
-              @click="form.id = item.id"></v-btn>
+            <v-btn v-if="isAdmin" class="my-2 bg-secondary" size="small" icon="mdi-eye"
+              @click="getInstallation(item.id, false)"></v-btn>
           </template>
         </v-data-table-server>
       </v-card-text>
+      <v-card-actions class="w-100 d-flex align-center justify-end ga-2 flex-wrap">
+        <p class="text-body-2 rounded-lg bg-grey py-1 px-2">Installation statuses</p>
+        <p class="d-inline-block py-1 px-2 rounded-lg bg-primary text-caption">Active</p>
+        <p class="d-inline-block py-1 px-2 rounded-lg bg-success text-caption">Approved</p>
+        <p class="d-inline-block py-1 px-2 rounded-lg bg-error text-caption">Rejected</p>
+      </v-card-actions>
     </v-card>
   </v-container>
 
   <!-- Create Dialog -->
-  <v-dialog v-model="createDialog" max-width="500" persistent>
+  <v-dialog v-model="createDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -107,7 +120,7 @@
   </v-dialog>
 
   <!-- Update Dialog -->
-  <v-dialog v-model="updateDialog" max-width="500" persistent>
+  <v-dialog v-model="updateDialog" max-width="600" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -160,6 +173,38 @@
                   :max="todayDate"></v-date-picker>
               </v-menu>
             </v-col>
+            <v-col cols="12">
+              <v-file-input v-model="formatPicture" :prepend-icon="null" prepend-inner-icon="mdi-paperclip"
+                hide-details="auto" :label="$t('installations.formatPicture')" chips />
+            </v-col>
+            <v-col cols="12">
+              <v-img v-if="form.installationFormatFile.path"
+                :src="`/api/files?path=${form.installationFormatFile.path}&v=${Date.now()}`" />
+            </v-col>
+            <v-col cols="12">
+              <v-file-input v-model="serialPicture" :prepend-icon="null" prepend-inner-icon="mdi-paperclip"
+                hide-details="auto" :label="$t('installations.serialPicture')" chips />
+            </v-col>
+            <v-col cols="12">
+              <v-img v-if="form.installationSerialFile.path"
+                :src="`/api/files?path=${form.installationSerialFile.path}&v=${Date.now()}`" />
+            </v-col>
+            <v-col cols="12">
+              <v-file-input v-model="installationPictures" :prepend-icon="null" prepend-inner-icon="mdi-paperclip"
+                hide-details="auto" :label="$t('installations.installationPictures')" multiple chips>
+                <template v-slot:selection="{ fileNames }">
+                  <v-chip v-for="fileName in fileNames" :key="fileName" size="small" label>
+                    {{ fileName }}
+                  </v-chip>
+                </template>
+              </v-file-input>
+            </v-col>
+            <v-col cols="12">
+              <v-carousel>
+                <v-carousel-item v-for="picture of form.installationEvidencesFiles"
+                  :src="`/api/files?path=${picture.path}&v=${Date.now()}`" cover></v-carousel-item>
+              </v-carousel>
+            </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
               <span class="mx-1"></span>
@@ -172,13 +217,13 @@
   </v-dialog>
 
   <!-- Delete Dialog -->
-  <v-dialog v-model="deleteDialog" max-width="500" persistent>
+  <v-dialog v-model="deleteDialog" max-width="600" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('installations.delete.title') }}
           <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="deleteDialog = false"></v-btn>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="deleteDialog = false"></v-btn>
         </v-row>
       </v-card-title>
       <v-card-text class="text-center py-6">
@@ -191,13 +236,13 @@
   </v-dialog>
 
   <!-- Search Dialog -->
-  <v-dialog v-model="searchDialog" max-width="500" persistent>
+  <v-dialog v-model="searchDialog" max-width="600" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('installations.search.title') }}
           <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="searchDialog = false"></v-btn>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="searchDialog = false"></v-btn>
         </v-row>
       </v-card-title>
       <v-card-text>
@@ -210,6 +255,118 @@
             </v-col>
             <v-col class="text-end mt-4" cols="12">
               <v-btn class="bg-primary" type="submit">{{ $t('search') }}</v-btn>
+            </v-col>
+          </v-row>
+        </v-form>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+
+  <!-- Approval Installations Dialog -->
+  <v-dialog v-model="approvalDialog" max-width="600" persistent :fullscreen="$vuetify.display.smAndDown">
+    <v-card tile>
+      <v-card-title class="bg-primary">
+        <v-row no-gutters align="center">
+          {{ $t('installations.approval.title') }}
+          <v-spacer></v-spacer>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="approvalDialog = false"></v-btn>
+        </v-row>
+      </v-card-title>
+      <v-card-text>
+        <v-form ref="approveForm" @submit.prevent="approveInstallation">
+          <v-row>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.equipmentId" :label="$t('equipments.title')" :items="equipments"
+                item-title="serialModel" item-value="id" hide-details="auto" @update:search="getEquipments" readonly />
+            </v-col>
+            <v-col v-if="isAdmin" cols="12">
+              <v-autocomplete v-model="form.distributorId" :label="$t('distributors.title')" :items="distributors"
+                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" readonly />
+            </v-col>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.siteDistributorId"
+                :label="`${$t('sites.title')} ${$t('distributors.title')}`" :items="distributorsSites" item-title="name"
+                item-value="id" hide-details="auto" @update:search="getDistributorsSites" readonly />
+            </v-col>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.clientId" :label="$t('clients.title')" :items="clients" item-title="name"
+                item-value="id" hide-details="auto" @update:search="getClients" readonly />
+            </v-col>
+            <v-col cols="12">
+              <v-autocomplete v-model="form.siteClientId" :label="`${$t('sites.title')} ${$t('clients.title')}`"
+                :items="clientsSites" item-title="name" item-value="id" hide-details="auto"
+                @update:search="getClientsSites" readonly />
+            </v-col>
+            <v-col cols="12">
+              <v-text-field v-model="form.serial" :label="$t('installations.serial')" hide-details="auto"
+                readonly></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-text-field v-model="form.installedDate" :label="$t('installations.installedDate')" hide-details="auto"
+                readonly></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-file-input v-model="formatPicture" :prepend-icon="null" prepend-inner-icon="mdi-paperclip"
+                hide-details="auto" :label="$t('installations.formatPicture')" chips readonly />
+            </v-col>
+            <v-col cols="12">
+              <v-img v-if="form.installationFormatFile.path"
+                :src="`/api/files?path=${form.installationFormatFile.path}&v=${Date.now()}`" />
+            </v-col>
+            <v-col cols="12">
+              <v-file-input v-model="serialPicture" :prepend-icon="null" prepend-inner-icon="mdi-paperclip"
+                hide-details="auto" :label="$t('installations.serialPicture')" chips readonly />
+            </v-col>
+            <v-col cols="12">
+              <v-img v-if="form.installationSerialFile.path"
+                :src="`/api/files?path=${form.installationSerialFile.path}&v=${Date.now()}`" />
+            </v-col>
+            <v-col cols="12">
+              <v-file-input v-model="installationPictures" :prepend-icon="null" prepend-inner-icon="mdi-paperclip"
+                hide-details="auto" :label="$t('installations.installationPictures')" multiple chips readonly>
+                <template v-slot:selection="{ fileNames }">
+                  <v-chip v-for="fileName in fileNames" :key="fileName" size="small" label>
+                    {{ fileName }}
+                  </v-chip>
+                </template>
+              </v-file-input>
+            </v-col>
+            <v-col cols="12">
+              <v-carousel>
+                <v-carousel-item v-for="picture of form.installationEvidencesFiles"
+                  :src="`/api/files?path=${picture.path}&v=${Date.now()}`" cover></v-carousel-item>
+              </v-carousel>
+            </v-col>
+            <v-col class="d-flex justify-end ga-2">
+              <v-btn variant="outlined" @click="approvalDialog = false">{{ $t('cancel') }}</v-btn>
+              <v-btn class="bg-error" @click="rejectDialog = true">{{ $t('reject') }}</v-btn>
+              <v-btn type="submit" class="bg-success">{{ $t('approve') }}</v-btn>
+            </v-col>
+          </v-row>
+        </v-form>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+
+  <!-- Reject Comments Dialog -->
+  <v-dialog v-model="rejectDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
+    <v-card tile>
+      <v-card-title class="bg-primary">
+        <v-row no-gutters align="center">
+          {{ $t('installations.reject.title') }}
+          <v-spacer></v-spacer>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="rejectDialog = false"></v-btn>
+        </v-row>
+      </v-card-title>
+      <v-card-text>
+        <v-form ref="rejectForm" @submit.prevent="rejectInstallation">
+          <v-row>
+            <v-col cols="12">
+              <v-textarea v-model="rejectComments" :placeholder="$t('installations.reject.description')"></v-textarea>
+            </v-col>
+            <v-col class="d-flex justify-end ga-2">
+              <v-btn variant="outlined" @click="rejectDialog = false">{{ $t('cancel') }}</v-btn>
+              <v-btn type="submit" class="bg-error">{{ $t('reject') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -257,11 +414,15 @@ const createModel = ref(false);
 const updateModel = ref(false);
 const createForm = ref();
 const updateForm = ref();
+const approveForm = ref();
 const formatPicture = ref(null);
 const serialPicture = ref(null);
 const installationPictures = ref(null);
 const showPicker = ref(false);
 const selectedDate = ref(null);
+const approvalDialog = ref(false);
+const rejectDialog = ref(false);
+const rejectComments = ref('');
 const form = ref({
   equipmentId: '',
   equipmentSerialModel: '',
@@ -275,6 +436,9 @@ const form = ref({
   siteClientName: '',
   serial: '',
   installedDate: null,
+  installationFormatFile: { originalName: '', path: '' },
+  installationSerialFile: { originalName: '', path: '' },
+  installationEvidencesFiles: []
 })
 
 const isAdmin = computed(() => profile.value.role === 'ADMIN');
@@ -325,6 +489,29 @@ watch(updateDialog, async (val) => {
   }
 })
 
+watch(deleteDialog, async (val) => {
+  if (!val) resetForm();
+})
+
+watch(approvalDialog, async (val) => {
+  if (val) {
+    await getEquipments(form.value.equipmentSerialModel);
+    if (isAdmin.value) {
+      await getDistributors(form.value.distributorName);
+    }
+    await getDistributorsSites(form.value.siteDistributorName);
+    await getClients(form.value.clientName);
+  } else {
+    approveForm.value.reset();
+    resetForm();
+  }
+})
+
+watch(rejectDialog, async (val) => {
+  if (!val) rejectComments.value = '';
+})
+
+
 watch(page, async () => {
   await getInstallations();
 })
@@ -335,7 +522,7 @@ watch(perPage, async () => {
 
 watch(() => form.value.distributorId, async (val) => {
   if (val) {
-    if (updateDialog.value || createDialog.value) {
+    if (approvalDialog.value || updateDialog.value || createDialog.value) {
       await getDistributorsSites();
       await getClients();
     } else {
@@ -362,7 +549,7 @@ watch(() => form.value.distributorId, async (val) => {
 
 watch(() => form.value.clientId, async (val) => {
   if (val) {
-    if (updateDialog.value || createDialog.value) await getClientsSites();
+    if (approvalDialog.value || updateDialog.value || createDialog.value) await getClientsSites();
     else await getClientsSites(form.value.siteClientName);
     nextTick(() => {
       if (form.value.siteClientId && !(clientsSites.value.map(e => e.id)).includes(form.value.siteClientId)) {
@@ -390,6 +577,9 @@ onBeforeMount(async () => {
 
 const resetForm = () => {
   selectedDate.value = null
+  formatPicture.value = null;
+  serialPicture.value = null;
+  installationPictures.value = null;
   form.value = {
     equipmentId: '',
     distributorId: '',
@@ -398,12 +588,15 @@ const resetForm = () => {
     siteClientId: '',
     serial: '',
     installedDate: null,
+    installationFormatFile: { originalName: '', path: '' },
+    installationSerialFile: { originalName: '', path: '' },
+    installationEvidencesFiles: []
   }
 }
 
 const getEquipments = async (search) => {
   try {
-    if (!createDialog.value && !updateDialog.value) return;
+    if (!createDialog.value && !updateDialog.value && !approvalDialog.value) return;
     const data = await $api('/api/equipments/', {
       query: {
         search,
@@ -421,7 +614,7 @@ const getEquipments = async (search) => {
 
 const getDistributors = async (search) => {
   try {
-    if (!createDialog.value && !updateDialog.value) return;
+    if (!createDialog.value && !updateDialog.value && approvalDialog.value) return;
     const data = await $api('/api/distributors/', {
       query: {
         search,
@@ -457,7 +650,7 @@ const getDistributorsSites = async (search) => {
 
 const getClients = async (search) => {
   try {
-    if (!createDialog.value && !updateDialog.value) return;
+    if (!createDialog.value && !updateDialog.value && !approvalDialog.value) return;
     if (!form.value.distributorId && !profile.value.distributor_id) return;
     const data = await $api(`/api/distributors/${form.value.distributorId || profile.value.distributor_id}/clients`, {
       query: {
@@ -476,7 +669,6 @@ const getClients = async (search) => {
 
 const getClientsSites = async (search) => {
   try {
-    // if (!createDialog.value && !updateDialog.value) return;
     if (!form.value.clientId) return;
     const data = await $api(`/api/sites/clients/${form.value.clientId}`, {
       query: {
@@ -511,7 +703,7 @@ const getInstallations = async () => {
   }
 }
 
-const getInstallation = async (id) => {
+const getInstallation = async (id, isUpdating) => {
   try {
     const data = await $api(`/api/installations/${id}`, {
       method: 'GET'
@@ -519,7 +711,8 @@ const getInstallation = async (id) => {
     form.value = data
     nextTick(() => {
       selectedDate.value = new Date(form.value.installedDate);
-      updateDialog.value = true
+      if (isUpdating) updateDialog.value = true;
+      else approvalDialog.value = true;
     });
   } catch (err) {
     const errorMessage = err.data?.message || err;
@@ -530,7 +723,9 @@ const getInstallation = async (id) => {
 const createInstallation = async () => {
   try {
     if (!createModel.value) return;
+
     const formData = new FormData();
+
     formData.append('formatPicture', formatPicture.value);
     formData.append('serialPicture', serialPicture.value);
 
@@ -546,10 +741,11 @@ const createInstallation = async () => {
       formData.set('distributorId', profile.value.distributor_id);
     }
 
-    const response = await $api('/api/installations/', {
+    const { message } = await $api('/api/installations/', {
       method: 'POST',
       body: formData
     })
+    show(message, 'success');
     await getInstallations()
     createDialog.value = false
   } catch (err) {
@@ -561,10 +757,30 @@ const createInstallation = async () => {
 const updateInstallation = async () => {
   try {
     if (!updateModel.value) return;
-    const response = await $api(`/api/installations/${form.value.id}`, {
+
+    const formData = new FormData();
+
+    if (formatPicture.value) formData.append('formatPicture', formatPicture.value);
+    if (serialPicture.value) formData.append('serialPicture', serialPicture.value);
+    if (installationPictures.value) {
+      for (const installationPicture of installationPictures.value) {
+        formData.append('installationPictures', installationPicture);
+      }
+    }
+
+    for (const [key, value] of Object.entries(form.value)) {
+      formData.append(key, value);
+    }
+
+    if (!form.value.distributorId) {
+      formData.set('distributorId', profile.value.distributor_id);
+    }
+
+    const { message } = await $api(`/api/installations/${form.value.id}`, {
       method: 'PUT',
-      body: form.value
+      body: formData
     })
+    show(message, 'success');
     await getInstallations()
     updateDialog.value = false
   } catch (err) {
@@ -575,15 +791,15 @@ const updateInstallation = async () => {
 
 const deleteInstallation = async () => {
   try {
-    const response = await $api(`/api/installations/${form.value.id}`, {
+    const { message } = await $api(`/api/installations/${form.value.id}`, {
       method: 'DELETE'
     })
+    show(message, 'success');
     await getInstallations()
     deleteDialog.value = false
-    resetForm();
   } catch (err) {
     const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');;
+    show(errorMessage, 'error');
   }
 }
 
@@ -593,6 +809,36 @@ const doSearch = async () => {
     perPage.value = 15
     await getInstallations()
     searchDialog.value = false
+  } catch (err) {
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
+  }
+}
+
+const approveInstallation = async () => {
+  try {
+    const { message } = await $api(`/api/installations/approve/${form.value.id}`, {
+      method: 'PATCH'
+    })
+    show(message, 'success');
+    await getInstallations();
+    approvalDialog.value = false;
+  } catch (err) {
+    const errorMessage = err.data?.message || err;
+    show(errorMessage, 'error');
+  }
+}
+
+const rejectInstallation = async () => {
+  try {
+    const { message } = await $api(`/api/installations/reject/${form.value.id}`, {
+      method: 'POST',
+      body: { rejectComments: rejectComments.value }
+    })
+    show(message, 'success');
+    await getInstallations();
+    rejectDialog.value = false;
+    approvalDialog.value = false;
   } catch (err) {
     const errorMessage = err.data?.message || err;
     show(errorMessage, 'error');

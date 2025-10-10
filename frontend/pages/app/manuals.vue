@@ -7,10 +7,11 @@
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
           <template v-slot:item.option="{ item }">
-            <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getManual(item.id)"></v-btn>
-            <span class="mx-2"></span>
-            <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
-              @click="form.id = item.id; deleteDialog = true"></v-btn>
+            <div class="d-flex align-center justify-center ga-2">
+              <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getManual(item.id)"></v-btn>
+              <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
+                @click="form.id = item.id; deleteDialog = true"></v-btn>
+            </div>
           </template>
         </v-data-table-server>
       </v-card-text>
@@ -18,7 +19,7 @@
   </v-container>
 
   <!-- Create Dialog -->
-  <v-dialog v-model="createDialog" max-width="500">
+  <v-dialog v-model="createDialog" max-width="500" :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -31,13 +32,16 @@
         <v-form ref="createForm" v-model="createModel" @submit.prevent="createManual">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('manuals.name')" :rules="[nameRequired]"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('manuals.name')"
+                :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-file-input v-model="form.file" hide-details="auto" :label="$t('manuals.file')" :rules="[fileRequired]"></v-file-input>
+              <v-file-input v-model="form.file" hide-details="auto" :label="$t('manuals.file')"
+                :rules="[fileRequired]"></v-file-input>
             </v-col>
             <v-col cols="12">
-              <v-select v-model="form.manualType" hide-details="auto" :label="$t('manuals.type')" :rules="[typeRequired]"></v-select>
+              <v-select v-model="form.manualType" hide-details="auto" :label="$t('manuals.type')"
+                :rules="[typeRequired]"></v-select>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -51,7 +55,7 @@
   </v-dialog>
 
   <!-- Update Dialog -->
-  <v-dialog v-model="updateDialog" max-width="500" persistent>
+  <v-dialog v-model="updateDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -64,13 +68,16 @@
         <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateManual">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('manuals.name')" :rules="[nameRequired]"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('manuals.name')"
+                :rules="[nameRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.file" hide-details="auto" :label="$t('manuals.file')" :rules="[fileRequired]"></v-text-field>
+              <v-text-field v-model="form.file" hide-details="auto" :label="$t('manuals.file')"
+                :rules="[fileRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-select v-model="form.manualType" hide-details="auto" :label="$t('manuals.manualType')" :rules="[typeRequired]"></v-select>
+              <v-select v-model="form.manualType" hide-details="auto" :label="$t('manuals.manualType')"
+                :rules="[typeRequired]"></v-select>
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -84,7 +91,7 @@
   </v-dialog>
 
   <!-- Delete Dialog -->
-  <v-dialog v-model="deleteDialog" max-width="500" persistent>
+  <v-dialog v-model="deleteDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -103,7 +110,7 @@
   </v-dialog>
 
   <!-- Search Dialog -->
-  <v-dialog v-model="searchDialog" max-width="500" persistent>
+  <v-dialog v-model="searchDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -180,11 +187,15 @@ const itemsPerPageOptions = computed(() => [
 ])
 
 const headers = computed(() => [
-  { title: 'Id', key: 'id', sortable: false },
-  { title: t('manuals.name'), key: 'name', sortable: false },
-  { title: t('manuals.type'), key: 'manualType', sortable: false },
-  { title: t('options'), key: 'option', align: 'center', sortable: false }
+  { title: 'Id', key: 'id', align: 'center', sortable: false },
+  { title: t('manuals.name'), key: 'name', align: 'center', sortable: false },
+  { title: t('manuals.type'), key: 'manualType', align: 'center', sortable: false },
+  { title: t('options'), key: 'option', align: 'center', align: 'center', sortable: false }
 ])
+
+watch(deleteDialog, async (val) => {
+  if (!val) resetForm();
+})
 
 watch(page, async () => {
   await getManuals();
@@ -236,10 +247,11 @@ const getManual = async (id) => {
 const createManual = async () => {
   try {
     if (!createModel.value) return;
-    const response = await $api('/api/manuals/', {
+    const { message } = await $api('/api/manuals/', {
       method: 'POST',
       body: form.value
     })
+    show(message, 'success');
     await getManuals()
     createDialog.value = false
   } catch (err) {
@@ -251,10 +263,11 @@ const createManual = async () => {
 const updateManual = async () => {
   try {
     if (!updateModel.value) return;
-    const response = await $api(`/api/manuals/${form.value.id}`, {
+    const { message } = await $api(`/api/manuals/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
+    show(message, 'success');
     await getManuals()
     updateDialog.value = false
   } catch (err) {
@@ -265,14 +278,15 @@ const updateManual = async () => {
 
 const deleteManual = async () => {
   try {
-    const response = await $api(`/api/manuals/${form.value.id}`, {
+    const { message } = await $api(`/api/manuals/${form.value.id}`, {
       method: 'DELETE'
     })
+    show(message, 'success');
     await getManuals()
     deleteDialog.value = false
   } catch (err) {
     const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');;
+    show(errorMessage, 'error');
   }
 }
 

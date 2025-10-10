@@ -7,10 +7,11 @@
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
           <template v-slot:item.option="{ item }">
-            <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getPart(item.id)"></v-btn>
-            <span class="mx-2"></span>
-            <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
-              @click="form.id = item.id; deleteDialog = true"></v-btn>
+            <div class="d-flex align-center justify-center ga-2">
+              <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getPart(item.id)"></v-btn>
+              <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
+                @click="form.id = item.id; deleteDialog = true"></v-btn>
+            </div>
           </template>
         </v-data-table-server>
       </v-card-text>
@@ -18,7 +19,7 @@
   </v-container>
 
   <!-- Create Dialog -->
-  <v-dialog v-model="createDialog" max-width="500" persistent>
+  <v-dialog v-model="createDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -50,7 +51,7 @@
   </v-dialog>
 
   <!-- Update Dialog -->
-  <v-dialog v-model="updateDialog" max-width="500" persistent>
+  <v-dialog v-model="updateDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -82,7 +83,7 @@
   </v-dialog>
 
   <!-- Delete Dialog -->
-  <v-dialog v-model="deleteDialog" max-width="500" persistent>
+  <v-dialog v-model="deleteDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -101,7 +102,7 @@
   </v-dialog>
 
   <!-- Search Dialog -->
-  <v-dialog v-model="searchDialog" max-width="500" persistent>
+  <v-dialog v-model="searchDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -180,9 +181,9 @@ const itemsPerPageOptions = computed(() => [
 
 const headers = computed(() => [
   { title: 'Id', key: 'id' },
-  { title: t('equipments.title', 1), key: 'equipment' },
-  { title: t('parts.serial'), key: 'serial' },
-  { title: t('parts.description'), key: 'description' },
+  { title: t('equipments.title', 1), key: 'equipment', align: 'center', sorteable: false },
+  { title: t('parts.serial'), key: 'serial', align: 'center', sorteable: false },
+  { title: t('parts.description'), key: 'description', align: 'center', sorteable: false },
   { title: t('options'), key: 'option', align: 'center' }
 ])
 
@@ -200,6 +201,10 @@ watch(updateDialog, async (val) => {
     updateForm.value.reset();
     resetForm();
   }
+})
+
+watch(deleteDialog, async (val) => {
+  if (!val) resetForm();
 })
 
 watch(page, async () => {
@@ -279,12 +284,12 @@ const getPart = async (id) => {
 const createPart = async () => {
   try {
     if (!createModel.value) return;
-    const response = await $api('/api/parts/', {
+    const { message } = await $api('/api/parts/', {
       method: 'POST',
       body: form.value
     })
-    await getEquipments()
-    resetForm()
+    show(message, 'success');
+    await getParts()
     createDialog.value = false
   } catch (err) {
     const errorMessage = err.data?.message || err;
@@ -295,12 +300,12 @@ const createPart = async () => {
 const updatePart = async () => {
   try {
     if (!updateModel.value) return;
-    const response = await $api(`/api/parts/${form.value.id}`, {
+    const { message } = await $api(`/api/parts/${form.value.id}`, {
       method: 'PUT',
       body: form.value
     })
-    await getEquipments()
-    resetForm()
+    show(message, 'success');
+    await getParts()
     updateDialog.value = false
   } catch (err) {
     const errorMessage = err.data?.message || err;
@@ -310,11 +315,11 @@ const updatePart = async () => {
 
 const deletePart = async () => {
   try {
-    const response = await $api(`/api/parts/${form.value.id}`, {
+    const { message } = await $api(`/api/parts/${form.value.id}`, {
       method: 'DELETE'
     })
-    await getEquipments()
-    resetForm()
+    show(message, 'success');
+    await getParts()
     deleteDialog.value = false
   } catch (err) {
     const errorMessage = err.data?.message || err;

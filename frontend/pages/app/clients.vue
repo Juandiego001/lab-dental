@@ -7,10 +7,11 @@
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
           <template v-slot:item.option="{ item }">
-            <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getClient(item.id)"></v-btn>
-            <span class="mx-2"></span>
-            <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
-              @click="form.id = item.id; deleteDialog = true"></v-btn>
+            <div class="d-flex align-center justify-center ga-2">
+              <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getClient(item.id)"></v-btn>
+              <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
+                @click="form.id = item.id; deleteDialog = true"></v-btn>
+            </div>
           </template>
         </v-data-table-server>
       </v-card-text>
@@ -18,7 +19,7 @@
   </v-container>
 
   <!-- Create Dialog -->
-  <v-dialog v-model="createDialog" max-width="500" persistent>
+  <v-dialog v-model="createDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -55,7 +56,7 @@
   </v-dialog>
 
   <!-- Update Dialog -->
-  <v-dialog v-model="updateDialog" max-width="500" persistent>
+  <v-dialog v-model="updateDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -92,7 +93,7 @@
   </v-dialog>
 
   <!-- Delete Dialog -->
-  <v-dialog v-model="deleteDialog" max-width="500" persistent>
+  <v-dialog v-model="deleteDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -111,7 +112,7 @@
   </v-dialog>
 
   <!-- Search Dialog -->
-  <v-dialog v-model="searchDialog" max-width="500" persistent>
+  <v-dialog v-model="searchDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -192,18 +193,18 @@ const itemsPerPageOptions = computed(() => [
 const headers = computed(() => {
   if (isAdmin.value) {
     return [
-      { title: 'Id', key: 'id', sortable: false },
-      { title: t('clients.name'), key: 'name', sortable: false },
-      { title: t('clients.phone'), key: 'phone', sortable: false },
-      { title: t('clients.distributor'), key: 'distributorName', sortable: false },
+      { title: 'Id', key: 'id', align: 'center', sortable: false },
+      { title: t('clients.name'), key: 'name', align: 'center', sortable: false },
+      { title: t('clients.phone'), key: 'phone', align: 'center', sortable: false },
+      { title: t('clients.distributor'), key: 'distributorName', align: 'center', sortable: false },
       { title: t('options'), key: 'option', align: 'center', sortable: false }
     ]
   }
 
   return [
-    { title: 'Id', key: 'id', sortable: false },
-    { title: t('clients.name'), key: 'name', sortable: false },
-    { title: t('clients.phone'), key: 'phone', sortable: false },
+    { title: 'Id', key: 'id', align: 'center', sortable: false },
+    { title: t('clients.name'), key: 'name', align: 'center', sortable: false },
+    { title: t('clients.phone'), key: 'phone', align: 'center', sortable: false },
     { title: t('options'), key: 'option', align: 'center', sortable: false }
   ]
 })
