@@ -34,7 +34,6 @@
       <v-btn class="me-2" icon="mdi-plus" size="small" variant="text" @click="createDialog = !createDialog"></v-btn>
       <v-btn class="me-2" icon="mdi-magnify" size="small" variant="text" @click="searchDialog = !searchDialog"></v-btn>
     </template>
-    <v-btn v-else icon="mdi-dots-vertical" size="small" variant="text"></v-btn>
 
     <v-menu>
       <template v-slot:activator="{ props }">
@@ -52,7 +51,6 @@
         </v-btn>
       </v-sheet>
     </v-menu>
-
   </v-app-bar>
 </template>
 

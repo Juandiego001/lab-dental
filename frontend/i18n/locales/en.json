@@ -22,7 +22,7 @@
   "contact": {
     "title": "Contact",
     "us": "Contact Us",
-    "send": "Enviar"
+    "send": "Send"
   },
   "services": {
     "title": "Services",
@@ -182,6 +182,11 @@
     "emailUsername": "Username or email",
     "password": "Password",
     "forgotPassword": "Forgot your password?"
+  },
+  "recoverPassword": {
+    "title": "Recover password",
+    "email": "Email",
+    "backToLogin": "Go back to login"
   },
   "distributors": {
     "title": "Distributor | Distributors",

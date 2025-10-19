@@ -183,6 +183,11 @@
     "password": "Contraseña",
     "forgotPassword": "¿Olvidaste tu contraseña?"
   },
+  "recoverPassword": {
+    "title": "Recuperar contraseña",
+    "email": "Correo",
+    "backToLogin": "Regresar al inicio de sesión"
+  },
   "distributors": {
     "title": "Distribuidor | Distribuidores",
     "name": "Nombre",

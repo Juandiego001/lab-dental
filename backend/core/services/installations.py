@@ -153,7 +153,7 @@ def notify_creation(installation: Installation = None):
         installation_data['app_url'] = f'{FRONTEND_APP_BASE_URL}/app/installations'
 
         send_mail(f'SOE Latam - Registro de certificado de instalación #{installation.id}',
-                  ['juandiego14012003@gmail.com'], 'register_installation.html',
+                  users_emails, 'register_installation.html',
                   installation_data,
                   installation_files_attachments)
 

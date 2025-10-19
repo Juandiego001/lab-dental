@@ -32,11 +32,18 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n();
+
 definePageMeta({
   layout: 'account'
 })
 
-const { show } = useSnackbar();
+useHead({
+  title: `SOE Latam | ${t('login.title')}`
+})
+
+const { notify } = useSnackbar();
 const { $ability } = useNuxtApp();
 const email = ref('')
 const password = ref('')
@@ -52,11 +59,10 @@ const logIn = async () => {
     })
     const { abilities } = await $api('/api/users/profile', { method: 'GET' });
     $ability.update(abilities);
-    show(response.message, 'success')
+    notify(response.message, 'success')
     navigateTo('/app');
   } catch (err) {
-    console.log(err);
-    show(err, 'error');
+    notify(err, 'error');
   }
 }
 </script>

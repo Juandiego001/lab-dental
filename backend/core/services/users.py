@@ -7,10 +7,10 @@ from werkzeug.exceptions import HTTPException
 from core.services.distributors import get_distributor_from_user
 
 
-def login(email: str, password: str):
+def login(email_or_username: str, password: str):
     '''Login'''
 
-    user = db.session.query(User).filter(User.email == email).first()
+    user = db.session.query(User).filter(or_(User.email == email_or_username, User.username == email_or_username)).first()
     if not user or not checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
         raise HTTPException('Incorrect username or password')
     return user

@@ -2,7 +2,7 @@ from flask import jsonify
 from core import get_user_permissions
 from core.app import db
 from core.services import users
-from apiflask import APIBlueprint, abort
+from apiflask import APIBlueprint, HTTPError, abort
 from werkzeug.exceptions import HTTPException
 from core.schemas.utils import Message, Pagination
 from flask_jwt_extended import create_access_token, set_access_cookies, jwt_required, get_jwt_identity, current_user
@@ -51,11 +51,12 @@ def login_users(user):
         user_data = ProfileOut().dump(user)
         access_token = create_access_token(
             identity=str(user.id), additional_claims=user_data)
-        response = jsonify(access_token=access_token, message=f'Welcome {user_data['full_name']}')
+        response = jsonify(access_token=access_token,
+                           message=f'Welcome {user_data['full_name']}')
         set_access_cookies(response, access_token)
         return response
     except HTTPException as ex:
-        abort(404, str(ex))
+        abort(404, ex.description)
     except Exception as ex:
         print(str(ex))
         abort(500, str(ex))

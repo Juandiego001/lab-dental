@@ -20,7 +20,7 @@ MAIL_SENDER = os.getenv('MAIL_SENDER')
 MAIL_SERVER = os.getenv('MAIL_SERVER')
 FRONTEND_APP_BASE_URL = os.getenv('FRONTEND_APP_BASE_URL', 'http://localhost:3000')
 
-app = APIFlask(__name__, title='SOE Latam API', version='0.0.1', enable_openapi=ENV == 'development', template_folder='../templates',)
+app = APIFlask(__name__, title='SOE Latam API', version='0.0.1', enable_openapi=ENV == 'development', template_folder='../templates', json_errors=False)
 CORS(app)
 
 app.config['JWT_SECRET_KEY'] = 'super-secret987'  # Change this!

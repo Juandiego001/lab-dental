@@ -1,20 +1,28 @@
 <template>
   <!-- Banner -->
   <v-container class="position-relative pa-0 ma-0 d-flex justify-center align-center" fluid>
-    <v-img class="w-100" max-height="600" cover src="/public/index_banner_img.jpg"
-      style="filter:brightness(40%);"></v-img>
-    <v-sheet class="bg-transparent position-absolute pa-12 text-center">
-      <v-img width="400" class="mx-auto" src="/snapon_navbar.svg"></v-img>
-      <h1 v-html="$t('index.banner')" class="text-white text-h4 my-6"></h1>
-      <NuxtLink :to="$localePath('/contact')"
-        class="d-inline-block text-primary bg-white font-weight-bold text-decoration-none pa-4 text-h6 rounded-lg">
+    <v-img class="w-100" :max-height="$vuetify.display.mdAndUp && 400 || $vuetify.display.sm && 350 || 200" cover
+      src="/public/index_banner_img.jpg" style="filter:brightness(40%);" />
+    <v-sheet class="bg-transparent position-absolute text-center">
+      <v-img class="mx-auto" :width="$vuetify.display.mdAndUp && 400 ||
+        $vuetify.display.smAndDown && 200
+        " src="/snapon_navbar.svg" />
+      <h1 v-html="$t('index.banner')" :class="`text-white my-6
+          ${$vuetify.display.mdAndUp && 'text-h4'}
+          ${$vuetify.display.smAndUp && 'text-h5'}
+          ${$vuetify.display.xs && 'text-body-2'}
+        `" />
+      <NuxtLink :to="$localePath('/contact')" :class="`d-inline-block text-primary bg-white font-weight-bold text-decoration-none  rounded-lg
+          ${$vuetify.display.mdAndUp && 'text-h6 pa-4'}
+          ${$vuetify.display.smAndDown && 'text-body-2 pa-2'}
+        `">
         <span class="text-primary">{{ $t('contact.title') }}</span>
       </NuxtLink>
     </v-sheet>
   </v-container>
 
   <!-- Our brands -->
-  <v-container class="py-16" fluid>
+  <v-container class="py-16 px-0" fluid>
     <v-row no-gutters>
       <v-col class="d-flex justify-center align-center text-center mb-8" cols="12">
         <h1 class="text-h4 text-primary font-weight-bold">{{ $t('index.ourBrands.title') }}</h1>
@@ -28,7 +36,7 @@
             src="/public/Jhon_Bean/bg_wheel_aligners.jpg"></v-img>
 
           <div class="bg-transparent rounded-xl" style="backdrop-filter: blur(24px);">
-            <v-img max-width="300" class="mx-auto my-4" src="/public/Jhon_Bean/logo_white.png"></v-img>
+            <v-img max-width="80%" width="300" class="mx-auto my-4" src="/public/Jhon_Bean/logo_white.png"></v-img>
             <p class="text-subtitle-2 text-center text-white pa-4">{{ $t('index.ourBrands.johnBean') }}</p>
           </div>
         </NuxtLink>
@@ -42,7 +50,7 @@
             src="/public/Hofmann/bg_wheel_aligners.png"></v-img>
 
           <div class="bg-transparent rounded-xl" style="backdrop-filter: blur(24px);">
-            <v-img max-width="300" class="mx-auto my-4" src="/public/Hofmann/logo_white.png"></v-img>
+            <v-img max-width="80%" width="300" class="mx-auto my-4" src="/public/Hofmann/logo_white.png"></v-img>
             <p class="text-subtitle-2 text-center text-white pa-4">{{ $t('index.ourBrands.hoffman') }}</p>
           </div>
         </NuxtLink>
@@ -51,7 +59,7 @@
   </v-container>
 
   <!-- Services -->
-  <v-container class="bg-primary text-center py-16 rounded-lg mb-8">
+  <v-container :class="`bg-primary text-center py-16  mb-8 ${$vuetify.display.mdAndUp && 'rounded-lg'}`">
     <v-sheet class="bg-white d-inline-block mx-auto text-center mb-12 w-auto rounded-xl pa-4">
       <h2 class="text-primary text-h4 font-weight-bold">{{ $t('services.title') }}</h2>
     </v-sheet>
@@ -105,7 +113,7 @@
 
 
   <!-- Contact Us -->
-  <v-container max-width="900" class="bg-primary text-center pa-8 mb-12 rounded-lg">
+  <v-container max-width="900" :class="`bg-primary text-center pa-8 mb-12 ${$vuetify.display.mdAndUp && 'rounded-lg'}`">
     <h2 class="text-white mb-8 text-h4 font-weight-bold">{{ $t('contact.us') }}</h2>
 
     <v-form>

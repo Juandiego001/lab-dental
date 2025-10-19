@@ -1,4 +1,4 @@
-export const useSnackbar  = () => {
+export const useSnackbar = () => {
   const snackbar = useState('snackbar', () => ({
     message: '',
     visible: false,
@@ -13,9 +13,24 @@ export const useSnackbar  = () => {
     snackbar.value.visible = false
   }
 
+  const notify = (response: any, type: 'success' | 'error') => {
+    let message = '';
+
+    if (type === 'success') {
+      if (typeof response === 'string') message = response;
+      else message = response.message;
+    }
+    else {
+      if (typeof response === 'string') message = response;
+      else message = response.data.message;
+    }
+    show(message, type);
+  }
+
   return {
     snackbar,
     show,
-    hide
+    hide,
+    notify
   }
 }
