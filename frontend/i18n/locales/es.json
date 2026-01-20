@@ -1,0 +1,600 @@
+{
+  "menu": {
+    "home": "Inicio",
+    "roi": "ROI",
+    "about": "Acerca de",
+    "blog": "Blog",
+    "forum": "Foro",
+    "logIn": "Log In",
+    "rights": "Todos los derechos reservados.",
+    "terms": "Términos y condiciones",
+    "privacy": "Política de privacidad"
+  },
+  "index": {
+    "banner": "Equipos de alta durabilidad,<br>listos para llevar a su empresa al siguiente nivel",
+    "ourBrands": {
+      "title": "Nuestras marcas",
+      "johnBean": "John Bean® ha sido líder en equipos de automoción para talleres mecánicos, talleres de neumáticos y servicios de reparación de carrocerías desde el lanzamiento de la primera alineadora de ruedas del mundo en 1925. John Bean ha sido una fuente líder mundial de soluciones de equipos de servicio para automóviles durante más de 100 años y fue adquirida en 1996 por Snap-on Incorporated.",
+      "hoffman": "Impregnado de un legado de innovación y excelencia, Hofmann® diseña máquinas de alineación de ruedas que realmente establecen los estándares de la industria. Fusionamos ocho décadas de experiencia con la tecnología más avanzada, garantizando que nuestros equipos ofrezcan una fiabilidad consagrada y características vanguardistas."
+    },
+    "ourBlog": "Nuestro blog"
+  },
+  "contact": {
+    "title": "Contacto",
+    "us": "Contáctenos",
+    "send": "Enviar"
+  },
+  "services": {
+    "title": "Servicios",
+    "installations": {
+      "title": "Instalaciones",
+      "description": "Nuestro servicio de instalación permite a los clientes solicitar certificados oficiales de instalación para cualquier equipo adquirido a través de SOE Latam, garantizando el cumplimiento de las normas y los estándares de calidad."
+    },
+    "equipments": {
+      "title": "Equipos",
+      "description": "A través de nuestra sección de Equipamiento, los clientes pueden explorar nuestro catálogo completo de herramientas y maquinaria de vanguardia adaptadas a los centros de servicio de automoción profesionales."
+    },
+    "warranties": {
+      "title": "Garantías",
+      "description": "Nuestro servicio de garantía ofrece un proceso sin complicaciones para presentar solicitudes de garantía para equipos certificados y correctamente instalados, respaldados por el compromiso de durabilidad y asistencia de Snap-on."
+    },
+    "manuals": {
+      "title": "Manuales",
+      "description": "Además, nuestra sección de manuales ofrece un fácil acceso a las guías de usuario y a la documentación de todos los equipos instalados, lo que garantiza que los técnicos puedan trabajar con confianza y eficacia. Con SOE Latam, la excelencia no se detiene en la compra, sino que se extiende a cada paso del recorrido de su taller."
+    }
+  },
+  "roi": {
+    "title": "ROI Calculator",
+    "settings": "Configuración",
+    "exchangeRate": "Tipo de cambio",
+    "averageServicesDay": "Número medio de servicios diarios",
+    "serviceSaleRate": "Tasa de venta de servicios (media)",
+    "employeesMonthSalary": "Sueldo mensual del empleado",
+    "daysWorkedMonth": "Días trabajados al mes",
+    "hoursWorkDay": "Horas de trabajo al día",
+    "rentPremisesMonth": "Alquiler del local por mes",
+    "areaPremises": "Superficie de los locales m²",
+    "workSiteArea": "Superficie de la obra m²",
+    "equipmentLeaseMonth": "Arrendamiento de equipos/financiero al mes",
+    "equipmentPrice": "Precio del equipo"
+  },
+  "aboutUs": {
+    "title": "Acerca de nosotros",
+    "part1": {
+      "title": "🛠️ Acerca de SOE Latam",
+      "paragraph1": "En SOE Latam, estamos orgullosos de ser el socio oficial de franquicias de Snap-on, el líder mundialmente reconocido en equipos automotrices de primera calidad. Nuestra misión es llevar el mismo legado de precisión, rendimiento e innovación a los talleres y centros de servicio de toda América Latina.",
+      "paragraph2": "Respaldados por el centenario legado de excelencia de Snap-on, ofrecemos equipos de taller líderes en el sector, incluidos alineadores de ruedas avanzados, desmontadoras de neumáticos, elevadores, herramientas de diagnóstico y mucho más, diseñados para profesionales que sólo exigen lo mejor.",
+      "paragraph3": "Con profundas raíces en los mercados latinoamericanos y una pasión por el progreso de la automoción, proporcionamos soluciones a medida que ayudan a las empresas a aumentar la eficiencia, mejorar la seguridad y elevar la calidad del servicio a estándares globales."
+    },
+    "part2": {
+      "title": "🌍 Visión y misión",
+      "vision": {
+        "title": "Visión",
+        "description": "Convertirnos en el proveedor más confiable y avanzado de soluciones de equipamiento automotriz en toda América Latina, brindando a los profesionales la tecnología y el apoyo que necesitan para prosperar en una industria que evoluciona rápidamente."
+      },
+      "mission": {
+        "title": "Misión",
+        "description": "Ofrecer equipos y servicios Snap-on de clase mundial en toda América Latina, combinando la innovación global con la experiencia local. Nuestro objetivo es construir alianzas duraderas con nuestros clientes, basadas en la fiabilidad, el rendimiento y la mejora continua."
+      }
+    },
+    "part3": {
+      "title": "💡 ¿Por qué elegir SOE Latam?",
+      "bullet1": {
+        "title": "Innovación global, servicio local",
+        "description": "Llevamos tecnología de punta de los centros globales de investigación y desarrollo de Snap-on directamente a las empresas latinoamericanas, con soporte y capacitación local en cada paso del camino."
+      },
+      "bullet2": {
+        "title": "Calidad de producto inigualable",
+        "description": "Desde máquinas de alineación de precisión hasta elevadores de cargas pesadas, nuestros equipos están diseñados para ofrecer durabilidad, seguridad y un rendimiento constante en los entornos más exigentes."
+      },
+      "bullet3": {
+        "title": "Asistencia técnica experta",
+        "description": "Nuestros equipos regionales han recibido formación en fábrica para garantizar una instalación, calibración y asistencia posventa óptimas y adaptadas a sus necesidades."
+      },
+      "bullet4": {
+        "title": "Soluciones empresariales personalizadas",
+        "description": "Entendemos los diversos retos del mercado latinoamericano. Por eso ofrecemos paquetes escalables para talleres de todos los tamaños, desde talleres independientes hasta redes de concesionarios."
+      },
+      "bullet5": {
+        "title": "Compromiso con el crecimiento y la formación",
+        "description": "Nuestra prioridad no es sólo vender equipos, sino crecer con usted mediante la formación continua, la optimización del servicio y la tecnología de última generación."
+      }
+    }
+  },
+  "blog": {
+    "title": "Blog",
+    "articles": {
+      "title": "Artículos",
+      "category": "CATEGORÍA"
+    },
+    "videos": {
+      "title": "Videos"
+    },
+    "date": "FECHA",
+    "viewMore": "Ver más",
+    "loadMore": "Cargar más"
+  },
+  "forum": {
+    "title": "Foro",
+    "latestPost": "Últimos posts",
+    "replies": "Respuestas"
+  },
+  "terms": {
+    "title": "Términos y condiciones",
+    "acceptanceTerms": {
+      "title": "1. Aceptación de los Términos",
+      "description": "Al acceder y utilizar la plataforma SOE Latam (en adelante, \"la Plataforma\"), el usuario acepta cumplir con los presentes Términos y Condiciones, así como con nuestras políticas de privacidad y uso de datos. Si no está de acuerdo con alguno de estos términos, debe abstenerse de utilizar la Plataforma."
+    },
+    "platformDescription": {
+      "title": "2. Descripción de la Plataforma",
+      "description": "SOE Latam es una herramienta digital creada para facilitar la comunicación entre los usuarios y los administradores de la empresa, con el fin de gestionar la solicitud y entrega de:",
+      "list": {
+        "bullet1": "<span class='font-weight-bold'>Certificados de instalación</span> de equipos como balanceadoras, alineadoras, montacargas, entre otros.",
+        "bullet2": "<span class='font-weight-bold'>Garantías</span> de los equipos adquiridos.",
+        "bullet3": "<span class='font-weight-bold'>Manuales</span> y documentación técnica de los productos instalados."
+      }
+    },
+    "registrationAccess": {
+      "title": "3. Registro y Acceso",
+      "description": "Para acceder a ciertos servicios, el usuario deberá registrarse proporcionando información veraz, completa y actualizada. El usuario es responsable de mantener la confidencialidad de sus credenciales y de todas las actividades que ocurran bajo su cuenta."
+    },
+    "acceptableUse": {
+      "title": "4. Uso Aceptable",
+      "description": "El usuario se compromete a utilizar la Plataforma de forma lícita y conforme a los fines para los cuales fue diseñada. Está estrictamente prohibido:",
+      "list": {
+        "bullet1": "Proporcionar información falsa o suplantar a terceros.",
+        "bullet2": "Interferir con el funcionamiento técnico de la Plataforma.",
+        "bullet3": "Intentar acceder sin autorización a secciones restringidas o a datos de otros usuarios."
+      }
+    },
+    "issuanceCertificates": {
+      "title": "5. Emisión de Certificados y Garantías",
+      "description": "La emisión de certificados de instalación está sujeta a la validación previa por parte del equipo técnico de la empresa. Los certificados se entregarán en formato digital a través de la Plataforma. Asimismo, los usuarios podrán consultar y descargar los documentos de garantía asociados a sus equipos, siempre y cuando se haya registrado previamente la instalación conforme a los procedimientos establecidos por la empresa."
+    },
+    "availabilityManuals": {
+      "title": "6. Disponibilidad de Manuales",
+      "description": "La Plataforma pone a disposición de los usuarios los manuales técnicos de los equipos adquiridos, los cuales podrán ser consultados o descargados en formato digital. Estos documentos están sujetos a derechos de autor y no podrán ser redistribuidos sin autorización."
+    },
+    "responsibilities": {
+      "title": "7. Responsabilidades",
+      "description": "La empresa no se hace responsable por:",
+      "list": {
+        "bullet1": "Errores u omisiones en la información proporcionada por el usuario.",
+        "bullet2": "Daños derivados del uso incorrecto de los certificados o garantías.",
+        "bullet3": "Fallos técnicos externos que impidan temporalmente el acceso a la Plataforma."
+      }
+    },
+    "modifications": {
+      "title": "8. Modificaciones",
+      "description": "La empresa se reserva el derecho de modificar estos Términos y Condiciones en cualquier momento. Los cambios serán notificados oportunamente a través de la Plataforma y su uso continuado implicará la aceptación de las modificaciones."
+    },
+    "intellectualProperty": {
+      "title": "9. Propiedad Intelectual",
+      "description": "Todos los derechos sobre el contenido, diseño y funcionalidades de la Plataforma pertenecen a la empresa. Queda prohibida su reproducción total o parcial sin consentimiento previo."
+    },
+    "governingLaw": {
+      "title": "10. Legislación Aplicable",
+      "description": "Estos Términos se regirán por las leyes del país donde la empresa tiene su sede principal. Cualquier disputa será resuelta ante los tribunales competentes de dicha jurisdicción."
+    }
+  },
+  "login": {
+    "title": "Iniciar sesión",
+    "emailUsername": "Correo o nombre de usuario",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?"
+  },
+  "recoverPassword": {
+    "title": "Recuperar contraseña",
+    "email": "Correo",
+    "backToLogin": "Regresar al inicio de sesión"
+  },
+  "distributors": {
+    "title": "Distribuidor | Distribuidores",
+    "name": "Nombre",
+    "create": {
+      "title": "Crear distribuidor"
+    },
+    "update": {
+      "title": "Actualizar distribuidor"
+    },
+    "delete": {
+      "title": "Eliminar distribuidor",
+      "message": "¿Está seguro que desea eliminar el distribuidor?"
+    },
+    "search": {
+      "title": "Buscar distribuidor",
+      "message": "Buscar distribuidor por nombre o ID",
+      "fields": "Nombre o id"
+    },
+    "rules": {
+      "nameRequired": "El nombre es requerido"
+    }
+  },
+  "sites": {
+    "title": "Sede | Sedes",
+    "name": "Nombre",
+    "address": "Dirección",
+    "distributorClient": "Distribuidor/Cliente",
+    "create": {
+      "title": "Crear sede",
+      "companyType": "Para distribuidores o clientes",
+      "selectDistributor": "Seleccione el distribuidor",
+      "selectClient": "Seleccione el cliente"
+    },
+    "update": {
+      "title": "Actualizar sede"
+    },
+    "delete": {
+      "title": "Eliminar sede",
+      "message": "¿Está seguro que desea eliminar la sede?"
+    },
+    "search": {
+      "title": "Buscar sede",
+      "message": "Buscar sede por nombre o ID",
+      "fields": "Nombre o id"
+    },
+    "rules": {
+      "distributorRequired": "El distribuidor es requerido",
+      "clientRequired": "El cliente es requerido",
+      "countryRequired": "El país es requerido",
+      "stateRequired": "El estado es requerido",
+      "addressRequired": "La dirección es requerida",
+      "nameRequired": "El nombre es requerido"
+    }
+  },
+  "clients": {
+    "title": "Cliente | Clientes",
+    "name": "Nombre",
+    "phone": "Teléfono",
+    "distributor": "Distribuidor",
+    "create": {
+      "title": "Crear cliente"
+    },
+    "update": {
+      "title": "Actualizar cliente"
+    },
+    "delete": {
+      "title": "Eliminar cliente",
+      "message": "¿Está seguro que desea eliminar el cliente?"
+    },
+    "search": {
+      "title": "Buscar cliente",
+      "message": "Buscar cliente por nombre o ID",
+      "fields": "Nombre o id"
+    },
+    "rules": {
+      "distributorRequired": "El distribuidor es requerido",
+      "nameRequired": "El nombre es requerido",
+      "phoneRequired": "El teléfono es requerido"
+    }
+  },
+  "users": {
+    "title": "Usuario | Usuarios",
+    "fullName": "Nombre completo",
+    "username": "Nombre de usuario",
+    "email": "Correo",
+    "password": "Contraseña",
+    "role": {
+      "title": "Rol",
+      "admin": "Admin",
+      "distributor": "Distribuidor"
+    },
+    "create": {
+      "title": "Crear usuario"
+    },
+    "update": {
+      "title": "Actualizar usuario"
+    },
+    "delete": {
+      "title": "Eliminar usuario",
+      "message": "¿Está seguro que desea eliminar el usuario?"
+    },
+    "search": {
+      "title": "Buscar usuario",
+      "message": "Buscar usuario por nombre completo, nombre de usuario, correo o ID",
+      "fields": "Nombre completo, nombre de usuario, correo o id"
+    },
+    "rules": {
+      "roleRequired": "El rol es requerido",
+      "distributorRequired": "El distribuidor es requerido",
+      "fullNameRequired": "El nombre completo es requerido",
+      "usernameRequired": "El nombre de usuario es requerido",
+      "emailRequired": "El email es requerido",
+      "passwordRequired": "La contraseña es requerida"
+    }
+  },
+  "modules": {
+    "title": "Módulo | Modulos"
+  },
+  "groups": {
+    "title": "Grupo | Grupos",
+    "name": "Name",
+    "create": {
+      "title": "Crear grupo"
+    },
+    "update": {
+      "title": "Actualizar grupo"
+    },
+    "delete": {
+      "title": "Eliminar grupo",
+      "message": "Are you sure you want to delete the grupo?"
+    },
+    "search": {
+      "title": "Buscar grupo",
+      "message": "Buscar grupo por nombre o ID",
+      "fields": "Nombre o id"
+    },
+    "permissions": {
+      "title": "Permisos",
+      "read": "Leer",
+      "create": "Crear",
+      "update": "Actualizar",
+      "delete": "Eliminar"
+    },
+    "rules": {
+      "nameRequired": "El nombre es requerido",
+      "distributorRequired": "El distribuidor es requerido",
+      "usersRequired": "Por lo menos un usuario es requerido"
+    }
+  },
+  "brands": {
+    "title": "Marca | Marcas",
+    "name": "Nombre",
+    "slug": "Slug",
+    "create": {
+      "title": "Crear marca"
+    },
+    "update": {
+      "title": "Actualizar marca"
+    },
+    "delete": {
+      "title": "Eliminar marca",
+      "message": "¿Está seguro que desea eliminar la marca?"
+    },
+    "search": {
+      "title": "Buscar marca",
+      "message": "Buscar marcas por nombre, slug o ID",
+      "fields": "Nombre, slug o id"
+    },
+    "rules": {
+      "nameRequired": "El nombre es requerido",
+      "slugRequired": "El slug es requerido"
+    }
+  },
+  "categories": {
+    "title": "Categoría | Categorías",
+    "name": "Nombre",
+    "slug": "Slug",
+    "create": {
+      "title": "Crear categoría"
+    },
+    "update": {
+      "title": "Actualizar categoría"
+    },
+    "delete": {
+      "title": "Eliminar categoría",
+      "message": "¿Está seguro que desea eliminar la categoría?"
+    },
+    "search": {
+      "title": "Buscar categoría",
+      "message": "Buscar categorías por nombre, slug o ID",
+      "fields": "Nombre, slug o id"
+    },
+    "rules": {
+      "nameRequired": "El nombre es requerido",
+      "slugRequired": "El slug es requerido"
+    }
+  },
+  "equipments": {
+    "title": "Equipo | Equipos",
+    "serial": "Serial",
+    "model": "Modelo",
+    "create": {
+      "title": "Create equipo"
+    },
+    "update": {
+      "title": "Actualizar equipo"
+    },
+    "delete": {
+      "title": "Eliminar equipo",
+      "message": "¿Está seguro que desea eliminar el equipo?"
+    },
+    "search": {
+      "title": "Buscar equipo",
+      "message": "Buscar equipos por serial, modelo o ID",
+      "fields": "Serial, modelo o id"
+    },
+    "rules": {
+      "brandRequired": "La marca es requerida",
+      "categoryRequired": "La categoría es requerida",
+      "serialRequired": "El serial es requerido",
+      "modelRequired": "El modelo es requerido"
+    }
+  },
+  "parts": {
+    "title": "Parte | Partes",
+    "serial": "Serial",
+    "description": "Descripción",
+    "create": {
+      "title": "Crear parte"
+    },
+    "update": {
+      "title": "Actualizar parte"
+    },
+    "delete": {
+      "title": "Eliminar parte",
+      "message": "¿Está seguro que desea eliminar la parte?"
+    },
+    "search": {
+      "title": "Buscar parte",
+      "message": "Buscar parte por serial o ID",
+      "fields": "Serial o id"
+    },
+    "rules": {
+      "serialRequired": "El serial es requerido",
+      "descriptionRequired": "La descripción es requerida"
+    }
+  },
+  "installations": {
+    "title": "Instalación | Instalaciones",
+    "installedAt": "Instalado en",
+    "serial": "Serial",
+    "installedDate": "Fecha de instalación",
+    "formatPicture": "Foto de formato",
+    "serialPicture": "Foto de serial",
+    "installationPictures": "Fotos de la instalación",
+    "create": {
+      "title": "Registrar instalación"
+    },
+    "update": {
+      "title": "Actualizar instalación"
+    },
+    "delete": {
+      "title": "Eliminar instalación",
+      "message": "¿Está seguro que desea eliminar la instalación?"
+    },
+    "search": {
+      "title": "Buscar instalación",
+      "message": "Buscar instalaciones por lugar de instalación, fecha de instalación o ID",
+      "fields": "Instalado en, fecha de instalación o id"
+    },
+    "approval": {
+      "title": "Aprobar instalación"
+    },
+    "reject": {
+      "title": "Comentarios de rechazo",
+      "description": "Agrega los motivos de rechazo..."
+    },
+    "rules": {
+      "equipmentRequired": "El equipo es requerido",
+      "distributorRequired": "El distribuidor es requerido",
+      "siteDistributorRequired": "La sede del distribuidor es requerida",
+      "clientRequired": "El cliente es requerido",
+      "siteClientRequired": "La sede del cliente es requerida",
+      "serialRequired": "El serial es requerido",
+      "installedDateRequired": "La fecha de instalación es requerida",
+      "formatPictureRequired": "La imagen del formato es requerida",
+      "serialPictureRequired": "La imagen del serial es requerida",
+      "installationPicturesRequired": "Por lo menos una foto de la instalación es requerida"
+    }
+  },
+  "reasons": {
+    "title": "Motivo | Motivos",
+    "name": "Nombre",
+    "slug": "Slug",
+    "create": {
+      "title": "Crear motivo"
+    },
+    "update": {
+      "title": "Actualizar motivo"
+    },
+    "delete": {
+      "title": "Eliminar motivo",
+      "message": "¿Está seguro que desea eliminar el motivo?"
+    },
+    "search": {
+      "title": "Buscar motivo",
+      "message": "Buscar motivo por name, slug o ID",
+      "fields": "Nombre, slug o id"
+    },
+    "rules": {
+      "nameRequired": "El nombre es requerido",
+      "slugRequired": "El slug es requerido"
+    }
+  },
+  "warranties": {
+    "title": "Garantía | Garantías",
+    "invoice": "Factura",
+    "problemDescription": "Descripción del problema",
+    "solutionDescription": "Descripción de la solución",
+    "create": {
+      "title": "Crear garantía"
+    },
+    "update": {
+      "title": "Actualizar garantía"
+    },
+    "delete": {
+      "title": "Eliminar garantía",
+      "message": "¿Está seguro que desea eliminar la garantía?"
+    },
+    "search": {
+      "title": "Buscar garantía",
+      "message": "Buscar garantía por factura o ID",
+      "fields": "Factura o id"
+    },
+    "rules": {
+      "invoiceRequired": "La factura es requerida",
+      "problemDescriptionRequired": "La descripción del problema es requerida",
+      "solutionDescriptionRequired": "La descripción de la solución es requerida"
+    }
+  },
+  "manuals": {
+    "title": "Manual | Manuales",
+    "name": "Nombre",
+    "file": "Archivo",
+    "type": "Tipo",
+    "create": {
+      "title": "Crear manual"
+    },
+    "update": {
+      "title": "Actualizar manual"
+    },
+    "delete": {
+      "title": "Eliminar manual",
+      "message": "¿Está seguro que desea eliminar el manual?"
+    },
+    "search": {
+      "title": "Buscar manual",
+      "message": "Buscar manual por nombre, tipo o ID",
+      "fields": "Nombre, tipo o id"
+    },
+    "rules": {
+      "nameRequired": "El nombre es requerido",
+      "fileRequired": "El archivo es requerido",
+      "typeRequired": "El tipo es requerido"
+    }
+  },
+  "lists": {
+    "title": "Lista | Listas",
+    "name": "Nombre",
+    "distributors": "Distribuidores",
+    "users": "Usuarios",
+    "slug": "Slug",
+    "isMain": "¿Es Principal?",
+    "create": {
+      "title": "Crear lista"
+    },
+    "update": {
+      "title": "Actualizar lista"
+    },
+    "delete": {
+      "title": "Eliminar lista",
+      "message": "¿Está seguro que desea eliminar la lista?"
+    },
+    "search": {
+      "title": "Buscar lista",
+      "message": "Buscar lista por nombre, tipo o ID",
+      "fields": "Nombre, tipo o id"
+    },
+    "rules": {
+      "nameRequired": "El nombre es requerido",
+      "distributorsRequired": "Por lo menos un distribuidor es requerido",
+      "usersRequired": "Por lo menos un usuario es requerido"
+    }
+  },
+  "countries": "País | Paises",
+  "states": "Estado | Estados",
+  "cities": "Ciudad | Ciudades",
+  "confirm": "Confirmar",
+  "approve": "Aprobar",
+  "reject": "Rechazar",
+  "email": "Correo",
+  "password": "Contraseña",
+  "phone": "Teléfono",
+  "name": "Nombre",
+  "message": "Mensaje",
+  "send": "Enviar",
+  "options": "Opciones",
+  "search": "Buscar",
+  "cancel": "Cancelar"
+}

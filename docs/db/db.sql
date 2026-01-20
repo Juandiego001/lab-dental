@@ -1,0 +1,130 @@
+-- Database creation
+CREATE DATABASE soe;
+
+-- Create table distributors
+CREATE TABLE distributors(
+    id SERIAL PRIMARY KEY NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    address VARCHAR(450) UNIQUE NOT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP::TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP::TIMESTAMP
+);
+
+-- Create table users
+CREATE TABLE users(
+    id SERIAL PRIMARY KEY NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(450) UNIQUE NOT NULL,
+    password VARCHAR NOT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP::TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP::TIMESTAMP
+);
+
+-- Create table groups
+CREATE TABLE groups(
+    id SERIAL PRIMARY KEY NOT NULL,
+    name VARCHAR(30) NOT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP::TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP::TIMESTAMP
+);
+
+-- Create table user_groups
+CREATE TABLE user_groups(
+    id SERIAL PRIMARY KEY NOT NULL,
+    user_id INTEGER NOT NULL,
+    group_id INTEGER NOT NULL,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_group FOREIGN KEY (group_id) REFERENCES groups(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- Create table modules
+CREATE TABLE modules(
+    id SERIAL PRIMARY KEY NOT NULL,
+    name VARCHAR(30) NOT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP::TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP::TIMESTAMP
+);
+
+-- Create table permissions
+CREATE TABLE permissions(
+    id SERIAL PRIMARY KEY NOT NULL,
+    group_id INT NOT NULL,
+    module_id INT NOT NULL,
+    "read" BOOLEAN NOT NULL DEFAULT true,
+    "create" BOOLEAN NOT NULL DEFAULT true,
+    "update" BOOLEAN NOT NULL DEFAULT true,
+    "delete" BOOLEAN NOT NULL DEFAULT true,
+    status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP::TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP::TIMESTAMP,
+    CONSTRAINT fk_group FOREIGN KEY (group_id) REFERENCES groups(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_module FOREIGN KEY (module_id) REFERENCES modules(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- Create table brands
+CREATE TABLE brands(
+    id SERIAL PRIMARY KEY NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    slug VARCHAR(100) NOT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP::TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP::TIMESTAMP
+);
+
+-- Create table categories
+CREATE TABLE categories(
+    id SERIAL PRIMARY KEY NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    slug VARCHAR(100) NOT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP::TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP::TIMESTAMP
+);
+
+-- Create table equipments
+CREATE TABLE equipments(
+    id SERIAL PRIMARY KEY NOT NULL,
+    brand_id INT NOT NULL,
+    category_id INT NOT NULL,
+    serial VARCHAR(200) NOT NULL, -- Uno de estos dos campos debe ser único
+    model VARCHAR(200) NOT NULL, -- Uno de estos dos campos debe ser único
+    status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP::TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP::TIMESTAMP,
+    CONSTRAINT fk_brand_equipment FOREIGN KEY (brand_id) REFERENCES brands(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_category_equipment FOREIGN KEY (category_id) REFERENCES categories(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- Create table installations
+CREATE TABLE installations(
+    id SERIAL PRIMARY KEY NOT NULL,
+    brand_id INT NOT NULL,
+    category_id INT NOT NULL,
+    serial VARCHAR(200) NOT NULL, -- Uno de estos dos campos debe ser único
+    model VARCHAR(200) NOT NULL, -- Uno de estos dos campos debe ser único
+    status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP::TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP::TIMESTAMP,
+    CONSTRAINT fk_brand_equipment FOREIGN KEY (brand_id) REFERENCES brands(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_category_equipment FOREIGN KEY (category_id) REFERENCES categories(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
