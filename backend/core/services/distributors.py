@@ -34,7 +34,8 @@ def get_clients_by_distributor_id(distributor_id: int, search: str):
     '''Get clients by distributor id'''
 
     query = [and_(Distributor.id == distributor_id, Client.status == 'ACTIVE')]
-
+    print('SEARCH: ', search)
+    print('DISTRIBUTOR ID: ', distributor_id)
     if search:
         query.append(Client.name.ilike(f'%{search}%'))
 
@@ -47,19 +48,45 @@ def get_clients_by_distributor_id(distributor_id: int, search: str):
 def get_users_by_distributor_id(distributor_id: int, search: str):
     '''Get users by distributor id'''
 
-    query = [and_(Distributor.id == distributor_id, User.status == 'ACTIVE')]
+    query = [Distributor.id == distributor_id, User.status == 'ACTIVE']
+
+    if distributor_id != 1:
+        query.append(User.role != 'ADMIN')
+
+    if search:
+        query.append(User.full_name.ilike(f'%{search}%'))
+
+
+    return db.paginate(db.session.query(User)
+                       .select_from(User)
+                       .join(UserList, UserList.user_id == User.id)
+                       .join(List_, UserList.list_id == List_.id)
+                       .join(DistributorList, List_.id == DistributorList.list_id)
+                       .join(Distributor, DistributorList.distributor_id == Distributor.id)
+                       .filter(*query),
+                       page=1, per_page=15)
+
+
+def get_users_and_existing_by_distributor_id(distributor_id: int, search: str, users_ids: list[int] = []):
+    '''Get users of a distributor for autocomplete. Existing users and new ones'''
+    
+    query = [Distributor.id == distributor_id, User.status == 'ACTIVE']
+
+    if distributor_id != 1:
+        query.append(User.role != 'ADMIN')
 
     if search:
         query.append(User.full_name.ilike(f'%{search}%'))
 
     return db.paginate(db.session.query(User)
                        .select_from(User)
-                       .join(UserList)
-                       .join(List_)
-                       .join(DistributorList)
-                       .join(Distributor)
-                       .filter(*query),
+                       .join(UserList, UserList.user_id == User.id)
+                       .join(List_, UserList.list_id == List_.id)
+                       .join(DistributorList, List_.id == DistributorList.list_id)
+                       .join(Distributor, DistributorList.distributor_id == Distributor.id)
+                       .filter(or_(and_(*query), User.id.in_(users_ids))),
                        page=1, per_page=15)
+
 
 def get_distributor_from_user(user: User) -> Distributor:
     '''Get distributor from user'''

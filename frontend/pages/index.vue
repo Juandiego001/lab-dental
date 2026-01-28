@@ -4,9 +4,7 @@
     <v-img class="w-100" :max-height="$vuetify.display.mdAndUp && 400 || $vuetify.display.sm && 350 || 200" cover
       src="/public/index_banner_img.jpg" style="filter:brightness(40%);" />
     <v-sheet class="bg-transparent position-absolute text-center">
-      <v-img class="mx-auto" :width="$vuetify.display.mdAndUp && 400 ||
-        $vuetify.display.smAndDown && 200
-        " src="/snapon_navbar.svg" />
+      <v-img class="mx-auto" :width="200" src="/soe_navbar.png" />
       <h1 v-html="$t('index.banner')" :class="`text-white my-6
           ${$vuetify.display.mdAndUp && 'text-h4'}
           ${$vuetify.display.smAndUp && 'text-h5'}
@@ -59,7 +57,7 @@
   </v-container>
 
   <!-- Services -->
-  <v-container :class="`bg-primary text-center py-16  mb-8 ${$vuetify.display.mdAndUp && 'rounded-lg'}`">
+  <v-container class="bg-primary text-center py-16 px-0 mb-8" fluid>
     <v-sheet class="bg-white d-inline-block mx-auto text-center mb-12 w-auto rounded-xl pa-4">
       <h2 class="text-primary text-h4 font-weight-bold">{{ $t('services.title') }}</h2>
     </v-sheet>
@@ -93,12 +91,12 @@
   </v-container>
 
   <!-- Manuals -->
-  <v-container class="text-center py-12">
+  <!-- <v-container class="text-center py-12">
     <h2 class="text-primary mb-4 text-h4 font-weight-bold">{{ $t('manuals.title') }}</h2>
-  </v-container>
+  </v-container> -->
 
   <!-- Blog -->
-  <v-container class="text-center py-12">
+  <!-- <v-container class="text-center py-12">
     <h2 class="text-primary mb-6 text-h4 font-weight-bold">{{ $t('index.ourBlog') }}</h2>
 
     <v-row no-gutters class="justify-center">
@@ -109,7 +107,7 @@
         <v-card-text class="text-start">{{ article.description }}</v-card-text>
       </v-card>
     </v-row>
-  </v-container>
+  </v-container> -->
 
 
   <!-- Contact Us -->

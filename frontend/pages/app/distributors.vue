@@ -3,17 +3,19 @@
     <v-card width="100%" flat>
       <v-card-title>{{ $t('distributors.title', 2) }}</v-card-title>
       <v-card-text>
-        <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
-          :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-          @update:itemsPerPage="v => perPage = v" :disable-sort="true">
-          <template v-slot:item.option="{ item }">
-            <div class="d-flex align-center justify-center ga-2">
-              <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getDistributor(item.id)"></v-btn>
-              <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                @click="form.id = item.id; deleteDialog = true"></v-btn>
-            </div>
-          </template>
-        </v-data-table-server>
+        <client-only>
+          <v-data-table :items="items" :headers="headers" :page="page" :items-per-page="perPage" :items-length="total"
+            :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
+            @update:itemsPerPage="v => perPage = v" :disable-sort="true">
+            <template v-slot:item.option="{ item }">
+              <div class="d-flex align-center justify-center ga-2">
+                <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getDistributor(item.id)"></v-btn>
+                <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
+                  @click="form.id = item.id; deleteDialog = true"></v-btn>
+              </div>
+            </template>
+          </v-data-table>
+        </client-only>
       </v-card-text>
     </v-card>
   </v-container>
@@ -100,7 +102,7 @@
         <v-row no-gutters align="center">
           {{ $t('distributors.search.title') }}
           <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="searchDialog = false"></v-btn>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="searchDialog = false"></v-btn>
         </v-row>
       </v-card-title>
       <v-card-text>
@@ -127,7 +129,9 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
-const { show } = useSnackbar();
+
+const { back } = useBack();
+const { notify } = useSnackbar();
 const { $ability } = useNuxtApp();
 const { t } = useI18n();
 
@@ -197,11 +201,12 @@ watch(perPage, async () => {
 })
 
 onBeforeMount(async () => {
-  if (!$ability.can('read', 'distributors')) {
-    navigateTo(history.state?.back || '/login');
+  if ($ability.can('read', 'distributors')) {
+    await getDistributors();
     return;
   }
-  await getDistributors();
+
+  back();
 })
 
 const resetForm = () => {
@@ -223,8 +228,7 @@ const getDistributors = async () => {
     items.value = data.items
     total.value = data.total
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -236,8 +240,7 @@ const getDistributor = async (id) => {
     form.value = user
     updateDialog.value = true
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -249,12 +252,11 @@ const createDistributor = async () => {
       body: form.value
     })
 
-    show(message, 'success');
+    notify(message, 'success');
     await getDistributors()
     createDialog.value = false;
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -265,12 +267,11 @@ const updateDistributor = async () => {
       method: 'PUT',
       body: form.value
     })
-    show(message, 'success');
+    notify(message, 'success');
     await getDistributors()
     updateDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -279,12 +280,11 @@ const deleteDistributor = async () => {
     const { message } = await $api(`/api/distributors/${form.value.id}`, {
       method: 'DELETE'
     })
-    show(message, 'success');
+    notify(message, 'success');
     await getDistributors();
     deleteDialog.value = false;
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -295,8 +295,7 @@ const doSearch = async () => {
     await getDistributors()
     searchDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 

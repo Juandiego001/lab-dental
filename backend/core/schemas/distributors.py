@@ -1,6 +1,6 @@
 from core.models import Distributor
 from apiflask import Schema, fields
-from marshmallow import post_load
+from marshmallow import post_load, validates_schema
 from core.schemas.utils import BaseSchema
 
 
@@ -33,3 +33,16 @@ class DistributorOut(BaseSchema):
 class DistributorsOut(Schema):
     items = fields.List(fields.Nested(DistributorOut))
     total = fields.Integer()
+
+
+class DistributorsExistingIn(BaseSchema):
+    search = fields.String(required=False)
+    distributors_ids = fields.List(fields.Integer(
+    ), required=False, allow_none=True, load_default=[], data_key='distributorsIds')
+
+    @validates_schema
+    def validate_distributors_ids(self, data, **kwargs):
+        if 'distributors_ids' in data and not data['distributors_ids']:
+            data['distributors_ids'] = []
+
+        return data

@@ -65,7 +65,8 @@ def create_group(current_user: User, group_object: Group, users_ids: list):
     '''Create a group'''
 
     # Get distributor_id if current_user not exists
-    group_object.distributor_id = group_object.distributor_id if group_object.distributor_id else get_distributor_from_user(current_user).id
+    if (not group_object.distributor_id):
+        group_object.distributor_id = get_distributor_from_user(current_user).id
 
     # Creation of group
     db.session.add(group_object)

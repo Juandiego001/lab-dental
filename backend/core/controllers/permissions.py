@@ -38,14 +38,13 @@ def get_permissions_by_group_id(group_id: int, query_data):
 
 
 @bp.put('/')
-@bp.input(PermissionIn, arg_name='permission_obj')
+@bp.input(PermissionIn)
 @jwt_required()
-def update_permissions_by_group_id(permission_obj: Permission):
-    '''Update permissions by group_id'''
+def update_permissions(json_data):
+    '''Update permissions'''
 
     try:
-        db.session.merge(permission_obj)
-        db.session.commit()
+        permissions.update_permissions(json_data)
         return {'message': 'Permission updated succesfully'}
     except Exception as ex:
         print(str(ex))

@@ -456,8 +456,8 @@
     },
     "search": {
       "title": "Search installation",
-      "message": "Search installations by installed at, installed date or ID",
-      "fields": "Installed at, installed date or ID"
+      "message": "Search installations by ID or equipment (model, serial or ID)",
+      "fields": "Installation ID or equipment (model, serial or ID)"
     },
     "approval": {
       "title": "Approve installation"

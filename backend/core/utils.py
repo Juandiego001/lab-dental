@@ -95,17 +95,3 @@ def send_mail_by_tls(smtp_server, port, user_email, password_email,
         server.starttls(context=context)
         server.login(user_email, password_email)
         server.sendmail(user_email, to, message.as_string())
-
-
-if __name__ == '__main__':
-    send_mail(
-        'Testing', ['juandiego14012003@gmail.com'], '',
-        {
-            'id': '1',
-            'equipment': 'Videoline 308-RP - EEBS805A',
-            'serial': '123123123',
-            'installed_date': 'August, 3, 2025',
-            'distributor': 'All For Tires',
-            'client': 'Prodynamics'
-        }
-    )

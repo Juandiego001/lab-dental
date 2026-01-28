@@ -6,7 +6,7 @@ from apiflask import APIBlueprint, HTTPError, abort
 from werkzeug.exceptions import HTTPException
 from core.schemas.utils import Message, Pagination
 from flask_jwt_extended import create_access_token, set_access_cookies, jwt_required, get_jwt_identity, current_user
-from core.schemas.users import UserInLogIn, UserInUpdate, UserInCreate, UserOut, UsersOut, ProfileIn, ProfileOut
+from core.schemas.users import UserInLogIn, UserInUpdate, UserInCreate, UserOut, UsersExistingIn, UsersOut, ProfileIn, ProfileOut
 
 
 bp = APIBlueprint('users', __name__)
@@ -126,6 +126,26 @@ def update_users(user_id, json_data):
         return {'message': 'User updated successfully'}
     except Exception as ex:
         print(str(ex))
+        abort(500, str(ex))
+
+
+@bp.post('/admins')
+@bp.input(UsersExistingIn)
+@bp.output(UsersOut)
+@jwt_required()
+def get_admin_users(json_data):
+    '''Get admin users'''
+
+    try:
+        if current_user.role != 'ADMIN':
+            return {'items': [], 'total': 0}
+
+        results = users.get_admin_users(
+            json_data['search'] if 'search' in json_data else '',
+            json_data['users_ids'] if 'users_ids' in json_data else []
+        )
+        return {'items': results, 'total': results.total}
+    except Exception as ex:
         abort(500, str(ex))
 
 

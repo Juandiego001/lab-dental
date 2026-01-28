@@ -1,9 +1,8 @@
-from core.schemas.users import UsersOut
+from core.schemas.users import UsersExistingIn, UsersOut
 from core.services import distributors
 from apiflask import APIBlueprint, abort
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, current_user
 from core.schemas.clients import ClientsOut
-from flask_jwt_extended import current_user
 from core.schemas.utils import Message, Pagination
 from core.schemas.distributors import DistributorInUpdate, DistributorInCreate, DistributorOut, DistributorsOut
 
@@ -65,6 +64,22 @@ def get_users_by_distributor(distributor_id, query_data):
     try:
         return distributors.get_users_by_distributor_id(distributor_id,
                                                         query_data['search'])
+    except Exception as ex:
+        abort(500, str(ex))
+
+
+@bp.post('/<int:distributor_id>/users')
+@bp.input(UsersExistingIn)
+@bp.output(UsersOut)
+@jwt_required()
+def get_users_and_existing_by_distributor(distributor_id, json_data):
+    '''Get users of a distributor for autocomplete. Existing users and new ones'''
+
+    try:
+        return distributors.get_users_and_existing_by_distributor_id(
+            distributor_id,
+            json_data['search'] if 'search' in json_data else '',
+            json_data['users_ids'] if 'users_ids' in json_data else [])
     except Exception as ex:
         abort(500, str(ex))
 

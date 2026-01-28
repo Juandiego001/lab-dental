@@ -19,7 +19,7 @@ def get_user_permissions(user_id: str) -> dict:
             .join(Group, Group.id == Permission.group_id)\
             .join(UserGroup, UserGroup.group_id == Group.id)\
             .join(User, User.id == UserGroup.user_id)\
-            .filter(User.id == user_id, permission_column)
+            .filter(User.id == user_id, Group.status == 'ACTIVE', permission_column)
 
     query_read = get_query_permission('read')
     query_update = get_query_permission('update')

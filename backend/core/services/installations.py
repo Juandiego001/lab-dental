@@ -1,5 +1,6 @@
 import uuid
 from core.app import db, FRONTEND_APP_BASE_URL
+from core.services.distributors import get_distributor_from_user
 from core.utils import send_mail
 from sqlalchemy.orm import aliased
 from sqlalchemy import JSON, or_, and_, func
@@ -11,22 +12,32 @@ from core.schemas.installations import InstallationCreatedNotification, Installa
 from core.models import Client, Distributor, DistributorList, Equipment, Installation, List_, Site, User, UserList
 
 
-def get_installations(search: str, page: int, per_page: int):
+def get_installations(current_user: User, search: str, page: int, per_page: int):
     '''Get installations'''
 
-    query = Installation.status != 'INACTIVE'
+    query = [Installation.status != 'INACTIVE']
     if search:
-        query = and_(Installation.status != 'INACTIVE',
-                     or_(Installation.equipment_id.ilike(f'%{search}%')))
+        search_query = []
+        try:
+            search_query.append(Installation.id == int(search))
+            search_query.append(Installation.equipment_id == int(search))
+        except:
+            search_query.append(Equipment.model.ilike(f'%{search}%'))
+            search_query.append(Equipment.serial.ilike(f'%{search}%'))
+
+        query.append(or_(*search_query))
+    
+    if current_user.role != 'ADMIN':
+        distributor: Distributor = get_distributor_from_user(current_user)
+        query.append(Installation.distributor_id == distributor.id)
 
     total = db.session.query(Installation).count()
-
     return list(db.session.execute(
         db.session.query(
             *Installation.__table__.c,
             func.concat(Equipment.model, ' - ', Equipment.serial).label('equipment_serial_model'))
         .join(Equipment)
-        .filter(query)
+        .filter(*query)
         .order_by(Installation.id.desc())
         .limit(per_page)
         .offset((page - 1) * per_page)
@@ -56,17 +67,12 @@ def get_installation_by_id(installation_id: int):
             func.cast('{"originalName":"' + InstallationFile.original_name + '","path":"' +
                       InstallationFile.path + '"}', JSON))
                   .filter(InstallationFile.file_type == 'SERIAL'), JSONB)[0]
-        .label('installation_serial_file'),
-        func.cast(func.json_agg(
-            func.cast('{"originalName":"' + InstallationFile.original_name + '","path":"' +
-                      InstallationFile.path + '"}', JSON))
-                  .filter(InstallationFile.file_type == 'FORMAT'), JSONB)[0]
-        .label('installation_format_file'),
+        .label('installation_serial_file')
     )\
         .select_from(Installation)\
-        .join(Equipment)\
-        .join(Distributor)\
-        .join(Client)\
+        .join(Equipment, Equipment.id == Installation.equipment_id)\
+        .join(Distributor, Distributor.id == Installation.distributor_id)\
+        .join(Client, Client.id == Installation.client_id)\
         .join(client_site, client_site.id == Installation.site_client_id)\
         .join(distributor_site, distributor_site.id == Installation.site_distributor_id)\
         .join(InstallationFile)\
@@ -102,7 +108,6 @@ def create_installation_file(installation_id: int, installation_file_data: FileS
 def create_installation(data: dict):
     '''Creates an installation'''
 
-    format_picture: FileStorage = data.pop('format_picture')
     serial_picture: FileStorage = data.pop('serial_picture')
     installation_pictures: list[FileStorage] = data.pop(
         'installation_pictures')
@@ -113,7 +118,6 @@ def create_installation(data: dict):
     db.session.add(installation)
     db.session.flush()
 
-    create_installation_file(installation.id, format_picture, 'FORMAT')
     create_installation_file(installation.id, serial_picture, 'SERIAL')
 
     for installation_picture in installation_pictures:
@@ -144,10 +148,6 @@ def notify_creation(installation: Installation = None):
                 'path': installation_data['serial_file']['path'],
                 'filename': installation_data['serial_file']['originalName']
             },
-            {
-                'path': installation_data['format_file']['path'],
-                'filename': installation_data['format_file']['originalName']
-            },
             *[{'path': evidence['path'], 'filename': evidence['originalName']} for evidence in installation_data['evidences_files']]
         ]
         installation_data['app_url'] = f'{FRONTEND_APP_BASE_URL}/app/installations'
@@ -164,17 +164,10 @@ def update_installation(installation_id: int, data: dict):
     if not check_installation_exists(installation_id):
         raise HTTPException('Installation not found')
 
-    format_picture: FileStorage = data.pop(
-        'format_picture') if 'format_picture' in data else None
     serial_picture: FileStorage = data.pop(
         'serial_picture') if 'serial_picture' in data else None
     installation_pictures: list[FileStorage] = data.pop(
         'installation_pictures') if 'installation_pictures' in data else None
-
-    if format_picture:
-        format_picture_data = db.session.query(InstallationFile).filter(
-            InstallationFile.installation_id == installation_id, InstallationFile.file_type == 'FORMAT').first()
-        format_picture.save(format_picture_data.path)
 
     if serial_picture:
         serial_picture_data = db.session.query(InstallationFile).filter(
@@ -249,7 +242,6 @@ def notify_rejection(installation_id: int, reject_comments: str):
         get_installation_by_id(installation_id))
     installation_data['reject_comments'] = reject_comments
     installation_data['app_url'] = f'{FRONTEND_APP_BASE_URL}/app/installations'
-
 
     users_ = db.session.query(User.email).distinct(User.email)\
         .join(UserList)\

@@ -1,6 +1,6 @@
 from core.services import installations
 from apiflask import APIBlueprint, abort
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, current_user
 from core.schemas.utils import Message, Pagination
 from core.schemas.installations import InstallationInUpdate, InstallationInCreate, InstallationOut, InstallationRejectCommentsIn, InstallationsOut
 
@@ -16,9 +16,11 @@ def get_installations(query_data):
     '''Get installations'''
 
     try:
-        results, total = installations.get_installations(query_data['search'],
-                                                  query_data['page'],
-                                                  query_data['per_page'])
+        results, total = installations.get_installations(
+            current_user,
+            query_data['search'],
+            query_data['page'],
+            query_data['per_page'])
         return {'items': results, 'total': total}
     except Exception as ex:
         abort(500, str(ex))
@@ -105,7 +107,8 @@ def reject_installation(installation_id, json_data):
     try:
         print('JSON_DATA: ', json_data)
         installations.reject_installation(installation_id)
-        installations.notify_rejection(installation_id, json_data['reject_comments'])
+        installations.notify_rejection(
+            installation_id, json_data['reject_comments'])
         return {'message': 'Installation rejected successfully'}
     except Exception as ex:
         print(str(ex))

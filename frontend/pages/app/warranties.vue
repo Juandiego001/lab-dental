@@ -3,7 +3,7 @@
     <v-card width="100%" flat>
       <v-card-title>{{ $t('warranties.title', 2) }}</v-card-title>
       <v-card-text>
-        <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
+        <v-data-table :items="items" :headers="headers" :page="page" :items-per-page="perPage"
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
           <template v-slot:item.option="{ item }">
@@ -13,7 +13,7 @@
                 @click="form.id = item.id; deleteDialog = true"></v-btn>
             </div>
           </template>
-        </v-data-table-server>
+        </v-data-table>
       </v-card-text>
     </v-card>
   </v-container>
@@ -32,7 +32,8 @@
         <v-form ref="createForm" v-model="createModel" @submit.prevent="createWarranty">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.invoice" hide-details="auto" :label="$t('warranties.invoice')" :rules="[invoiceRequired]"></v-text-field>
+              <v-text-field v-model="form.invoice" hide-details="auto" :label="$t('warranties.invoice')"
+                :rules="[invoiceRequired]"></v-text-field>
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.problemDescription" hide-details="auto"
@@ -93,7 +94,7 @@
         <v-row no-gutters align="center">
           {{ $t('warranties.delete.title') }}
           <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="deleteDialog = false"></v-btn>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="deleteDialog = false"></v-btn>
         </v-row>
       </v-card-title>
       <v-card-text class="text-center py-6">
@@ -113,7 +114,7 @@
         <v-row no-gutters align="center">
           {{ $t('warranties.search.title') }}
           <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="searchDialog = false"></v-btn>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="searchDialog = false"></v-btn>
         </v-row>
       </v-card-title>
       <v-card-text>
@@ -141,10 +142,11 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
-const { show } = useSnackbar();
+
+const { back } = useBack()
+const { notify } = useSnackbar();
 const { $ability } = useNuxtApp();
 const { t } = useI18n();
-
 
 definePageMeta({
   layout: 'app',
@@ -190,11 +192,11 @@ const headers = computed(() => [
   { title: t('warranties.invoice'), key: 'invoice', align: 'center', sortable: false },
   { title: t('warranties.problemDescription'), key: 'problemDescription', align: 'center', sortable: false },
   { title: t('warranties.solutionDescription'), key: 'solutionDescription', align: 'center', sortable: false },
-  { title: t('options'), key: 'option', align: 'center', align: 'center', sortable: false }
+  { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
 watch(createDialog, async (val) => {
-  if (val) {}
+  if (val) { }
   else {
     createForm.value.reset();
     resetForm();
@@ -202,7 +204,7 @@ watch(createDialog, async (val) => {
 })
 
 watch(updateDialog, async (val) => {
-  if (val) {}
+  if (val) { }
   else {
     updateForm.value.reset();
     resetForm();
@@ -222,11 +224,12 @@ watch(perPage, async () => {
 })
 
 onBeforeMount(async () => {
-  if (!$ability.can('read', 'warranties')) {
-    navigateTo(history.state?.back || '/login');
+  if ($ability.can('read', 'warranties')) {
+    await getWarranties();
     return;
   }
-  await getWarranties();
+
+  back();
 })
 
 const resetForm = () => {
@@ -254,8 +257,7 @@ const getWarranties = async () => {
     items.value = data.items
     total.value = data.total
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -267,8 +269,7 @@ const getWarranty = async (id) => {
     form.value = user
     updateDialog.value = true
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -279,12 +280,11 @@ const createWarranty = async () => {
       method: 'POST',
       body: form.value
     })
-    show(message, 'success');
+    notify(message, 'success');
     await getWarranties()
     createDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -295,12 +295,11 @@ const updateWarranty = async () => {
       method: 'PUT',
       body: form.value
     })
-    show(message, 'success');
+    notify(message, 'success');
     await getWarranties()
     updateDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -309,12 +308,11 @@ const deleteWarranty = async () => {
     const { message } = await $api(`/api/warranties/${form.value.id}`, {
       method: 'DELETE'
     })
-    show(message, 'success');
+    notify(message, 'success');
     await getWarranties()
     deleteDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');;
+    notify(err, 'error');
   }
 }
 
@@ -325,8 +323,7 @@ const doSearch = async () => {
     await getWarranties()
     searchDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 

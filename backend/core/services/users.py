@@ -10,7 +10,8 @@ from core.services.distributors import get_distributor_from_user
 def login(email_or_username: str, password: str):
     '''Login'''
 
-    user = db.session.query(User).filter(or_(User.email == email_or_username, User.username == email_or_username)).first()
+    user = db.session.query(User).filter(
+        or_(User.email == email_or_username, User.username == email_or_username)).first()
     if not user or not checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
         raise HTTPException('Incorrect username or password')
     return user
@@ -19,18 +20,20 @@ def login(email_or_username: str, password: str):
 def get_users(current_user: User, search: str, page: int, per_page: int):
     '''Get users'''
 
-    query = User.status == 'ACTIVE'
+    query = [User.status == 'ACTIVE']
     if search:
-        query = and_(User.status == 'ACTIVE',
-                     or_(User.full_name.ilike(f'%{search}%'),
+        query.append(or_(User.full_name.ilike(f'%{search}%'),
                          User.username.ilike(f'%{search}%'),
                          User.email.ilike(f'%{search}%')))
 
     if current_user.role == 'ADMIN':
-        return db.paginate(db.session.query(User).filter(query).order_by(User.id.desc()),
+        return db.paginate(db.session.query(User).filter(*query).order_by(User.id.desc()),
                            page=page, per_page=per_page, count=True)
+    else:
+        distributor: Distributor = get_distributor_from_user(current_user)
+        query.append(User.role != 'ADMIN')
+        query.append(Distributor.id == distributor.id)
 
-    distributor: Distributor = get_distributor_from_user(current_user)
     return db.paginate(
         db.session.query(User)
         .select_from(User)
@@ -38,9 +41,24 @@ def get_users(current_user: User, search: str, page: int, per_page: int):
         .join(List_)
         .join(DistributorList)
         .join(Distributor)
-        .filter(and_(Distributor.id == distributor.id, query))
+        .filter(*query)
         .order_by(User.id.desc()),
         page=page, per_page=per_page, count=True)
+
+
+def get_admin_users(search: str, users_ids: list[int] = []):
+    '''Get admin users'''
+
+    query = [User.status == 'ACTIVE', User.role == 'ADMIN']
+    if search:
+        query.append(or_(User.full_name.ilike(f'%{search}%'),
+                         User.username.ilike(f'%{search}%'),
+                         User.email.ilike(f'%{search}%')))
+
+    return db.paginate(db.session.query(User)
+                       .filter(or_(and_(*query), User.id.in_(users_ids)))
+                       .order_by(User.id.desc()),
+                       page=1, per_page=15, count=True)
 
 
 def get_user_by_id(user_id: int):

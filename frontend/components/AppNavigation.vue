@@ -1,9 +1,9 @@
 <template>
   <v-navigation-drawer v-model="drawer" class="bg-primary" location="left">
     <v-list-item>
-      <v-list-item-title>
+      <v-list-item-title class="py-3">
         <NuxtLink to="/app" class="text-white text-decoration-none">
-          <v-img width="100" height="30" class="mx-auto" src="/public/snapon_navbar.svg"></v-img>
+          <v-img width="100" height="25" class="mx-auto" src="/public/soe_navbar.png"></v-img>
         </NuxtLink>
       </v-list-item-title>
     </v-list-item>
@@ -31,8 +31,10 @@
     <v-toolbar-title>SOE Latam</v-toolbar-title>
     <v-spacer></v-spacer>
     <template v-if="$vuetify.display.mdAndUp">
-      <v-btn class="me-2" icon="mdi-plus" size="small" variant="text" @click="createDialog = !createDialog"></v-btn>
-      <v-btn class="me-2" icon="mdi-magnify" size="small" variant="text" @click="searchDialog = !searchDialog"></v-btn>
+      <v-btn v-if="$ability.can('create', module)" class="me-2" icon="mdi-plus" size="small" variant="text"
+        @click="createDialog = !createDialog"></v-btn>
+      <v-btn v-if="$ability.can('read', module)" class="me-2" icon="mdi-magnify" size="small" variant="text"
+        @click="searchDialog = !searchDialog"></v-btn>
     </template>
 
     <v-menu>
@@ -41,12 +43,12 @@
       </template>
 
       <v-sheet class="bg-primary py-2" max-width="110" max-height="200">
-        <v-btn variant="text" prepend-icon="mdi-plus" class="text-none text-body-2 w-100"
-          @click="createDialog = !createDialog">
+        <v-btn v-if="$ability.can('create', module)" variant="text" prepend-icon="mdi-plus"
+          class="text-none text-body-2 w-100" @click="createDialog = !createDialog">
           Create
         </v-btn>
-        <v-btn variant="text" prepend-icon="mdi-magnify" class="text-none text-body-2 w-100"
-          @click="searchDialog = !searchDialog">
+        <v-btn v-if="$ability.can('read', module)" variant="text" prepend-icon="mdi-magnify"
+          class="text-none text-body-2 w-100" @click="searchDialog = !searchDialog">
           Search
         </v-btn>
       </v-sheet>
@@ -58,24 +60,18 @@
 import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
+import { ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
+const module = ref('');
 const { $ability } = useNuxtApp();
 const { searchDialog } = toRefs(searchMixin)
 const { createDialog } = toRefs(createMixin)
-
 const routes = ref([])
 const drawer = ref(true);
-const items = ref([
-  {
-    title: 'Create',
-    icon: 'mdi-plus'
-  },
-  {
-    title: 'Search',
-    icon: 'mdi-magnify'
-  }
-])
 const menu = ref([
+
   {
     title: 'Distributors',
     subject: 'distributors',
@@ -126,64 +122,71 @@ const menu = ref([
     path: '/app/equipments',
     icon: 'mdi-car-cog'
   },
-  {
-    title: 'Parts',
-    subject: 'parts',
-    path: '/app/parts',
-    icon: 'mdi-nut'
-  },
+  // {
+  //   title: 'Parts',
+  //   subject: 'parts',
+  //   path: '/app/parts',
+  //   icon: 'mdi-nut'
+  // },
   {
     title: 'Installations',
     subject: 'installations',
     path: '/app/installations',
     icon: 'mdi-train-car-flatbed-car'
   },
-  {
-    title: 'Reasons',
-    subject: 'reasons',
-    path: '/app/reasons',
-    icon: 'mdi-file-cancel'
-  },
-  {
-    title: 'Warranties',
-    subject: 'warranties',
-    path: '/app/warranties',
-    icon: 'mdi-certificate'
-  },
-  {
-    title: 'Manuals',
-    subject: 'manuals',
-    path: '/app/manuals',
-    icon: 'mdi-book-cog'
+  // {
+  //   title: 'Reasons',
+  //   subject: 'reasons',
+  //   path: '/app/reasons',
+  //   icon: 'mdi-file-cancel'
+  // },
+  // {
+  //   title: 'Warranties',
+  //   subject: 'warranties',
+  //   path: '/app/warranties',
+  //   icon: 'mdi-certificate'
+  // },
+  // {
+  //   title: 'Manuals',
+  //   subject: 'manuals',
+  //   path: '/app/manuals',
+  //   icon: 'mdi-book-cog'
 
-  },
+  // },
   {
     title: 'Lists',
     subject: 'lists',
     path: '/app/lists',
     icon: 'mdi-office-building-cog-outline'
   },
-  {
-    title: 'Configuration',
-    subject: 'configuration',
-    path: '/app/configuration',
-    icon: 'mdi-cog'
+  // {
+  //   title: 'Configuration',
+  //   subject: 'configuration',
+  //   path: '/app/configuration',
+  //   icon: 'mdi-cog'
 
-  },
-  {
-    title: 'Forums',
-    subject: 'forums',
-    path: 'http://192.168.0.104:4200',
-    icon: 'mdi-open-in-new'
-  },
-  {
-    title: 'Strapi',
-    subject: 'strapi',
-    path: 'http://localhost:1337',
-    icon: 'mdi-open-in-new'
-  }
+  // },
+  // {
+  //   title: 'Forums',
+  //   subject: 'forums',
+  //   path: 'http://192.168.0.104:4200',
+  //   icon: 'mdi-open-in-new'
+  // },
+  // {
+  //   title: 'Strapi',
+  //   subject: 'strapi',
+  //   path: 'http://localhost:1337',
+  //   icon: 'mdi-open-in-new'
+  // }
 ])
 
+watch(() => route.path, (newPath) => {
+  if (newPath.includes('/app/')) {
+    module.value = newPath.split('/app/')[1];
+  }
+},
+  { immediate: true }
+);
 
 onMounted(() => {
   try {

@@ -98,6 +98,30 @@ def get_site_by_id(site_id: int):
         .first()
 
 
+def create_site(current_user: User, site_model: Site, address_model: Address):
+    '''
+    Create Site
+
+    :param current_user: Description
+    :type current_user: User
+    :param site_model: Description
+    :type site_model: Site
+    '''
+
+    if not site_model.client_id and not (site_model.distributor_id):
+        distributor: Distributor = get_distributor_from_user(current_user)
+        site_model.distributor_id = distributor.id
+
+    # Se crea objeto de dirección
+    db.session.add(address_model)
+    db.session.flush()
+
+    # Se crea objeto de sede
+    site_model.address_id = address_model.id
+    db.session.add(site_model)
+    db.session.commit()
+
+
 def check_site_exists(site_id: int):
     '''Check if site exists'''
 

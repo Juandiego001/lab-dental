@@ -3,18 +3,20 @@
     <v-card width="100%" flat>
       <v-card-title>{{ $t('sites.title', 2) }}</v-card-title>
       <v-card-text>
-        <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
-          :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-          @update:itemsPerPage="v => perPage = v" :disable-sort="true">
-          <template v-slot:item.option="{ item }">
-            <div class="d-flex align-center justify-center ga-2">
-              <v-btn v-if="$ability.can('update', 'sites')" class="my-2 bg-primary" size="small" icon="mdi-pencil"
-                @click="getSite(item.id)"></v-btn>
-              <v-btn v-if="$ability.can('delete', 'sites')" class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                @click="form.id = item.id; deleteDialog = true"></v-btn>
-            </div>
-          </template>
-        </v-data-table-server>
+        <client-only>
+          <v-data-table :items="items" :headers="headers" :page="page" :items-per-page="perPage" :items-length="total"
+            :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
+            @update:itemsPerPage="v => perPage = v" :disable-sort="true">
+            <template v-slot:item.option="{ item }">
+              <div class="d-flex align-center justify-center ga-2">
+                <v-btn v-if="$ability.can('update', 'sites')" class="my-2 bg-primary" size="small" icon="mdi-pencil"
+                  @click="getSite(item.id)"></v-btn>
+                <v-btn v-if="$ability.can('delete', 'sites')" class="my-2 bg-red" size="small" icon="mdi-trash-can"
+                  @click="form.id = item.id; deleteDialog = true"></v-btn>
+              </div>
+            </template>
+          </v-data-table>
+        </client-only>
       </v-card-text>
     </v-card>
   </v-container>
@@ -98,12 +100,10 @@
       <v-card-text>
         <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateSite">
           <v-row>
-            <v-col cols="12">
-              <v-radio-group v-model="form.companyType" :label="$t('sites.create.companyType')" hide-details="auto"
-                inline>
-                <v-radio :label="$t('distributors.title', 2)" value="distributors"></v-radio>
-                <v-radio :label="$t('clients.title', 2)" value="clients"></v-radio>
-              </v-radio-group>
+            <v-col class="pb-0" cols="12">
+              <p class="text-body-2 font-bold text-primary text-decoration-underline">
+                {{ form.companyType === 'distributors' ? 'Distributors Site' : 'Clients Site' }}
+              </p>
             </v-col>
             <template v-if="isAdmin && form.companyType === 'distributors'">
               <v-col cols="12">
@@ -158,7 +158,7 @@
         <v-row no-gutters align="center">
           {{ $t('sites.delete.title') }}
           <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="deleteDialog = false"></v-btn>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="deleteDialog = false"></v-btn>
         </v-row>
       </v-card-title>
       <v-card-text class="text-center py-6">
@@ -177,7 +177,7 @@
         <v-row no-gutters align="center">
           {{ $t('sites.search.title') }}
           <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="searchDialog = false"></v-btn>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="searchDialog = false"></v-btn>
         </v-row>
       </v-card-title>
       <v-card-text>
@@ -204,7 +204,9 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
-const { show } = useSnackbar();
+
+const { back } = useBack()
+const { notify } = useSnackbar();
 const { $ability } = useNuxtApp();
 const { profile } = useProfile();
 const { t } = useI18n();
@@ -241,14 +243,8 @@ const createForm = ref();
 const updateForm = ref();
 const form = ref({
   companyType: 'distributors',
-  distributorId: null,
-  clientId: null,
   distributorName: '',
   clientName: '',
-  cityId: null,
-  cityName: null,
-  stateId: null,
-  stateName: null,
   countryId: '',
   countryName: '',
   addressId: '',
@@ -269,7 +265,7 @@ const headers = computed(() => [
   { title: 'Id', key: 'id', align: 'center', sortable: false },
   { title: t('sites.name'), key: 'name', align: 'center', sortable: false },
   { title: t('sites.distributorClient'), key: 'distributorClient', align: 'center', sortable: false },
-  { title: t('options'), key: 'option', align: 'center', align: 'center', sortable: false }
+  { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
 watch(createDialog, async (val) => {
@@ -291,6 +287,18 @@ watch(updateDialog, async (val) => {
   } else {
     updateForm.value.reset();
     resetForm();
+  }
+})
+
+watch(() => form.value.companyType, (val) => {
+  if (val === 'clients') {
+    delete form.value.distributorName;
+    delete form.value.distributorId;
+  }
+
+  if (val === 'distributors') {
+    delete form.value.clientName;
+    delete form.value.clientId;
   }
 })
 
@@ -335,11 +343,12 @@ watch(perPage, async () => {
 })
 
 onBeforeMount(async () => {
-  if (!$ability.can('read', 'sites')) {
-    navigateTo(history.state?.back || '/login');
+  if ($ability.can('read', 'sites')) {
+    await getSites();
     return;
   }
-  await getSites();
+
+  back();
 })
 
 const resetForm = () => {
@@ -348,12 +357,6 @@ const resetForm = () => {
   cityId.value = ''
   form.value = {
     companyType: 'distributors',
-    distributorId: null,
-    clientId: null,
-    cityId: null,
-    cityName: null,
-    stateId: null,
-    stateName: null,
     countryId: '',
     countryName: '',
     addressId: '',
@@ -375,7 +378,7 @@ const getDistributors = async (search) => {
     distributors.value = data.items
   } catch (err) {
     const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -392,7 +395,7 @@ const getClients = async (search) => {
     clients.value = data.items
   } catch (err) {
     const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -409,7 +412,7 @@ const getCountries = async (search) => {
     countries.value = data.items
   } catch (err) {
     const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -426,8 +429,7 @@ const getStates = async (search) => {
     })
     states.value = data.items
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -444,8 +446,7 @@ const getCities = async (search) => {
     })
     cities.value = data.items
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -462,8 +463,7 @@ const getSites = async () => {
     items.value = data.items
     total.value = data.total
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -475,8 +475,7 @@ const getSite = async (id) => {
     form.value = site
     nextTick(() => updateDialog.value = true);
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -487,12 +486,11 @@ const createSite = async () => {
       method: 'POST',
       body: form.value
     })
-    show(message, 'success');
+    notify(message, 'success');
     await getSites()
     createDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -503,12 +501,11 @@ const updateSite = async () => {
       method: 'PUT',
       body: form.value
     })
-    show(message, 'success');
+    notify(message, 'success');
     await getSites()
     updateDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -517,12 +514,11 @@ const deleteSite = async () => {
     const { message } = await $api(`/api/sites/${form.value.id}`, {
       method: 'DELETE'
     })
-    show(message, 'success');
+    notify(message, 'success');
     await getSites()
     deleteDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -533,8 +529,7 @@ const doSearch = async () => {
     await getSites()
     searchDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 

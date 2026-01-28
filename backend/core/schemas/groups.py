@@ -6,7 +6,7 @@ from core.schemas.utils import BaseSchema
 
 class GroupIn(BaseSchema):
     name = fields.String()
-    distributor_id = fields.Integer(data_key='distributorId')
+    distributor_id = fields.Integer(required=False, data_key='distributorId')
     users_ids = fields.List(fields.Integer, data_key='usersIds')
     status = fields.String(load_default='ACTIVE')
 

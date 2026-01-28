@@ -22,7 +22,8 @@ def get_list_by_id(list_id: int):
 
     return db.session.query(
         *List_.__table__.c,
-        func.array_agg(case((Distributor.status == 'ACTIVE', Distributor.id), else_=None)).label('distributors_ids'),
+        func.array_agg(case((Distributor.status == 'ACTIVE',
+                       Distributor.id), else_=None)).label('distributors_ids'),
         func.array_agg(case((User.status == 'ACTIVE', User.id), else_=None)).label('users_ids'))\
         .select_from(List_)\
         .outerjoin(DistributorList)\
@@ -70,6 +71,32 @@ def check_list_exists(list_id: int):
     return db.session.query(List_).filter(List_.id == list_id).first()
 
 
+def get_users_and_existing(search: str, users_ids: list[int] = []):
+    '''Get users of a list for autocomplete. Existing users and new ones'''
+
+    query = [User.status == 'ACTIVE']
+
+    if search:
+        query.append(User.full_name.ilike(f'%{search}%'))
+
+    return db.paginate(db.session.query(User)
+                       .filter(or_(and_(*query), User.id.in_(users_ids))),
+                       page=1, per_page=15)
+
+
+def get_distributors_and_existing(search: str, distributors_ids: list[int] = []):
+    '''Get distributors of a list for autocomplete. Existing distributors and new ones'''
+
+    query = [Distributor.status == 'ACTIVE']
+
+    if search:
+        query.append(Distributor.name.ilike(f'%{search}%'))
+
+    return db.paginate(db.session.query(Distributor)
+                       .filter(or_(and_(*query), Distributor.id.in_(distributors_ids))),
+                       page=1, per_page=15)
+
+
 def update_list(list_id: int, list_data: dict):
     '''Update list'''
 
@@ -77,7 +104,8 @@ def update_list(list_id: int, list_data: dict):
         raise HTTPException('List not found')
 
     # Delete old distributors ids
-    db.session.execute(delete(DistributorList).where(DistributorList.list_id == list_id))
+    db.session.execute(delete(DistributorList).where(
+        DistributorList.list_id == list_id))
 
     # Delete old users ids
     db.session.execute(delete(UserList).where(UserList.list_id == list_id))

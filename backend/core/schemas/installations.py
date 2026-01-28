@@ -12,7 +12,6 @@ class InstallationIn(BaseSchema):
     site_distributor_id = fields.Integer(data_key='siteDistributorId')
     serial = fields.String(data_key='serial')
     installed_date = fields.String(data_key='installedDate')
-    format_picture = fields.File(data_key='formatPicture')
     serial_picture = fields.File(data_key='serialPicture')
     installation_pictures = fields.List(
         fields.File(), data_key='installationPictures')
@@ -47,7 +46,6 @@ class InstallationOut(BaseSchema):
     serial = fields.String(data_key='serial')
     installed_date = fields.String(data_key='installedDate')
     installation_serial_file = fields.Dict(data_key='installationSerialFile')
-    installation_format_file = fields.Dict(data_key='installationFormatFile')
     installation_evidences_files = fields.List(fields.Dict, data_key='installationEvidencesFiles')
     status = fields.String()
 
@@ -60,7 +58,6 @@ class InstallationCreatedNotification(BaseSchema):
     serial = fields.String()
     installed_date = fields.Function(lambda row: row.installed_date.strftime('%B %d, %Y'))
     installation_serial_file = fields.Dict(data_key='serial_file')
-    installation_format_file = fields.Dict(data_key='format_file')
     installation_evidences_files = fields.List(fields.Dict, data_key='evidences_files')
 
 

@@ -1,5 +1,7 @@
 from flask_jwt_extended import jwt_required
 from core.app import db
+from core.schemas.distributors import DistributorsExistingIn, DistributorsOut
+from core.schemas.users import UsersExistingIn, UsersOut
 from core.services import lists
 from apiflask import APIBlueprint, abort
 from core.schemas.utils import Message, Pagination
@@ -84,6 +86,23 @@ def update_list(list_id, json_data):
         abort(500, str(ex))
 
 
+@bp.post('/distributors')
+@bp.input(DistributorsExistingIn)
+@bp.output(DistributorsOut)
+@jwt_required()
+def get_distributors_for_lists(json_data):
+    '''Get distributors with existing distributors for lists'''
+
+    try:
+        return lists.get_distributors_and_existing(
+            json_data['search'] if 'search' in json_data else '',
+            json_data['distributors_ids'] if 'distributors_ids' in json_data else []
+        )
+    except Exception as ex:
+        print(str(ex))
+        abort(500, str(ex))
+
+
 @bp.delete('/<int:list_id>')
 @bp.output(Message)
 @jwt_required()
@@ -95,4 +114,19 @@ def delete_list(list_id):
         return {'message': 'List deleted successfully'}
     except Exception as ex:
         print(str(ex))
+        abort(500, str(ex))
+
+
+@bp.post('/users')
+@bp.input(UsersExistingIn)
+@bp.output(UsersOut)
+@jwt_required()
+def get_users(json_data):
+    '''Get users of a list for autocomplete. Existing users and new ones'''
+
+    try:
+        return lists.get_users_and_existing(
+            json_data['search'] if 'search' in json_data else '',
+            json_data['users_ids'] if 'users_ids' in json_data else [])
+    except Exception as ex:
         abort(500, str(ex))

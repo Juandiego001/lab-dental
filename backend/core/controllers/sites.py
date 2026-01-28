@@ -24,7 +24,6 @@ def get_sites(query_data):
             query_data['page'],
             query_data['per_page'])
 
-
         return {'items': results, 'total': total}
     except Exception as ex:
         abort(500, str(ex))
@@ -79,18 +78,9 @@ def create_sites(site_and_address):
     '''Create sites'''
 
     try:
-        # Se obtienen dirección y sede
         address: Address = site_and_address[0]
         site: Site = site_and_address[1]
-
-        # Se crea objeto de dirección
-        db.session.add(address)
-        db.session.flush()
-
-        # Se crea objeto de sede
-        site.address_id = address.id
-        db.session.add(site)
-        db.session.commit()
+        sites.create_site(current_user, site, address)
         return {'message': 'Site registered successfully'}
     except Exception as ex:
         print(str(ex))

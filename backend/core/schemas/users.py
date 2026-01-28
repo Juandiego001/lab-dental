@@ -2,8 +2,8 @@ from bcrypt import hashpw, gensalt
 from sqlalchemy import and_, or_
 from core.app import db
 from core.models import User
-from apiflask import Schema, abort, fields
-from marshmallow import post_load, pre_load, validates_schema
+from apiflask import Schema, fields
+from marshmallow import ValidationError, post_load, pre_load, validates_schema
 from core.schemas.utils import BaseSchema
 from werkzeug.exceptions import HTTPException
 
@@ -25,6 +25,19 @@ class UserIn(BaseSchema):
     status = fields.String(load_default='ACTIVE')
 
 
+class UsersExistingIn(BaseSchema):
+    search = fields.String(required=False, allow_none=True, load_default='')
+    users_ids = fields.List(fields.Integer(), required=False,
+                            allow_none=True, load_default=[], data_key='usersIds')
+
+    @validates_schema
+    def validate_users_ids(self, data, **kwargs):
+        if 'users_ids' in data and not data['users_ids']:
+            data['users_ids'] = []
+
+        return data
+
+
 class UserInCreate(UserIn):
     @pre_load
     def check_email_or_username_exists(self, data, **kwargs):
@@ -35,7 +48,8 @@ class UserInCreate(UserIn):
             .first()
 
         if user:
-            abort(400, 'Username or email already exists')
+            raise ValidationError(
+                {'message':  'Username or email already exists'})
 
         return data
 
@@ -86,7 +100,8 @@ class UserInUpdate(UserIn):
                 .first()
 
         if user_exists:
-            abort(400, 'Username or email already exists')
+            raise ValidationError(
+                {'message':  'Username or email already exists'})
 
         return data
 

@@ -3,19 +3,21 @@
     <v-card width="100%" flat>
       <v-card-title>{{ $t('groups.title', 2) }}</v-card-title>
       <v-card-text>
-        <v-data-table-server :items="items" :headers="tableHeaders" :page="page" :items-per-page="perPage"
-          :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-          @update:itemsPerPage="v => perPage = v" :disable-sort="true">
-          <template v-slot:item.option="{ item }">
-            <div class="d-flex align-center justify-center ga-2">
-              <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getGroup(item.id)"></v-btn>
-              <v-btn class="my-2 mx-2 bg-secondary" size="small" icon="mdi-shield-edit"
-                @click="form.id = item.id; getPermissions()"></v-btn>
-              <v-btn v-if="item.id !== 1" class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                @click="form.id = item.id; deleteDialog = true"></v-btn>
-            </div>
-          </template>
-        </v-data-table-server>
+        <client-only>
+          <v-data-table :items="items" :headers="tableHeaders" :page="page" :items-per-page="perPage"
+            :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
+            @update:itemsPerPage="v => perPage = v" :disable-sort="true">
+            <template v-slot:item.option="{ item }">
+              <div class="d-flex align-center justify-center ga-2">
+                <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getGroup(item.id)"></v-btn>
+                <v-btn class="my-2 mx-2 bg-secondary" size="small" icon="mdi-shield-edit"
+                  @click="form = item; getPermissions()"></v-btn>
+                <v-btn v-if="item.id !== 1" class="my-2 bg-red" size="small" icon="mdi-trash-can"
+                  @click="form.id = item.id; deleteDialog = true"></v-btn>
+              </div>
+            </template>
+          </v-data-table>
+        </client-only>
       </v-card-text>
     </v-card>
   </v-container>
@@ -153,7 +155,7 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-data-table-server :items="itemsPermissions" :headers="headersPermissions" :page="pagePermissions"
+        <v-data-table :items="itemsPermissions" :headers="headersPermissions" :page="pagePermissions"
           :items-per-page="perPagePermissions" :items-length="totalPermissions"
           :items-per-page-options="itemsPerPageOptions" @update:page="v => pagePermissions = v"
           @update:itemsPerPage="v => perPagePermissions = v" :disable-sort="true" density="compact">
@@ -180,7 +182,7 @@
               density="compact" @update:modelValue="v => updatePermissions(v, item, 'delete')"
               :disabled="disablePermission(item, 'delete')" />
           </template>
-        </v-data-table-server>
+        </v-data-table>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -192,7 +194,9 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
-const { show } = useSnackbar();
+
+const { back } = useBack()
+const { notify } = useSnackbar();
 const { $ability } = useNuxtApp();
 const { profile } = useProfile();
 const { t } = useI18n();
@@ -209,6 +213,7 @@ useHead({
 const { searchDialog } = toRefs(searchMixin)
 const { createDialog } = toRefs(createMixin)
 const users = ref([]);
+const selectedUsers = ref([]);
 const distributors = ref([]);
 
 /* Groups */
@@ -233,9 +238,8 @@ const updateForm = ref();
 const permissionsDialog = ref(false);
 const form = ref({
   name: '',
-  distributorId: '',
   distributorName: '',
-  usersIds: null
+  usersIds: []
 })
 
 const isAdmin = computed(() => profile.value.role === 'ADMIN');
@@ -258,7 +262,7 @@ const tableHeaders = computed(() => {
   }
 
   return [
-    { title: 'Id', key: 'id', align: 'center', align: 'center', sortable: false },
+    { title: 'Id', key: 'id', align: 'center', sortable: false },
     { title: t('groups.name'), key: 'name', align: 'center', sortable: false },
     { title: t('options'), key: 'option', align: 'center', sortable: false }
   ]
@@ -274,7 +278,7 @@ const headersPermissions = computed(() => [
 
 watch(createDialog, async (val) => {
   if (val) {
-    if (isAdmin) {
+    if (isAdmin.value) {
       await getDistributors();
     } else {
       await getUsers();
@@ -295,13 +299,22 @@ watch(updateDialog, async (val) => {
   }
 })
 
-watch(() => form.value.distributorId, async (val) => {
-  if (val) await getUsers();
+watch(() => form.value.distributorId, async (val, prev) => {
+  if (!val || (prev && prev !== form.value.distributorId)) {
+    delete form.value.usersIds;
+  }
+
+  await getUsers();
 })
 
 watch(deleteDialog, async (val) => {
   if (!val) resetForm();
 })
+
+watch(permissionsDialog, (val) => {
+  if (!val) resetForm();
+})
+
 
 watch(page, async () => {
   await getGroups();
@@ -310,6 +323,7 @@ watch(page, async () => {
 watch(perPage, async () => {
   await getGroups();
 })
+
 
 watch(pagePermissions, async () => {
   await getPermissions();
@@ -320,11 +334,12 @@ watch(perPagePermissions, async () => {
 })
 
 onBeforeMount(async () => {
-  if (!$ability.can('read', 'groups')) {
-    navigateTo(history.state?.back || '/login');
+  if ($ability.can('read', 'groups')) {
+    await getGroups();
     return;
   }
-  await getGroups();
+
+  back();
 })
 
 const resetForm = () => {
@@ -349,8 +364,7 @@ const getGroups = async () => {
     items.value = data.items
     total.value = data.total
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -362,8 +376,7 @@ const getGroup = async (id) => {
     form.value = data
     updateDialog.value = true
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -374,12 +387,11 @@ const createGroup = async () => {
       method: 'POST',
       body: form.value
     })
-    show(message, 'success');
+    notify(message, 'success');
     await getGroups()
     createDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -390,12 +402,11 @@ const updateGroup = async () => {
       method: 'PUT',
       body: form.value
     })
-    show(message, 'success');
+    notify(message, 'success');
     await getGroups()
     updateDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -404,12 +415,11 @@ const deleteGroup = async () => {
     const { message } = await $api(`/api/groups/${form.value.id}`, {
       method: 'DELETE'
     })
-    show(message, 'success');
+    notify(message, 'success');
     await getGroups()
     deleteDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -420,8 +430,7 @@ const doSearch = async () => {
     await getGroups()
     searchDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -438,23 +447,22 @@ const getDistributors = async (search) => {
     })
     distributors.value = data.items
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
 const getUsers = async (search) => {
   try {
     if (!createDialog.value && !updateDialog.value) return;
+
     let data;
     if (form.value.distributorId) {
       data = await $api(`/api/distributors/${form.value.distributorId}/users`, {
-        query: {
+        body: {
           search,
-          page: 1,
-          perPage: 15
+          usersIds: form.value.usersIds
         },
-        method: 'GET'
+        method: 'POST'
       })
     } else {
       data = await $api(`/api/users`, {
@@ -468,8 +476,7 @@ const getUsers = async (search) => {
     }
     users.value = data.items
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -487,8 +494,7 @@ const getPermissions = async (search) => {
     itemsPermissions.value = data.items
     totalPermissions.value = data.total
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -499,18 +505,32 @@ const updatePermissions = async (v, item, action) => {
       method: 'PUT',
       body: item
     })
-    show(message, 'success');
+    notify(message, 'success');
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
+const modulesOnlyRead = ['brands', 'categories', 'equipments'];
+const modulesBan = ['distributors', 'lists'];
+
 const disablePermission = (permission, action) => {
   if (form.value.id == 1) return true;
+
   if (!isAdmin.value &&
-    ['equipments', 'forums', 'manuals', 'parts'].includes(permission.moduleName) &&
+    ['equipments', 'brands', 'categories'].includes(permission.moduleName) &&
     ['create', 'update', 'delete'].includes(action)) return true;
+
+  if (form.value.distributorId !== 1 &&
+    modulesOnlyRead.includes(permission.moduleName) &&
+    ['create', 'update', 'delete'].includes(action)
+  ) return true;
+
+  if (form.value.distributorId !== 1 &&
+    modulesBan.includes(permission.moduleName) &&
+    ['read', 'create', 'update', 'delete'].includes(action)
+  ) return true;
+
   return false;
 }
 

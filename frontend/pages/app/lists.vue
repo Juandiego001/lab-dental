@@ -3,20 +3,22 @@
     <v-card width="100%" flat>
       <v-card-title>{{ $t('lists.title', 2) }}</v-card-title>
       <v-card-text>
-        <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
-          :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-          @update:itemsPerPage="v => perPage = v" :disable-sort="true">
-          <template v-slot:item.isMain="{ item }">
-            <v-icon v-if="item.isMain" icon="mdi-check-bold" color="success"></v-icon>
-          </template>
-          <template v-slot:item.option="{ item }">
-            <div class="d-flex justify-center align-center ga-2">
-              <v-btn class="my-2 bg-primary" size="x-small" icon="mdi-pencil" @click="getList(item.id)"></v-btn>
-              <v-btn v-if="!item.isMain" class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                @click="form.id = item.id; deleteDialog = true"></v-btn>
-            </div>
-          </template>
-        </v-data-table-server>
+        <client-only>
+          <v-data-table :items="items" :headers="headers" :page="page" :items-per-page="perPage" :items-length="total"
+            :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
+            @update:itemsPerPage="v => perPage = v" :disable-sort="true">
+            <template v-slot:item.isMain="{ item }">
+              <v-icon v-if="item.isMain" icon="mdi-check-bold" color="success"></v-icon>
+            </template>
+            <template v-slot:item.option="{ item }">
+              <div class="d-flex justify-center align-center ga-2">
+                <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getList(item.id)"></v-btn>
+                <v-btn v-if="!item.isMain" class="my-2 bg-red" size="small" icon="mdi-trash-can"
+                  @click="form.id = item.id; deleteDialog = true"></v-btn>
+              </div>
+            </template>
+          </v-data-table>
+        </client-only>
       </v-card-text>
     </v-card>
   </v-container>
@@ -73,13 +75,13 @@
         <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateList">
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('lists.name')"
-                :rules="[nameRequired]" :readonly="form.isMain"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('lists.name')" :rules="[nameRequired]"
+                :readonly="form.isMain"></v-text-field>
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.distributorsIds" :label="$t('lists.distributors')" :items="distributors"
-                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" :clearable="!form.isMain"
-                multiple chips :rules="[distributorsRequired]" :readonly="form.isMain" />
+                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors"
+                :clearable="!form.isMain" multiple chips :rules="[distributorsRequired]" :readonly="form.isMain" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.usersIds" :label="$t('lists.users')" :items="users" item-title="fullName"
@@ -149,7 +151,9 @@ import { ref, computed, watch, onBeforeMount, useTemplateRef, toRefs } from 'vue
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
-const { show } = useSnackbar();
+
+const { back } = useBack()
+const { notify } = useSnackbar();
 const { $ability } = useNuxtApp();
 const { t } = useI18n();
 
@@ -231,11 +235,12 @@ watch(perPage, async () => {
 })
 
 onBeforeMount(async () => {
-  if (!$ability.can('read', 'lists')) {
-    navigateTo(history.state?.back || '/login');
+  if ($ability.can('read', 'lists')) {
+    await getLists();
     return;
   }
-  await getLists();
+
+  back();
 })
 
 const resetForm = () => {
@@ -249,35 +254,48 @@ const resetForm = () => {
 
 const getDistributors = async (search) => {
   try {
-    const data = await $api('/api/distributors/', {
-      query: {
+    if (!createDialog.value && !updateDialog.value) return;
+    const data = await $api('/api/lists/distributors', {
+      body: {
         search,
-        page: 1,
-        perPage: 15
+        distributorsIds: form.value.distributorsIds
       },
-      method: 'GET'
+      method: 'POST'
     })
     distributors.value = data.items
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
 const getUsers = async (search) => {
   try {
-    const data = await $api('/api/users/', {
-      query: {
-        search,
-        page: 1,
-        perPage: 15
-      },
-      method: 'GET'
-    })
+    if (!createDialog.value && !updateDialog.value) return;
+
+    let data;
+    if (createDialog.value || (updateDialog.value && !form.value.isMain)) {
+      data = await $api('/api/users/admins', {
+        body: {
+          search,
+          usersIds: form.value.usersIds
+        },
+        method: 'POST'
+      })
+    }
+
+    if (updateDialog.value && form.value.isMain) {
+      data = await $api('/api/lists/users', {
+        body: {
+          search,
+          usersIds: form.value.usersIds
+        },
+        method: 'POST'
+      })
+    }
+
     users.value = data.items
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -294,8 +312,7 @@ const getLists = async () => {
     items.value = data.items
     total.value = data.total
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -307,8 +324,7 @@ const getList = async (id) => {
     form.value = data
     updateDialog.value = true
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -319,12 +335,11 @@ const createList = async () => {
       method: 'POST',
       body: form.value
     })
-    show(message, 'success');
+    notify(message, 'success');
     await getLists()
     createDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -335,12 +350,11 @@ const updateList = async () => {
       method: 'PUT',
       body: form.value
     })
-    show(message, 'success');
+    notify(message, 'success');
     await getLists()
     updateDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -349,12 +363,11 @@ const deleteList = async () => {
     const { message } = await $api(`/api/lists/${form.value.id}`, {
       method: 'DELETE'
     })
-    show(message, 'success');
+    notify(message, 'success');
     await getLists()
     deleteDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');;
+    notify(err, 'error');
   }
 }
 
@@ -365,8 +378,7 @@ const doSearch = async () => {
     await getLists()
     searchDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 

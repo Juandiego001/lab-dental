@@ -3,7 +3,7 @@
     <v-row no-gutters justify="space-between" :class="`py-4 ${$vuetify.display.mdAndUp && 'px-4'}`">
       <v-col :class="`d-flex align-center ${$vuetify.display.smAndDown && 'justify-center'}`">
         <NuxtLink class="text-white text-decoration-none" :to="$localePath('/')">
-          <v-img width="200" height="30" src="/public/snapon_navbar.svg"></v-img>
+          <v-img width="200" height="25" src="/public/soe_navbar.png"></v-img>
         </NuxtLink>
       </v-col>
 
@@ -17,12 +17,12 @@
         <NuxtLink class="text-white text-decoration-none text-caption" :to="$localePath('/about')">
           {{ $t('menu.about') }}
         </NuxtLink>
-        <NuxtLink class="text-white text-decoration-none text-caption" :to="$localePath('/blog')">
+        <!-- <NuxtLink class="text-white text-decoration-none text-caption" :to="$localePath('/blog')">
           {{ $t('menu.blog') }}
         </NuxtLink>
         <NuxtLink class="text-white text-decoration-none text-caption" :to="$localePath('/forum')">
           {{ $t('menu.forum') }}
-        </NuxtLink>
+        </NuxtLink> -->
         <NuxtLink class="text-white text-decoration-none text-caption" :to="$localePath('/login')">
           {{ $t('menu.logIn') }}
         </NuxtLink>
@@ -66,7 +66,7 @@
     <div :class="`py-4 border-surface-light border-t-md d-flex ${$vuetify.display.mdAndUp ? 'flex-row align-center justify-space-between px-4' : 'flex-column ga-1'}`">
       <p
         :class="`text-center text-subtitle-2 d-flex justify-center items-center ${$vuetify.display.mdAndUp ? 'ga-2' : 'flex-column ga-1 text-caption'}`">
-        <span>© Snapon SOE Latam 2025.</span>
+        <span>© SOE Latam 2026.</span>
         <span>{{ $t('menu.rights') }}</span>
       </p>
       <div class="d-flex justify-center align-center">

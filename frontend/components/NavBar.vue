@@ -27,7 +27,7 @@
     <v-row class="ma-0 py-2 justify-center align-center no-gutters">
       <div>
         <NuxtLink class="text-decoration-none text-white text-h5" to="/">
-          <v-img width="200" height="30" src="/public/snapon_navbar.svg"></v-img>
+          <v-img width="200" height="25" src="/public/soe_navbar.png"></v-img>
         </NuxtLink>
       </div>
 
@@ -39,8 +39,8 @@
           <v-btn class="text-none me-2" :to="$localePath('/services')" variant="text">{{ $t('services.title') }}</v-btn>
           <v-btn class="text-none me-2" :to="$localePath('/roi')" variant="text">{{ $t('menu.roi') }}</v-btn>
           <v-btn class="text-none me-2" :to="$localePath('/about')" variant="text">{{ $t('menu.about') }}</v-btn>
-          <v-btn class="text-none me-2" :to="$localePath('/blog')" variant="text">{{ $t('menu.blog') }}</v-btn>
-          <v-btn class="text-none me-2" :to="$localePath('/forum')" variant="text">{{ $t('menu.forum') }}</v-btn>
+          <!-- <v-btn class="text-none me-2" :to="$localePath('/blog')" variant="text">{{ $t('menu.blog') }}</v-btn>
+          <v-btn class="text-none me-2" :to="$localePath('/forum')" variant="text">{{ $t('menu.forum') }}</v-btn> -->
           <v-btn class="text-none font-weight-bold me-2" variant="text" :to="$localePath('/login')">
             {{ $t('menu.logIn') }}
           </v-btn>
@@ -74,12 +74,8 @@
 </template>
 
 <script setup>
-import { computed, onBeforeMount } from 'vue'
-
 const { locale, locales, setLocale, t } = useI18n();
-
 const drawer = ref(false);
-
 const routes = ref([
   {
     title: t('services.title'),
@@ -96,16 +92,16 @@ const routes = ref([
     path: '/about',
     icon: 'mdi-domain'
   },
-  {
-    title: t('blog.title'),
-    path: '/blog',
-    icon: 'mdi-file-document-multiple'
-  },
-  {
-    title: t('forum.title'),
-    path: '/forum',
-    icon: 'mdi-forum'
-  },
+  // {
+  //   title: t('blog.title'),
+  //   path: '/blog',
+  //   icon: 'mdi-file-document-multiple'
+  // },
+  // {
+  //   title: t('forum.title'),
+  //   path: '/forum',
+  //   icon: 'mdi-forum'
+  // },
   {
     title: t('contact.title'),
     path: '/contact',
@@ -117,5 +113,7 @@ const routes = ref([
     icon: 'mdi-login'
   }
 ])
+
+
 
 </script>

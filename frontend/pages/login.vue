@@ -14,7 +14,12 @@
 
           <v-col cols="12 pb-0">
             <v-text-field class="text-white" v-model="password" :label="$t('login.password')" hide-details="auto"
-              variant="outlined" type="password" autocomplete="off"></v-text-field>
+              variant="outlined" :type="isVisible ? 'text' : 'password'" autocomplete="off">
+              <template #append-inner>
+                <v-btn :icon="isVisible ? 'mdi-eye-off' : 'mdi-eye'" variant="text" size="small"
+                  @click="isVisible = !isVisible" />
+              </template>
+            </v-text-field>
           </v-col>
 
           <v-col cols="12" class="text-end">
@@ -47,6 +52,7 @@ const { notify } = useSnackbar();
 const { $ability } = useNuxtApp();
 const email = ref('')
 const password = ref('')
+const isVisible = ref(false)
 
 const logIn = async () => {
   try {

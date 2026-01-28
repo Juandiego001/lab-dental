@@ -11,12 +11,6 @@ class PermissionIn(BaseSchema):
   update = fields.Boolean()
   delete = fields.Boolean()
 
-  @post_load
-  def make_object(self, data, **kwargs):
-    '''Make object permission'''
-
-    return Permission(**data)
-
 
 class PermissionGroupOut(BaseSchema):
   id = fields.Integer()

@@ -3,17 +3,19 @@
     <v-card width="100%" flat>
       <v-card-title>{{ $t('equipments.title', 2) }}</v-card-title>
       <v-card-text>
-        <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
-          :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-          @update:itemsPerPage="v => perPage = v" :disable-sort="true">
-          <template v-slot:item.option="{ item }">
-            <div class="d-flex align-center justify-center ga-2">
-              <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getEquipment(item.id)"></v-btn>
-              <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                @click="form.id = item.id; deleteDialog = true"></v-btn>
-            </div>
-          </template>
-        </v-data-table-server>
+        <client-only>
+          <v-data-table :items="items" :headers="headers" :page="page" :items-per-page="perPage" :items-length="total"
+            :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
+            @update:itemsPerPage="v => perPage = v" :disable-sort="true">
+            <template v-slot:item.option="{ item }">
+              <div class="d-flex align-center justify-center ga-2">
+                <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getEquipment(item.id)"></v-btn>
+                <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
+                  @click="form.id = item.id; deleteDialog = true"></v-btn>
+              </div>
+            </template>
+          </v-data-table>
+        </client-only>
       </v-card-text>
     </v-card>
   </v-container>
@@ -127,7 +129,7 @@
         <v-row no-gutters align="center">
           {{ $t('equipments.search.title') }}
           <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="searchDialog = false"></v-btn>
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="searchDialog = false"></v-btn>
         </v-row>
       </v-card-title>
       <v-card-text>
@@ -154,7 +156,9 @@ import { toRefs } from 'vue'
 import { searchMixin } from '~/mixins/searchMixin'
 import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
-const { show } = useSnackbar();
+
+const { back } = useBack()
+const { notify } = useSnackbar();
 const { $ability } = useNuxtApp();
 const { t } = useI18n();
 
@@ -247,11 +251,12 @@ watch(perPage, async () => {
 })
 
 onBeforeMount(async () => {
-  if (!$ability.can('read', 'equipments')) {
-    navigateTo(history.state?.back || '/login');
+  if ($ability.can('read', 'equipments')) {
+    await getEquipments();
     return;
   }
-  await getEquipments();
+
+  back();
 })
 
 const resetForm = () => {
@@ -278,8 +283,7 @@ const getBrands = async (search) => {
     })
     brands.value = data.items
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');;
+    notify(err, 'error');
   }
 }
 
@@ -296,8 +300,7 @@ const getCategories = async (search) => {
     })
     categories.value = data.items
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');;
+    notify(err, 'error');
   }
 }
 
@@ -314,8 +317,7 @@ const getEquipments = async () => {
     items.value = data.items
     total.value = data.total
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -327,8 +329,7 @@ const getEquipment = async (id) => {
     form.value = data
     updateDialog.value = true
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -339,12 +340,11 @@ const createEquipment = async () => {
       method: 'POST',
       body: form.value
     })
-    show(message, 'success');
+    notify(message, 'success');
     await getEquipments()
     createDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -355,12 +355,11 @@ const updateEquipment = async () => {
       method: 'PUT',
       body: form.value
     })
-    show(message, 'success');
+    notify(message, 'success');
     await getEquipments()
     updateDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 
@@ -369,12 +368,11 @@ const deleteEquipment = async () => {
     const { message } = await $api(`/api/equipments/${form.value.id}`, {
       method: 'DELETE'
     })
-    show(message, 'success');
+    notify(message, 'success');
     await getEquipments()
     deleteDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');;
+    notify(err, 'error');
   }
 }
 
@@ -385,8 +383,7 @@ const doSearch = async () => {
     await getEquipments()
     searchDialog.value = false
   } catch (err) {
-    const errorMessage = err.data?.message || err;
-    show(errorMessage, 'error');
+    notify(err, 'error');
   }
 }
 

@@ -2,7 +2,7 @@ from apiflask import fields
 from core.models import Address, Site
 from core.schemas.utils import BaseSchema
 from werkzeug.exceptions import HTTPException
-from marshmallow import post_load, validates_schema
+from marshmallow import ValidationError, post_load, validates_schema
 
 
 class SiteIn(BaseSchema):
@@ -25,8 +25,13 @@ class SiteInCreate(SiteIn):
     def distributor_id_or_client_id(self, data: dict, **kwargs):
         '''There must be either a distributor id or a client id'''
 
-        if ('distributor_id' in data and not data['distributor_id']) and ('client_id' in data and not data['client_id']):
-            raise HTTPException('Distributor ID or Client ID required')
+        if 'distributor_id' in data and not data['distributor_id']:
+            raise ValidationError(
+                {'message':  'Distributor ID required'})
+
+        if 'client_id' in data and not data['client_id']:
+            raise ValidationError(
+                {'message':  'Client ID required'})
 
         if 'distributor_id' in data and not data['distributor_id']:
             data.pop('distributor_id')

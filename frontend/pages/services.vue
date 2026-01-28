@@ -1,12 +1,16 @@
 <template>
-  <v-container min-height="100%" class="justify-center text-center" fluid>
-    <v-row class="my-8 justify-center">
+  <v-container min-height="100%" class="justify-center pa-0 text-center" fluid>
+    <v-img width="100%" height="100%" cover class="position-absolute" src="/public/attractive-brave-woman-is-posing-photographer-auto-workshop-with-part-car.jpg"></v-img>
+    <v-row class="my-8 px-16 justify-center">
       <v-col class="my-4" cols="12">
-        <p class="text-h4 bg-primary font-weight-bold text-white pa-4 d-inline-block text-center rounded-xl">{{ $t('services.title') }}</p>
+        <p
+          class="text-h4 bg-primary font-weight-bold text-white pa-4 d-inline-block text-center rounded-xl position-relative">
+          {{ $t('services.title') }}
+        </p>
       </v-col>
 
       <v-col class="d-flex justify-center align-center" md="4" cols="12">
-        <v-card class="bg-primary">
+        <v-card class="bg-primary" style="backdrop-filter: blur(12px);">
           <v-card-title>
             <v-icon class="text-h2" size="x-large">mdi-train-car-flatbed-car</v-icon>
             <p class="text-h5">{{ $t('services.installations.title') }}</p>
