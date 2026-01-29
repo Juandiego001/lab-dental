@@ -56,7 +56,8 @@
     "areaPremises": "Superficie de los locales m²",
     "workSiteArea": "Superficie de la obra m²",
     "equipmentLeaseMonth": "Arrendamiento de equipos/financiero al mes",
-    "equipmentPrice": "Precio del equipo"
+    "equipmentPrice": "Precio del equipo",
+    "prediction": "Predicción"
   },
   "aboutUs": {
     "title": "Acerca de nosotros",

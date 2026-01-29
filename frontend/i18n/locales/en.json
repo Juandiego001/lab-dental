@@ -56,7 +56,8 @@
     "areaPremises": "Area of the premises m²",
     "workSiteArea": "Work site area m²",
     "equipmentLeaseMonth": "Equipment lease/financial per month",
-    "equipmentPrice": "Equipment price"
+    "equipmentPrice": "Equipment price",
+    "prediction": "Prediction"
   },
   "aboutUs": {
     "title": "About Us",

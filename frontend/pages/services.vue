@@ -1,6 +1,6 @@
 <template>
   <v-container min-height="100%" class="justify-center pa-0 text-center" fluid>
-    <v-img width="100%" height="100%" cover class="position-absolute" src="/public/attractive-brave-woman-is-posing-photographer-auto-workshop-with-part-car.jpg"></v-img>
+    <v-img width="100%" height="100%" cover class="position-absolute" src="/public/services.webp"></v-img>
     <v-row class="my-8 px-16 justify-center">
       <v-col class="my-4" cols="12">
         <p
