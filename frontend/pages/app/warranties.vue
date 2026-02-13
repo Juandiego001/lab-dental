@@ -3,14 +3,14 @@
     <v-card width="100%" flat>
       <v-card-title>{{ $t('warranties.title', 2) }}</v-card-title>
       <v-card-text>
-        <v-data-table :items="items" :headers="headers" :page="page" :items-per-page="perPage"
-          :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
+        <v-data-table :items="items" :headers="headers" :page="page" :items-per-page="perPage" :items-length="total"
+          :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
           <template v-slot:item.option="{ item }">
             <div class="d-flex align-center justify-center ga-2">
-              <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getWarranty(item.id)"></v-btn>
+              <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getWarranty(item.id)" />
               <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                @click="form.id = item.id; deleteDialog = true"></v-btn>
+                @click="form.id = item.id; deleteDialog = true" />
             </div>
           </template>
         </v-data-table>
@@ -24,13 +24,13 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('warranties.create.title') }}
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="createDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="createDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text>
         <v-form ref="createForm" v-model="createModel" @submit.prevent="createWarranty">
-          <v-row>
+          <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="form.invoice" hide-details="auto" :label="$t('warranties.invoice')"
                 :rules="[invoiceRequired]"></v-text-field>
@@ -60,13 +60,13 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('warranties.update.title') }}
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="updateDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="updateDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text>
         <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateWarranty">
-          <v-row>
+          <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="form.invoice" hide-details="auto" label="Full name"></v-text-field>
             </v-col>
@@ -93,15 +93,15 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('warranties.delete.title') }}
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="deleteDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="deleteDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text class="text-center py-6">
         <p class="text-subtitle-1 mb-6 text-center">{{ $t('warranties.delete.message') }}</p>
 
         <v-btn @click="deleteDialog = false" variant="outlined">{{ $t('cancel') }}</v-btn>
-        <span class="mx-2"></span>
+        <span class="mx-2" />
         <v-btn @click="deleteWarranty" class="bg-red">{{ $t('confirm') }}</v-btn>
       </v-card-text>
     </v-card>
@@ -113,20 +113,19 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('warranties.search.title') }}
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="searchDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="searchDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text>
-        <p class="text-subtitle-2 pb-2">{{ $t('warranties.search.message') }}</p>
         <v-form @submit.prevent="doSearch">
-          <v-row no-gutters="">
+          <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="search" :label="$t('warranties.search.fields')" hide-details="auto"
                 prepend-inner-icon="mdi-magnify" clearable></v-text-field>
             </v-col>
 
-            <v-col class="text-end mt-4" cols="12">
+            <v-col class="text-end" cols="12">
               <v-btn class="bg-primary" type="submit">{{ $t('search') }}</v-btn>
             </v-col>
           </v-row>
@@ -138,9 +137,6 @@
 
 <script setup>
 import { ref, computed, watch, onBeforeMount, } from 'vue'
-import { toRefs } from 'vue'
-import { searchMixin } from '~/mixins/searchMixin'
-import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
 
 const { back } = useBack()
@@ -157,8 +153,8 @@ useHead({
   title: `SOE Latam | ${t('warranties.title', 2)}`
 })
 
-const { searchDialog } = toRefs(searchMixin)
-const { createDialog } = toRefs(createMixin)
+const searchDialog = ref(false);
+const createDialog = ref(false);
 const items = ref([]);
 const search = ref('');
 const page = ref(1);
@@ -188,7 +184,6 @@ const itemsPerPageOptions = computed(() => [
 ])
 
 const headers = computed(() => [
-  { title: 'Id', key: 'id', align: 'center', sortable: false },
   { title: t('warranties.invoice'), key: 'invoice', align: 'center', sortable: false },
   { title: t('warranties.problemDescription'), key: 'problemDescription', align: 'center', sortable: false },
   { title: t('warranties.solutionDescription'), key: 'solutionDescription', align: 'center', sortable: false },

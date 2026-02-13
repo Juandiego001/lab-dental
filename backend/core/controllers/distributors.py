@@ -1,29 +1,29 @@
-from core.schemas.users import UsersExistingIn, UsersOut
 from core.services import distributors
 from apiflask import APIBlueprint, abort
 from flask_jwt_extended import jwt_required, current_user
 from core.schemas.clients import ClientsOut
 from core.schemas.utils import Message, Pagination
-from core.schemas.distributors import DistributorInUpdate, DistributorInCreate, DistributorOut, DistributorsOut
+from core.schemas.distributors import DistributorInUpdate, DistributorInCreate, DistributorOut, DistributorSearch, DistributorsOut
 
 
 bp = APIBlueprint('distributors', __name__)
 
 
-@bp.get('/')
-@bp.input(Pagination, location='query')
+@bp.post('/search')
+@bp.input(DistributorSearch)
 @bp.output(DistributorsOut)
 @jwt_required()
-def get_distributors(query_data):
-    '''Get distributors'''
+def search_distributors(json_data):
+    '''Search distributors'''
 
     try:
-        results = distributors.get_distributors(
-            current_user,
-            query_data['search'],
-            query_data['page'],
-            query_data['per_page'])
-        return {'items': results, 'total': results.total}
+        results, total = distributors.search_distributors(
+            current_user=current_user,
+            distributors_ids=json_data['distributors_ids'],
+            name=json_data['name'],
+            page=json_data['page'],
+            per_page=json_data['per_page'])
+        return {'items': results, 'total': total}
     except Exception as ex:
         abort(500, str(ex))
 
@@ -50,49 +50,6 @@ def get_clients_by_distributor(distributor_id, query_data):
     try:
         return distributors.get_clients_by_distributor_id(distributor_id,
                                                           query_data['search'])
-    except Exception as ex:
-        abort(500, str(ex))
-
-
-@bp.get('/<int:distributor_id>/users')
-@bp.input(Pagination, location='query')
-@bp.output(UsersOut)
-@jwt_required()
-def get_users_by_distributor(distributor_id, query_data):
-    '''Get users of a distributor'''
-
-    try:
-        return distributors.get_users_by_distributor_id(distributor_id,
-                                                        query_data['search'])
-    except Exception as ex:
-        abort(500, str(ex))
-
-
-@bp.post('/<int:distributor_id>/users')
-@bp.input(UsersExistingIn)
-@bp.output(UsersOut)
-@jwt_required()
-def get_users_and_existing_by_distributor(distributor_id, json_data):
-    '''Get users of a distributor for autocomplete. Existing users and new ones'''
-
-    try:
-        return distributors.get_users_and_existing_by_distributor_id(
-            distributor_id,
-            json_data['search'] if 'search' in json_data else '',
-            json_data['users_ids'] if 'users_ids' in json_data else [])
-    except Exception as ex:
-        abort(500, str(ex))
-
-
-@bp.get('/distributors/users')
-@bp.input(Pagination, location='query')
-@bp.output(DistributorsOut)
-@jwt_required()
-def get_distributors_for_users_creation(query_data):
-    '''Get distributors for users creation without Snapon distributor'''
-
-    try:
-        return distributors.get_distributors_for_users_creation(current_user, query_data['search'])
     except Exception as ex:
         abort(500, str(ex))
 

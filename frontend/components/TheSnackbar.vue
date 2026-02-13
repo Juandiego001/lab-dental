@@ -3,7 +3,7 @@
     {{ snackbar.message }}
 
     <template v-slot:actions>
-      <v-btn color="white" icon="mdi-close" size="x-small" variant="text" @click="snackbar.visible = false"></v-btn>
+      <v-btn color="white" icon="mdi-close" size="x-small" variant="text" @click="snackbar.visible = false" />
     </template>
   </v-snackbar>
 </template>

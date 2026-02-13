@@ -1,9 +1,10 @@
+from datetime import datetime, timedelta
 import uuid
 from core.app import db, FRONTEND_APP_BASE_URL
 from core.services.distributors import get_distributor_from_user
 from core.utils import send_mail
 from sqlalchemy.orm import aliased
-from sqlalchemy import JSON, or_, and_, func
+from sqlalchemy import JSON, and_, func
 from werkzeug.exceptions import HTTPException
 from werkzeug.datastructures import FileStorage
 from sqlalchemy.dialects.postgresql import JSONB
@@ -12,31 +13,33 @@ from core.schemas.installations import InstallationCreatedNotification, Installa
 from core.models import Client, Distributor, DistributorList, Equipment, Installation, List_, Site, User, UserList
 
 
-def get_installations(current_user: User, search: str, page: int, per_page: int):
+def search_installations(current_user: User, equipment_id: int, distributor_id: int, client_id: int, serial: str, page: int, per_page: int):
     '''Get installations'''
 
     query = [Installation.status != 'INACTIVE']
-    if search:
-        search_query = []
-        try:
-            search_query.append(Installation.id == int(search))
-            search_query.append(Installation.equipment_id == int(search))
-        except:
-            search_query.append(Equipment.model.ilike(f'%{search}%'))
-            search_query.append(Equipment.serial.ilike(f'%{search}%'))
+    if equipment_id:
+        query.append(Installation.equipment_id == equipment_id)
+    if distributor_id:
+        query.append(Installation.distributor_id == distributor_id)
+    if client_id:
+        query.append(Installation.client_id == client_id)
+    if serial:
+        query.append(Installation.serial.ilike(f'%{serial}%'))
 
-        query.append(or_(*search_query))
-    
     if current_user.role != 'ADMIN':
         distributor: Distributor = get_distributor_from_user(current_user)
         query.append(Installation.distributor_id == distributor.id)
 
-    total = db.session.query(Installation).count()
+    total = db.session.query(Installation)\
+        .filter(*query)\
+        .count()
     return list(db.session.execute(
         db.session.query(
             *Installation.__table__.c,
-            func.concat(Equipment.model, ' - ', Equipment.serial).label('equipment_serial_model'))
+            Client.name.label('client_name'),
+            func.concat(Equipment.model, ' - ', Equipment.reference).label('equipment_model_reference'))
         .join(Equipment)
+        .join(Client, Client.id == Installation.client_id)
         .filter(*query)
         .order_by(Installation.id.desc())
         .limit(per_page)
@@ -53,7 +56,7 @@ def get_installation_by_id(installation_id: int):
     return db.session.query(
         *Installation.__table__.c,
         func.concat(Equipment.model, ' - ',
-                    Equipment.serial).label('equipment_serial_model'),
+                    Equipment.reference).label('equipment_model_reference'),
         Distributor.name.label('distributor_name'),
         Client.name.label('client_name'),
         client_site.name.label('site_client_name'),
@@ -78,7 +81,7 @@ def get_installation_by_id(installation_id: int):
         .join(InstallationFile)\
         .filter(Installation.id == installation_id)\
         .group_by(*Installation.__table__.c,
-                  'equipment_serial_model',
+                  'equipment_model_reference',
                   'distributor_name',
                   'client_name',
                   'site_client_name',
@@ -90,6 +93,18 @@ def check_installation_exists(installation_id: int):
     '''Check if installation exists'''
 
     return db.session.query(Installation).filter(Installation.id == installation_id).first()
+
+
+def get_expiration_date(installed_date: str):
+    '''
+    Get expiration date from installed_date
+
+    :param installed_date: Description
+    :type installed_date: str
+    '''
+
+    fecha_dt = datetime.strptime(installed_date, "%b %d, %Y")
+    return fecha_dt + timedelta(days=365 * 3)
 
 
 def create_installation_file(installation_id: int, installation_file_data: FileStorage, file_type: str):
@@ -113,6 +128,8 @@ def create_installation(data: dict):
         'installation_pictures')
 
     data['user_id'] = 1
+    data['expiration_date'] = get_expiration_date(data['installed_date'])
+
     installation = Installation(**data)
 
     db.session.add(installation)
@@ -168,6 +185,9 @@ def update_installation(installation_id: int, data: dict):
         'serial_picture') if 'serial_picture' in data else None
     installation_pictures: list[FileStorage] = data.pop(
         'installation_pictures') if 'installation_pictures' in data else None
+
+    if 'installed_date' in data and data['installed_date']:
+        data['expiration_date'] = get_expiration_date(data['installed_date'])
 
     if serial_picture:
         serial_picture_data = db.session.query(InstallationFile).filter(
@@ -257,3 +277,37 @@ def notify_rejection(installation_id: int, reject_comments: str):
         send_mail(f'SOE Latam - Rechazo de instalación #{installation_id}',
                   ['juandiego14012003@gmail.com'], 'installation_rejected.html',
                   installation_data)
+
+
+# def get_equipments_for_installation(search: str, equipment_id: int = 0):
+#     '''Get equipments for installation autocomplete. Existing equipments and new ones'''
+
+#     query = [Equipment.status == 'ACTIVE']
+
+#     if search:
+#         query.append(or_(
+#             Equipment.model.ilike(f'%{search}%'),
+#             Equipment.reference.ilike(f'%{search}%'),
+#             literal(search).ilike('%' + Equipment.model + '%'),
+#             literal(search).ilike('%' + Equipment.reference + '%')))
+
+#     selection_fields = [
+#         *Equipment.__table__.c,
+#         func.concat(Equipment.model, ' - ',
+#                     Equipment.reference).label('model_reference'),
+#     ]
+
+#     q_selected = db.session.query(*selection_fields)\
+#         .filter(Equipment.id == equipment_id)
+#     result1 = list(db.session.execute(q_selected))
+
+#     q_search = db.session.query(*selection_fields)\
+#         .filter(
+#         and_(
+#             Equipment.id != equipment_id,
+#             *query
+#         )
+#     ).limit(15)
+#     result2 = list(db.session.execute(q_search))
+
+#     return result1 + result2

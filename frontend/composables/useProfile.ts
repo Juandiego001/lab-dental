@@ -11,8 +11,11 @@ export const useProfile = () => {
     profile.value = profileData
   }
 
+  const isAdmin = computed(() => profile.value.role === 'ADMIN');
+
   return {
     profile,
-    setProfile
+    setProfile,
+    isAdmin
   }
 }

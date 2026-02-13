@@ -29,45 +29,17 @@
   <v-app-bar color="primary">
     <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
     <v-toolbar-title>SOE Latam</v-toolbar-title>
-    <v-spacer></v-spacer>
-    <template v-if="$vuetify.display.mdAndUp">
-      <v-btn v-if="$ability.can('create', module)" class="me-2" icon="mdi-plus" size="small" variant="text"
-        @click="createDialog = !createDialog"></v-btn>
-      <v-btn v-if="$ability.can('read', module)" class="me-2" icon="mdi-magnify" size="small" variant="text"
-        @click="searchDialog = !searchDialog"></v-btn>
-    </template>
-
-    <v-menu>
-      <template v-slot:activator="{ props }">
-        <v-btn icon="mdi-dots-vertical" size="small" variant="text" v-bind="props"></v-btn>
-      </template>
-
-      <v-sheet class="bg-primary py-2" max-width="110" max-height="200">
-        <v-btn v-if="$ability.can('create', module)" variant="text" prepend-icon="mdi-plus"
-          class="text-none text-body-2 w-100" @click="createDialog = !createDialog">
-          Create
-        </v-btn>
-        <v-btn v-if="$ability.can('read', module)" variant="text" prepend-icon="mdi-magnify"
-          class="text-none text-body-2 w-100" @click="searchDialog = !searchDialog">
-          Search
-        </v-btn>
-      </v-sheet>
-    </v-menu>
+    <v-spacer />
   </v-app-bar>
 </template>
 
 <script setup>
-import { toRefs } from 'vue'
-import { searchMixin } from '~/mixins/searchMixin'
-import { createMixin } from '~/mixins/createMixin'
 import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
 const module = ref('');
 const { $ability } = useNuxtApp();
-const { searchDialog } = toRefs(searchMixin)
-const { createDialog } = toRefs(createMixin)
 const routes = ref([])
 const drawer = ref(true);
 const menu = ref([

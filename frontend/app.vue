@@ -13,4 +13,12 @@ import TheSnackbar from '~/components/TheSnackbar.vue'
 html {
   overflow-y: auto;
 }
+
+.v-input:not(:has(input:focus)) .v-input__details {
+  display: none;
+}
+
+.v-input.v-input--error .v-input__details {
+  display: flex !important;
+}
 </style>

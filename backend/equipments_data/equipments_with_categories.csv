@@ -1,4 +1,4 @@
-brand_id,category_id,serial,model
+brand_id,category_id,reference,model
 6,7,EEBS701A,005-RP
 6,7,EEBS701AE1,005-RP
 9,7,EEBS803A,005-RP

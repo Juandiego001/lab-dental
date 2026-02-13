@@ -1,21 +1,31 @@
   <template>
     <v-container fluid class="fill-height align-start">
       <v-card width="100%" flat>
-        <v-card-title>{{ $t('brands.title', 2) }}</v-card-title>
+        <v-card-title class="d-flex justify-space-between">
+          <p>{{ $t('brands.title', 2) }}</p>
+          <div>
+            <client-only>
+              <v-btn v-if="$ability.can('create', 'brands')" class="me-2" icon="mdi-plus" size="small" variant="text"
+                @click="createDialog = !createDialog" />
+              <v-btn v-if="$ability.can('read', 'brands')" class="me-2" icon="mdi-magnify" size="small" variant="text"
+                @click="searchDialog = !searchDialog" />
+            </client-only>
+          </div>
+        </v-card-title>
         <v-card-text>
           <client-only>
-            <v-data-table :items="items" :headers="headers" :page="page" :items-per-page="perPage" :items-length="total"
+            <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage" :items-length="total"
               :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
               @update:itemsPerPage="v => perPage = v" :disable-sort="true">
               <template v-slot:item.option="{ item }">
                 <div class="d-flex align-center justify-center ga-2">
                   <v-btn v-if="$ability.can('update', 'brands')" class="my-2 bg-primary" size="small" icon="mdi-pencil"
-                    @click="getBrand(item.id)"></v-btn>
+                    @click="getBrand(item.id)" />
                   <v-btn v-if="$ability.can('delete', 'brands')" class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                    @click="form.id = item.id; deleteDialog = true"></v-btn>
+                    @click="form.id = item.id; deleteDialog = true" />
                 </div>
               </template>
-            </v-data-table>
+            </v-data-table-server>
           </client-only>
         </v-card-text>
       </v-card>
@@ -27,20 +37,20 @@
         <v-card-title class="bg-primary">
           <v-row no-gutters align="center">
             {{ $t('brands.create.title') }}
-            <v-spacer></v-spacer>
-            <v-btn class="bg-primary" size="small" icon="mdi-close" @click="createDialog = false"></v-btn>
+            <v-spacer />
+            <v-btn class="bg-primary" size="small" icon="mdi-close" @click="createDialog = false" />
           </v-row>
         </v-card-title>
         <v-card-text>
           <v-form ref="createForm" v-model="createModel" @submit.prevent="createBrand">
-            <v-row>
+            <v-row dense>
               <v-col cols="12">
-                <v-text-field v-model="form.name" hide-details="auto" :label="$t('brands.name')"
-                  :rules="[nameRequired]"></v-text-field>
+                <v-text-field v-model="form.name" hide-details="auto" :label="$t('brands.name')" :rules="[nameRequired]"
+                  counter="50" maxlength="50" />
               </v-col>
               <v-col cols="12">
-                <v-text-field v-model="form.slug" hide-details="auto" :label="$t('brands.slug')"
-                  :rules="[slugRequired]"></v-text-field>
+                <v-text-field v-model="form.slug" hide-details="auto" :label="$t('brands.slug')" :rules="[slugRequired]"
+                  counter="50" maxlength="50" />
               </v-col>
               <v-col class="text-end">
                 <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -59,20 +69,20 @@
         <v-card-title class="bg-primary">
           <v-row no-gutters align="center">
             {{ $t('brands.update.title') }}
-            <v-spacer></v-spacer>
-            <v-btn class="bg-primary" size="small" icon="mdi-close" @click="updateDialog = false"></v-btn>
+            <v-spacer />
+            <v-btn class="bg-primary" size="small" icon="mdi-close" @click="updateDialog = false" />
           </v-row>
         </v-card-title>
         <v-card-text>
           <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateBrand">
-            <v-row>
+            <v-row dense>
               <v-col cols="12">
-                <v-text-field v-model="form.name" hide-details="auto" :label="$t('brands.name')"
-                  :rules="[nameRequired]"></v-text-field>
+                <v-text-field v-model="form.name" hide-details="auto" :label="$t('brands.name')" :rules="[nameRequired]"
+                  counter="50" maxlength="50"></v-text-field>
               </v-col>
               <v-col cols="12">
-                <v-text-field v-model="form.slug" hide-details="auto" :label="$t('brands.slug')"
-                  :rules="[slugRequired]"></v-text-field>
+                <v-text-field v-model="form.slug" hide-details="auto" :label="$t('brands.slug')" :rules="[slugRequired]"
+                  counter="50" maxlength="50"></v-text-field>
               </v-col>
               <v-col class="text-end">
                 <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -91,38 +101,44 @@
         <v-card-title class="bg-primary">
           <v-row no-gutters align="center">
             {{ $t('brands.delete.title') }}
-            <v-spacer></v-spacer>
-            <v-btn class="bg-primary" icon="mdi-close" @click="deleteDialog = false"></v-btn>
+            <v-spacer />
+            <v-btn class="bg-primary" size="small" icon="mdi-close" @click="deleteDialog = false" />
           </v-row>
         </v-card-title>
         <v-card-text class="text-center py-6">
           <p class="text-subtitle-1 mb-6 text-center">{{ $t('brands.delete.message') }}</p>
           <v-btn @click="deleteDialog = false" variant="outlined">{{ $t('cancel') }}</v-btn>
-          <span class="mx-2"></span>
+          <span class="mx-2" />
           <v-btn @click="deleteBrand" class="bg-red">{{ $t('confirm') }}</v-btn>
         </v-card-text>
       </v-card>
     </v-dialog>
 
     <!-- Search Dialog -->
-    <v-dialog v-model="searchDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
+    <v-dialog v-model="searchDialog" max-width="700" persistent :fullscreen="$vuetify.display.smAndDown">
       <v-card tile>
         <v-card-title class="bg-primary">
           <v-row no-gutters align="center">
             {{ $t('brands.search.title') }}
-            <v-spacer></v-spacer>
-            <v-btn class="bg-primary" size="small" icon="mdi-close" @click="searchDialog = false"></v-btn>
+            <v-spacer />
+            <v-btn class="bg-primary" size="small" icon="mdi-close" @click="searchDialog = false" />
           </v-row>
         </v-card-title>
         <v-card-text>
-          <p class="text-subtitle-2 pb-2">{{ $t('brands.search.message') }}</p>
-          <v-form @submit.prevent="doSearch">
-            <v-row no-gutters="">
-              <v-col cols="12">
-                <v-text-field v-model="search" :label="$t('brands.search.fields')" hide-details="auto"
-                  prepend-inner-icon="mdi-magnify" clearable></v-text-field>
+          <v-form @submit.prevent="async () => {
+            await searchBrands(1, 15);
+            searchDialog = false;
+          }">
+            <v-row dense>
+              <v-col cols="6">
+                <v-text-field v-model="searchForm.name" :label="$t('brands.name')" hide-details="auto" clearable counter="50"
+                  maxlength="50" />
               </v-col>
-              <v-col class="text-end mt-4" cols="12">
+              <v-col cols="6">
+                <v-text-field v-model="searchForm.slug" :label="$t('brands.slug')" hide-details="auto" clearable counter="50"
+                  maxlength="50" />
+              </v-col>
+              <v-col class="text-end" cols="12">
                 <v-btn class="bg-primary" type="submit">{{ $t('search') }}</v-btn>
               </v-col>
             </v-row>
@@ -134,15 +150,13 @@
 
 <script setup>
 import { ref, computed, watch, onBeforeMount, } from 'vue'
-import { toRefs } from 'vue'
-import { searchMixin } from '~/mixins/searchMixin'
-import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
 
 const { back } = useBack()
 const { notify } = useSnackbar();
 const { $ability } = useNuxtApp();
 const { t } = useI18n();
+const { items, total, getBrands } = useBrands();
 
 definePageMeta({
   layout: 'app',
@@ -153,13 +167,10 @@ useHead({
   title: `SOE Latam | ${t('brands.title', 2)}`
 })
 
-const { searchDialog } = toRefs(searchMixin)
-const { createDialog } = toRefs(createMixin)
-const items = ref([]);
-const search = ref('');
+const searchDialog = ref(false);
+const createDialog = ref(false);
 const page = ref(1);
 const perPage = ref(15);
-const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
 const createModel = ref(false);
@@ -167,6 +178,10 @@ const updateModel = ref(false);
 const createForm = ref();
 const updateForm = ref();
 const form = ref({
+  name: '',
+  slug: ''
+})
+const searchForm = ref({
   name: '',
   slug: ''
 })
@@ -181,9 +196,8 @@ const itemsPerPageOptions = computed(() => [
 const headers = computed(() => {
 
   const defaultHeaders = [
-    { title: 'Id', key: 'id', align: 'center', sortable: false },
-    { title: t('brands.name'), key: 'name', align: 'center', sortable: false },
-    { title: t('brands.slug'), key: 'slug', align: 'center', sortable: false },
+    { title: t('brands.name'), key: 'name', sortable: false },
+    { title: t('brands.slug'), key: 'slug', sortable: false },
   ]
 
   if ($ability.can('update', 'brands') || $ability.can('delete', 'brands')) {
@@ -197,6 +211,7 @@ watch(createDialog, (val) => {
   if (!val) {
     createForm.value.reset();
     resetForm();
+    return;
   }
 })
 
@@ -204,6 +219,7 @@ watch(updateDialog, (val) => {
   if (!val) {
     updateForm.value.reset();
     resetForm();
+    return;
   }
 })
 
@@ -212,19 +228,18 @@ watch(deleteDialog, async (val) => {
 })
 
 watch(page, async () => {
-  await getBrands();
+  await searchBrands();
 })
 
 watch(perPage, async () => {
-  await getBrands();
+  await searchBrands();
 })
 
 onBeforeMount(async () => {
   if ($ability.can('read', 'brands')) {
-    await getBrands();
+    await getBrands({});
     return;
   }
-
   back();
 })
 
@@ -235,21 +250,15 @@ const resetForm = () => {
   }
 }
 
-const getBrands = async () => {
+const searchBrands = async (defPage, defPerPage) => {
   try {
-    const data = await $api('/api/brands/', {
-      query: {
-        search: search.value,
-        page: page.value,
-        perPage: perPage.value
-      },
-      method: 'GET'
+    await getBrands({
+      name: searchForm.value.name,
+      slug: searchForm.value.slug,
+      page: defPage || page.value,
+      perPage: defPerPage || perPage.value
     })
-    items.value = data.items
-    total.value = data.total
-  } catch (err) {
-    notify(err, 'error');
-  }
+  } catch (err) { }
 }
 
 const getBrand = async (id) => {
@@ -272,7 +281,7 @@ const createBrand = async () => {
       body: form.value
     })
     notify(message, 'success');
-    await getBrands()
+    await getBrands({})
     createDialog.value = false
   } catch (err) {
     notify(err, 'error');
@@ -287,7 +296,7 @@ const updateBrand = async () => {
       body: form.value
     })
     notify(message, 'success');
-    await getBrands()
+    await getBrands({})
     updateDialog.value = false
   } catch (err) {
     notify(err, 'error');
@@ -300,19 +309,8 @@ const deleteBrand = async () => {
       method: 'DELETE'
     })
     notify(message, 'success');
-    await getBrands()
+    await getBrands({})
     deleteDialog.value = false
-  } catch (err) {
-    notify(err, 'error');
-  }
-}
-
-const doSearch = async () => {
-  try {
-    page.value = 1
-    perPage.value = 15
-    await getBrands()
-    searchDialog.value = false
   } catch (err) {
     notify(err, 'error');
   }

@@ -3,54 +3,30 @@ from core.models import Address, Site
 from core.services import sites
 from apiflask import APIBlueprint, abort
 from flask_jwt_extended import jwt_required, current_user
-from core.schemas.utils import Message, Pagination
-from core.schemas.sites import SiteInUpdate, SiteInCreate, SiteOut, SitesInstallationsOut, SitesOut
+from core.schemas.utils import Message
+from core.schemas.sites import SiteInUpdate, SiteInCreate, SiteOut, SiteSearch, SitesInstallationsOut, SitesOut
 
 
 bp = APIBlueprint('sites', __name__)
 
 
-@bp.get('/')
-@bp.input(Pagination, location='query')
+@bp.post('/search')
+@bp.input(SiteSearch)
 @bp.output(SitesOut)
 @jwt_required()
-def get_sites(query_data):
-    '''Get sites'''
+def search_sites(json_data):
+    '''Search sites'''
 
     try:
-        results, total = sites.get_sites(
-            current_user,
-            query_data['search'],
-            query_data['page'],
-            query_data['per_page'])
-
+        results, total = sites.search_sites(
+            current_user=current_user,
+            site_id=json_data['site_id'],
+            distributor_id=json_data['distributor_id'],
+            client_id=json_data['client_id'],
+            name=json_data['name'],
+            page=json_data['page'],
+            per_page=json_data['per_page'])
         return {'items': results, 'total': total}
-    except Exception as ex:
-        abort(500, str(ex))
-
-
-@bp.get('/clients/<string:client_id>')
-@bp.input(Pagination, location='query')
-@bp.output(SitesInstallationsOut)
-@jwt_required()
-def get_clients_sites(query_data, client_id):
-    '''Get clients sites'''
-
-    try:
-        return {'items': sites.get_clients_sites(client_id, query_data['search'])}
-    except Exception as ex:
-        abort(500, str(ex))
-
-
-@bp.get('/distributors/<string:distributor_id>')
-@bp.input(Pagination, location='query')
-@bp.output(SitesInstallationsOut)
-@jwt_required()
-def get_distributors_sites(query_data, distributor_id):
-    '''Get distributors sites'''
-
-    try:
-        return {'items': sites.get_distributors_sites(distributor_id, query_data['search'])}
     except Exception as ex:
         abort(500, str(ex))
 

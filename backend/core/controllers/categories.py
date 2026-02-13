@@ -2,25 +2,28 @@ from flask_jwt_extended import jwt_required
 from core.app import db
 from core.services import categories
 from apiflask import APIBlueprint, abort
-from core.schemas.utils import Message, Pagination
-from core.schemas.categories import CategoryInUpdate, CategoryInCreate, CategoryOut, CategoriesOut
+from core.schemas.utils import Message
+from core.schemas.categories import CategoryInUpdate, CategoryInCreate, CategoryOut, CategoriesOut, CategorySearch
 
 
 bp = APIBlueprint('categories', __name__)
 
 
-@bp.get('/')
-@bp.input(Pagination, location='query')
+@bp.post('/search')
+@bp.input(CategorySearch)
 @bp.output(CategoriesOut)
 @jwt_required()
-def get_categories(query_data):
-    '''Get categories'''
+def categories_brands(json_data):
+    '''Search categories'''
 
     try:
-        results = categories.get_categories(query_data['search'],
-                                         query_data['page'],
-                                         query_data['per_page'])
-        return {'items': results, 'total': results.total}
+        results, total = categories.search_categories(
+            category_id=json_data['category_id'],
+            name=json_data['name'],
+            slug=json_data['slug'],
+            page=json_data['page'],
+            per_page=json_data['per_page'])
+        return {'items': results, 'total': total}
     except Exception as ex:
         abort(500, str(ex))
 

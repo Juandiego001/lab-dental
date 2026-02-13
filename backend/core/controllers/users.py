@@ -2,29 +2,36 @@ from flask import jsonify
 from core import get_user_permissions
 from core.app import db
 from core.services import users
-from apiflask import APIBlueprint, HTTPError, abort
+from apiflask import APIBlueprint, abort
 from werkzeug.exceptions import HTTPException
-from core.schemas.utils import Message, Pagination
+from core.schemas.utils import Message
 from flask_jwt_extended import create_access_token, set_access_cookies, jwt_required, get_jwt_identity, current_user
-from core.schemas.users import UserInLogIn, UserInUpdate, UserInCreate, UserOut, UsersExistingIn, UsersOut, ProfileIn, ProfileOut
+from core.schemas.users import EmailIn, PasswordIn, TokenIn, UserInLogIn, UserInUpdate, UserInCreate, UserOut, UserSearch, UsersExistingIn, UsersOut, ProfileIn, ProfileOut
 
 
 bp = APIBlueprint('users', __name__)
 
 
-@bp.get('/')
-@bp.input(Pagination, location='query')
+@bp.post('/search')
+@bp.input(UserSearch)
 @bp.output(UsersOut)
 @jwt_required()
-def get_users(query_data):
-    '''Get users'''
+def get_users(json_data):
+    '''Search users'''
 
     try:
-        results = users.get_users(current_user,
-                                  query_data['search'],
-                                  query_data['page'],
-                                  query_data['per_page'])
-        return {'items': results, 'total': results.total}
+        results, total = users.search_users(
+            current_user=current_user,
+            users_ids=json_data['users_ids'],
+            distributor_id=json_data['distributor_id'],
+            is_main=json_data['is_main'],
+            role=json_data['role'],
+            full_name=json_data['full_name'],
+            username=json_data['username'],
+            email=json_data['email'],
+            page=json_data['page'],
+            per_page=json_data['per_page'])
+        return {'items': results, 'total': total}
     except Exception as ex:
         abort(500, str(ex))
 
@@ -160,4 +167,46 @@ def delete_users(user_id):
         return {'message': 'User deleted successfully'}
     except Exception as ex:
         print(str(ex))
+        abort(500, str(ex))
+
+
+@bp.get('/token')
+@bp.input(TokenIn, location='query')
+@bp.output(Message)
+def validate_token(query_data):
+    try:
+        if not users.validate_token(query_data['token']):
+            raise Exception('Token is invalid')
+        return {'message': 'Token validated'}
+    except Exception as ex:
+        abort(500, str(ex))
+
+
+@bp.post('/password')
+@bp.input(EmailIn)
+@bp.output(Message)
+def send_mail_recover_password(json_data):
+    '''
+    Send mail to recover password
+
+    :param json_data: Description
+    '''
+
+    try:
+        return {'message': 'A recovery link has been sent. Please check your email'}
+    finally:
+        try:
+            users.send_mail_recover_password(json_data['email'])
+        except:
+            pass
+
+
+@bp.patch('/password')
+@bp.input(PasswordIn)
+@bp.output(Message)
+def change_password(json_data):
+    try:
+        users.change_password(json_data['token'], json_data['password'])
+        return {'message': 'The password has been successfully updated'}
+    except Exception as ex:
         abort(500, str(ex))

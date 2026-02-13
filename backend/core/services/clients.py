@@ -6,40 +6,48 @@ from werkzeug.exceptions import HTTPException
 from core.services.distributors import get_distributor_from_user
 
 
-def get_clients(current_user: User, search: str, page: int, per_page: int):
-    '''Get clients'''
 
-    query = Client.status == 'ACTIVE'
-    if search:
-        query = and_(Client.status == 'ACTIVE',
-                     or_(Client.name.ilike(f'%{search}%')))
+def search_clients(current_user: User, distributor_id: int, client_id: int, name: str, phone: str, page: int, per_page: int):
+    '''Search clients'''
 
+    query = [Client.status == 'ACTIVE']
+    with_client_id = None
+    if distributor_id:
+        query.append(Client.distributor_id == distributor_id)
+    if name:
+        query.append(Client.name.ilike(f'%{name}%'))
+    if phone:
+        query.append(Client.phone.ilike(f'%{phone}%'))
 
-    if current_user.role == 'ADMIN':
-      total = db.session.query(Client).count()
-      return list(db.session.execute(
-          db.session.query(
-              *Client.__table__.c,
-              Distributor.name.label('distributor_name'))
-          .join(Distributor)
-          .filter(query)
-          .order_by(Client.id.desc())
-          .limit(per_page)
-          .offset((page - 1) * per_page)
-      ).unique()), total
-    
-    distributor: Distributor = get_distributor_from_user(current_user)
-    total = db.session.query(Client).join(Distributor).filter(Distributor.id == distributor.id).count()
-    return list(db.session.execute(
-        db.session.query(
-            *Client.__table__.c,
-            Distributor.name.label('distributor_name'))
-        .join(Distributor)
-        .filter(and_(query, Distributor.id == distributor.id))
-        .order_by(Client.id.desc())
-        .limit(per_page)
-        .offset((page - 1) * per_page)
-    ).unique()), total
+    query_stmt = db.session.query(
+        *Client.__table__.c,
+        Distributor.name.label('distributor_name'))\
+        .join(Distributor)\
+
+    if client_id:
+        query.append(Client.id != client_id)
+        with_client_id = query_stmt\
+            .filter(Client.id == client_id)\
+            .all()
+
+    if current_user.role != 'ADMIN':
+        distributor: Distributor = get_distributor_from_user(current_user)
+        query.append(Client.distributor_id == distributor.id)
+
+    total = db.session.query(Client)\
+        .filter(*query)\
+        .count()
+    total += len(with_client_id) if with_client_id else 0
+    clients = query_stmt\
+        .filter(*query)\
+        .order_by(Client.id.desc())\
+        .limit(per_page)\
+        .offset((page - 1) * per_page)\
+        .all()
+
+    if not with_client_id:
+        return clients, total
+    return with_client_id + clients, total
 
 
 def get_client_by_id(client_id: int):
@@ -56,10 +64,10 @@ def get_client_by_id(client_id: int):
 def create_client(current_user: User, client_model: Client):
     '''Create a client'''
 
-    if not(client_model.distributor_id):
+    if not (client_model.distributor_id):
         distributor: Distributor = get_distributor_from_user(current_user)
         client_model.distributor_id = distributor.id
-    
+
     db.session.add(client_model)
     db.session.commit()
 

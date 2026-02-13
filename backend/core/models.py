@@ -327,8 +327,9 @@ class Equipment(db.Model):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     brand_id: Mapped[int] = mapped_column(ForeignKey('brands.id'), nullable=False)
     category_id: Mapped[int] = mapped_column(ForeignKey('categories.id'), nullable=False)
-    serial: Mapped[str] = mapped_column(String(100), nullable=False)
     model: Mapped[str] = mapped_column(String(100), nullable=False)
+    reference: Mapped[str] = mapped_column(String(100), nullable=False)
+    main_picture: Mapped[str] = mapped_column(String(), nullable=False)
     status: Mapped[str] = mapped_column(String(20), 
                                         nullable=False,
                                         default='ACTIVE')
@@ -466,6 +467,7 @@ class Installation(db.Model):
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
     serial: Mapped[str] = mapped_column(String(), nullable=False)
     installed_date: Mapped[datetime] = mapped_column(DateTime(), nullable=False)
+    expiration_date: Mapped[datetime] = mapped_column(DateTime(), nullable=False)
     status: Mapped[str] = mapped_column(String(20), 
                                         nullable=False,
                                         default='ACTIVE')

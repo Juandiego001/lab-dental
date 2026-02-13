@@ -31,7 +31,7 @@
         </NuxtLink>
       </div>
 
-      <v-spacer></v-spacer>
+      <v-spacer />
 
       <template v-if="$vuetify.display.mdAndUp">
         <div>
@@ -49,7 +49,7 @@
           </v-btn>
         </div>
 
-        <v-spacer></v-spacer>
+        <v-spacer />
 
         <v-menu>
           <template v-slot:activator="{ props }">

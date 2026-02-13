@@ -1,10 +1,20 @@
 <template>
   <v-container fluid class="fill-height align-start">
     <v-card width="100%" flat>
-      <v-card-title>{{ $t('lists.title', 2) }}</v-card-title>
+      <v-card-title class="d-flex justify-space-between">
+        <p>{{ $t('lists.title', 2) }}</p>
+        <div>
+          <client-only>
+            <v-btn v-if="$ability.can('create', 'lists')" class="me-2" icon="mdi-plus" size="small" variant="text"
+              @click="createDialog = !createDialog" />
+            <v-btn v-if="$ability.can('read', 'lists')" class="me-2" icon="mdi-magnify" size="small" variant="text"
+              @click="searchDialog = !searchDialog" />
+          </client-only>
+        </div>
+      </v-card-title>
       <v-card-text>
         <client-only>
-          <v-data-table :items="items" :headers="headers" :page="page" :items-per-page="perPage" :items-length="total"
+          <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage" :items-length="total"
             :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
             @update:itemsPerPage="v => perPage = v" :disable-sort="true">
             <template v-slot:item.isMain="{ item }">
@@ -12,12 +22,12 @@
             </template>
             <template v-slot:item.option="{ item }">
               <div class="d-flex justify-center align-center ga-2">
-                <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getList(item.id)"></v-btn>
+                <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getList(item.id)" />
                 <v-btn v-if="!item.isMain" class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                  @click="form.id = item.id; deleteDialog = true"></v-btn>
+                  @click="form.id = item.id; deleteDialog = true" />
               </div>
             </template>
-          </v-data-table>
+          </v-data-table-server>
         </client-only>
       </v-card-text>
     </v-card>
@@ -29,26 +39,31 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('lists.create.title') }}
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="createDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="createDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text>
         <v-form ref="createForm" v-model="createModel" @submit.prevent="createList">
-          <v-row>
+          <v-row dense>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('lists.name')"
-                :rules="[nameRequired]"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('lists.name')" :rules="[nameRequired]"
+                counter="30" maxlength="30" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.distributorsIds" :label="$t('lists.distributors')" :items="distributors"
-                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable
-                multiple chips :rules="[distributorsRequired]" />
+                item-title="name" item-value="id" hide-details="auto" clearable multiple chips
+                :rules="[distributorsRequired]" @update:search="(name) => {
+                  if (!createDialog) return;
+                  getDistributors({ distributorsIds: form.distributorsIds, name })
+                }" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.usersIds" :label="$t('lists.users')" :items="users" item-title="fullName"
-                item-value="id" hide-details="auto" @update:search="getUsers" clearable multiple chips
-                :rules="[usersRequired]" />
+                item-value="id" hide-details="auto" clearable multiple chips :rules="[usersRequired]" @update:search="(fullName) => {
+                  if (!createDialog) return;
+                  getUsers({ usersIds: form.usersIds, fullName });
+                }" />
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -67,26 +82,32 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('lists.update.title') }}
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="updateDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="updateDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text>
         <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateList">
-          <v-row>
+          <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('lists.name')" :rules="[nameRequired]"
-                :readonly="form.isMain"></v-text-field>
+                :readonly="form.isMain" counter="30" maxlength="30" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.distributorsIds" :label="$t('lists.distributors')" :items="distributors"
-                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors"
-                :clearable="!form.isMain" multiple chips :rules="[distributorsRequired]" :readonly="form.isMain" />
+                item-title="name" item-value="id" hide-details="auto" :clearable="!form.isMain" multiple chips
+                :rules="[distributorsRequired]" :readonly="form.isMain" @update:search="(name) => {
+                  if (!updateDialog) return;
+                  getDistributors({ distributorsIds: form.distributorsIds, name });
+                }" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.usersIds" :label="$t('lists.users')" :items="users" item-title="fullName"
-                item-value="id" hide-details="auto" @update:search="getUsers" :clearable="!form.isMain" multiple chips
-                :rules="[usersRequired]" :readonly="form.isMain" />
+                item-value="id" hide-details="auto" :clearable="!form.isMain" multiple chips :rules="[usersRequired]"
+                :readonly="form.isMain" @update:search="(fullName) => {
+                  if (!updateDialog) return;
+                  getUsers({ usersIds: form.usersIds, fullName });
+                }" />
             </v-col>
             <v-col v-if="!form.isMain" class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -105,14 +126,14 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('lists.delete.title') }}
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="deleteDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="deleteDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text class="text-center py-6">
         <p class="text-subtitle-1 mb-6 text-center">{{ $t('lists.delete.message') }}</p>
         <v-btn @click="deleteDialog = false" variant="outlined">{{ $t('cancel') }}</v-btn>
-        <span class="mx-2"></span>
+        <span class="mx-2" />
         <v-btn @click="deleteList" class="bg-red">{{ $t('confirm') }}</v-btn>
       </v-card-text>
     </v-card>
@@ -124,19 +145,18 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('lists.search.title') }}
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="searchDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="searchDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text>
-        <p class="text-subtitle-2 pb-2">{{ $t('lists.search.message') }}</p>
         <v-form @submit.prevent="doSearch">
-          <v-row no-gutters="">
+          <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="search" :label="$t('lists.search.fields')" hide-details="auto"
-                prepend-inner-icon="mdi-magnify" clearable></v-text-field>
+                prepend-inner-icon="mdi-magnify" clearable />
             </v-col>
-            <v-col class="text-end mt-4" cols="12">
+            <v-col class="text-end" cols="12">
               <v-btn class="bg-primary" type="submit">{{ $t('search') }}</v-btn>
             </v-col>
           </v-row>
@@ -147,15 +167,15 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onBeforeMount, useTemplateRef, toRefs } from 'vue'
-import { searchMixin } from '~/mixins/searchMixin'
-import { createMixin } from '~/mixins/createMixin'
+import { ref, computed, watch, onBeforeMount } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { back } = useBack()
 const { notify } = useSnackbar();
 const { $ability } = useNuxtApp();
 const { t } = useI18n();
+const { items: users, getUsers } = useUsers();
+const { items: distributors, getDistributors } = useDistributors();
 
 definePageMeta({
   layout: 'app',
@@ -166,10 +186,8 @@ useHead({
   title: `SOE Latam | ${t('installations.title', 2)}`
 })
 
-const { searchDialog } = toRefs(searchMixin)
-const { createDialog } = toRefs(createMixin)
-const distributors = ref([]);
-const users = ref([]);
+const searchDialog = ref(false);
+const createDialog = ref(false);
 const items = ref([]);
 const search = ref('');
 const page = ref(1);
@@ -196,30 +214,32 @@ const itemsPerPageOptions = computed(() => [
 ])
 
 const headers = computed(() => [
-  { title: 'Id', key: 'id', align: 'center', sortable: false },
-  { title: t('lists.name'), key: 'name', align: 'center', sortable: false },
-  { title: t('lists.isMain'), key: 'isMain', align: 'center', sortable: false },
+  { title: t('lists.name'), key: 'name', sortable: false },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
 watch(createDialog, async (val) => {
-  if (val) {
-    await getDistributors();
-    await getUsers();
-  } else {
+  if (!val) {
     createForm.value.reset();
     resetForm()
+    return;
   }
+  await getDistributors({});
+  await getUsers({});
 })
 
 watch(updateDialog, async (val) => {
-  if (val) {
-    await getDistributors();
-    await getUsers();
-  } else {
+  if (!val) {
     updateForm.value.reset();
     resetForm()
+    return;
   }
+  await getDistributors({
+    distributorsIds: form.value.distributorsIds
+  });
+  await getUsers({
+    usersIds: form.value.usersIds
+  });
 })
 
 watch(deleteDialog, async (val) => {
@@ -239,7 +259,6 @@ onBeforeMount(async () => {
     await getLists();
     return;
   }
-
   back();
 })
 
@@ -249,53 +268,6 @@ const resetForm = () => {
     slug: '',
     distributorsIds: [],
     usersIds: [],
-  }
-}
-
-const getDistributors = async (search) => {
-  try {
-    if (!createDialog.value && !updateDialog.value) return;
-    const data = await $api('/api/lists/distributors', {
-      body: {
-        search,
-        distributorsIds: form.value.distributorsIds
-      },
-      method: 'POST'
-    })
-    distributors.value = data.items
-  } catch (err) {
-    notify(err, 'error');
-  }
-}
-
-const getUsers = async (search) => {
-  try {
-    if (!createDialog.value && !updateDialog.value) return;
-
-    let data;
-    if (createDialog.value || (updateDialog.value && !form.value.isMain)) {
-      data = await $api('/api/users/admins', {
-        body: {
-          search,
-          usersIds: form.value.usersIds
-        },
-        method: 'POST'
-      })
-    }
-
-    if (updateDialog.value && form.value.isMain) {
-      data = await $api('/api/lists/users', {
-        body: {
-          search,
-          usersIds: form.value.usersIds
-        },
-        method: 'POST'
-      })
-    }
-
-    users.value = data.items
-  } catch (err) {
-    notify(err, 'error');
   }
 }
 

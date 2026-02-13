@@ -3,56 +3,63 @@ from core.app import db
 from core.services import locations
 from apiflask import APIBlueprint, abort
 from core.schemas.utils import Message, Pagination
-from core.schemas.locations import LocationOut, LocationsOut
+from core.schemas.locations import LocationOut, LocationSearch, LocationsOut
 
 
 bp = APIBlueprint('locations', __name__)
 
 
-@bp.get('/countries')
-@bp.input(Pagination, location='query')
+@bp.post('/countries/search')
+@bp.input(LocationSearch)
 @bp.output(LocationsOut)
 @jwt_required()
-def get_countries(query_data):
-    '''Get countries'''
+def search_countries(json_data):
+    '''Search countries'''
 
     try:
-        return {'items': locations.get_countries(query_data['search'],
-                                                 query_data['page'],
-                                                 query_data['per_page'])}
+        results, total = locations.search_countries(
+            country_id=json_data['id'],
+            name=json_data['name'],
+            page=json_data['page'],
+            per_page=json_data['per_page'])
+        return {'items': results, 'total': total}
     except Exception as ex:
         abort(500, str(ex))
 
 
-@bp.get('/states/<string:country_id>')
-@bp.input(Pagination, location='query')
+@bp.post('/states/<string:country_id>/search')
+@bp.input(LocationSearch)
 @bp.output(LocationsOut)
 @jwt_required()
-def get_states(query_data, country_id):
-    '''Get states'''
+def search_states(json_data, country_id):
+    '''Search states'''
 
     try:
-        return {'items': locations.get_states(
-            country_id,
-            query_data['search'],
-            query_data['page'],
-            query_data['per_page'])}
+        results, total = locations.search_states(
+            country_id=country_id,
+            state_id=json_data['id'],
+            name=json_data['name'],
+            page=json_data['page'],
+            per_page=json_data['per_page'])
+        return {'items': results, 'total': total}
     except Exception as ex:
         abort(500, str(ex))
 
 
-@bp.get('/cities/<string:state_id>')
-@bp.input(Pagination, location='query')
+@bp.post('/cities/<string:state_id>/search')
+@bp.input(LocationSearch)
 @bp.output(LocationsOut)
 @jwt_required()
-def get_cities(query_data, state_id):
+def get_cities(json_data, state_id):
     '''Get cities'''
 
     try:
-        return {'items': locations.get_cities(
-            state_id,
-            query_data['search'],
-            query_data['page'],
-            query_data['per_page'])}
+        results, total = locations.search_cities(
+            state_id=state_id,
+            city_id=json_data['id'],
+            name=json_data['name'],
+            page=json_data['page'],
+            per_page=json_data['per_page'])
+        return {'items': results, 'total': total}
     except Exception as ex:
         abort(500, str(ex))

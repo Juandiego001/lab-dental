@@ -1,0 +1,37 @@
+import type { DistributorSearch } from '~/shared/types/distributors'
+import type { ItemsTotal } from '~/shared/types/utils'
+
+export const useDistributors = () => {
+  const { notify } = useSnackbar()
+  const items: any = ref([])
+  const total: any = ref(15)
+
+  const getDistributors = async ({
+    distributorsIds,
+    name = '',
+    page = 1,
+    perPage = 15,
+  }: DistributorSearch): Promise<void> => {
+    try {
+      const data = await $api<ItemsTotal>('/api/distributors/search', {
+        body: {
+          distributorsIds,
+          name,
+          page,
+          perPage,
+        },
+        method: 'POST',
+      })
+      items.value = data.items
+      total.value = data.total
+    } catch (err) {
+      notify(err, 'error')
+    }
+  }
+
+  return {
+    items,
+    total,
+    getDistributors,
+  }
+}

@@ -1,19 +1,38 @@
 from core.app import db
 from core.models import Brand
-from sqlalchemy import or_, and_
 from werkzeug.exceptions import HTTPException
 
 
-def get_brands(search: str, page: int, per_page: int):
-    '''Get brands'''
+def search_brands(brand_id: int, name: str, slug: str, page: int, per_page: int):
+    '''Search brands'''
 
-    query = Brand.status == 'ACTIVE'
-    if search:
-        query = and_(Brand.status == 'ACTIVE',
-                     or_(Brand.name.ilike(f'%{search}%')))
+    query = [Brand.status == 'ACTIVE']
+    with_brand_id = None
+    if name:
+        query.append(Brand.name.ilike(f'%{name}%'))
+    if slug:
+        query.append(Brand.slug.ilike(f'%{slug}%'))
+    if brand_id:
+        query.append(Brand.id != brand_id)
+        with_brand_id = db.session.query(Brand)\
+            .filter(Brand.id == brand_id)\
+            .all()
 
-    return db.paginate(db.session.query(Brand).filter(query).order_by(Brand.id.desc()),
-                       page=page, per_page=per_page, count=True)
+    total = db.session.query(Brand)\
+        .filter(*query)\
+        .count()
+    total += len(with_brand_id) if with_brand_id else 0
+
+    brands = db.session.query(Brand)\
+        .filter(*query)\
+        .order_by(Brand.id.desc())\
+        .limit(per_page)\
+        .offset((page - 1) * per_page)\
+        .all()
+
+    if not with_brand_id:
+        return brands, total
+    return with_brand_id + brands, total
 
 
 def get_brand_by_id(brand_id: int):

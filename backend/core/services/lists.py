@@ -13,7 +13,7 @@ def get_lists(search: str, page: int, per_page: int):
     if search:
         query = and_(query, List_.name.ilike(f'%{search}%'))
 
-    return db.paginate(db.session.query(List_).filter(query).order_by(List_.id.desc()),
+    return db.paginate(db.session.query(List_).filter(query, List_.is_main == False).order_by(List_.id.desc()),
                        page=page, per_page=per_page, count=True)
 
 

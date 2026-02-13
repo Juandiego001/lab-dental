@@ -1,8 +1,21 @@
-from apiflask import fields
+from apiflask import Schema, fields
 from core.models import Address, Site
 from core.schemas.utils import BaseSchema
 from werkzeug.exceptions import HTTPException
-from marshmallow import ValidationError, post_load, validates_schema
+from marshmallow import ValidationError, post_load, validates_schema, validate
+
+
+class SiteSearch(Schema):
+    site_id = fields.Integer(
+        required=False, allow_none=True, data_key='siteId', load_default=None)
+    distributor_id = fields.Integer(
+        required=False, allow_none=True, data_key='distributorId', load_default=None)
+    client_id = fields.Integer(
+        required=False, allow_none=True, data_key='clientId', load_default=None)
+    name = fields.String(required=False, allow_none=True,
+                         validate=validate.Length(max=50), load_default='')
+    page = fields.Integer(load_default=1)
+    per_page = fields.Integer(data_key='perPage', load_default=15)
 
 
 class SiteIn(BaseSchema):
@@ -15,9 +28,43 @@ class SiteIn(BaseSchema):
         required=False, allow_none=True, data_key='stateId')
     city_id = fields.Integer(
         required=False, allow_none=True, data_key='cityId')
-    description = fields.String()
-    name = fields.String()
+    description = fields.String(
+        required=True, allow_none=False, validate=validate.Length(max=255))
+    name = fields.String(required=True, allow_none=False,
+                         validate=validate.Length(max=50))
     status = fields.String(load_default='ACTIVE')
+
+    @validates_schema
+    def name_exists(self, data, **kwargs):
+        '''
+        Validate the name exists and have a value
+
+        :param self: Description
+        :param data: Description
+        :param kwargs: Description
+        '''
+
+        if not 'name' in data:
+            raise ValidationError({'message':  "Site's name required"})
+
+        if not data['name']:
+            raise ValidationError({'message':  "Sites's name required"})
+
+    @validates_schema
+    def description_exists(self, data, **kwargs):
+        '''
+        Validate the description exists and have a value
+
+        :param self: Description
+        :param data: Description
+        :param kwargs: Description
+        '''
+
+        if not 'description' in data:
+            raise ValidationError({'message':  "Site's address required"})
+
+        if not data['description']:
+            raise ValidationError({'message':  "Sites's address required"})
 
 
 class SiteInCreate(SiteIn):
@@ -26,18 +73,16 @@ class SiteInCreate(SiteIn):
         '''There must be either a distributor id or a client id'''
 
         if 'distributor_id' in data and not data['distributor_id']:
-            raise ValidationError(
-                {'message':  'Distributor ID required'})
-
-        if 'client_id' in data and not data['client_id']:
-            raise ValidationError(
-                {'message':  'Client ID required'})
-
-        if 'distributor_id' in data and not data['distributor_id']:
             data.pop('distributor_id')
 
         if 'client_id' in data and not data['client_id']:
             data.pop('client_id')
+
+        if 'distributor_id' in data:
+            return data
+
+        if 'client_id' in data:
+            return data
 
     @post_load
     def make_object(self, data: dict, **kwargs):
@@ -56,14 +101,20 @@ class SiteInUpdate(SiteIn):
     def distributor_id_or_client_id(self, data: dict, **kwargs):
         '''There must be either a distributor id or a client id'''
 
-        if ('distributor_id' in data and not data['distributor_id']) and ('client_id' in data and not data['client_id']):
-            raise HTTPException('Distributor ID or Client ID required')
-
         if 'distributor_id' in data and not data['distributor_id']:
             data.pop('distributor_id')
 
         if 'client_id' in data and not data['client_id']:
             data.pop('client_id')
+
+        if 'distributor_id' in data:
+            return data
+
+        if 'client_id' in data:
+            return data
+
+        raise ValidationError(
+            {'message':  'Distributor ID or Client ID required'})
 
     @post_load
     def make_object(self, data: dict, **kwargs):

@@ -187,7 +187,13 @@
   "recoverPassword": {
     "title": "Recover password",
     "email": "Email",
-    "backToLogin": "Go back to login"
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "backToLogin": "Go back to login",
+    "rules": {
+      "passwordRequired": "The password is required",
+      "passwordsDontMatch": "Passwords do not match"
+    }
   },
   "distributors": {
     "title": "Distributor | Distributors",
@@ -203,9 +209,7 @@
       "message": "Are you sure you want to delete the distributor?"
     },
     "search": {
-      "title": "Search distributor",
-      "message": "Search distributor by name or ID",
-      "fields": "Name or id"
+      "title": "Distributors search"
     },
     "rules": {
       "nameRequired": "The name is required"
@@ -230,9 +234,7 @@
       "message": "Are you sure you want to delete the site?"
     },
     "search": {
-      "title": "Search site",
-      "message": "Seach site by name or ID",
-      "fields": "Name or id"
+      "title": "Sites search"
     },
     "rules": {
       "distributorRequired": "The distributor is required",
@@ -259,9 +261,7 @@
       "message": "Are you sure you want to delete the client?"
     },
     "search": {
-      "title": "Search client",
-      "message": "Search client by name or ID",
-      "fields": "Name or id"
+      "title": "Clients search"
     },
     "rules": {
       "distributorRequired": "The distributor is required",
@@ -291,9 +291,7 @@
       "message": "Are you sure you want to delete the user?"
     },
     "search": {
-      "title": "Search user",
-      "message": "Search user by full name, username, email or ID",
-      "fields": "Full name, username, email or id"
+      "title": "Users search"
     },
     "rules": {
       "roleRequired": "The role is required",
@@ -321,9 +319,7 @@
       "message": "Are you sure you want to delete the group?"
     },
     "search": {
-      "title": "Search group",
-      "message": "Search group by name or ID",
-      "fields": "Name or id"
+      "title": "Groups search"
     },
     "permissions": {
       "title": "Permissions",
@@ -353,9 +349,7 @@
       "message": "Are you sure you want to delete the brand?"
     },
     "search": {
-      "title": "Search brand",
-      "message": "Search brands by name, slug or ID",
-      "fields": "Name, slug or id"
+      "title": "Brands search"
     },
     "rules": {
       "nameRequired": "The name is required",
@@ -377,9 +371,7 @@
       "message": "Are you sure you want to delete the category?"
     },
     "search": {
-      "title": "Search category",
-      "message": "Search cateogires by name, slug or ID",
-      "fields": "Name, slug or id"
+      "title": "Categories search"
     },
     "rules": {
       "nameRequired": "The name is required",
@@ -388,8 +380,8 @@
   },
   "equipments": {
     "title": "Equipment | Equipments",
-    "serial": "Serial",
     "model": "Model",
+    "reference": "Reference",
     "create": {
       "title": "Create equipment"
     },
@@ -401,14 +393,13 @@
       "message": "Are you sure you want to delete the equipment?"
     },
     "search": {
-      "title": "Search equipment",
-      "message": "Search equipments by serial, model or ID",
-      "fields": "Serial, model or id"
+      "title": "Equipments search",
+      "fields": "Model, reference or ID"
     },
     "rules": {
       "brandRequired": "The brand is required",
       "categoryRequired": "The category is required",
-      "serialRequired": "The serial is required",
+      "referenceRequired": "The reference is required",
       "modelRequired": "The model is required"
     }
   },
@@ -428,9 +419,9 @@
       "message": "Are you sure you want to delete the part?"
     },
     "search": {
-      "title": "Search part",
+      "title": "Parts search",
       "message": "Search part by serial or ID",
-      "fields": "Serial or id"
+      "fields": "Serial or ID"
     },
     "rules": {
       "serialRequired": "The serial is required",
@@ -442,7 +433,7 @@
     "installedAt": "Installed At",
     "serial": "Serial",
     "installedDate": "Installed Date",
-    "formatPicture": "Format picture",
+    "expirationDate": "Expiration Date",
     "serialPicture": "Serial picture",
     "installationPictures": "Installation pictures",
     "create": {
@@ -456,9 +447,7 @@
       "message": "Are you sure you want to delete the installation?"
     },
     "search": {
-      "title": "Search installation",
-      "message": "Search installations by ID or equipment (model, serial or ID)",
-      "fields": "Installation ID or equipment (model, serial or ID)"
+      "title": "Installations search"
     },
     "approval": {
       "title": "Approve installation"
@@ -475,7 +464,6 @@
       "siteClientRequired": "The client site is required",
       "serialRequired": "The serial is required",
       "installedDateRequired": "The installed date is required",
-      "formatPictureRequired": "The format picture is required",
       "serialPictureRequired": "The serial picture is required",
       "installationPicturesRequired": "At least one installation picture is required"
     }
@@ -495,9 +483,9 @@
       "message": "Are you sure you want to delete the reason?"
     },
     "search": {
-      "title": "Search reason",
+      "title": "Reasons search",
       "message": "Search reason by name, slug or ID",
-      "fields": "Name, slug or id"
+      "fields": "Name, slug or ID"
     },
     "rules": {
       "nameRequired": "The name is required",
@@ -520,9 +508,9 @@
       "message": "Are you sure you want to delete the warranty?"
     },
     "search": {
-      "title": "Search warranty",
+      "title": "Warranties search",
       "message": "Search warranty by invoice or ID",
-      "fields": "Invoice or id"
+      "fields": "Invoice or ID"
     },
     "rules": {
       "invoiceRequired": "The invoice is required",
@@ -546,9 +534,9 @@
       "message": "Are you sure you want to delete the manual?"
     },
     "search": {
-      "title": "Search manual",
+      "title": "Manuals search",
       "message": "Search manual by name, type or ID",
-      "fields": "Name, type or id"
+      "fields": "Name, type or ID"
     },
     "rules": {
       "nameRequired": "The name is required",
@@ -574,7 +562,7 @@
       "message": "Are you sure you want to delete the list?"
     },
     "search": {
-      "title": "Search list",
+      "title": "Lists search",
       "message": "Search list by name, type or ID",
       "fields": "Name, type or ID"
     },
@@ -598,5 +586,6 @@
   "send": "Send",
   "options": "Options",
   "search": "Search",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "missingRequiredFields": "Missing required fields"
 }

@@ -3,14 +3,14 @@
     <v-card width="100%" flat>
       <v-card-title>{{ $t('reasons.title', 2) }}</v-card-title>
       <v-card-text>
-        <v-data-table :items="items" :headers="headers" :page="page" :items-per-page="perPage"
-          :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
+        <v-data-table :items="items" :headers="headers" :page="page" :items-per-page="perPage" :items-length="total"
+          :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" :disable-sort="true">
           <template v-slot:item.option="{ item }">
             <div class="d-flex align-center justify-center ga-2">
-              <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getReason(item.id)"></v-btn>
+              <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getReason(item.id)" />
               <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                @click="form.id = item.id; deleteDialog = true"></v-btn>
+                @click="form.id = item.id; deleteDialog = true" />
             </div>
           </template>
         </v-data-table>
@@ -24,13 +24,13 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('reasons.create.title') }}
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="createDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="createDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text>
         <v-form ref="createForm" v-model="createModel" @submit.prevent="createReason">
-          <v-row>
+          <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('reasons.name')"
                 :rules="[nameRequired]"></v-text-field>
@@ -56,13 +56,13 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('reasons.update.title') }}
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="updateDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="updateDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text>
         <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateReason">
-          <v-row>
+          <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('reasons.name')"
                 :rules="[nameRequired]"></v-text-field>
@@ -88,14 +88,14 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('reasons.delete.title') }}
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="deleteDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="deleteDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text class="text-center py-6">
         <p class="text-subtitle-1 mb-6 text-center">{{ $t('reasons.delete.message') }}</p>
         <v-btn @click="deleteDialog = false" variant="outlined">{{ $t('cancel') }}</v-btn>
-        <span class="mx-2"></span>
+        <span class="mx-2" />
         <v-btn @click="deleteReason" class="bg-red">{{ $t('confirm') }}</v-btn>
       </v-card-text>
     </v-card>
@@ -107,19 +107,18 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('reasons.search.title') }}
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="searchDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="searchDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text>
-        <p class="text-subtitle-2 pb-2">{{ $t('reasons.search.message') }}</p>
         <v-form @submit.prevent="doSearch">
-          <v-row no-gutters="">
+          <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="search" :label="$t('reasons.search.fields')" hide-details="auto"
                 prepend-inner-icon="mdi-magnify" clearable></v-text-field>
             </v-col>
-            <v-col class="text-end mt-4" cols="12">
+            <v-col class="text-end" cols="12">
               <v-btn class="bg-primary" type="submit">{{ $t('search') }}</v-btn>
             </v-col>
           </v-row>
@@ -130,10 +129,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onBeforeMount, } from 'vue'
-import { toRefs } from 'vue'
-import { searchMixin } from '~/mixins/searchMixin'
-import { createMixin } from '~/mixins/createMixin'
+import { ref, computed, watch, onBeforeMount } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { back } = useBack()
@@ -150,8 +146,8 @@ useHead({
   title: `SOE Latam | ${t('reasons.title', 2)}`
 })
 
-const { searchDialog } = toRefs(searchMixin)
-const { createDialog } = toRefs(createMixin)
+const searchDialog = ref(false);
+const createDialog = ref(false);
 const items = ref([]);
 const search = ref('');
 const page = ref(1);
@@ -180,7 +176,6 @@ const itemsPerPageOptions = computed(() => [
 ])
 
 const headers = computed(() => [
-  { title: 'Id', key: 'id', align: 'center', sortable: false },
   { title: t('reasons.name'), key: 'name', align: 'center', sortable: false },
   { title: t('reasons.slug'), key: 'slug', align: 'center', sortable: false },
   { title: t('options'), key: 'option', align: 'center', sortable: false }

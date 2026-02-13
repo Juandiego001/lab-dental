@@ -3,23 +3,29 @@ from core.app import db
 from core.services import equipments
 from apiflask import APIBlueprint, abort
 from core.schemas.utils import Message, Pagination
-from core.schemas.equipments import EquipmentInUpdate, EquipmentInCreate, EquipmentOut, EquipmentsOut
+from core.schemas.equipments import EquipmentInUpdate, EquipmentInCreate, EquipmentOut, EquipmentSearch, EquipmentsOut
 
 
 bp = APIBlueprint('equipments', __name__)
 
 
-@bp.get('/')
-@bp.input(Pagination, location='query')
+@bp.post('/search')
+@bp.input(EquipmentSearch)
 @bp.output(EquipmentsOut)
 @jwt_required()
-def get_equipments(query_data):
-    '''Get equipments'''
+def search_equipments(json_data):
+    '''Search equipments'''
 
     try:
-        results, total = equipments.get_equipments(query_data['search'],
-                                                   query_data['page'],
-                                                   query_data['per_page'])
+        results, total = equipments.search_equipments(
+            equipment_id=json_data['equipment_id'],
+            brand_id=json_data['brand_id'],
+            category_id=json_data['category_id'],
+            model=json_data['model'],
+            reference=json_data['reference'],
+            with_picture=json_data['with_picture'],
+            page=json_data['page'],
+            per_page=json_data['per_page'])
         return {'items': results, 'total': total}
     except Exception as ex:
         abort(500, str(ex))

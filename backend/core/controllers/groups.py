@@ -2,25 +2,26 @@ from core.services import groups
 from apiflask import APIBlueprint, abort
 from core.schemas.utils import Message, Pagination
 from flask_jwt_extended import jwt_required, current_user
-from core.schemas.groups import GroupInUpdate, GroupInCreate, GroupOut, GroupsOut
+from core.schemas.groups import GroupInUpdate, GroupInCreate, GroupOut, GroupSearch, GroupsOut
 
 
 bp = APIBlueprint('groups', __name__)
 
 
-@bp.get('/')
-@bp.input(Pagination, location='query')
+@bp.post('/search')
+@bp.input(GroupSearch)
 @bp.output(GroupsOut)
 @jwt_required()
-def get_groups(query_data):
-    '''Get groups'''
+def search_groups(json_data):
+    '''Search groups'''
 
     try:
-        results, total = groups.get_groups(
-            current_user,
-            query_data['search'],
-            query_data['page'],
-            query_data['per_page'])
+        results, total = groups.search_groups(
+            current_user=current_user,
+            distributor_id=json_data['distributor_id'],
+            name=json_data['name'],
+            page=json_data['page'],
+            per_page=json_data['per_page'])
         return {'items': results, 'total': total}
     except Exception as ex:
         abort(500, str(ex))

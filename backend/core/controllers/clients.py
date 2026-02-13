@@ -3,25 +3,28 @@ from core.app import db
 from core.services import clients
 from apiflask import APIBlueprint, abort
 from core.schemas.utils import Message, Pagination
-from core.schemas.clients import ClientInUpdate, ClientInCreate, ClientOut, ClientsOut
+from core.schemas.clients import ClientInUpdate, ClientInCreate, ClientOut, ClientSearch, ClientsOut
 
 
 bp = APIBlueprint('clients', __name__)
 
 
-@bp.get('/')
-@bp.input(Pagination, location='query')
+@bp.post('/search')
+@bp.input(ClientSearch)
 @bp.output(ClientsOut)
 @jwt_required()
-def get_clients(query_data):
-    '''Get clients'''
+def search_clients(json_data):
+    '''Search clients'''
 
     try:
-        results, total = clients.get_clients(
-            current_user,
-            query_data['search'],
-            query_data['page'],
-            query_data['per_page'])
+        results, total = clients.search_clients(
+            current_user=current_user,
+            distributor_id=json_data['distributor_id'],
+            client_id=json_data['client_id'],
+            name=json_data['name'],
+            phone=json_data['phone'],
+            page=json_data['page'],
+            per_page=json_data['per_page'])
 
         return {'items': results, 'total': total}
     except Exception as ex:

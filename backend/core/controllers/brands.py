@@ -2,26 +2,28 @@ from flask_jwt_extended import jwt_required
 from core.app import db
 from core.services import brands
 from apiflask import APIBlueprint, abort
-from werkzeug.exceptions import HTTPException
 from core.schemas.utils import Message, Pagination
-from core.schemas.brands import BrandInUpdate, BrandInCreate, BrandOut, BrandsOut
+from core.schemas.brands import BrandInUpdate, BrandInCreate, BrandOut, BrandSearch, BrandsOut
 
 
 bp = APIBlueprint('brands', __name__)
 
 
-@bp.get('/')
-@bp.input(Pagination, location='query')
+@bp.post('/search')
+@bp.input(BrandSearch)
 @bp.output(BrandsOut)
 @jwt_required()
-def get_brands(query_data):
-    '''Get brands'''
+def search_brands(json_data):
+    '''Search brands'''
 
     try:
-        results = brands.get_brands(query_data['search'],
-                                         query_data['page'],
-                                         query_data['per_page'])
-        return {'items': results, 'total': results.total}
+        results, total = brands.search_brands(
+            brand_id=json_data['brand_id'],
+            name=json_data['name'],
+            slug=json_data['slug'],
+            page=json_data['page'],
+            per_page=json_data['per_page'])
+        return {'items': results, 'total': total}
     except Exception as ex:
         abort(500, str(ex))
 

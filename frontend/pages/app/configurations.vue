@@ -7,9 +7,9 @@
           @update:itemsPerPage="v => perPage = v">
 
           <template v-slot:item.option="{ item }">
-            <v-btn class="my-2 bg-primary" icon="mdi-pencil" @click="getUser(item.id)"></v-btn>
-            <span class="mx-2"></span>
-            <v-btn class="my-2 bg-red" icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true"></v-btn>
+            <v-btn class="my-2 bg-primary" icon="mdi-pencil" @click="getUser(item.id)" />
+            <span class="mx-2" />
+            <v-btn class="my-2 bg-red" icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" />
           </template>
 
         </v-data-table>
@@ -23,8 +23,8 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           Create user
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="createDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" icon="mdi-close" @click="createDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text>
@@ -57,8 +57,8 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           Update user
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="updateDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" icon="mdi-close" @click="updateDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text>
@@ -95,15 +95,15 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           Delete user
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="deleteDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" icon="mdi-close" @click="deleteDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text class="text-center py-6">
         <p class="text-subtitle-1 mb-6 text-center">¿Are you sure you want to delete the user?</p>
 
         <v-btn @click="deleteDialog = false" variant="outlined">Cancel</v-btn>
-        <span class="mx-2"></span>
+        <span class="mx-2" />
         <v-btn @click="deleteUser" class="bg-red">Confirm</v-btn>
       </v-card-text>
     </v-card>
@@ -115,20 +115,19 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           Search users
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="searchDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" icon="mdi-close" @click="searchDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text>
-        <p class="text-subtitle-2 pb-2">Search users by full name, email or document</p>
         <v-form @submit.prevent="doSearch">
-          <v-row no-gutters="">
+          <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="search" label="Full name, email, document" hide-details="auto"
                 prepend-inner-icon="mdi-magnify" clearable></v-text-field>
             </v-col>
 
-            <v-col class="text-end mt-4" cols="12">
+            <v-col class="text-end" cols="12">
               <v-btn class="bg-primary" type="submit">Search</v-btn>
             </v-col>
 
@@ -141,9 +140,6 @@
 
 <script setup>
 import { ref, computed, watch, onBeforeMount, } from 'vue'
-import { toRefs } from 'vue'
-import { searchMixin } from '~/mixins/searchMixin'
-import { createMixin } from '~/mixins/createMixin'
 
 definePageMeta({
   layout: 'app',
@@ -154,8 +150,8 @@ useHead({
   title: 'SOE Latam | Configuration'
 })
 
-const { searchDialog } = toRefs(searchMixin)
-const { createDialog } = toRefs(createMixin)
+const searchDialog = ref(false);
+const createDialog = ref(false);
 const items = ref([]);
 const search = ref('');
 const page = ref(1);

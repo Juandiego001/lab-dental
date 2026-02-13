@@ -1,26 +1,30 @@
+from core.schemas.equipments import EquipmentsExistingIn, EquipmentsOut
 from core.services import installations
 from apiflask import APIBlueprint, abort
 from flask_jwt_extended import jwt_required, current_user
 from core.schemas.utils import Message, Pagination
-from core.schemas.installations import InstallationInUpdate, InstallationInCreate, InstallationOut, InstallationRejectCommentsIn, InstallationsOut
+from core.schemas.installations import InstallationInUpdate, InstallationInCreate, InstallationOut, InstallationRejectCommentsIn, InstallationSearch, InstallationsOut
 
 
 bp = APIBlueprint('installations', __name__)
 
 
-@bp.get('/')
-@bp.input(Pagination, location='query')
+@bp.post('/search')
+@bp.input(InstallationSearch)
 @bp.output(InstallationsOut)
 @jwt_required()
-def get_installations(query_data):
-    '''Get installations'''
+def search_installations(json_data):
+    '''Search installations'''
 
     try:
-        results, total = installations.get_installations(
-            current_user,
-            query_data['search'],
-            query_data['page'],
-            query_data['per_page'])
+        results, total = installations.search_installations(
+            current_user=current_user,
+            equipment_id=json_data['equipment_id'],
+            distributor_id=json_data['distributor_id'],
+            client_id=json_data['client_id'],
+            serial=json_data['serial'],
+            page=json_data['page'],
+            per_page=json_data['per_page'])
         return {'items': results, 'total': total}
     except Exception as ex:
         abort(500, str(ex))
@@ -82,6 +86,22 @@ def delete_installations(installation_id):
         abort(500, str(ex))
 
 
+# @bp.post('/equipments')
+# @bp.input(EquipmentsExistingIn)
+# @bp.output(EquipmentsOut)
+# @jwt_required()
+# def get_equipments_for_installation(json_data):
+#     '''Get equipments for installation autocomplete. Existing equipments and new ones'''
+
+#     try:
+#         results = installations.get_equipments_for_installation(
+#             json_data['search'] if 'search' in json_data else '',
+#             json_data['equipment_id'] if 'equipment_id' in json_data else 0)
+#         return {'items': results}
+#     except Exception as ex:
+#         abort(500, str(ex))
+
+
 @bp.patch('/approve/<int:installation_id>')
 @bp.output(Message)
 @jwt_required()
@@ -105,7 +125,6 @@ def reject_installation(installation_id, json_data):
     '''Reject installation'''
 
     try:
-        print('JSON_DATA: ', json_data)
         installations.reject_installation(installation_id)
         installations.notify_rejection(
             installation_id, json_data['reject_comments'])

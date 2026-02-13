@@ -98,8 +98,8 @@ CREATE TABLE equipments(
     id SERIAL PRIMARY KEY NOT NULL,
     brand_id INT NOT NULL,
     category_id INT NOT NULL,
-    serial VARCHAR(200) NOT NULL, -- Uno de estos dos campos debe ser único
     model VARCHAR(200) NOT NULL, -- Uno de estos dos campos debe ser único
+    reference VARCHAR(200) NOT NULL, -- Uno de estos dos campos debe ser único
     status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP::TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP::TIMESTAMP,

@@ -1,13 +1,63 @@
 from core.models import Distributor
 from apiflask import Schema, fields
-from marshmallow import post_load, validates_schema
+from marshmallow import post_load, validates_schema, ValidationError, validate
 from core.schemas.utils import BaseSchema
+
+
+class DistributorSearch(Schema):
+    distributors_ids = fields.List(fields.Integer(required=False, allow_none=True, load_default=None),
+                                   required=False, allow_none=True, data_key='distributorsIds', load_default=None)
+    name = fields.String(required=False, allow_none=True,
+                         validate=validate.Length(max=50), load_default='')
+    page = fields.Integer(load_default=1)
+    per_page = fields.Integer(data_key='perPage', load_default=15)
+
+    @validates_schema
+    def validate_distributors_ids(self, data: dict, **kwargs):
+        '''
+        Docstring for validate_distributors_ids
+        
+        :param self: Description
+        :param data: Description
+        :type data: dict
+        :param kwargs: Description
+        '''
+
+        if not 'distributors_ids' in data:
+            return data
+        
+        if not data['distributors_ids']:
+            return data
+            
+        for i in data['distributors_ids']:
+            if i != None:
+                return data
+        
+        data['distributors_ids'] = None
+        return data
 
 
 class DistributorIn(BaseSchema):
     id = fields.Integer()
-    name = fields.String(allow_none=False, validate=lambda v: v != '')
+    name = fields.String(required=True, allow_none=False,
+                         validate=validate.Length(max=50))
     status = fields.String(load_default='ACTIVE')
+
+    @validates_schema
+    def name_exists(self, data, **kwargs):
+        '''
+        Validate the name exists and have a value
+
+        :param self: Description
+        :param data: Description
+        :param kwargs: Description
+        '''
+
+        if not 'name' in data:
+            raise ValidationError({'message':  "Distributor's name required"})
+
+        if not data['name']:
+            raise ValidationError({'message':  "Distributor's name required"})
 
 
 class DistributorInCreate(DistributorIn):

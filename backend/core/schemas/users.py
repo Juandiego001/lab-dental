@@ -3,9 +3,49 @@ from sqlalchemy import and_, or_
 from core.app import db
 from core.models import User
 from apiflask import Schema, fields
-from marshmallow import ValidationError, post_load, pre_load, validates_schema
+from marshmallow import ValidationError, post_load, pre_load, validates_schema, validate
 from core.schemas.utils import BaseSchema
 from werkzeug.exceptions import HTTPException
+
+
+
+class UserSearch(Schema):
+    users_ids = fields.List(fields.Integer(), required=False, allow_none=True, data_key='usersIds', load_default=None)
+    distributor_id = fields.Integer(
+        required=False, allow_none=True, data_key='distributorId', load_default=None)
+    is_main = fields.Boolean(required=False, allow_none=True, data_key='isMain', load_default=False)
+    role = fields.String(required=False, allow_none=True, load_default='')
+    full_name = fields.String(required=False, allow_none=True,
+                         validate=validate.Length(max=50), data_key='fullName', load_default='')
+    username = fields.String(required=False, allow_none=True,
+                          validate=validate.Length(max=20), load_default='')
+    email = fields.String(required=False, allow_none=True, validate=validate.Length(max=250), load_default='')
+    page = fields.Integer(load_default=1)
+    per_page = fields.Integer(data_key='perPage', load_default=15)
+
+    @validates_schema
+    def validate_users_ids(self, data: dict, **kwargs):
+        '''
+        Docstring for validate_users_ids
+        
+        :param self: Description
+        :param data: Description
+        :type data: dict
+        :param kwargs: Description
+        '''
+
+        if not 'users_ids' in data:
+            return data
+        
+        if not data['users_ids']:
+            return data
+            
+        for i in data['users_ids']:
+            if i != None:
+                return data
+        
+        data['users_ids'] = None
+        return data
 
 
 class UserInLogIn(BaseSchema):
@@ -17,12 +57,62 @@ class UserIn(BaseSchema):
     id = fields.Integer()
     distributor_id = fields.Integer(
         data_key='distributorId', required=False, allow_none=True)
-    full_name = fields.String(data_key='fullName')
-    username = fields.String()
-    email = fields.String()
+    full_name = fields.String(required=True, allow_none=False, data_key='fullName', validate=validate.Length(max=50))
+    username = fields.String(required=True, allow_none=False, validate=validate.Length(max=20))
+    email = fields.String(required=True, allow_none=False, validate=validate.Length(max=250))
     role = fields.String()
     password = fields.String()
     status = fields.String(load_default='ACTIVE')
+
+    @validates_schema
+    def full_name_exists(self, data, **kwargs):
+        '''
+        Validate the full name exists and have a value
+        
+        :param self: Description
+        :param data: Description
+        :param kwargs: Description
+        '''
+
+        if not 'full_name' in data :
+            raise ValidationError({'message':  'Full name required'})
+        
+        if not data['full_name']:
+            raise ValidationError({'message':  'Full name required'})
+
+
+    @validates_schema
+    def username_exists(self, data, **kwargs):
+        '''
+        Validate the username exists and have a value
+        
+        :param self: Description
+        :param data: Description
+        :param kwargs: Description
+        '''
+
+        if not 'username' in data :
+            raise ValidationError({'message':  'Username required'})
+        
+        if not data['username']:
+            raise ValidationError({'message':  'Username required'})
+
+
+    @validates_schema
+    def email_exists(self, data, **kwargs):
+        '''
+        Validate the email exists and have a value
+        
+        :param self: Description
+        :param data: Description
+        :param kwargs: Description
+        '''
+
+        if not 'email' in data :
+            raise ValidationError({'message':  'Email required'})
+        
+        if not data['email']:
+            raise ValidationError({'message':  'Email required'})
 
 
 class UsersExistingIn(BaseSchema):
@@ -158,3 +248,29 @@ class ProfileOut(Schema):
     role = fields.String()
     email = fields.String()
     abilities = fields.List(fields.Nested(AbilitiesOut), dump_only=True)
+
+
+class TokenIn(Schema):
+    token = fields.String()
+
+class EmailIn(Schema):
+    email = fields.String()
+
+class PasswordIn(Schema):
+    token = fields.String()
+    password = fields.String()
+
+    @pre_load
+    def convert_password(self, data, **kwargs):
+        '''
+        Docstring for convert_password
+        
+        :param self: Description
+        :param data: Description
+        :param kwargs: Description
+        '''
+
+        new_password = data['password'].encode('utf-8')
+        new_password = hashpw(new_password, gensalt()).decode('utf-8')
+        data['password'] = new_password
+        return data

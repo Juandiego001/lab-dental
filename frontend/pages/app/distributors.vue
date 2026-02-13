@@ -1,20 +1,30 @@
 <template>
   <v-container fluid class="fill-height align-start">
     <v-card width="100%" flat>
-      <v-card-title>{{ $t('distributors.title', 2) }}</v-card-title>
+      <v-card-title class="d-flex justify-space-between">
+        <p>{{ $t('distributors.title', 2) }}</p>
+        <div>
+          <client-only>
+            <v-btn v-if="$ability.can('create', 'distributors')" class="me-2" icon="mdi-plus" size="small"
+              variant="text" @click="createDialog = !createDialog" />
+            <v-btn v-if="$ability.can('read', 'distributors')" class="me-2" icon="mdi-magnify" size="small"
+              variant="text" @click="searchDialog = !searchDialog" />
+          </client-only>
+        </div>
+      </v-card-title>
       <v-card-text>
         <client-only>
-          <v-data-table :items="items" :headers="headers" :page="page" :items-per-page="perPage" :items-length="total"
-            :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
+          <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
+            :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
             @update:itemsPerPage="v => perPage = v" :disable-sort="true">
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
-                <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getDistributor(item.id)"></v-btn>
+                <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getDistributor(item.id)" />
                 <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                  @click="form.id = item.id; deleteDialog = true"></v-btn>
+                  @click="form.id = item.id; deleteDialog = true" />
               </div>
             </template>
-          </v-data-table>
+          </v-data-table-server>
         </client-only>
       </v-card-text>
     </v-card>
@@ -26,20 +36,20 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('distributors.create.title') }}
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="createDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="createDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text>
         <v-form ref="createForm" v-model="createModel" @submit.prevent="createDistributor">
-          <v-row>
+          <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('distributors.name')"
-                :rules="[nameRequired]"></v-text-field>
+                :rules="[nameRequired]" counter="50" maxlength="50" />
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
-              <span class="mx-1"></span>
+              <span class="mx-1" />
               <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
             </v-col>
           </v-row>
@@ -54,20 +64,20 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('distributors.update.title') }}
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="updateDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="updateDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text>
         <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateDistributor">
-          <v-row>
+          <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('distributors.name')"
-                :rules="[nameRequired]"></v-text-field>
+                :rules="[nameRequired]" counter="50" maxlength="50" />
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
-              <span class="mx-1"></span>
+              <span class="mx-1" />
               <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
             </v-col>
           </v-row>
@@ -82,14 +92,14 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('distributors.delete.title') }}
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" @click="deleteDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" icon="mdi-close" @click="deleteDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text class="text-center py-6">
         <p class="text-subtitle-1 mb-6 text-center">{{ $t('distributors.delete.message') }}</p>
         <v-btn @click="deleteDialog = false" variant="outlined">{{ $t('cancel') }}</v-btn>
-        <span class="mx-2"></span>
+        <span class="mx-2" />
         <v-btn @click="deleteDistributor" class="bg-red">{{ $t('confirm') }}</v-btn>
       </v-card-text>
     </v-card>
@@ -101,19 +111,21 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('distributors.search.title') }}
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="searchDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="searchDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text>
-        <p class="text-subtitle-2 pb-2">{{ $t('distributors.search.message') }}</p>
-        <v-form @submit.prevent="doSearch">
-          <v-row no-gutters="">
+        <v-form @submit.prevent="async () => {
+          await searchDistributors(1, 15);
+          searchDialog = false;
+        }">
+          <v-row dense>
             <v-col cols="12">
-              <v-text-field v-model="search" :label="$t('distributors.search.fields')" hide-details="auto"
-                prepend-inner-icon="mdi-magnify" clearable></v-text-field>
+              <v-text-field v-model="searchForm.name" :label="$t('distributors.name')" hide-details="auto"
+                prepend-inner-icon="mdi-magnify" counter="50" maxlength="50" clearable />
             </v-col>
-            <v-col class="text-end mt-4" cols="12">
+            <v-col class="text-end" cols="12">
               <v-btn class="bg-primary" type="submit">{{ $t('search') }}</v-btn>
             </v-col>
           </v-row>
@@ -125,15 +137,13 @@
 
 <script setup>
 import { ref, computed, watch, onBeforeMount, } from 'vue'
-import { toRefs } from 'vue'
-import { searchMixin } from '~/mixins/searchMixin'
-import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
 
 const { back } = useBack();
 const { notify } = useSnackbar();
 const { $ability } = useNuxtApp();
 const { t } = useI18n();
+const { items, total, getDistributors } = useDistributors();
 
 definePageMeta({
   layout: 'app',
@@ -144,13 +154,10 @@ useHead({
   title: `SOE Latam | ${t('distributors.title', 2)}`
 })
 
-const { searchDialog } = toRefs(searchMixin)
-const { createDialog } = toRefs(createMixin)
-const items = ref([]);
-const search = ref('');
+const searchDialog = ref(false);
+const createDialog = ref(false);
 const page = ref(1);
 const perPage = ref(15);
-const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
 const createModel = ref(false);
@@ -158,6 +165,9 @@ const updateModel = ref(false);
 const createForm = ref();
 const updateForm = ref();
 const form = ref({
+  name: ''
+})
+const searchForm = ref({
   name: ''
 })
 
@@ -169,8 +179,7 @@ const itemsPerPageOptions = computed(() => [
 ])
 
 const headers = computed(() => [
-  { title: 'Id', key: 'id', align: 'center', sortable: false },
-  { title: t('distributors.name'), key: 'name', align: 'center', sortable: false },
+  { title: t('distributors.name'), key: 'name', sortable: false },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
@@ -178,6 +187,7 @@ watch(createDialog, (val) => {
   if (!val) {
     createForm.value.reset();
     resetForm();
+    return;
   }
 })
 
@@ -193,19 +203,18 @@ watch(deleteDialog, (val) => {
 })
 
 watch(page, async () => {
-  await getDistributors();
+  await searchDistributors();
 })
 
 watch(perPage, async () => {
-  await getDistributors();
+  await searchDistributors();
 })
 
 onBeforeMount(async () => {
   if ($ability.can('read', 'distributors')) {
-    await getDistributors();
+    await getDistributors({})
     return;
   }
-
   back();
 })
 
@@ -215,21 +224,14 @@ const resetForm = () => {
   }
 }
 
-const getDistributors = async () => {
+const searchDistributors = async (defPage, defPerPage) => {
   try {
-    const data = await $api('/api/distributors/', {
-      query: {
-        search: search.value,
-        page: page.value,
-        perPage: perPage.value
-      },
-      method: 'GET'
-    })
-    items.value = data.items
-    total.value = data.total
-  } catch (err) {
-    notify(err, 'error');
-  }
+    await getDistributors({
+      name: searchForm.value.name,
+      page: defPage || page.value,
+      perPage: defPerPage || perPage.value
+    });
+  } catch (err) { }
 }
 
 const getDistributor = async (id) => {
@@ -253,7 +255,7 @@ const createDistributor = async () => {
     })
 
     notify(message, 'success');
-    await getDistributors()
+    await getDistributors({});
     createDialog.value = false;
   } catch (err) {
     notify(err, 'error');
@@ -268,7 +270,11 @@ const updateDistributor = async () => {
       body: form.value
     })
     notify(message, 'success');
-    await getDistributors()
+    await getDistributors({
+      name: searchForm.value.name,
+      page: page.value,
+      perPage: perPage.value
+    });
     updateDialog.value = false
   } catch (err) {
     notify(err, 'error');
@@ -281,23 +287,13 @@ const deleteDistributor = async () => {
       method: 'DELETE'
     })
     notify(message, 'success');
-    await getDistributors();
+    await getDistributors({});
     deleteDialog.value = false;
   } catch (err) {
     notify(err, 'error');
   }
 }
 
-const doSearch = async () => {
-  try {
-    page.value = 1
-    perPage.value = 15
-    await getDistributors()
-    searchDialog.value = false
-  } catch (err) {
-    notify(err, 'error');
-  }
-}
 
 // Rules
 const nameRequired = (v) => !!v || t('distributors.rules.nameRequired');

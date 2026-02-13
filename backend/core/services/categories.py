@@ -1,20 +1,38 @@
 from core.app import db
 from core.models import Category
-from sqlalchemy import or_, and_
 from werkzeug.exceptions import HTTPException
 
 
-def get_categories(search: str, page: int, per_page: int):
-    '''Get categories'''
+def search_categories(category_id: int, name: str, slug: str, page: int, per_page: int):
+    '''Search categories'''
 
-    query = Category.status == 'ACTIVE'
-    if search:
-        query = and_(Category.status == 'ACTIVE',
-                     or_(Category.name.ilike(f'%{search}%'),
-                         Category.slug.ilike(f'%{search}%')))
+    query = [Category.status == 'ACTIVE']
+    with_category_id = None
+    if name:
+        query.append(Category.name.ilike(f'%{name}%'))
+    if slug:
+        query.append(Category.slug.ilike(f'%{slug}%'))
+    if category_id:
+        query.append(Category.id != category_id)
+        with_category_id = db.session.query(Category)\
+            .filter(Category.id == category_id)\
+            .all()
 
-    return db.paginate(db.session.query(Category).filter(query).order_by(Category.id.desc()),
-                       page=page, per_page=per_page, count=True)
+    total = db.session.query(Category)\
+        .filter(*query)\
+        .count()
+    total += len(with_category_id) if with_category_id else 0
+
+    categories = db.session.query(Category)\
+        .filter(*query)\
+        .order_by(Category.id.desc())\
+        .limit(per_page)\
+        .offset((page - 1) * per_page)\
+        .all()
+
+    if not with_category_id:
+        return categories, total
+    return with_category_id + categories, total
 
 
 def get_category_by_id(category_id: int):

@@ -40,22 +40,15 @@ useHead({
 })
 
 const { notify } = useSnackbar();
-const { $ability } = useNuxtApp();
 const email = ref('')
 
 const sendEmail = async () => {
   try {
-    const response = await $api('/api/users/login', {
+    const response = await $api('/api/users/password', {
       method: 'POST',
-      body: {
-        email: email.value,
-        password: password.value
-      }
+      body: { email: email.value }
     })
-    const { abilities } = await $api('/api/users/profile', { method: 'GET' });
-    $ability.update(abilities);
     notify(response.message, 'success')
-    navigateTo('/app');
   } catch (err) {
     notify(err, 'error');
   }

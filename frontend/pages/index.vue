@@ -150,9 +150,13 @@ const strapiUrl = config.public.strapiUrl;
 const articles = ref([]);
 const videos = ref([]);
 
+useHead({
+  title: 'SOE Latam | Home'
+})
+
 onBeforeMount(async () => {
   try {
-    const { data } = await $api('/strapi/articles?populate=*');
+    // const { data } = await $api('/strapi/articles?populate=*');
     articles.value = data;
   } catch (err) {
     console.log('Ocurrió un error al intentar obtener las entradas de blog');

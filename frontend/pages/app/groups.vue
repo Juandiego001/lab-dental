@@ -1,22 +1,32 @@
 <template>
   <v-container fluid class="fill-height align-start">
     <v-card width="100%" flat>
-      <v-card-title>{{ $t('groups.title', 2) }}</v-card-title>
+      <v-card-title class="d-flex justify-space-between">
+        <p>{{ $t('groups.title', 2) }}</p>
+        <div>
+          <client-only>
+            <v-btn v-if="$ability.can('create', 'groups')" class="me-2" icon="mdi-plus" size="small" variant="text"
+              @click="createDialog = !createDialog" />
+            <v-btn v-if="$ability.can('read', 'groups')" class="me-2" icon="mdi-magnify" size="small" variant="text"
+              @click="searchDialog = !searchDialog" />
+          </client-only>
+        </div>
+      </v-card-title>
       <v-card-text>
         <client-only>
-          <v-data-table :items="items" :headers="tableHeaders" :page="page" :items-per-page="perPage"
+          <v-data-table-server :items="items" :headers="tableHeaders" :page="page" :items-per-page="perPage"
             :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
             @update:itemsPerPage="v => perPage = v" :disable-sort="true">
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
-                <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getGroup(item.id)"></v-btn>
+                <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getGroup(item.id)" />
                 <v-btn class="my-2 mx-2 bg-secondary" size="small" icon="mdi-shield-edit"
-                  @click="form = item; getPermissions()"></v-btn>
+                  @click="form = item; getPermissions()" />
                 <v-btn v-if="item.id !== 1" class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                  @click="form.id = item.id; deleteDialog = true"></v-btn>
+                  @click="form.id = item.id; deleteDialog = true" />
               </div>
             </template>
-          </v-data-table>
+          </v-data-table-server>
         </client-only>
       </v-card-text>
     </v-card>
@@ -28,30 +38,36 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('groups.create.title') }}
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" icon="mdi-close" size="small" @click="createDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" icon="mdi-close" size="small" @click="createDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text>
         <v-form ref="createForm" v-model="createModel" @submit.prevent="createGroup">
-          <v-row>
+          <v-row dense>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('groups.name')"
-                :rules="[nameRequired]"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('groups.name')" :rules="[nameRequired]"
+                counter="30" maxlength="30" />
             </v-col>
             <v-col v-if="isAdmin" cols="12">
               <v-autocomplete v-model="form.distributorId" :label="$t('distributors.title')" :items="distributors"
-                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable
-                :rules="[distributorRequired]" />
+                item-title="name" item-value="id" hide-details="auto" clearable :rules="[distributorRequired]"
+                @update:search="(name) => {
+                  if (!createDialog) return;
+                  getDistributors({ distributorsIds: [form.distributorId], name })
+                }" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.usersIds" :label="$t('users.title', 2)" :items="users" item-title="fullName"
-                item-value="id" hide-details="auto" @update:search="getUsers" clearable multiple chips
-                :readonly="isAdmin && !form.distributorId" :rules="[usersRequired]" />
+                item-value="id" hide-details="auto" clearable multiple chips :readonly="isAdmin && !form.distributorId"
+                :rules="[usersRequired]" @update:search="(fullName) => {
+                  if (!createDialog) return;
+                  getUsers({ distributorId: form.distributorId, usersIds: form.usersIds, fullName, isMain: true })
+                }" />
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
-              <span class="mx-1"></span>
+              <span class="mx-1" />
               <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
             </v-col>
           </v-row>
@@ -66,30 +82,36 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('groups.update.title') }}
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="updateDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="updateDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text>
         <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateGroup">
-          <v-row>
+          <v-row dense>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('groups.name')"
-                :rules="[nameRequired]"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('groups.name')" :rules="[nameRequired]"
+                counter="30" maxlength="30" />
             </v-col>
             <v-col v-if="isAdmin" cols="12">
               <v-autocomplete v-model="form.distributorId" :label="$t('distributors.title')" :items="distributors"
-                item-title="name" item-value="id" hide-details="auto" @update:search="getDistributors" clearable
-                :rules="[distributorRequired]" />
+                item-title="name" item-value="id" hide-details="auto" clearable :rules="[distributorRequired]"
+                @update:search="(name) => {
+                  if (!updateDialog) return;
+                  getDistributors({ distributorsIds: [form.distributorId], name })
+                }" />
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="form.usersIds" :label="$t('users.title', 2)" :items="users" item-title="fullName"
-                item-value="id" hide-details="auto" @update:search="getUsers" clearable multiple chips
-                :readonly="isAdmin && !form.distributorId" :rules="[usersRequired]" />
+                item-value="id" hide-details="auto" clearable multiple chips :readonly="isAdmin && !form.distributorId"
+                :rules="[usersRequired]" @update:search="(fullName) => {
+                  if (!updateDialog) return;
+                  getUsers({ distributorId: form.distributorId, usersIds: form.usersIds, fullName, isMain: true })
+                }" />
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
-              <span class="mx-1"></span>
+              <span class="mx-1" />
               <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
             </v-col>
           </v-row>
@@ -104,14 +126,14 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('groups.delete.title') }}
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="deleteDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="deleteDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text class="text-center py-6">
         <p class="text-subtitle-1 mb-6 text-center">{{ $t('groups.delete.message') }}</p>
         <v-btn @click="deleteDialog = false" variant="outlined">{{ $t('cancel') }}</v-btn>
-        <span class="mx-2"></span>
+        <span class="mx-2" />
         <v-btn @click="deleteGroup" class="bg-red">{{ $t('confirm') }}</v-btn>
       </v-card-text>
     </v-card>
@@ -123,19 +145,36 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('groups.search.title') }}
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="searchDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="searchDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text>
-        <p class="text-subtitle-2 pb-2">{{ $t('groups.search.message') }}</p>
         <v-form @submit.prevent="doSearch">
-          <v-row no-gutters="">
+          <v-row dense>
+            <!-- Distributors -->
+            <template v-if="isAdmin">
+              <v-col cols="12">
+                <p class="text-body-2 text-primary">{{ $t('distributors.title', 2) }}</p>
+              </v-col>
+              <v-col class="pb-4" cols="12">
+                <v-autocomplete v-model="searchForm.distributorId" :label="$t('distributors.title')"
+                  :items="distributors" item-title="name" item-value="id" hide-details="auto" clearable
+                  @update:search="(name) => getDistributors({ distributorsIds: [searchForm.distributorId], name })" />
+              </v-col>
+            </template>
+
+            <!-- Groups -->
             <v-col cols="12">
-              <v-text-field v-model="search" :label="$t('groups.search.fields')" hide-details="auto"
-                prepend-inner-icon="mdi-magnify" clearable></v-text-field>
+              <p class="text-body-2 text-primary">{{ $t('groups.title', 2) }}</p>
             </v-col>
-            <v-col class="text-end mt-4" cols="12">
+            <v-col cols="12">
+              <v-text-field v-model="searchForm.name" :label="$t('groups.name')" hide-details="auto" clearable
+                counter="30" maxlength="30" />
+            </v-col>
+
+            <!-- Search Button -->
+            <v-col class="text-end" cols="12">
               <v-btn class="bg-primary" type="submit">{{ $t('search') }}</v-btn>
             </v-col>
           </v-row>
@@ -150,8 +189,8 @@
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
           {{ $t('groups.permissions.title') }}
-          <v-spacer></v-spacer>
-          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="permissionsDialog = false"></v-btn>
+          <v-spacer />
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="permissionsDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text>
@@ -190,16 +229,15 @@
 
 <script setup>
 import { ref, computed, watch, onBeforeMount, } from 'vue'
-import { toRefs } from 'vue'
-import { searchMixin } from '~/mixins/searchMixin'
-import { createMixin } from '~/mixins/createMixin'
 import { useI18n } from 'vue-i18n'
 
 const { back } = useBack()
 const { notify } = useSnackbar();
 const { $ability } = useNuxtApp();
-const { profile } = useProfile();
+const { isAdmin } = useProfile();
 const { t } = useI18n();
+const { items: distributors, getDistributors } = useDistributors();
+const { items: users, getUsers } = useUsers();
 
 definePageMeta({
   layout: 'app',
@@ -210,15 +248,11 @@ useHead({
   title: `SOE Latam | ${t('groups.title', 2)}`
 })
 
-const { searchDialog } = toRefs(searchMixin)
-const { createDialog } = toRefs(createMixin)
-const users = ref([]);
-const selectedUsers = ref([]);
-const distributors = ref([]);
+const searchDialog = ref(false);
+const createDialog = ref(false);
 
 /* Groups */
 const items = ref([]);
-const search = ref('');
 const page = ref(1);
 const perPage = ref(15);
 const total = ref(15);
@@ -241,8 +275,10 @@ const form = ref({
   distributorName: '',
   usersIds: []
 })
-
-const isAdmin = computed(() => profile.value.role === 'ADMIN');
+const searchForm = ref({
+  distributorId: null,
+  name: ''
+})
 
 const itemsPerPageOptions = computed(() => [
   { value: 15, title: '15' },
@@ -254,16 +290,14 @@ const itemsPerPageOptions = computed(() => [
 const tableHeaders = computed(() => {
   if (isAdmin.value) {
     return [
-      { title: 'Id', key: 'id', align: 'center', sortable: false },
-      { title: t('groups.name'), key: 'name', align: 'center', sortable: false },
-      { title: t('distributors.title'), key: 'distributorName', align: 'center', sortable: false },
+      { title: t('groups.name'), key: 'name', sortable: false },
+      { title: t('distributors.title'), key: 'distributorName', sortable: false },
       { title: t('options'), key: 'option', align: 'center', sortable: false }
     ]
   }
 
   return [
-    { title: 'Id', key: 'id', align: 'center', sortable: false },
-    { title: t('groups.name'), key: 'name', align: 'center', sortable: false },
+    { title: t('groups.name'), key: 'name', sortable: false },
     { title: t('options'), key: 'option', align: 'center', sortable: false }
   ]
 })
@@ -277,34 +311,35 @@ const headersPermissions = computed(() => [
 ])
 
 watch(createDialog, async (val) => {
-  if (val) {
-    if (isAdmin.value) {
-      await getDistributors();
-    } else {
-      await getUsers();
-    }
-  } else {
+  if (!val) {
     createForm.value.reset();
     resetForm();
+    return;
   }
+  if (isAdmin.value) {
+    await getDistributors({});
+    return;
+  }
+  await getUsers({ distributorId: form.value.distributorId, isMain: true });
 })
 
 watch(updateDialog, async (val) => {
-  if (val) {
-    if (isAdmin.value) await getDistributors(form.value.distributorName);
-    await getUsers();
-  } else {
+  if (!val) {
     updateForm.value.reset();
     resetForm();
+    return;
   }
+  if (isAdmin.value) await getDistributors({ distributorsIds: [form.value.distributorId] });
 })
 
 watch(() => form.value.distributorId, async (val, prev) => {
-  if (!val || (prev && prev !== form.value.distributorId)) {
-    delete form.value.usersIds;
-  }
+  if (!val) return;
+  if (prev && prev !== form.value.distributorId) delete form.value.usersIds;
+  await getUsers({ distributorId: form.value.distributorId, usersIds: form.value.usersIds, isMain: true });
+})
 
-  await getUsers();
+watch(searchDialog, async (val) => {
+  if (val && isAdmin.value) await getDistributors({ distributorsIds: [searchForm.value.distributorId] });
 })
 
 watch(deleteDialog, async (val) => {
@@ -314,7 +349,6 @@ watch(deleteDialog, async (val) => {
 watch(permissionsDialog, (val) => {
   if (!val) resetForm();
 })
-
 
 watch(page, async () => {
   await getGroups();
@@ -338,14 +372,13 @@ onBeforeMount(async () => {
     await getGroups();
     return;
   }
-
   back();
 })
 
 const resetForm = () => {
   form.value = {
     name: '',
-    distributorId: '',
+    distributorId: null,
     distributorName: '',
     usersIds: null
   }
@@ -353,13 +386,14 @@ const resetForm = () => {
 
 const getGroups = async () => {
   try {
-    const data = await $api('/api/groups/', {
-      query: {
-        search: search.value,
+    const data = await $api('/api/groups/search', {
+      body: {
+        distributorId: searchForm.value.distributorId,
+        name: searchForm.value.name,
         page: page.value,
         perPage: perPage.value
       },
-      method: 'GET'
+      method: 'POST'
     })
     items.value = data.items
     total.value = data.total
@@ -429,52 +463,6 @@ const doSearch = async () => {
     perPage.value = 15
     await getGroups()
     searchDialog.value = false
-  } catch (err) {
-    notify(err, 'error');
-  }
-}
-
-const getDistributors = async (search) => {
-  try {
-    if (!createDialog.value && !updateDialog.value) return;
-    const data = await $api('/api/distributors/', {
-      query: {
-        search,
-        page: 1,
-        perPage: 15
-      },
-      method: 'GET'
-    })
-    distributors.value = data.items
-  } catch (err) {
-    notify(err, 'error');
-  }
-}
-
-const getUsers = async (search) => {
-  try {
-    if (!createDialog.value && !updateDialog.value) return;
-
-    let data;
-    if (form.value.distributorId) {
-      data = await $api(`/api/distributors/${form.value.distributorId}/users`, {
-        body: {
-          search,
-          usersIds: form.value.usersIds
-        },
-        method: 'POST'
-      })
-    } else {
-      data = await $api(`/api/users`, {
-        query: {
-          search,
-          page: 1,
-          perPage: 15
-        },
-        method: 'GET'
-      })
-    }
-    users.value = data.items
   } catch (err) {
     notify(err, 'error');
   }

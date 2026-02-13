@@ -13,7 +13,7 @@
       <v-card-title class="pa-4">
         <v-row no-gutters class="align-center">
           <p class="text-h5 font-weight-bold">{{ $t('roi.settings') }}</p>
-          <v-spacer></v-spacer>
+          <v-spacer />
           <p class="text-subtitle-1 me-3 font-weight-medium">{{ $t('roi.exchangeRate') }}</p>
           <v-text-field v-model.number="exchangeRate" class="font-weight-medium" density="compact" type="number"
             variant="outlined" hide-details="auto" max-width="180" @update:model-value="handleExchangeRate">
@@ -32,7 +32,7 @@
           <v-row>
             <v-col cols="12" class="d-flex align-center pb-0">
               <p class="font-weight-medium text-subtitle-1">{{ $t('roi.averageServicesDay') }}</p>
-              <v-spacer></v-spacer>
+              <v-spacer />
               <v-text-field v-model.number="servicesDay" class="font-weight-medium" density="compact" variant="outlined"
                 hide-details="auto" max-width="80"></v-text-field>
             </v-col>
@@ -42,7 +42,7 @@
 
             <v-col cols="12" class="d-flex align-center pb-0">
               <p class="font-weight-medium text-subtitle-1">{{ $t('roi.serviceSaleRate') }}</p>
-              <v-spacer></v-spacer>
+              <v-spacer />
               <v-text-field v-model.number="servicesSaleRate" class="font-weight-medium" density="compact"
                 variant="outlined" hide-details="auto" max-width="80"></v-text-field>
             </v-col>
@@ -53,7 +53,7 @@
 
             <v-col cols="12" class="d-flex align-center pb-0">
               <p class="font-weight-medium text-subtitle-1">{{ $t('roi.employeesMonthSalary') }}</p>
-              <v-spacer></v-spacer>
+              <v-spacer />
               <v-text-field v-model.number="employeesMonthSalary" class="font-weight-medium" density="compact"
                 variant="outlined" hide-details="auto" max-width="80"></v-text-field>
             </v-col>
@@ -64,7 +64,7 @@
 
             <v-col cols="12" class="d-flex align-center pb-0">
               <p class="font-weight-medium text-subtitle-1">{{ $t('roi.daysWorkedMonth') }}</p>
-              <v-spacer></v-spacer>
+              <v-spacer />
               <v-text-field v-model.number="daysWorkedMonth" class="font-weight-medium" density="compact"
                 variant="outlined" hide-details="auto" max-width="80"></v-text-field>
             </v-col>
@@ -75,7 +75,7 @@
 
             <v-col cols="12" class="d-flex align-center pb-0">
               <p class="font-weight-medium text-subtitle-1">{{ $t('roi.hoursWorkDay') }}</p>
-              <v-spacer></v-spacer>
+              <v-spacer />
               <v-text-field v-model.number="hoursWorkedDay" class="font-weight-medium" density="compact"
                 variant="outlined" hide-details="auto" max-width="80"></v-text-field>
             </v-col>
@@ -85,7 +85,7 @@
 
             <v-col cols="12" class="d-flex align-center pb-0">
               <p class="font-weight-medium text-subtitle-1">{{ $t('roi.rentPremisesMonth') }}</p>
-              <v-spacer></v-spacer>
+              <v-spacer />
               <v-text-field v-model.number="rentPremisesMonth" class="font-weight-medium" density="compact"
                 variant="outlined" hide-details="auto" max-width="100"></v-text-field>
             </v-col>
@@ -96,7 +96,7 @@
 
             <v-col cols="12" class="d-flex align-center pb-0">
               <p class="font-weight-medium text-subtitle-1">{{ $t('roi.areaPremises') }}</p>
-              <v-spacer></v-spacer>
+              <v-spacer />
               <v-text-field v-model.number="areaPremises" class="font-weight-medium" density="compact"
                 variant="outlined" hide-details="auto" max-width="80"></v-text-field>
             </v-col>
@@ -107,7 +107,7 @@
 
             <v-col cols="12" class="d-flex align-center pb-0">
               <p class="font-weight-medium text-subtitle-1">{{ $t('roi.workSiteArea') }}</p>
-              <v-spacer></v-spacer>
+              <v-spacer />
               <v-text-field v-model.number="workArea" class="font-weight-medium" density="compact" variant="outlined"
                 hide-details="auto" max-width="80"></v-text-field>
             </v-col>
@@ -117,7 +117,7 @@
 
             <v-col cols="12" class="d-flex align-center pb-0">
               <p class="font-weight-medium text-subtitle-1">{{ $t('roi.equipmentLeaseMonth') }}</p>
-              <v-spacer></v-spacer>
+              <v-spacer />
               <v-text-field v-model.number="equipmentLeaseMonth" class="font-weight-medium" density="compact"
                 variant="outlined" hide-details="auto" max-width="100"></v-text-field>
             </v-col>
@@ -128,7 +128,7 @@
 
             <v-col cols="12" class="d-flex align-center pb-0">
               <p class="font-weight-medium text-subtitle-1">{{ $t('roi.equipmentPrice') }}</p>
-              <v-spacer></v-spacer>
+              <v-spacer />
               <v-text-field v-model.number="equipmentPrice" class="font-weight-medium" density="compact"
                 variant="outlined" hide-details="auto" max-width="100"></v-text-field>
             </v-col>
@@ -174,6 +174,12 @@
 
 <script setup>
 import { ref, computed, reactive } from 'vue';
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n();
+
+useHead({
+  title: `SOE Latam | ${t('roi.title')}`
+})
 
 // Variables de estado (Refs)
 const exchangeRate = ref(1);

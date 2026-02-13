@@ -18,7 +18,7 @@
           <v-row class="py-4 px-2">
             <p class="text-caption pa-1 rounded-lg text-white" :style="{ background: post.category_color }">{{
               post.category_slug }}</p>
-            <v-spacer></v-spacer>
+            <v-spacer />
             <p class="text-caption">{{ $t('forum.replies') }} {{ post.reply_count }}</p>
           </v-row>
         </v-card-title>
@@ -28,7 +28,7 @@
         <v-card-actions>
           <v-row no-gutters>
             <p class="text-caption">{{ post.username }}</p>
-            <v-spacer></v-spacer>
+            <v-spacer />
             <p class="text-caption">{{ $dateFormat(new Date(post.created_at)) }}</p>
           </v-row>
         </v-card-actions>

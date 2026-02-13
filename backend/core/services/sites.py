@@ -1,54 +1,57 @@
 from core.app import db
-from core.models import Address, City, Client, Country, Distributor, Site, State, User
 from sqlalchemy import or_, and_
 from werkzeug.exceptions import HTTPException
-from sqlalchemy import func
-
 from core.services.distributors import get_distributor_from_user
+from core.models import Address, City, Client, Country, Distributor, Site, State, User
 
 
-def get_sites(current_user: User, search: str, page: int, per_page: int):
+def search_sites(current_user: User, site_id: int, distributor_id: int, client_id: int, name: str, page: int, per_page: int):
     '''Get sites and total of sites in DB'''
 
-    query = Site.status == 'ACTIVE'
-    if search:
-        query = and_(Site.status == 'ACTIVE',
-                     or_(Site.name.ilike(f'%{search}%')))
+    query = [Site.status == 'ACTIVE']
+    with_site_id = None
+    if distributor_id:
+        query.append(Site.distributor_id == distributor_id)
+    if client_id:
+        query.append(Site.client_id == client_id)
+    if name:
+        query.append(Site.name.ilike(f'%{name}%'))
 
-    if current_user.role == 'ADMIN':
-        total = db.session.query(Site).count()
-        return list(db.session.execute(
-            db.session.query(
-                *Site.__table__.c,
-                Client.name.label('client_name'),
-                Distributor.name.label('distributor_name'))
-            .outerjoin(Site.client)
-            .outerjoin(Site.distributor)
-            .filter(query)
-            .order_by(Site.id.desc())
-            .limit(per_page)
-            .offset((page - 1) * per_page)
-        ).unique()), total
+    query_stmt = db.session.query(
+        *Site.__table__.c,
+        Client.name.label('client_name'),
+        Distributor.name.label('distributor_name'))\
+        .outerjoin(Site.client)\
+        .outerjoin(Site.distributor)
 
-    distributor: Distributor = get_distributor_from_user(current_user)
-    query = and_(query, or_(Site.distributor_id == distributor.id,
-                 Client.distributor_id == distributor.id))
+    if site_id:
+        query.append(Site.id != site_id)
+        with_site_id = query_stmt\
+            .filter(Site.id == site_id)\
+            .all()
+
+    if current_user.role != 'ADMIN':
+        distributor: Distributor = get_distributor_from_user(current_user)
+        query.append(or_(Site.distributor_id == distributor.id,
+                         Client.distributor_id == distributor.id))
+
     total = db.session.query(Site)\
         .outerjoin(Site.client)\
         .outerjoin(Site.distributor)\
-        .filter(query).count()
-    return list(db.session.execute(
-        db.session.query(
-            *Site.__table__.c,
-            Client.name.label('client_name'),
-            Distributor.name.label('distributor_name'))
-        .outerjoin(Site.client)
-        .outerjoin(Site.distributor)
-        .filter(query)
+        .filter(*query)\
+        .count()
+    total += len(with_site_id) if with_site_id else 0
+    sites = list(db.session.execute(
+        query_stmt
+        .filter(*query)
         .order_by(Site.id.desc())
         .limit(per_page)
         .offset((page - 1) * per_page)
-    ).unique()), total
+    ).unique())
+
+    if not with_site_id:
+        return sites, total
+    return with_site_id + sites, total
 
 
 def get_clients_sites(client_id: int, search: str):

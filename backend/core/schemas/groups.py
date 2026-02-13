@@ -1,14 +1,38 @@
 from apiflask import Schema, fields
-from marshmallow import post_load, pre_load
+from marshmallow import ValidationError, post_load, pre_load, validate, validates_schema
 from core.models import Group
 from core.schemas.utils import BaseSchema
 
+class GroupSearch(Schema):
+    distributor_id = fields.Integer(
+        required=False, allow_none=True, data_key='distributorId', load_default=None)
+    name = fields.String(required=False, allow_none=True,
+                         validate=validate.Length(max=50), load_default='')
+    page = fields.Integer(load_default=1)
+    per_page = fields.Integer(data_key='perPage', load_default=15)
 
 class GroupIn(BaseSchema):
-    name = fields.String()
-    distributor_id = fields.Integer(required=False, data_key='distributorId')
+    name = fields.String(required=True, allow_none=False,
+                         validate=validate.Length(max=30))
+    distributor_id = fields.Integer(required=False, allow_none=True, data_key='distributorId')
     users_ids = fields.List(fields.Integer, data_key='usersIds')
     status = fields.String(load_default='ACTIVE')
+
+    @validates_schema
+    def name_exists(self, data, **kwargs):
+        '''
+        Validate the name exists and have a value
+
+        :param self: Description
+        :param data: Description
+        :param kwargs: Description
+        '''
+
+        if not 'name' in data:
+            raise ValidationError({'message':  'Group name required'})
+
+        if not data['name']:
+            raise ValidationError({'message':  'Group name required'})
 
 
 class GroupInCreate(GroupIn):

@@ -187,7 +187,13 @@
   "recoverPassword": {
     "title": "Recuperar contraseña",
     "email": "Correo",
-    "backToLogin": "Regresar al inicio de sesión"
+    "newPassword": "Nueva contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "backToLogin": "Regresar al inicio de sesión",
+    "rules": {
+      "passwordRequired": "La contraseña es requerida",
+      "passwordsDontMatch": "Las contraseñas no coinciden"
+    }
   },
   "distributors": {
     "title": "Distribuidor | Distribuidores",
@@ -203,9 +209,7 @@
       "message": "¿Está seguro que desea eliminar el distribuidor?"
     },
     "search": {
-      "title": "Buscar distribuidor",
-      "message": "Buscar distribuidor por nombre o ID",
-      "fields": "Nombre o id"
+      "title": "Buscar distribuidor"
     },
     "rules": {
       "nameRequired": "El nombre es requerido"
@@ -230,9 +234,7 @@
       "message": "¿Está seguro que desea eliminar la sede?"
     },
     "search": {
-      "title": "Buscar sede",
-      "message": "Buscar sede por nombre o ID",
-      "fields": "Nombre o id"
+      "title": "Buscar sede"
     },
     "rules": {
       "distributorRequired": "El distribuidor es requerido",
@@ -259,9 +261,7 @@
       "message": "¿Está seguro que desea eliminar el cliente?"
     },
     "search": {
-      "title": "Buscar cliente",
-      "message": "Buscar cliente por nombre o ID",
-      "fields": "Nombre o id"
+      "title": "Buscar cliente"
     },
     "rules": {
       "distributorRequired": "El distribuidor es requerido",
@@ -291,9 +291,7 @@
       "message": "¿Está seguro que desea eliminar el usuario?"
     },
     "search": {
-      "title": "Buscar usuario",
-      "message": "Buscar usuario por nombre completo, nombre de usuario, correo o ID",
-      "fields": "Nombre completo, nombre de usuario, correo o id"
+      "title": "Buscar usuario"
     },
     "rules": {
       "roleRequired": "El rol es requerido",
@@ -321,9 +319,7 @@
       "message": "Are you sure you want to delete the grupo?"
     },
     "search": {
-      "title": "Buscar grupo",
-      "message": "Buscar grupo por nombre o ID",
-      "fields": "Nombre o id"
+      "title": "Buscar grupo"
     },
     "permissions": {
       "title": "Permisos",
@@ -353,9 +349,7 @@
       "message": "¿Está seguro que desea eliminar la marca?"
     },
     "search": {
-      "title": "Buscar marca",
-      "message": "Buscar marcas por nombre, slug o ID",
-      "fields": "Nombre, slug o id"
+      "title": "Buscar marca"
     },
     "rules": {
       "nameRequired": "El nombre es requerido",
@@ -377,9 +371,7 @@
       "message": "¿Está seguro que desea eliminar la categoría?"
     },
     "search": {
-      "title": "Buscar categoría",
-      "message": "Buscar categorías por nombre, slug o ID",
-      "fields": "Nombre, slug o id"
+      "title": "Buscar categoría"
     },
     "rules": {
       "nameRequired": "El nombre es requerido",
@@ -388,8 +380,8 @@
   },
   "equipments": {
     "title": "Equipo | Equipos",
-    "serial": "Serial",
     "model": "Modelo",
+    "reference": "Referencia",
     "create": {
       "title": "Create equipo"
     },
@@ -402,14 +394,13 @@
     },
     "search": {
       "title": "Buscar equipo",
-      "message": "Buscar equipos por serial, modelo o ID",
-      "fields": "Serial, modelo o id"
+      "fields": "Modelo, referencia o ID"
     },
     "rules": {
       "brandRequired": "La marca es requerida",
       "categoryRequired": "La categoría es requerida",
-      "serialRequired": "El serial es requerido",
-      "modelRequired": "El modelo es requerido"
+      "modelRequired": "El modelo es requerido",
+      "referenceRequired": "La referencia es requerida"
     }
   },
   "parts": {
@@ -429,7 +420,7 @@
     "search": {
       "title": "Buscar parte",
       "message": "Buscar parte por serial o ID",
-      "fields": "Serial o id"
+      "fields": "Serial o ID"
     },
     "rules": {
       "serialRequired": "El serial es requerido",
@@ -441,7 +432,7 @@
     "installedAt": "Instalado en",
     "serial": "Serial",
     "installedDate": "Fecha de instalación",
-    "formatPicture": "Foto de formato",
+    "expirationDate": "Fecha de expiración",
     "serialPicture": "Foto de serial",
     "installationPictures": "Fotos de la instalación",
     "create": {
@@ -455,9 +446,7 @@
       "message": "¿Está seguro que desea eliminar la instalación?"
     },
     "search": {
-      "title": "Buscar instalación",
-      "message": "Buscar instalaciones por ID O equipo (modelo, serial o ID)",
-      "fields": "ID de instalación o equipo (modelo, serial o ID)"
+      "title": "Buscar instalación"
     },
     "approval": {
       "title": "Aprobar instalación"
@@ -474,7 +463,6 @@
       "siteClientRequired": "La sede del cliente es requerida",
       "serialRequired": "El serial es requerido",
       "installedDateRequired": "La fecha de instalación es requerida",
-      "formatPictureRequired": "La imagen del formato es requerida",
       "serialPictureRequired": "La imagen del serial es requerida",
       "installationPicturesRequired": "Por lo menos una foto de la instalación es requerida"
     }
@@ -496,7 +484,7 @@
     "search": {
       "title": "Buscar motivo",
       "message": "Buscar motivo por name, slug o ID",
-      "fields": "Nombre, slug o id"
+      "fields": "Nombre, slug o ID"
     },
     "rules": {
       "nameRequired": "El nombre es requerido",
@@ -521,7 +509,7 @@
     "search": {
       "title": "Buscar garantía",
       "message": "Buscar garantía por factura o ID",
-      "fields": "Factura o id"
+      "fields": "Factura o ID"
     },
     "rules": {
       "invoiceRequired": "La factura es requerida",
@@ -547,7 +535,7 @@
     "search": {
       "title": "Buscar manual",
       "message": "Buscar manual por nombre, tipo o ID",
-      "fields": "Nombre, tipo o id"
+      "fields": "Nombre, tipo o ID"
     },
     "rules": {
       "nameRequired": "El nombre es requerido",
@@ -575,7 +563,7 @@
     "search": {
       "title": "Buscar lista",
       "message": "Buscar lista por nombre, tipo o ID",
-      "fields": "Nombre, tipo o id"
+      "fields": "Nombre, tipo o ID"
     },
     "rules": {
       "nameRequired": "El nombre es requerido",
@@ -597,5 +585,6 @@
   "send": "Enviar",
   "options": "Opciones",
   "search": "Buscar",
-  "cancel": "Cancelar"
+  "cancel": "Cancelar",
+  "missingRequiredFields": "Campos requeridos faltantes"
 }
