@@ -35,6 +35,7 @@ export default defineNuxtConfig({
     "@nuxtjs/i18n",
   ],
   i18n: {
+    strategy: 'no_prefix',
     bundle: {
       optimizeTranslationDirective: false,
     },

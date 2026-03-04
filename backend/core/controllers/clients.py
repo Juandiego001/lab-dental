@@ -4,6 +4,7 @@ from core.services import clients
 from apiflask import APIBlueprint, abort
 from core.schemas.utils import Message, Pagination
 from core.schemas.clients import ClientInUpdate, ClientInCreate, ClientOut, ClientSearch, ClientsOut
+from flask_babel import gettext
 
 
 bp = APIBlueprint('clients', __name__)
@@ -28,7 +29,7 @@ def search_clients(json_data):
 
         return {'items': results, 'total': total}
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.get('/<int:client_id>')
@@ -40,7 +41,7 @@ def get_client(client_id):
     try:
         return clients.get_client_by_id(client_id)
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/')
@@ -51,10 +52,9 @@ def create_clients(client):
 
     try:
         clients.create_client(current_user, client)
-        return {'message': 'Client registered successfully'}
+        return {'message': gettext('clientCreated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.put('/<int:client_id>')
@@ -65,10 +65,9 @@ def update_clients(client_id, json_data):
     '''Update client'''
     try:
         clients.update_client(client_id, json_data)
-        return {'message': 'Client updated successfully'}
+        return {'message': gettext('clientUpdated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.delete('/<int:client_id>')
@@ -79,7 +78,6 @@ def delete_clients(client_id):
 
     try:
         clients.delete_client(client_id)
-        return {'message': 'Client deleted successfully'}
+        return {'message': gettext('clientDeleted')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))

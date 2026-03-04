@@ -11,6 +11,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from core.models import Installation, InstallationFile
 from core.schemas.installations import InstallationCreatedNotification, InstallationApprovedNotification
 from core.models import Client, Distributor, DistributorList, Equipment, Installation, List_, Site, User, UserList
+from flask_babel import force_locale, gettext
 
 
 def search_installations(current_user: User, equipment_id: int, distributor_id: int, client_id: int, serial: str, page: int, per_page: int):
@@ -148,31 +149,44 @@ def create_installation(data: dict):
 def notify_creation(installation: Installation = None):
     '''Send notification to every admin that manages the distributor that creates an installation'''
 
-    users_ = db.session.query(User.email).distinct(User.email)\
+    installation_data = InstallationCreatedNotification().dump(
+        get_installation_by_id(installation.id))
+    installation_files_attachments = [
+        {
+            'path': installation_data['serial_file']['path'],
+            'filename': installation_data['serial_file']['originalName']
+        },
+        *[{'path': evidence['path'], 'filename': evidence['originalName']} for evidence in installation_data['evidences_files']]
+    ]
+    installation_data['app_url'] = f'{FRONTEND_APP_BASE_URL}/app/installations'
+
+    users_ = db.session.query(User)\
         .join(UserList)\
         .join(List_)\
         .join(DistributorList)\
-        .filter(and_(DistributorList.distributor_id == installation.distributor_id, User.status == 'ACTIVE', User.role == 'ADMIN')).all()
+        .filter(and_(DistributorList.distributor_id == installation.distributor_id, User.status == 'ACTIVE', User.role == 'ADMIN'))\
+        .distinct(User.email)\
+        .order_by(User.email)\
+        .all()
 
-    users_emails = [user_data[0] for user_data in users_]
+    users_emails_by_language = {'es': [], 'en': []}
+    for each_user in users_:
+        users_emails_by_language[each_user.language].append(
+            each_user.email)
 
-    # If there are users to notify
-    if len(users_emails):
-        installation_data = InstallationCreatedNotification().dump(
-            get_installation_by_id(installation.id))
-        installation_files_attachments = [
-            {
-                'path': installation_data['serial_file']['path'],
-                'filename': installation_data['serial_file']['originalName']
-            },
-            *[{'path': evidence['path'], 'filename': evidence['originalName']} for evidence in installation_data['evidences_files']]
-        ]
-        installation_data['app_url'] = f'{FRONTEND_APP_BASE_URL}/app/installations'
-
-        send_mail(f'SOE Latam - Registro de certificado de instalación #{installation.id}',
-                  users_emails, 'register_installation.html',
-                  installation_data,
-                  installation_files_attachments)
+    for each_language in users_emails_by_language.keys():
+        users_filtered = users_emails_by_language[each_language]
+        if len(users_filtered) > 0:
+            with force_locale(each_language):
+                mail_subject = gettext(u'SOE Latam - Registro de certificado de instalación #%(id)s',
+                                       id=installation.id)
+            send_mail(
+                subject=mail_subject,
+                to=users_filtered,
+                plantilla='register_installation.html',
+                params=installation_data,
+                attachments=installation_files_attachments,
+                language=each_language)
 
 
 def update_installation(installation_id: int, data: dict):
@@ -229,20 +243,32 @@ def notify_approval(installation_id: int):
         get_installation_by_id(installation_id))
     installation_data['app_url'] = f'{FRONTEND_APP_BASE_URL}/app/installations'
 
-    users_ = db.session.query(User.email).distinct(User.email)\
+    users_ = db.session.query(User)\
         .join(UserList)\
         .join(List_)\
         .join(DistributorList)\
         .filter(and_(DistributorList.distributor_id == installation_data['distributor_id'], User.status == 'ACTIVE', User.role != 'ADMIN'))\
+        .distinct(User.email)\
+        .order_by(User.email)\
         .all()
 
-    users_emails = [user_data[0] for user_data in users_]
+    users_emails_by_language = {'es': [], 'en': []}
+    for each_user in users_:
+        users_emails_by_language[each_user.language].append(
+            each_user.email)
 
-    # If there are users to notify
-    if len(users_emails):
-        send_mail(f'SOE Latam - Aprobación de instalación #{installation_id}',
-                  ['juandiego14012003@gmail.com'], 'installation_approved.html',
-                  installation_data)
+    for each_language in users_emails_by_language.keys():
+        users_filtered = users_emails_by_language[each_language]
+        if len(users_filtered) > 0:
+            with force_locale(each_language):
+                mail_subject = gettext(u'SOE Latam - Aprobación de instalación #%(id)s',
+                                       id=installation_id)
+            send_mail(
+                subject=mail_subject,
+                to=users_filtered,
+                plantilla='installation_approved.html',
+                params=installation_data,
+                language=each_language)
 
 
 def reject_installation(installation_id: int):
@@ -263,51 +289,28 @@ def notify_rejection(installation_id: int, reject_comments: str):
     installation_data['reject_comments'] = reject_comments
     installation_data['app_url'] = f'{FRONTEND_APP_BASE_URL}/app/installations'
 
-    users_ = db.session.query(User.email).distinct(User.email)\
+    users_ = db.session.query(User)\
         .join(UserList)\
         .join(List_)\
         .join(DistributorList)\
         .filter(and_(DistributorList.distributor_id == installation_data['distributor_id'], User.status == 'ACTIVE', User.role != 'ADMIN'))\
+        .distinct(User.email)\
+        .order_by(User.email)\
         .all()
+    users_emails_by_language = {'es': [], 'en': []}
+    for each_user in users_:
+        users_emails_by_language[each_user.language].append(
+            each_user.email)
 
-    users_emails = [user_data[0] for user_data in users_]
-
-    # If there are users to notify
-    if len(users_emails):
-        send_mail(f'SOE Latam - Rechazo de instalación #{installation_id}',
-                  ['juandiego14012003@gmail.com'], 'installation_rejected.html',
-                  installation_data)
-
-
-# def get_equipments_for_installation(search: str, equipment_id: int = 0):
-#     '''Get equipments for installation autocomplete. Existing equipments and new ones'''
-
-#     query = [Equipment.status == 'ACTIVE']
-
-#     if search:
-#         query.append(or_(
-#             Equipment.model.ilike(f'%{search}%'),
-#             Equipment.reference.ilike(f'%{search}%'),
-#             literal(search).ilike('%' + Equipment.model + '%'),
-#             literal(search).ilike('%' + Equipment.reference + '%')))
-
-#     selection_fields = [
-#         *Equipment.__table__.c,
-#         func.concat(Equipment.model, ' - ',
-#                     Equipment.reference).label('model_reference'),
-#     ]
-
-#     q_selected = db.session.query(*selection_fields)\
-#         .filter(Equipment.id == equipment_id)
-#     result1 = list(db.session.execute(q_selected))
-
-#     q_search = db.session.query(*selection_fields)\
-#         .filter(
-#         and_(
-#             Equipment.id != equipment_id,
-#             *query
-#         )
-#     ).limit(15)
-#     result2 = list(db.session.execute(q_search))
-
-#     return result1 + result2
+    for each_language in users_emails_by_language.keys():
+        users_filtered = users_emails_by_language[each_language]
+        if len(users_filtered) > 0:
+            with force_locale(each_language):
+                mail_subject = gettext(u'SOE Latam - Rechazo de instalación #%(id)s',
+                                       id=installation_id)
+            send_mail(
+                subject=mail_subject,
+                to=users_filtered,
+                plantilla='installation_rejected.html',
+                params=installation_data,
+                language=each_language)

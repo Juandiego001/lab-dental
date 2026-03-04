@@ -37,7 +37,6 @@
 </template>
 
 <script setup>
-import { useI18n } from 'vue-i18n'
 const { t } = useI18n();
 
 definePageMeta({
@@ -66,7 +65,7 @@ const logIn = async () => {
     const { abilities } = await $api('/api/users/profile', { method: 'GET' });
     $ability.update(abilities);
     notify(response.message, 'success')
-    navigateTo('/app');
+    await navigateTo('/app');
   } catch (err) {
     notify(err, 'error');
   }

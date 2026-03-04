@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rejected Installation Notification</title>
+  <title>{{ _('rejectedInstallationNotification') }}</title>
   <style>
     * {
       padding: 0;
@@ -29,10 +29,10 @@
 
     <tr>
       <td style="padding: 1rem;">
-        <p style="margin-bottom: 1rem;">Estimados {{ distributor }},</p>
+        <p style="margin-bottom: 1rem;">{{ _('dearColleagues') }} {{ distributor }},</p>
 
         <p>
-          La instalación con los siguientes datos ha sido
+          {{ _('installationWithFollowingData') }}
           <span style="
             padding-left: 0.5rem;
             padding-right: 0.5rem;
@@ -42,20 +42,20 @@
             border-radius: 8px;
             color: white;
             font-size: 12px;
-          ">RECHAZADA</span>
+          ">{{ _('rejected') }}</span>
         </p>
 
         <ul style="padding-left: 1.75rem; margin-top: 0.5rem; margin-bottom: 1rem;">
           <li>ID <span style="font-weight: bold;">#{{ id }}.</span></li>
-          <li>Equipment: <span style="font-weight: bold;">{{ equipment }}.</span></li>
+          <li>{{ _('equipment') }}: <span style="font-weight: bold;">{{ equipment }}.</span></li>
           <li>Serial: <span style="font-weight: bold;">{{ serial }}.</span></li>
-          <li>Installed date: <span style="font-weight: bold;">{{ installed_date }}.</span></li>
-          <li>Distributor site: <span style="font-weight: bold;">{{ distributor_site }}.</span></li>
-          <li>Client: <span style="font-weight: bold;">{{ client }}.</span></li>
-          <li>Client site: <span style="font-weight: bold;">{{ client_site }}.</span></li>
+          <li>{{ _('installedDate') }}: <span style="font-weight: bold;">{{ installed_date }}.</span></li>
+          <li>{{ _('distributorSite') }}: <span style="font-weight: bold;">{{ distributor_site }}.</span></li>
+          <li>{{ _('client') }}: <span style="font-weight: bold;">{{ client }}.</span></li>
+          <li>{{ _('clientSite') }}: <span style="font-weight: bold;">{{ client_site }}.</span></li>
         </ul>
 
-        <p style="margin-bottom: 1rem;">Los motivos de rechazo son los siguientes: </p>
+        <p style="margin-bottom: 1rem;">{{ _('rejectionReasonsAreFollowing') }}: </p>
 
         <table style="
           margin-bottom: 1rem;
@@ -71,14 +71,14 @@
         </table>
 
         <p>
-          Haga click
+          {{ _('makeClick') }}
           <a style="text-decoration: none; font-weight: bold; color: black;" href="{{ app_url }}">
-            aquí
+            {{ _('here') }}
           </a>
-          para dirigirse a la aplicación.
+          {{ _('toGoToApplication') }}.
         </p>
 
-        <p style="margin-top: 1rem;">Saludos cordiales,</p>
+        <p style="margin-top: 1rem;">{{ _('bestRegards') }},</p>
         <p>SOE Latam.</p>
       </td>
     </tr>

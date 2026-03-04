@@ -5,6 +5,7 @@ from core.schemas.permissions import PermissionIn, PermissionsGroupOut
 from core.schemas.utils import Pagination
 from core.services import permissions
 from core.app import db
+from flask_babel import gettext
 
 
 bp = APIBlueprint('permissions', __name__)
@@ -33,8 +34,7 @@ def get_permissions_by_group_id(group_id: int, query_data):
             query_data['per_page'])
         return {'items': results, 'total': total}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.put('/')
@@ -45,7 +45,6 @@ def update_permissions(json_data):
 
     try:
         permissions.update_permissions(json_data)
-        return {'message': 'Permission updated succesfully'}
+        return {'message': gettext('permissionUpdated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))

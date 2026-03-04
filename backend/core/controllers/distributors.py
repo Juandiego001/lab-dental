@@ -4,6 +4,7 @@ from flask_jwt_extended import jwt_required, current_user
 from core.schemas.clients import ClientsOut
 from core.schemas.utils import Message, Pagination
 from core.schemas.distributors import DistributorInUpdate, DistributorInCreate, DistributorOut, DistributorSearch, DistributorsOut
+from flask_babel import gettext
 
 
 bp = APIBlueprint('distributors', __name__)
@@ -25,7 +26,7 @@ def search_distributors(json_data):
             per_page=json_data['per_page'])
         return {'items': results, 'total': total}
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.get('/<int:distributor_id>')
@@ -37,7 +38,7 @@ def get_distributor(distributor_id):
     try:
         return distributors.get_distributor_by_id(distributor_id)
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.get('/<int:distributor_id>/clients')
@@ -51,7 +52,7 @@ def get_clients_by_distributor(distributor_id, query_data):
         return distributors.get_clients_by_distributor_id(distributor_id,
                                                           query_data['search'])
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/')
@@ -62,10 +63,10 @@ def create_distributors(distributor):
 
     try:
         distributors.create_distributor(distributor)
-        return {'message': 'Distributor registered successfully'}
+        return {'message': gettext('distributorCreated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        print(gettext('abortException'))
+        abort(500, gettext('abortException'))
 
 
 @bp.put('/<int:distributor_id>')
@@ -76,10 +77,10 @@ def update_distributors(distributor_id, json_data):
     '''Update distributor'''
     try:
         distributors.update_distributor(distributor_id, json_data)
-        return {'message': 'Distributor updated successfully'}
+        return {'message': gettext('distributorUpdated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        print(gettext('abortException'))
+        abort(500, gettext('abortException'))
 
 
 @bp.delete('/<int:distributor_id>')
@@ -90,7 +91,7 @@ def delete_distributors(distributor_id):
 
     try:
         distributors.delete_distributor(distributor_id)
-        return {'message': 'Distributor deleted successfully'}
+        return {'message': gettext('distributorDeleted')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        print(gettext('abortException'))
+        abort(500, gettext('abortException'))

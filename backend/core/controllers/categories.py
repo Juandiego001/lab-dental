@@ -4,6 +4,7 @@ from core.services import categories
 from apiflask import APIBlueprint, abort
 from core.schemas.utils import Message
 from core.schemas.categories import CategoryInUpdate, CategoryInCreate, CategoryOut, CategoriesOut, CategorySearch
+from flask_babel import gettext
 
 
 bp = APIBlueprint('categories', __name__)
@@ -25,7 +26,7 @@ def categories_brands(json_data):
             per_page=json_data['per_page'])
         return {'items': results, 'total': total}
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.get('/<int:category_id>')
@@ -37,7 +38,7 @@ def get_category(category_id):
     try:
         return categories.get_category_by_id(category_id)
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/')
@@ -49,10 +50,10 @@ def create_categories(category):
     try:
         db.session.add(category)
         db.session.commit()
-        return {'message': 'Category registered successfully'}
+        return {'message': gettext('categoryCreated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        print(gettext('abortException'))
+        abort(500, gettext('abortException'))
 
 
 @bp.put('/<int:category_id>')
@@ -63,10 +64,10 @@ def update_categories(category_id, json_data):
     '''Update category'''
     try:
         categories.update_category(category_id, json_data)
-        return {'message': 'Category updated successfully'}
+        return {'message': gettext('categoryUpdated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        print(gettext('abortException'))
+        abort(500, gettext('abortException'))
 
 
 @bp.delete('/<int:category_id>')
@@ -77,7 +78,7 @@ def delete_categories(category_id):
 
     try:
         categories.delete_category(category_id)
-        return {'message': 'Category deleted successfully'}
+        return {'message': gettext('categoryDeleted')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        print(gettext('abortException'))
+        abort(500, gettext('abortException'))

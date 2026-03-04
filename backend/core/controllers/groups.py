@@ -3,6 +3,7 @@ from apiflask import APIBlueprint, abort
 from core.schemas.utils import Message, Pagination
 from flask_jwt_extended import jwt_required, current_user
 from core.schemas.groups import GroupInUpdate, GroupInCreate, GroupOut, GroupSearch, GroupsOut
+from flask_babel import gettext
 
 
 bp = APIBlueprint('groups', __name__)
@@ -24,7 +25,7 @@ def search_groups(json_data):
             per_page=json_data['per_page'])
         return {'items': results, 'total': total}
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.get('/<int:group_id>')
@@ -36,7 +37,7 @@ def get_group(group_id):
     try:
         return groups.get_group_by_id(group_id)
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/')
@@ -49,10 +50,9 @@ def create_groups(json_data):
     try:
         group_object, users_ids = json_data
         groups.create_group(current_user, group_object, users_ids)
-        return {'message': 'Group registered successfully'}
+        return {'message': gettext('groupCreated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.put('/<int:group_id>')
@@ -64,10 +64,9 @@ def update_groups(group_id, json_data):
 
     try:
         groups.update_group(group_id, json_data)
-        return {'message': 'Group updated successfully'}
+        return {'message': gettext('groupUpdated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.delete('/<int:group_id>')
@@ -78,7 +77,6 @@ def delete_groups(group_id):
 
     try:
         groups.delete_group(group_id)
-        return {'message': 'Group deleted successfully'}
+        return {'message': gettext('groupDeleted')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))

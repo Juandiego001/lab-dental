@@ -2,6 +2,7 @@ from core.models import Client
 from apiflask import Schema, fields
 from marshmallow import post_load, pre_load, validates_schema, ValidationError, validate
 from core.schemas.utils import BaseSchema
+from flask_babel import gettext
 
 
 class ClientSearch(Schema):
@@ -38,10 +39,10 @@ class ClientIn(BaseSchema):
         '''
 
         if not 'name' in data:
-            raise ValidationError({'message':  "Client's name required"})
+            raise ValidationError({'message':  gettext('clientNameRequired')})
 
         if not data['name']:
-            raise ValidationError({'message':  "Client's name required"})
+            raise ValidationError({'message':  gettext('clientNameRequired')})
 
     @validates_schema
     def phone_exists(self, data, **kwargs):
@@ -54,10 +55,10 @@ class ClientIn(BaseSchema):
         '''
 
         if not 'phone' in data:
-            raise ValidationError({'message':  "Client's phone required"})
+            raise ValidationError({'message':  gettext('clientPhoneRequired')})
 
         if not data['phone']:
-            raise ValidationError({'message':  "Client's phone required"})
+            raise ValidationError({'message':  gettext('clientPhoneRequired')})
 
 
 class ClientInCreate(ClientIn):

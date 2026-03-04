@@ -1,8 +1,7 @@
-from bcrypt import hashpw, gensalt
-from core.models import List_
 from apiflask import Schema, fields
-from marshmallow import ValidationError, post_load, pre_load, validates_schema, validate
+from marshmallow import ValidationError, validates_schema, validate
 from core.schemas.utils import BaseSchema
+from flask_babel import gettext
 
 
 class ListIn(BaseSchema):
@@ -23,10 +22,10 @@ class ListIn(BaseSchema):
         '''
 
         if not 'name' in data :
-            raise ValidationError({'message':  'Name required'})
+            raise ValidationError({'message':  gettext('nameRequired')})
         
         if not data['name']:
-            raise ValidationError({'message':  'Name required'})
+            raise ValidationError({'message':  gettext('nameRequired')})
 
 
 class ListOut(BaseSchema):

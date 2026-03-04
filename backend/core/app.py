@@ -1,4 +1,6 @@
 import os
+from flask import request
+import redis
 from pathlib import Path
 from flask_cors import CORS
 from apiflask import APIFlask
@@ -8,7 +10,7 @@ from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
-import redis
+from flask_babel import Babel
 
 load_dotenv()
 
@@ -39,7 +41,7 @@ CORS(app)
 app.config['JWT_SECRET_KEY'] = 'fB7Cp8UoZJ6FQIG0DjLjes5E'
 
 '''Create folder files_data'''
-base_route = Path.cwd() 
+base_route = Path.cwd()
 files_data_folder = "files_data"
 full_route = base_route / files_data_folder
 if not full_route.exists():
@@ -56,8 +58,20 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
 app.config['JWT_COOKIE_CSRF_PROTECT'] = False
 
+
+def get_locale():
+    ''''''
+
+    supported_languages = ['es', 'en']
+    lang_cookie = request.cookies.get('language_cookie')
+    if lang_cookie:
+        return lang_cookie
+    return request.accept_languages.best_match(supported_languages)
+
+
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 bcrypt = Bcrypt(app)
 migrate = Migrate(app, db)
 r = redis.Redis.from_url(REDIS_URL)
+babel = Babel(app, locale_selector=get_locale)

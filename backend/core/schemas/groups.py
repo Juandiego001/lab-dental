@@ -2,6 +2,8 @@ from apiflask import Schema, fields
 from marshmallow import ValidationError, post_load, pre_load, validate, validates_schema
 from core.models import Group
 from core.schemas.utils import BaseSchema
+from flask_babel import gettext
+
 
 class GroupSearch(Schema):
     distributor_id = fields.Integer(
@@ -11,10 +13,12 @@ class GroupSearch(Schema):
     page = fields.Integer(load_default=1)
     per_page = fields.Integer(data_key='perPage', load_default=15)
 
+
 class GroupIn(BaseSchema):
     name = fields.String(required=True, allow_none=False,
                          validate=validate.Length(max=30))
-    distributor_id = fields.Integer(required=False, allow_none=True, data_key='distributorId')
+    distributor_id = fields.Integer(
+        required=False, allow_none=True, data_key='distributorId')
     users_ids = fields.List(fields.Integer, data_key='usersIds')
     status = fields.String(load_default='ACTIVE')
 
@@ -29,10 +33,10 @@ class GroupIn(BaseSchema):
         '''
 
         if not 'name' in data:
-            raise ValidationError({'message':  'Group name required'})
+            raise ValidationError({'message':  gettext('groupNameRequired')})
 
         if not data['name']:
-            raise ValidationError({'message':  'Group name required'})
+            raise ValidationError({'message':  gettext('groupNameRequired')})
 
 
 class GroupInCreate(GroupIn):

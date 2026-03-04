@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Register Installation Notification</title>
+  <title>{{ _('registerInstallationNotification') }}</title>
   <style>
     * {
       padding: 0;
@@ -29,28 +29,28 @@
 
     <tr>
       <td style="padding: 1rem;">
-        <p style="margin-bottom: 1rem;">Hola administrador,</p>
+        <p style="margin-bottom: 1rem;">{{ _('hiAdmin') }},</p>
 
-        <p>Se ha registrado una nueva instalación en el sistema. Los detalles son los siguientes:</p>
+        <p>{{ _('newInstallationCheckDetails') }}</p>
 
         <ul style="padding-left: 1.75rem; margin-top: 0.5rem; margin-bottom: 1rem;">
           <li>ID <span style="font-weight: bold;">#{{ id }}.</span></li>
-          <li>Equipment: <span style="font-weight: bold;">{{ equipment }}.</span></li>
+          <li>{{ _('equipment') }}: <span style="font-weight: bold;">{{ equipment }}.</span></li>
           <li>Serial: <span style="font-weight: bold;">{{ serial }}.</span></li>
-          <li>Installed date: <span style="font-weight: bold;">{{ installed_date }}.</span></li>
-          <li>Distributor: <span style="font-weight: bold;">{{ distributor }}.</span></li>
-          <li>Client: <span style="font-weight: bold;">{{ client }}.</span></li>
+          <li>{{ _('installedDate') }}: <span style="font-weight: bold;">{{ installed_date }}.</span></li>
+          <li>{{ _('distributor') }}: <span style="font-weight: bold;">{{ distributor }}.</span></li>
+          <li>{{ _('client') }}: <span style="font-weight: bold;">{{ client }}.</span></li>
         </ul>
 
         <p>
-          Haga click
+          {{ _('makeClick') }}
           <a style="text-decoration: none; font-weight: bold; color: black;" href="{{ app_url }}">
-            aquí
+            {{ _('here') }}
           </a>
-          para dirigirse a la aplicación.
+          {{ _('toGoToApplication') }}.
         </p>
 
-        <p style="margin-top: 1rem;">Saludos cordiales,</p>
+        <p style="margin-top: 1rem;">{{ _('bestRegards') }},</p>
         <p>SOE Latam.</p>
       </td>
     </tr>

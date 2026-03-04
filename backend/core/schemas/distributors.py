@@ -2,6 +2,7 @@ from core.models import Distributor
 from apiflask import Schema, fields
 from marshmallow import post_load, validates_schema, ValidationError, validate
 from core.schemas.utils import BaseSchema
+from flask_babel import gettext
 
 
 class DistributorSearch(Schema):
@@ -54,10 +55,10 @@ class DistributorIn(BaseSchema):
         '''
 
         if not 'name' in data:
-            raise ValidationError({'message':  "Distributor's name required"})
+            raise ValidationError({'message':  gettext('distributorNameRequired')})
 
         if not data['name']:
-            raise ValidationError({'message':  "Distributor's name required"})
+            raise ValidationError({'message':  gettext('distributorNameRequired')})
 
 
 class DistributorInCreate(DistributorIn):

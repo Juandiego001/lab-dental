@@ -1,0 +1,466 @@
+# English translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-03-04 06:03-0500\n"
+"PO-Revision-Date: 2026-03-03 09:13-0500\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: core/controllers/brands.py:29 core/controllers/brands.py:41
+#: core/controllers/brands.py:55 core/controllers/brands.py:56
+#: core/controllers/brands.py:69 core/controllers/brands.py:70
+#: core/controllers/brands.py:83 core/controllers/brands.py:84
+#: core/controllers/categories.py:29 core/controllers/categories.py:41
+#: core/controllers/categories.py:55 core/controllers/categories.py:56
+#: core/controllers/categories.py:69 core/controllers/categories.py:70
+#: core/controllers/categories.py:83 core/controllers/categories.py:84
+#: core/controllers/clients.py:32 core/controllers/clients.py:44
+#: core/controllers/clients.py:57 core/controllers/clients.py:70
+#: core/controllers/clients.py:83 core/controllers/distributors.py:29
+#: core/controllers/distributors.py:41 core/controllers/distributors.py:55
+#: core/controllers/distributors.py:68 core/controllers/distributors.py:69
+#: core/controllers/distributors.py:82 core/controllers/distributors.py:83
+#: core/controllers/distributors.py:96 core/controllers/distributors.py:97
+#: core/controllers/equipments.py:32 core/controllers/equipments.py:44
+#: core/controllers/equipments.py:58 core/controllers/equipments.py:73
+#: core/controllers/equipments.py:86 core/controllers/files.py:19
+#: core/controllers/groups.py:28 core/controllers/groups.py:40
+#: core/controllers/groups.py:55 core/controllers/groups.py:69
+#: core/controllers/groups.py:82 core/controllers/installations.py:30
+#: core/controllers/installations.py:42 core/controllers/installations.py:57
+#: core/controllers/installations.py:70 core/controllers/installations.py:83
+#: core/controllers/installations.py:98 core/controllers/installations.py:115
+#: core/controllers/lists.py:28 core/controllers/lists.py:58
+#: core/controllers/lists.py:71 core/controllers/lists.py:85
+#: core/controllers/lists.py:101 core/controllers/lists.py:114
+#: core/controllers/lists.py:129 core/controllers/locations.py:26
+#: core/controllers/locations.py:45 core/controllers/locations.py:64
+#: core/controllers/permissions.py:37 core/controllers/permissions.py:50
+#: core/controllers/sites.py:32 core/controllers/sites.py:44
+#: core/controllers/sites.py:59 core/controllers/sites.py:60
+#: core/controllers/sites.py:79 core/controllers/sites.py:80
+#: core/controllers/sites.py:93 core/controllers/sites.py:94
+#: core/controllers/users.py:37 core/controllers/users.py:49
+#: core/controllers/users.py:70 core/controllers/users.py:84
+#: core/controllers/users.py:105 core/controllers/users.py:130
+#: core/controllers/users.py:143 core/controllers/users.py:163
+#: core/controllers/users.py:176 core/controllers/users.py:177
+#: core/controllers/users.py:191 core/controllers/users.py:208
+#: core/controllers/users.py:238
+msgid "abortException"
+msgstr "There was an internal error"
+
+#: core/controllers/brands.py:53
+msgid "brandCreated"
+msgstr "Brand created successfully"
+
+#: core/controllers/brands.py:67
+msgid "brandUpdated"
+msgstr "Brand updated successfully"
+
+#: core/controllers/brands.py:81
+msgid "brandDeleted"
+msgstr "Brand deleted successfully"
+
+#: core/controllers/categories.py:53
+msgid "categoryCreated"
+msgstr "Category created successfully"
+
+#: core/controllers/categories.py:67
+msgid "categoryUpdated"
+msgstr "Category updated successfully"
+
+#: core/controllers/categories.py:81
+msgid "categoryDeleted"
+msgstr "Category deleted successfully"
+
+#: core/controllers/clients.py:55
+msgid "clientCreated"
+msgstr "Client created successfully"
+
+#: core/controllers/clients.py:68
+msgid "clientUpdated"
+msgstr "Client updated successfully"
+
+#: core/controllers/clients.py:81
+msgid "clientDeleted"
+msgstr "Client deleted successfully"
+
+#: core/controllers/distributors.py:66
+msgid "distributorCreated"
+msgstr "Distributor created successfully"
+
+#: core/controllers/distributors.py:80
+msgid "distributorUpdated"
+msgstr "Distributor updated successfully"
+
+#: core/controllers/distributors.py:94
+msgid "distributorDeleted"
+msgstr "Distributor deleted successfully"
+
+#: core/controllers/equipments.py:56
+msgid "equipmentCreated"
+msgstr "Equipment created successfully"
+
+#: core/controllers/equipments.py:71
+msgid "equipmentUpdated"
+msgstr "Equipment updated successfully"
+
+#: core/controllers/equipments.py:84
+msgid "equipmentDeleted"
+msgstr "Equipment deleted successfully"
+
+#: core/controllers/groups.py:53
+msgid "groupCreated"
+msgstr "Group created successfully"
+
+#: core/controllers/groups.py:67
+msgid "groupUpdated"
+msgstr "Group updated successfully"
+
+#: core/controllers/groups.py:80
+msgid "groupDeleted"
+msgstr "Group deleted successfully"
+
+#: core/controllers/installations.py:55
+msgid "installationCreated"
+msgstr "Installation created successfully"
+
+#: core/controllers/installations.py:68
+msgid "installationUpdated"
+msgstr "Installation updated successfully"
+
+#: core/controllers/installations.py:81
+msgid "installationDeleted"
+msgstr "Installation deleted successfully"
+
+#: core/controllers/installations.py:95
+msgid "installationApproved"
+msgstr "Installation approved successfully"
+
+#: core/controllers/installations.py:112
+msgid "installationRejected"
+msgstr "Installation rejected successfully"
+
+#: core/controllers/lists.py:69
+msgid "listCreated"
+msgstr "List created successfully"
+
+#: core/controllers/lists.py:83
+msgid "listUpdated"
+msgstr "List updated successfully"
+
+#: core/controllers/lists.py:112
+msgid "listDeleted"
+msgstr "List deleted successfully"
+
+#: core/controllers/permissions.py:48
+msgid "permissionUpdated"
+msgstr "Permission updated successfully"
+
+#: core/controllers/sites.py:57
+msgid "siteCreated"
+msgstr "Site created successfully"
+
+#: core/controllers/sites.py:77
+msgid "siteUpdated"
+msgstr "Site updated successfully"
+
+#: core/controllers/sites.py:91
+msgid "siteDeleted"
+msgstr "Site deleted successfully"
+
+#: core/controllers/users.py:64
+msgid "welcome"
+msgstr "Welcome"
+
+#: core/controllers/users.py:68
+msgid "wrongUsernamePassword"
+msgstr "Username or password incorrect"
+
+#: core/controllers/users.py:82
+msgid "userCreated"
+msgstr "User created successfully"
+
+#: core/controllers/users.py:126
+msgid "profileUpdated"
+msgstr "Profile update successfully"
+
+#: core/controllers/users.py:141
+msgid "userUpdated"
+msgstr "User updated successfully"
+
+#: core/controllers/users.py:174
+msgid "userDeleted"
+msgstr "User deleted successfully"
+
+#: core/controllers/users.py:187
+msgid "tokenValid"
+msgstr "Token valid"
+
+#: core/controllers/users.py:189
+msgid "tokenInvalid"
+msgstr "Token invalid"
+
+#: core/controllers/users.py:206 core/controllers/users.py:236
+msgid "passwordUpdated"
+msgstr "Password updated successfully"
+
+#: core/schemas/brands.py:35 core/schemas/brands.py:38
+#: core/schemas/categories.py:35 core/schemas/categories.py:38
+#: core/schemas/lists.py:25 core/schemas/lists.py:28
+msgid "nameRequired"
+msgstr "Name required"
+
+#: core/schemas/brands.py:52 core/schemas/brands.py:55
+#: core/schemas/categories.py:52 core/schemas/categories.py:55
+msgid "slugRequired"
+msgstr "Slug required"
+
+#: core/schemas/clients.py:42 core/schemas/clients.py:45
+msgid "clientNameRequired"
+msgstr "Client's name required"
+
+#: core/schemas/clients.py:58 core/schemas/clients.py:61
+msgid "clientPhoneRequired"
+msgstr "Client's phone required"
+
+#: core/schemas/distributors.py:58 core/schemas/distributors.py:61
+msgid "distributorNameRequired"
+msgstr "Distributor name required"
+
+#: core/schemas/equipments.py:44 core/schemas/equipments.py:47
+msgid "modelRequired"
+msgstr "Model required"
+
+#: core/schemas/equipments.py:60 core/schemas/equipments.py:63
+msgid "referenceRequired"
+msgstr "Reference required"
+
+#: core/schemas/groups.py:36 core/schemas/groups.py:39
+msgid "groupNameRequired"
+msgstr "Group name required"
+
+#: core/schemas/installations.py:45 core/schemas/installations.py:48
+#: core/schemas/installations.py:64
+msgid "serialRequired"
+msgstr "Serial required"
+
+#: core/schemas/installations.py:61
+msgid "installedDateRequired"
+msgstr "Installed Date required"
+
+#: core/schemas/sites.py:49 core/schemas/sites.py:52
+msgid "siteNameRequired"
+msgstr "Site name required"
+
+#: core/schemas/sites.py:65 core/schemas/sites.py:68
+msgid "siteAddressRequired"
+msgstr "Site address is required"
+
+#: core/schemas/sites.py:118
+msgid "clientIddistributorIdRequired"
+msgstr "Client ID or Distributor ID is required"
+
+#: core/schemas/users.py:89 core/schemas/users.py:92
+msgid "fullNameRequired"
+msgstr "Full name is required"
+
+#: core/schemas/users.py:105 core/schemas/users.py:108
+msgid "usernameRequired"
+msgstr "Username is required"
+
+#: core/schemas/users.py:121 core/schemas/users.py:124
+msgid "emailRequired"
+msgstr "Email is required"
+
+#: core/schemas/users.py:169 core/schemas/users.py:221
+msgid "usernameEmailExist"
+msgstr "Username or email already exists"
+
+#: core/schemas/users.py:306
+msgid "mustHaveUppercase"
+msgstr "Must contain at least one uppercase letter"
+
+#: core/schemas/users.py:308
+msgid "mustHaveLowerCase"
+msgstr "Must contain at least one lowercase letter"
+
+#: core/schemas/users.py:311
+msgid "mustHaveSpecialCharacter"
+msgstr "Must contain at least one special character"
+
+#: core/schemas/users.py:313
+msgid "mustHaveNumber"
+msgstr "Must contain at least one number"
+
+#: core/schemas/users.py:316
+msgid "mustHaveMinimum10Characters"
+msgstr "Must be at least 10 characters long"
+
+#: core/schemas/users.py:319
+msgid "mustHaveMaximum24Characters"
+msgstr "Must not exceed 24 characters"
+
+#: core/schemas/users.py:328
+msgid "invalidCurrentPassword"
+msgstr "Invalid current password"
+
+#: core/services/installations.py:181
+#, python-format
+msgid "SOE Latam - Registro de certificado de instalación #%(id)s"
+msgstr "SOE Latam - Installation certificate registration #%(id)s"
+
+#: core/services/installations.py:264
+#, python-format
+msgid "SOE Latam - Aprobación de instalación #%(id)s"
+msgstr "SOE Latam - Installation Approval #%(id)s"
+
+#: core/services/installations.py:309
+#, python-format
+msgid "SOE Latam - Rechazo de instalación #%(id)s"
+msgstr "SOE Latam - Installation rejection #%(id)s"
+
+#: core/services/users.py:213 templates/recover_password.html:81
+msgid "resetPassword"
+msgstr "Reset Password"
+
+#: templates/installation_approved.html:6
+msgid "approvedInstallationNotification"
+msgstr "Approved Installation Notification"
+
+#: templates/installation_approved.html:32
+#: templates/installation_rejected.html:32
+msgid "dearColleagues"
+msgstr "Dear colleagues"
+
+#: templates/installation_approved.html:35
+#: templates/installation_rejected.html:35
+msgid "installationWithFollowingData"
+msgstr "An installation with the following data has been"
+
+#: templates/installation_approved.html:45
+msgid "approved"
+msgstr "APPROVED"
+
+#: templates/installation_approved.html:50
+#: templates/installation_rejected.html:50
+#: templates/register_installation.html:38
+msgid "equipment"
+msgstr "Equipment"
+
+#: templates/installation_approved.html:52
+#: templates/installation_rejected.html:52
+#: templates/register_installation.html:40
+msgid "installedDate"
+msgstr "Installation date"
+
+#: templates/installation_approved.html:53
+#: templates/installation_rejected.html:53
+msgid "distributorSite"
+msgstr "Distributor site"
+
+#: templates/installation_approved.html:54
+#: templates/installation_rejected.html:54
+#: templates/register_installation.html:42
+msgid "client"
+msgstr "Client"
+
+#: templates/installation_approved.html:55
+#: templates/installation_rejected.html:55
+msgid "clientSite"
+msgstr "Client site"
+
+#: templates/installation_approved.html:59
+#: templates/installation_rejected.html:74
+#: templates/register_installation.html:46
+msgid "makeClick"
+msgstr "Click"
+
+#: templates/installation_approved.html:61
+#: templates/installation_rejected.html:76
+#: templates/register_installation.html:48
+msgid "here"
+msgstr "here"
+
+#: templates/installation_approved.html:63
+#: templates/installation_rejected.html:78
+#: templates/register_installation.html:50
+msgid "toGoToApplication"
+msgstr "to go to the application"
+
+#: templates/installation_approved.html:66
+#: templates/installation_rejected.html:81
+#: templates/register_installation.html:53
+msgid "bestRegards"
+msgstr "Best regards"
+
+#: templates/installation_rejected.html:6
+msgid "rejectedInstallationNotification"
+msgstr "Rejected Installation Notification"
+
+#: templates/installation_rejected.html:45
+msgid "rejected"
+msgstr "REJECTED"
+
+#: templates/installation_rejected.html:58
+msgid "rejectionReasonsAreFollowing"
+msgstr "The rejection reasons are the following:"
+
+#: templates/recover_password.html:6 templates/recover_password.html:60
+msgid "resetingPassword"
+msgstr "Reset Password"
+
+#: templates/recover_password.html:64
+msgid "requestResetPasswordParagraph"
+msgstr ""
+"We have received a request to reset your account password. To continue "
+"with the process, please click on the following button"
+
+#: templates/recover_password.html:86
+msgid "ifButtonDoesntWork"
+msgstr ""
+"If the button does not work, please copy and paste the following link "
+"into your browser:"
+
+#: templates/recover_password.html:102
+msgid "ignoreMessageIfNotRequested"
+msgstr "If you did not request this change, you can safely ignore this message."
+
+#: templates/recover_password.html:112
+msgid "thisIsAutomaticMessage"
+msgstr ""
+"This is an automatically generated message, please do not reply to this "
+"email"
+
+#: templates/register_installation.html:6
+msgid "registerInstallationNotification"
+msgstr "Installation Registration Notification"
+
+#: templates/register_installation.html:32
+msgid "hiAdmin"
+msgstr "Hi Admin,"
+
+#: templates/register_installation.html:34
+msgid "newInstallationCheckDetails"
+msgstr "A new installation has been registered. Please check the details below"
+
+#: templates/register_installation.html:41
+msgid "distributor"
+msgstr "Distributor"
+
+#~ msgid "SOE Latam - Registro de certificado de instalación %(id)s"
+#~ msgstr ""
+

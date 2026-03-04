@@ -3,6 +3,7 @@ from core.models import Address, Site
 from core.schemas.utils import BaseSchema
 from werkzeug.exceptions import HTTPException
 from marshmallow import ValidationError, post_load, validates_schema, validate
+from flask_babel import gettext
 
 
 class SiteSearch(Schema):
@@ -45,10 +46,10 @@ class SiteIn(BaseSchema):
         '''
 
         if not 'name' in data:
-            raise ValidationError({'message':  "Site's name required"})
+            raise ValidationError({'message':  gettext('siteNameRequired')})
 
         if not data['name']:
-            raise ValidationError({'message':  "Sites's name required"})
+            raise ValidationError({'message':  gettext('siteNameRequired')})
 
     @validates_schema
     def description_exists(self, data, **kwargs):
@@ -61,10 +62,10 @@ class SiteIn(BaseSchema):
         '''
 
         if not 'description' in data:
-            raise ValidationError({'message':  "Site's address required"})
+            raise ValidationError({'message':  gettext('siteAddressRequired')})
 
         if not data['description']:
-            raise ValidationError({'message':  "Sites's address required"})
+            raise ValidationError({'message':  gettext('siteAddressRequired')})
 
 
 class SiteInCreate(SiteIn):
@@ -88,7 +89,7 @@ class SiteInCreate(SiteIn):
     def make_object(self, data: dict, **kwargs):
         country_id = data.pop('country_id')
         state_id = data.pop('state_id')
-        city_id = data.pop('city_id')
+        city_id = data.pop('city_id') if 'city_id' in data else None
         description = data.pop('description')
         return Address(country_id=country_id, state_id=state_id, city_id=city_id, description=description), Site(**data)
 
@@ -114,7 +115,7 @@ class SiteInUpdate(SiteIn):
             return data
 
         raise ValidationError(
-            {'message':  'Distributor ID or Client ID required'})
+            {'message':  gettext('clientIddistributorIdRequired')})
 
     @post_load
     def make_object(self, data: dict, **kwargs):

@@ -2,6 +2,7 @@ from apiflask import Schema, fields
 from marshmallow import ValidationError, post_load, pre_load, validates_schema, validate
 from core.models import Equipment
 from core.schemas.utils import BaseSchema
+from flask_babel import gettext
 
 
 class EquipmentSearch(Schema):
@@ -40,10 +41,10 @@ class EquipmentIn(BaseSchema):
         '''
 
         if not 'model' in data:
-            raise ValidationError({'message':  'Model required'})
+            raise ValidationError({'message':  gettext('modelRequired')})
 
         if not data['model']:
-            raise ValidationError({'message':  'Model required'})
+            raise ValidationError({'message':  gettext('modelRequired')})
 
     @validates_schema
     def reference_exists(self, data, **kwargs):
@@ -56,10 +57,10 @@ class EquipmentIn(BaseSchema):
         '''
 
         if not 'reference' in data:
-            raise ValidationError({'message':  'Reference required'})
+            raise ValidationError({'message':  gettext('referenceRequired')})
 
         if not data['reference']:
-            raise ValidationError({'message':  'Reference required'})
+            raise ValidationError({'message':  gettext('referenceRequired')})
 
 
 class EquipmentInCreate(EquipmentIn):

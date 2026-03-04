@@ -2,6 +2,7 @@ from core.models import Brand
 from apiflask import Schema, fields
 from marshmallow import ValidationError, post_load, validate, validates_schema
 from core.schemas.utils import BaseSchema
+from flask_babel import gettext
 
 
 class BrandSearch(Schema):
@@ -31,10 +32,10 @@ class BrandIn(BaseSchema):
         '''
 
         if not 'name' in data :
-            raise ValidationError({'message':  'Name required'})
+            raise ValidationError({'message':  gettext('nameRequired')})
         
         if not data['name']:
-            raise ValidationError({'message':  'Name required'})
+            raise ValidationError({'message':  gettext('nameRequired')})
 
 
     @validates_schema
@@ -48,10 +49,10 @@ class BrandIn(BaseSchema):
         '''
 
         if not 'slug' in data :
-            raise ValidationError({'message':  'Slug required'})
+            raise ValidationError({'message':  gettext('slugRequired')})
         
         if not data['slug']:
-            raise ValidationError({'message':  'Slug required'})
+            raise ValidationError({'message':  gettext('slugRequired')})
 
 
 class BrandInCreate(BrandIn):

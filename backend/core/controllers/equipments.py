@@ -4,6 +4,7 @@ from core.services import equipments
 from apiflask import APIBlueprint, abort
 from core.schemas.utils import Message, Pagination
 from core.schemas.equipments import EquipmentInUpdate, EquipmentInCreate, EquipmentOut, EquipmentSearch, EquipmentsOut
+from flask_babel import gettext
 
 
 bp = APIBlueprint('equipments', __name__)
@@ -28,7 +29,7 @@ def search_equipments(json_data):
             per_page=json_data['per_page'])
         return {'items': results, 'total': total}
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.get('/<int:equipment_id>')
@@ -40,7 +41,7 @@ def get_equipment(equipment_id):
     try:
         return equipments.get_equipment_by_id(equipment_id)
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/')
@@ -52,10 +53,9 @@ def create_equipments(equipment):
     try:
         db.session.add(equipment)
         db.session.commit()
-        return {'message': 'Equipment registered successfully'}
+        return {'message': gettext('equipmentCreated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.put('/<int:equipment_id>')
@@ -68,10 +68,9 @@ def update_equipments(equipment_id, json_data):
     try:
         db.session.merge(json_data)
         db.session.commit()
-        return {'message': 'Equipment updated successfully'}
+        return {'message': gettext('equipmentUpdated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.delete('/<int:equipment_id>')
@@ -82,7 +81,6 @@ def delete_equipments(equipment_id):
 
     try:
         equipments.delete_equipment(equipment_id)
-        return {'message': 'Equipment deleted successfully'}
+        return {'message': gettext('equipmentDeleted')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))

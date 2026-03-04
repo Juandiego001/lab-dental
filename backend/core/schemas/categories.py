@@ -2,6 +2,7 @@ from core.models import Category
 from apiflask import Schema, fields
 from marshmallow import ValidationError, post_load, validates_schema, validate
 from core.schemas.utils import BaseSchema
+from flask_babel import gettext
 
 
 class CategorySearch(Schema):
@@ -31,10 +32,10 @@ class CategoryIn(BaseSchema):
         '''
 
         if not 'name' in data :
-            raise ValidationError({'message':  'Name required'})
+            raise ValidationError({'message':  gettext('nameRequired')})
         
         if not data['name']:
-            raise ValidationError({'message':  'Name required'})
+            raise ValidationError({'message':  gettext('nameRequired')})
 
 
     @validates_schema
@@ -48,10 +49,10 @@ class CategoryIn(BaseSchema):
         '''
 
         if not 'slug' in data :
-            raise ValidationError({'message':  'Slug required'})
+            raise ValidationError({'message':  gettext('slugRequired')})
         
         if not data['slug']:
-            raise ValidationError({'message':  'Slug required'})
+            raise ValidationError({'message':  gettext('slugRequired')})
 
 
 class CategoryInCreate(CategoryIn):

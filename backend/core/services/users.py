@@ -1,13 +1,12 @@
-from core.app import FRONTEND_APP_BASE_URL, app
 from core.app import db, r
-from core.models import Distributor, DistributorList, List_, User, UserList
-from sqlalchemy import or_, and_, case
-from bcrypt import checkpw
-from werkzeug.exceptions import HTTPException
-from secrets import token_urlsafe
-
-from core.services.distributors import get_distributor_from_user
 from core.utils import send_mail
+from secrets import token_urlsafe
+from sqlalchemy import or_, and_, case
+from core.app import FRONTEND_APP_BASE_URL
+from werkzeug.exceptions import HTTPException
+from core.services.distributors import get_distributor_from_user
+from core.models import Distributor, DistributorList, List_, User, UserList
+from flask_babel import force_locale, gettext
 
 
 def login(email_or_username: str, password: str):
@@ -15,7 +14,7 @@ def login(email_or_username: str, password: str):
 
     user = db.session.query(User).filter(
         or_(User.email == email_or_username, User.username == email_or_username)).first()
-    if not user or not checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
+    if not user or not user.check_password(password):
         raise HTTPException('Incorrect username or password')
     return user
 
@@ -56,9 +55,6 @@ def search_users(current_user: User, users_ids: list[int], distributor_id: int, 
         .join(Distributor)\
         .filter(*query)\
         .count()
-    
-    print('TOTAL: ')
-    print(total)
 
     total += len(with_users_ids) if with_users_ids else 0
     users = db.session.query(User)\
@@ -72,7 +68,7 @@ def search_users(current_user: User, users_ids: list[int], distributor_id: int, 
         .limit(per_page)\
         .offset((page - 1) * per_page)\
         .all()
-    
+
     if not with_users_ids:
         return users, total
     return with_users_ids + users, total
@@ -98,16 +94,13 @@ def get_user_by_id(user_id: int):
 
     return db.session.query(
         *User.__table__.c,
-        case((Distributor.id == 1, None),
-             else_=Distributor.id).label('distributor_id'),
-        case((Distributor.name == 'Snapon', ''),
-             else_=Distributor.name).label('distributor_name'),
+        Distributor.id.label('distributor_id'),
+        Distributor.name.label('distributor_name'),
     )\
-        .select_from(User)\
-        .join(UserList)\
-        .join(List_)\
-        .join(DistributorList)\
-        .join(Distributor)\
+        .join(UserList, UserList.user_id == User.id)\
+        .join(List_, List_.id == UserList.list_id)\
+        .join(DistributorList, DistributorList.list_id == List_.id)\
+        .join(Distributor, Distributor.id == DistributorList.distributor_id)\
         .filter(and_(User.id == user_id, List_.is_main))\
         .first()
 
@@ -209,8 +202,25 @@ def send_mail_recover_password(email: str):
 
     token = token_urlsafe(16)
     link = f'{FRONTEND_APP_BASE_URL}/recover-password/{token}'
-    send_mail('Recover Password', [user.email],
-              'recover_password.html', {'link': link})
+
+    with force_locale(user.language):
+        mail_subject = gettext('resetPassword')
+
+    '''
+    subject: str
+    to: list
+    plantilla: str
+    params: dict
+    attachments: list = []
+    language: str = 'es'
+    '''
+
+    send_mail(
+        subject=mail_subject,
+        to=[user.email],
+        plantilla='recover_password.html',
+        params={'link': link},
+        language=user.language)
     r.set(f'recover:{user.id}:{token}', user.id, ex=300)
 
 
@@ -232,3 +242,29 @@ def change_password(token: str, password: str):
     db.session.commit()
 
     r.delete(keys[0])
+
+
+def update_profile(current_user: User, user_data: dict) -> User:
+    '''Update profile'''
+
+    user_exists = None
+    if current_user.email != user_data['email'] and current_user.email != user_data['username']:
+        user_exists = db.session.query(User)\
+            .filter(and_(or_(User.email == user_data['email'], User.username == user_data['username']), User.status == 'ACTIVE'))\
+            .first()
+    elif current_user.email != user_data['email']:
+        user_exists = db.session.query(User)\
+            .filter(and_(User.email == user_data['email'], User.status == 'ACTIVE'))\
+            .first()
+    elif current_user.username != user_data['username']:
+        user_exists = db.session.query(User)\
+            .filter(and_(User.username == user_data['username'], User.status == 'ACTIVE'))\
+            .first()
+
+    if user_exists:
+        raise Exception('Username or email already exists')
+
+    user = User(id=current_user.id, **user_data)
+    db.session.merge(user)
+    db.session.commit()
+    return user

@@ -5,6 +5,7 @@ from apiflask import APIBlueprint, abort
 from flask_jwt_extended import jwt_required, current_user
 from core.schemas.utils import Message
 from core.schemas.sites import SiteInUpdate, SiteInCreate, SiteOut, SiteSearch, SitesInstallationsOut, SitesOut
+from flask_babel import gettext
 
 
 bp = APIBlueprint('sites', __name__)
@@ -28,7 +29,7 @@ def search_sites(json_data):
             per_page=json_data['per_page'])
         return {'items': results, 'total': total}
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.get('/<int:site_id>')
@@ -38,13 +39,9 @@ def get_site(site_id):
     '''Get site'''
 
     try:
-        result = sites.get_site_by_id(site_id)
-
-        print(result)
-
-        return result
+        return sites.get_site_by_id(site_id)
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/')
@@ -57,10 +54,10 @@ def create_sites(site_and_address):
         address: Address = site_and_address[0]
         site: Site = site_and_address[1]
         sites.create_site(current_user, site, address)
-        return {'message': 'Site registered successfully'}
+        return {'message': gettext('siteCreated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        print(gettext('abortException'))
+        abort(500, gettext('abortException'))
 
 
 @bp.put('/<int:site_id>')
@@ -77,10 +74,10 @@ def update_sites(site_id, site_and_address):
         db.session.merge(address)
         db.session.merge(site)
         db.session.commit()
-        return {'message': 'Site updated successfully'}
+        return {'message': gettext('siteUpdated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        print(gettext('abortException'))
+        abort(500, gettext('abortException'))
 
 
 @bp.delete('/<int:site_id>')
@@ -91,7 +88,7 @@ def delete_sites(site_id):
 
     try:
         sites.delete_site(site_id)
-        return {'message': 'Site deleted successfully'}
+        return {'message': gettext('siteDeleted')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        print(gettext('abortException'))
+        abort(500, gettext('abortException'))

@@ -1,9 +1,8 @@
-from datetime import datetime
-from typing import Literal
 from apiflask import Schema, fields
 from marshmallow import ValidationError, validates_schema, validate
 from core.models import Installation
 from core.schemas.utils import BaseSchema
+from flask_babel import gettext
 
 
 class InstallationSearch(Schema):
@@ -43,10 +42,10 @@ class InstallationIn(BaseSchema):
         '''
 
         if not 'serial' in data :
-            raise ValidationError({'message':  'Serial required'})
+            raise ValidationError({'message':  gettext('serialRequired')})
         
         if not data['serial']:
-            raise ValidationError({'message':  'Serial required'})
+            raise ValidationError({'message':  gettext('serialRequired')})
 
     @validates_schema
     def installed_date_exists(self, data, **kwargs):
@@ -59,10 +58,10 @@ class InstallationIn(BaseSchema):
         '''
 
         if not 'installed_date' in data :
-            raise ValidationError({'message':  'Installed date required'})
+            raise ValidationError({'message':  gettext('installedDateRequired')})
         
         if not data['installed_date']:
-            raise ValidationError({'message':  'Installed date required'})
+            raise ValidationError({'message':  gettext('serialRequired')})
 
 
 class InstallationInCreate(InstallationIn):

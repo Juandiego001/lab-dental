@@ -1,7 +1,8 @@
-from flask_jwt_extended import jwt_required
 from core.app import db
+from flask_babel import gettext
 from core.services import brands
 from apiflask import APIBlueprint, abort
+from flask_jwt_extended import jwt_required
 from core.schemas.utils import Message, Pagination
 from core.schemas.brands import BrandInUpdate, BrandInCreate, BrandOut, BrandSearch, BrandsOut
 
@@ -25,7 +26,7 @@ def search_brands(json_data):
             per_page=json_data['per_page'])
         return {'items': results, 'total': total}
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.get('/<int:brand_id>')
@@ -37,7 +38,7 @@ def get_brand(brand_id):
     try:
         return brands.get_brand_by_id(brand_id)
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/')
@@ -49,10 +50,10 @@ def create_brands(brand):
     try:
         db.session.add(brand)
         db.session.commit()
-        return {'message': 'Brand registered successfully'}
+        return {'message': gettext('brandCreated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        print(gettext('abortException'))
+        abort(500, gettext('abortException'))
 
 
 @bp.put('/<int:brand_id>')
@@ -63,10 +64,10 @@ def update_brands(brand_id, json_data):
     '''Update brand'''
     try:
         brands.update_brand(brand_id, json_data)
-        return {'message': 'Brand updated successfully'}
+        return {'message': gettext('brandUpdated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        print(gettext('abortException'))
+        abort(500, gettext('abortException'))
 
 
 @bp.delete('/<int:brand_id>')
@@ -77,7 +78,7 @@ def delete_brands(brand_id):
 
     try:
         brands.delete_brand(brand_id)
-        return {'message': 'Brand deleted successfully'}
+        return {'message': gettext('brandDeleted')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        print(gettext('abortException'))
+        abort(500, gettext('abortException'))

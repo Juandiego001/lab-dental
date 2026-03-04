@@ -1,9 +1,8 @@
 from flask_jwt_extended import jwt_required
-from core.app import db
 from core.services import locations
 from apiflask import APIBlueprint, abort
-from core.schemas.utils import Message, Pagination
-from core.schemas.locations import LocationOut, LocationSearch, LocationsOut
+from core.schemas.locations import LocationSearch, LocationsOut
+from flask_babel import gettext
 
 
 bp = APIBlueprint('locations', __name__)
@@ -24,7 +23,7 @@ def search_countries(json_data):
             per_page=json_data['per_page'])
         return {'items': results, 'total': total}
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/states/<string:country_id>/search')
@@ -43,7 +42,7 @@ def search_states(json_data, country_id):
             per_page=json_data['per_page'])
         return {'items': results, 'total': total}
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/cities/<string:state_id>/search')
@@ -62,4 +61,4 @@ def get_cities(json_data, state_id):
             per_page=json_data['per_page'])
         return {'items': results, 'total': total}
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))

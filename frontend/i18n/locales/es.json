@@ -1,4 +1,29 @@
 {
+  "profile": {
+    "title": "Mi Perfil",
+    "personalInfo": "Información Personal",
+    "fullName": "Nombre completo",
+    "username": "Username",
+    "email": "Correo",
+    "language": "Idioma",
+    "changePassword": {
+      "title": "Cambiar Contraseña",
+      "current": "Contraseña actual",
+      "new": "Nueva contraseña",
+      "confirm": "Confirmar nueva contraseña"
+    },
+    "update": "Actualizar"
+  },
+  "passwordRules": {
+    "required": "Este campo es requerido",
+    "requiredUpper": "Requiere al menos una mayúscula",
+    "requiredLower": "Requiere al menos una minúscula",
+    "requiredSpecial": "Requiere al menos un caracter especial",
+    "requiredNumber": "Requiere al menos un número",
+    "minLength10": "Require mínimo 10 caracteres",
+    "maxLength24": "Require máximo 24 caracteres",
+    "dontMatch": "Las contraseñas no coinciden"
+  },
   "menu": {
     "home": "Inicio",
     "roi": "ROI",
@@ -274,6 +299,7 @@
     "fullName": "Nombre completo",
     "username": "Nombre de usuario",
     "email": "Correo",
+    "language": "Idioma",
     "password": "Contraseña",
     "role": {
       "title": "Rol",
@@ -586,5 +612,6 @@
   "options": "Opciones",
   "search": "Buscar",
   "cancel": "Cancelar",
-  "missingRequiredFields": "Campos requeridos faltantes"
+  "missingRequiredFields": "Campos requeridos faltantes",
+  "logout": "Cerrar sesión"
 }

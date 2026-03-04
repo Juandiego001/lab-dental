@@ -1,4 +1,29 @@
 {
+  "profile": {
+    "title": "My Profile",
+    "personalInfo": "Personal Information",
+    "fullName": "Full name",
+    "username": "Username",
+    "email": "Email",
+    "language": "Language",
+    "changePassword": {
+      "title": "Change Password",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm new password"
+    },
+    "update": "Update"
+  },
+  "passwordRules": {
+    "required": "This field is required",
+    "requiredUpper": "Requires at least one uppercase letter",
+    "requiredLower": "Requires at least one lowercase letter",
+    "requiredSpecial": "Requires at least one special character",
+    "requiredNumber": "Requires at least one number",
+    "minLength10": "Requires at least 10 characters",
+    "maxLength24": "Requires a maximum of 24 characters",
+    "dontMatch": "Passwords don't match"
+  },
   "menu": {
     "home": "Home",
     "roi": "ROI",
@@ -274,6 +299,7 @@
     "fullName": "Full name",
     "username": "Username",
     "email": "Email",
+    "language": "Language",
     "password": "Password",
     "role": {
       "title": "Role",
@@ -587,5 +613,6 @@
   "options": "Options",
   "search": "Search",
   "cancel": "Cancel",
-  "missingRequiredFields": "Missing required fields"
+  "missingRequiredFields": "Missing required fields",
+  "logout": "Logout"
 }

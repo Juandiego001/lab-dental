@@ -6,6 +6,7 @@ from core.services import lists
 from apiflask import APIBlueprint, abort
 from core.schemas.utils import Message, Pagination
 from core.schemas.lists import ListIn, ListOut, ListsOut
+from flask_babel import gettext
 
 
 bp = APIBlueprint('lists', __name__)
@@ -24,7 +25,7 @@ def get_lists(query_data):
                                   query_data['per_page'])
         return {'items': results, 'total': results.total}
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.get('/<int:list_id>')
@@ -54,7 +55,7 @@ def get_list(list_id):
 
         return list_
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/')
@@ -65,10 +66,9 @@ def create_list(list_):
 
     try:
         lists.create_list(list_)
-        return {'message': 'List created successfully'}
+        return {'message': gettext('listCreated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.put('/<int:list_id>')
@@ -80,10 +80,9 @@ def update_list(list_id, json_data):
 
     try:
         lists.update_list(list_id, json_data)
-        return {'message': 'List updated successfully'}
+        return {'message': gettext('listUpdated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/distributors')
@@ -99,8 +98,7 @@ def get_distributors_for_lists(json_data):
             json_data['distributors_ids'] if 'distributors_ids' in json_data else []
         )
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.delete('/<int:list_id>')
@@ -111,10 +109,9 @@ def delete_list(list_id):
 
     try:
         lists.delete_list(list_id)
-        return {'message': 'List deleted successfully'}
+        return {'message': gettext('listDeleted')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/users')
@@ -129,4 +126,4 @@ def get_users(json_data):
             json_data['search'] if 'search' in json_data else '',
             json_data['users_ids'] if 'users_ids' in json_data else [])
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))

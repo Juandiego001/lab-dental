@@ -6,7 +6,8 @@ from apiflask import APIBlueprint, abort
 from werkzeug.exceptions import HTTPException
 from core.schemas.utils import Message
 from flask_jwt_extended import create_access_token, set_access_cookies, jwt_required, get_jwt_identity, current_user
-from core.schemas.users import EmailIn, PasswordIn, TokenIn, UserInLogIn, UserInUpdate, UserInCreate, UserOut, UserSearch, UsersExistingIn, UsersOut, ProfileIn, ProfileOut
+from core.schemas.users import EmailIn, PasswordIn, TokenIn, UserInLogIn, UserInUpdate, UserInCreate, UserOut, UserSearch, UsersExistingIn, UsersOut, ProfileIn, ProfileOut, TokenPasswordIn
+from flask_babel import gettext, force_locale
 
 
 bp = APIBlueprint('users', __name__)
@@ -33,7 +34,7 @@ def get_users(json_data):
             per_page=json_data['per_page'])
         return {'items': results, 'total': total}
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.get('/<int:user_id>')
@@ -45,7 +46,7 @@ def get_user(user_id):
     try:
         return users.get_user_by_id(user_id)
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/login')
@@ -58,15 +59,15 @@ def login_users(user):
         user_data = ProfileOut().dump(user)
         access_token = create_access_token(
             identity=str(user.id), additional_claims=user_data)
-        response = jsonify(access_token=access_token,
-                           message=f'Welcome {user_data['full_name']}')
+        with force_locale(user_data['language']):
+            response = jsonify(access_token=access_token,
+                            message=f'{gettext('welcome')} {user_data['fullName']}')
         set_access_cookies(response, access_token)
         return response
     except HTTPException as ex:
-        abort(404, ex.description)
+        abort(404, gettext('wrongUsernamePassword'))
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/')
@@ -78,10 +79,9 @@ def create_users(json_data):
     try:
         user_data, distributor_id = json_data
         users.create_user(current_user, user_data, distributor_id)
-        return {'message': 'User created successfully'}
+        return {'message': gettext('userCreated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.get('/profile')
@@ -97,29 +97,37 @@ def get_profile():
         user_id = int(get_jwt_identity())
         user_detail = users.get_user_by_id(user_id)
         user_profile = ProfileOut().dump(user_detail)
+        user_profile['full_name'] = user_profile.pop('fullName')
         user_profile['abilities'] = [
             {'subject': ability[0], 'action': ability[1]} for ability in get_user_permissions(user_id)]
         return user_profile
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
-@bp.put('/profile')
+@bp.patch('/profile')
 @bp.input(ProfileIn, arg_name='user_data')
 @bp.output(Message)
 @jwt_required()
-def update_profile(user_data):
+def update_profile(user_data: dict):
     '''
     Actualización del perfil de usuario
     :param user_data:
     '''
     try:
-        db.session.merge(user_data)
-        db.session.commit()
-        response = jsonify({'message': 'User updated successfully'})
+        user = users.update_profile(
+            current_user=current_user, user_data=user_data)
+        user_data = ProfileOut().dump(user)
+        access_token = create_access_token(
+            identity=str(user.id), additional_claims=user_data)
+        
+        with force_locale(user_data['language']):
+            response = jsonify(access_token=access_token,
+                            message=gettext('profileUpdated'))
+        set_access_cookies(response, access_token)
         return response
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.put('/<int:user_id>')
@@ -130,10 +138,9 @@ def update_users(user_id, json_data):
     '''Update user'''
     try:
         users.update_user(user_id, json_data)
-        return {'message': 'User updated successfully'}
+        return {'message': gettext('userUpdated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/admins')
@@ -153,7 +160,7 @@ def get_admin_users(json_data):
         )
         return {'items': results, 'total': results.total}
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.delete('/<int:user_id>')
@@ -164,10 +171,10 @@ def delete_users(user_id):
 
     try:
         users.delete_user(user_id)
-        return {'message': 'User deleted successfully'}
+        return {'message': gettext('userDeleted')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        print(gettext('abortException'))
+        abort(500, gettext('abortException'))
 
 
 @bp.get('/token')
@@ -176,10 +183,29 @@ def delete_users(user_id):
 def validate_token(query_data):
     try:
         if not users.validate_token(query_data['token']):
-            raise Exception('Token is invalid')
-        return {'message': 'Token validated'}
+            raise HTTPException('Token is invalid')
+        return {'message': gettext('tokenValid')}
+    except HTTPException as ex:
+        abort(404, gettext('tokenInvalid'))
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
+
+
+@bp.put('/password')
+@jwt_required()
+@bp.input(PasswordIn, arg_name='user_data')
+@bp.output(Message)
+def change_password(user_data):
+    '''
+    Actualización de la contraseña del usuario
+    :param user_data:
+    '''
+    try:
+        db.session.merge(user_data)
+        db.session.commit()
+        return {'message': gettext('passwordUpdated')}
+    except Exception as ex:
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/password')
@@ -202,11 +228,11 @@ def send_mail_recover_password(json_data):
 
 
 @bp.patch('/password')
-@bp.input(PasswordIn)
+@bp.input(TokenPasswordIn)
 @bp.output(Message)
-def change_password(json_data):
+def change_password_by_token(json_data):
     try:
         users.change_password(json_data['token'], json_data['password'])
-        return {'message': 'The password has been successfully updated'}
+        return {'message': gettext('passwordUpdated')}
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))

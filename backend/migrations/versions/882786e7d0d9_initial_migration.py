@@ -1,8 +1,8 @@
-"""Initial migration
+"""initial_migration
 
-Revision ID: f3a9b9802163
+Revision ID: 882786e7d0d9
 Revises: 
-Create Date: 2025-07-25 23:10:32.446347
+Create Date: 2026-03-04 05:55:32.921340
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'f3a9b9802163'
+revision = '882786e7d0d9'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -86,6 +86,7 @@ def upgrade():
     sa.Column('email', sa.String(length=450), nullable=True),
     sa.Column('password', sa.String(), nullable=False),
     sa.Column('role', sa.String(length=20), nullable=False),
+    sa.Column('language', sa.String(length=10), nullable=False),
     sa.Column('status', sa.String(length=20), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
@@ -119,7 +120,7 @@ def upgrade():
     sa.Column('category_id', sa.BigInteger(), nullable=False),
     sa.Column('model', sa.String(length=100), nullable=False),
     sa.Column('reference', sa.String(length=100), nullable=False),
-    sa.Column('main_picture', sa.String(), nullable=False),
+    sa.Column('main_picture', sa.String(), nullable=True),
     sa.Column('status', sa.String(length=20), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),

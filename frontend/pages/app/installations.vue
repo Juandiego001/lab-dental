@@ -402,13 +402,11 @@
 
             <!-- Distributors -->
             <v-col v-if="isAdmin" class="d-flex flex-column" cols="6">
-              <p class="text-body-2 text-primary">{{ $t('distributors.title', 2) }}</p>
-              <v-col v-if="isAdmin" cols="6">
-                <v-autocomplete v-model="searchForm.distributorId" :label="$t('distributors.title')"
-                  :items="distributors" item-title="name" item-value="id" hide-details="auto" clearable @update:search="(name) => {
-                    getDistributors({ distributorsIds: [searchForm.distributorId], name })
-                  }" />
-              </v-col>
+              <p class="text-body-2 text-primary pb-2">{{ $t('distributors.title', 2) }}</p>
+              <v-autocomplete class="flex-grow-0" v-model="searchForm.distributorId" :label="$t('distributors.title')"
+                :items="distributors" item-title="name" item-value="id" hide-details="auto" clearable @update:search="(name) => {
+                  getDistributors({ distributorsIds: [searchForm.distributorId], name })
+                }" />
             </v-col>
 
             <!-- Clients -->
@@ -421,7 +419,7 @@
             </v-col>
 
             <!-- Installations -->
-            <v-col class="d-flex flex-column" :cols="isAdmin ? 12 : 6">
+            <v-col class="d-flex flex-column" :cols="isAdmin ? 12 : 6" :class="isAdmin && 'mt-2'">
               <p class="text-body-2 text-primary pb-2">{{ $t('installations.title', 2) }}</p>
               <v-text-field v-model="searchForm.serial" :label="$t('installations.serial')" hide-details="auto"
                 counter="30" maxlength="30" clearable />

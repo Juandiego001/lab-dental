@@ -8,16 +8,17 @@ from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from flask.templating import render_template
+from flask_babel import force_locale
 from email.mime.multipart import MIMEMultipart
 
 
-def send_mail(subject: str, to: list, plantilla: str, params: dict, attachments: list = []):
+def send_mail(subject: str, to: list, plantilla: str, params: dict, attachments: list = [], language: str = 'es'):
     '''
-    Envia un correo electronico
-    :param subject: asunto del correo electronico
-    :param to: destinatarios del correo electronico
-    :param plantilla: plantilla utilizada para el correo electronico
-    :param params: parametros de la plantilla
+    Envío de correo
+    :param subject: asunto del correo
+    :param to: destinatarios del correo
+    :param plantilla: plantilla utilizada para el correo
+    :param params: parámetros de la plantilla
     '''
 
     with app.app_context():
@@ -28,10 +29,11 @@ def send_mail(subject: str, to: list, plantilla: str, params: dict, attachments:
             sender_email = os.getenv('MAIL_SENDER')
             user_email = os.getenv('MAIL_SENDER')
             password_email = os.getenv('MAIL_PASSWORD')
-
-            msg = render_template(plantilla, **params)
-
+            
             message = MIMEMultipart('related')
+            with force_locale(language):
+                msg = render_template(plantilla, **params)
+
             message['Subject'] = subject
             message['From'] = sender_email
             message['To'] = ','.join(to)
@@ -64,14 +66,15 @@ def send_mail(subject: str, to: list, plantilla: str, params: dict, attachments:
 def send_mail_by_ssl(smtp_server, port, user_email, password_email,
                      to, message):
     '''
-    Envio de correo electronico por ssl
-    :param smtp_server: servidor de correo electronico
-    :param port: puerto del servidor de correo electronico
+    Envío de correo por ssl
+    :param smtp_server: servidor de correo
+    :param port: puerto del servidor de correo
     :param sender_email: usuario del servidor de correo
     :param password_email: contraseña del usuario del servidor de correo
-    :param to: destinatarios del correo electronico
-    :param message: cuerpo del correo electronico
+    :param to: destinatarios del correo
+    :param message: cuerpo del correo
     '''
+
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
         server.login(user_email, password_email)
@@ -81,13 +84,13 @@ def send_mail_by_ssl(smtp_server, port, user_email, password_email,
 def send_mail_by_tls(smtp_server, port, user_email, password_email,
                      to, message):
     '''
-    Envio de correo electronico por tls
-    :param smtp_server: servidor de correo electronico
-    :param port: puerto del servidor de correo electronico
+    Envío de correo por tls
+    :param smtp_server: servidor de correo
+    :param port: puerto del servidor de correo
     :param sender_email: usuario del servidor de correo
     :param password_email: contraseña del usuario del servidor de correo
-    :param to: destinatarios del correo electronico
-    :param message: cuerpo del correo electronico
+    :param to: destinatarios del correo
+    :param message: cuerpo del correo
     '''
 
     context = ssl.create_default_context()

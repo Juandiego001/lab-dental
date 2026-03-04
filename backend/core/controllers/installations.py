@@ -1,8 +1,8 @@
-from core.schemas.equipments import EquipmentsExistingIn, EquipmentsOut
+from flask_babel import gettext
+from core.schemas.utils import Message
 from core.services import installations
 from apiflask import APIBlueprint, abort
 from flask_jwt_extended import jwt_required, current_user
-from core.schemas.utils import Message, Pagination
 from core.schemas.installations import InstallationInUpdate, InstallationInCreate, InstallationOut, InstallationRejectCommentsIn, InstallationSearch, InstallationsOut
 
 
@@ -27,7 +27,7 @@ def search_installations(json_data):
             per_page=json_data['per_page'])
         return {'items': results, 'total': total}
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.get('/<int:installation_id>')
@@ -39,7 +39,7 @@ def get_installation(installation_id):
     try:
         return installations.get_installation_by_id(installation_id)
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/')
@@ -52,10 +52,9 @@ def create_installations(form_and_files_data):
     try:
         installation = installations.create_installation(form_and_files_data)
         installations.notify_creation(installation)
-        return {'message': 'Installation registered successfully'}
+        return {'message': gettext('installationCreated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.put('/<int:installation_id>')
@@ -66,10 +65,9 @@ def update_installations(installation_id, form_and_files_data):
     '''Update installation'''
     try:
         installations.update_installation(installation_id, form_and_files_data)
-        return {'message': 'Installation updated successfully'}
+        return {'message': gettext('installationUpdated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.delete('/<int:installation_id>')
@@ -80,26 +78,9 @@ def delete_installations(installation_id):
 
     try:
         installations.delete_installation(installation_id)
-        return {'message': 'Installation deleted successfully'}
+        return {'message': gettext('installationDeleted')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
-
-
-# @bp.post('/equipments')
-# @bp.input(EquipmentsExistingIn)
-# @bp.output(EquipmentsOut)
-# @jwt_required()
-# def get_equipments_for_installation(json_data):
-#     '''Get equipments for installation autocomplete. Existing equipments and new ones'''
-
-#     try:
-#         results = installations.get_equipments_for_installation(
-#             json_data['search'] if 'search' in json_data else '',
-#             json_data['equipment_id'] if 'equipment_id' in json_data else 0)
-#         return {'items': results}
-#     except Exception as ex:
-#         abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.patch('/approve/<int:installation_id>')
@@ -111,10 +92,10 @@ def approve_installation(installation_id):
     try:
         installations.approve_installation(installation_id)
         installations.notify_approval(installation_id)
-        return {'message': 'Installation approved successfully'}
+        return {'message': gettext('installationApproved')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        print(ex)
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/reject/<int:installation_id>')
@@ -128,7 +109,7 @@ def reject_installation(installation_id, json_data):
         installations.reject_installation(installation_id)
         installations.notify_rejection(
             installation_id, json_data['reject_comments'])
-        return {'message': 'Installation rejected successfully'}
+        return {'message': gettext('installationRejected')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        print(ex)
+        abort(500, gettext('abortException'))

@@ -69,8 +69,14 @@
                 :rules="[emailRequired]" counter="250" maxlength="250" />
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.password" type="password" hide-details="auto" label="Password"
-                autocomplete="off" :rules="[passwordRequired]" maxlength="50" />
+              <v-select v-model="form.language" item-title="title" item-value="value" hide-details="auto"
+                :label="$t('users.language')" :items="languages" />
+            </v-col>
+            <v-col cols="12">
+              <v-text-field v-model="form.password" hide-details="auto" :label="$t('users.password')" autocomplete="off"
+                :rules="passwordRules" maxlength="50" :type="showPassword ? 'text' : 'password'"
+                :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+                @click:append-inner="showPassword = !showPassword" />
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
@@ -121,8 +127,14 @@
                 :rules="[emailRequired]" counter="250" maxlength="250" />
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.password" type="password" hide-details="auto" :label="$t('users.password')"
-                autocomplete="off" maxlength="50" />
+              <v-select v-model="form.language" item-title="title" item-value="value" hide-details="auto"
+                :label="$t('users.language')" :items="languages" />
+            </v-col>
+            <v-col cols="12">
+              <v-text-field v-model="form.password" hide-details="auto" :label="$t('users.password')" autocomplete="off"
+                :rules="passwordNotRequiredRules" maxlength="50" :type="showPassword ? 'text' : 'password'"
+                :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+                @click:append-inner="showPassword = !showPassword" />
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
@@ -245,12 +257,14 @@ const createModel = ref(false);
 const updateModel = ref(false);
 const createForm = ref();
 const updateForm = ref();
+const showPassword = ref(false);
 const form = ref({
   distributorId: null,
   distributorName: '',
   fullName: '',
   username: '',
   email: '',
+  language: '',
   role: ''
 })
 const searchForm = ref({
@@ -260,6 +274,11 @@ const searchForm = ref({
   username: '',
   email: '',
 })
+
+const languages = computed(() => [
+  { title: 'Español', value: 'es' },
+  { title: 'English', value: 'en' }
+])
 
 const itemsPerPageOptions = computed(() => [
   { value: 15, title: '15' },
@@ -315,10 +334,6 @@ watch(searchDialog, async (val) => {
   });
 })
 
-watch(() => form.value.role, async (val) => {
-  if (updateDialog.value) form.value.distributorId = null;
-})
-
 watch(deleteDialog, async (val) => {
   if (!val) resetForm();
 })
@@ -346,6 +361,7 @@ const resetForm = () => {
     fullName: '',
     username: '',
     email: '',
+    language: '',
     role: ''
   }
 }
@@ -370,7 +386,10 @@ const getUser = async (id) => {
     const user = await $api(`/api/users/${id}`, {
       method: 'GET'
     })
+    console.log({ user });
+
     form.value = user
+
     updateDialog.value = true;
   } catch (err) {
     notify(err, 'error');
@@ -430,6 +449,22 @@ const distributorRequired = (v) => !!v || t('users.rules.distributorRequired');
 const fullNameRequired = (v) => !!v || t('users.rules.fullNameRequired');
 const usernameRequired = (v) => !!v || t('users.rules.usernameRequired');
 const emailRequired = (v) => !!v || t('users.rules.emailRequired');
-const passwordRequired = (v) => !!v || t('users.rules.passwordRequired');
+const passwordRules = [
+  v => !!v || t('passwordRules.required'),
+  v => /[A-Z]/.test(v) || t('passwordRules.requiredUpper'),
+  v => /[a-z]/.test(v) || t('passwordRules.requiredLower'),
+  v => /[^a-zA-Z\d]/.test(v) || t('passwordRules.requiredSpecial'),
+  v => /\d/.test(v) || t('passwordRules.requiredNumber'),
+  v => (v && v.length >= 10) || t('passwordRules.minLength10'),
+  v => (v && v.length <= 24) || t('passwordRules.maxLength24'),
+]
+const passwordNotRequiredRules = [
+  v => !v || /[A-Z]/.test(v) || t('passwordRules.requiredUpper'),
+  v => !v || /[a-z]/.test(v) || t('passwordRules.requiredLower'),
+  v => !v || /[^a-zA-Z\d]/.test(v) || t('passwordRules.requiredSpecial'),
+  v => !v || /\d/.test(v) || t('passwordRules.requiredNumber'),
+  v => !v || (v && v.length >= 10) || t('passwordRules.minLength10'),
+  v => !v || (v && v.length <= 24) || t('passwordRules.maxLength24'),
+]
 
 </script>
