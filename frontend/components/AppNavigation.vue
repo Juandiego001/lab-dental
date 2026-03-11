@@ -21,7 +21,7 @@
 
     <template v-slot:append>
       <div class="pa-2">
-        <v-btn class="bg-primary" block variant="text" @click="navigateTo('/')">
+        <v-btn class="bg-primary" block variant="text" @click="logout">
           <v-icon icon="mdi-logout" class="me-2" />
           {{ $t('logout') }}
         </v-btn>
@@ -44,7 +44,7 @@
       <v-list density="compact" nav>
         <v-list-item density="compact" variant="flat" append-icon="mdi-account" :title="$t('profile.title')"
           :to="'/app/profile'" />
-        <v-list-item :title="$t('logout')" append-icon="mdi-logout" class="text-error" />
+        <v-list-item :title="$t('logout')" append-icon="mdi-logout" class="text-error" @click="logout" />
       </v-list>
     </v-menu>
   </v-app-bar>
@@ -53,6 +53,7 @@
 <script setup>
 import { ref } from 'vue';
 
+const { notify } = useSnackbar();
 const { t } = useI18n();
 const { $ability } = useNuxtApp();
 const routes = ref([])
@@ -165,4 +166,14 @@ onMounted(() => {
     console.error(err);
   }
 })
+
+const logout = async () => {
+  try {
+    const { message } = await $api('/api/users/logout', { method: 'GET' });
+    await navigateTo('/');
+    notify(message, 'success');
+  } catch (err) {
+    notify(err, 'error');
+  }
+}
 </script>

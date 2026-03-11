@@ -67,7 +67,7 @@
                   if (!createDialog) return;
                   getEquipments({
                     equipmentId: form.equipmentId,
-                    model: modelReference, reference: modelReference
+                    modelReference
                   })
                 }" />
             </v-col>
@@ -135,9 +135,10 @@
               </v-file-input>
             </v-col>
             <v-col class="text-end">
-              <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="createDialog = false" @mousedown.prevent :disabled="loading">{{
+                $t('cancel') }}</v-btn>
               <span class="mx-1"></span>
-              <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
+              <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('confirm') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -161,12 +162,11 @@
             <v-col cols="12">
               <v-autocomplete v-model="form.equipmentId" :label="$t('equipments.title')" :items="equipments"
                 item-title="modelReference" item-value="id" hide-details="auto" :clearable="!isApproved"
-                :rules="[equipmentRequired]" :readonly="isApproved" @update:search="(modalReference) => {
+                :rules="[equipmentRequired]" :readonly="isApproved" @update:search="(modelReference) => {
                   if (!updateDialog) return;
                   getEquipments({
                     equipmentId: form.equipmentId,
-                    model: modalReference,
-                    reference: modalReference
+                    modelReference
                   })
                 }" />
             </v-col>
@@ -245,9 +245,10 @@
               </v-carousel>
             </v-col>
             <v-col v-if="!isApproved" class="text-end">
-              <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="updateDialog = false" @mousedown.prevent :disabled="loading">{{
+                $t('cancel') }}</v-btn>
               <span class="mx-1" />
-              <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
+              <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('confirm') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -267,9 +268,9 @@
       </v-card-title>
       <v-card-text class="text-center py-6">
         <p class="text-subtitle-1 mb-6 text-center">{{ $t('installations.delete.message') }}</p>
-        <v-btn @click="deleteDialog = false" variant="outlined">{{ $t('cancel') }}</v-btn>
+        <v-btn @click="deleteDialog = false" variant="outlined" :disabled="loading">{{ $t('cancel') }}</v-btn>
         <span class="mx-2" />
-        <v-btn @click="deleteInstallation" class="bg-red">{{ $t('confirm') }}</v-btn>
+        <v-btn @click="deleteInstallation" class="bg-red" :loading="loading">{{ $t('confirm') }}</v-btn>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -340,9 +341,12 @@
               </v-carousel>
             </v-col>
             <v-col class="d-flex justify-end ga-2">
-              <v-btn variant="outlined" @click="approvalDialog = false">{{ $t('cancel') }}</v-btn>
-              <v-btn class="bg-error" @click="rejectDialog = true">{{ $t('reject') }}</v-btn>
-              <v-btn type="submit" class="bg-success">{{ $t('approve') }}</v-btn>
+              <v-btn variant="outlined" @click="approvalDialog = false" @mousedown.prevent :disabled="approveLoading">{{
+                $t('cancel') }}</v-btn>
+              <v-btn class="bg-error" @click="rejectDialog = true" @mousedown.prevent :disabled="approveLoading">{{
+                $t('reject') }}</v-btn>
+              <v-btn type="submit" class="bg-success" @mousedown.prevent :loading="approveLoading">{{ $t('approve')
+              }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -367,8 +371,10 @@
               <v-textarea v-model="rejectComments" :placeholder="$t('installations.reject.description')"></v-textarea>
             </v-col>
             <v-col class="d-flex justify-end ga-2">
-              <v-btn variant="outlined" @click="rejectDialog = false">{{ $t('cancel') }}</v-btn>
-              <v-btn type="submit" class="bg-error">{{ $t('reject') }}</v-btn>
+              <v-btn variant="outlined" @click="rejectDialog = false" @mousedown.prevent :disabled="rejectLoading">{{
+                $t('cancel') }}</v-btn>
+              <v-btn type="submit" class="bg-error" @mousedown.prevent :loading="rejectLoading">{{ $t('reject')
+              }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -396,7 +402,7 @@
             <v-col class="pb-4" cols="12">
               <v-autocomplete v-model="searchForm.equipmentId" :label="$t('equipments.title')" :items="equipments"
                 item-title="modelReference" item-value="id" hide-details="auto" clearable @update:search="(modelReference) => {
-                  getEquipments({ equipmentId: searchForm.equipmentId, model: modelReference, reference: modelReference })
+                  getEquipments({ equipmentId: searchForm.equipmentId, modelReference })
                 }" />
             </v-col>
 
@@ -412,8 +418,8 @@
             <!-- Clients -->
             <v-col class="d-flex flex-column" cols="6">
               <p class="text-body-2 text-primary pb-2">{{ $t('clients.title', 2) }}</p>
-              <v-autocomplete class="flex-grow-0" v-model="searchForm.clientId" :label="$t('clients.title')" :items="clients"
-                item-title="name" item-value="id" hide-details="auto" clearable @update:search="(name) => {
+              <v-autocomplete class="flex-grow-0" v-model="searchForm.clientId" :label="$t('clients.title')"
+                :items="clients" item-title="name" item-value="id" hide-details="auto" clearable @update:search="(name) => {
                   getClients({ distributorId: searchForm.distributorId, clientId: searchForm.clientId, name })
                 }" />
             </v-col>
@@ -427,7 +433,7 @@
 
             <!-- Search Button -->
             <v-col class="text-end" cols="12">
-              <v-btn class="bg-primary" type="submit">{{ $t('search') }}</v-btn>
+              <v-btn class="bg-primary" type="submit" @mousedown.prevent :loading="loading">{{ $t('search') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -461,6 +467,9 @@ useHead({
   title: `SOE Latam | ${t('installations.title', 2)}`
 })
 
+const rejectLoading = ref(false);
+const approveLoading = ref(false);
+const loading = ref(false);
 const searchDialog = ref(false);
 const createDialog = ref(false);
 const distributorsSites = ref([]);
@@ -676,6 +685,7 @@ const getClientsSites = async (name) => {
 
 const getInstallations = async () => {
   try {
+    loading.value = true;
     const data = await $api('/api/installations/search', {
       body: {
         equipmentId: searchForm.value.equipmentId,
@@ -691,6 +701,8 @@ const getInstallations = async () => {
     total.value = data.total
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
@@ -708,6 +720,7 @@ const getInstallation = async (id) => {
 
 const createInstallation = async () => {
   try {
+    loading.value = true;
     const { valid } = await createForm.value.validate();
     if (!valid) {
       notify(t('missingRequiredFields'), 'error');
@@ -739,11 +752,14 @@ const createInstallation = async () => {
     createDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const updateInstallation = async () => {
   try {
+    loading.value = true;
     const { valid } = await updateForm.value.validate();
     if (!valid) {
       notify(t('missingRequiredFields'), 'error');
@@ -777,11 +793,14 @@ const updateInstallation = async () => {
     updateDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const deleteInstallation = async () => {
   try {
+    loading.value = true;
     const { message } = await $api(`/api/installations/${form.value.id}`, {
       method: 'DELETE'
     })
@@ -790,22 +809,28 @@ const deleteInstallation = async () => {
     deleteDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const doSearch = async () => {
   try {
+    loading.value = true;
     page.value = 1
     perPage.value = 15
     await getInstallations()
     searchDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const approveInstallation = async () => {
   try {
+    approveLoading.value = true;
     const { message } = await $api(`/api/installations/approve/${form.value.id}`, {
       method: 'PATCH'
     })
@@ -814,11 +839,14 @@ const approveInstallation = async () => {
     approvalDialog.value = false;
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    approveLoading.value = false;
   }
 }
 
 const rejectInstallation = async () => {
   try {
+    rejectLoading.value = true;
     const { message } = await $api(`/api/installations/reject/${form.value.id}`, {
       method: 'POST',
       body: { rejectComments: rejectComments.value }
@@ -829,6 +857,8 @@ const rejectInstallation = async () => {
     approvalDialog.value = false;
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    rejectLoading.value = false;
   }
 }
 

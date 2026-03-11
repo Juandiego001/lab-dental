@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-04 06:03-0500\n"
+"POT-Creation-Date: 2026-03-10 22:55-0500\n"
 "PO-Revision-Date: 2026-03-03 09:13-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -40,8 +40,8 @@ msgstr ""
 #: core/controllers/groups.py:55 core/controllers/groups.py:69
 #: core/controllers/groups.py:82 core/controllers/installations.py:30
 #: core/controllers/installations.py:42 core/controllers/installations.py:57
-#: core/controllers/installations.py:70 core/controllers/installations.py:83
-#: core/controllers/installations.py:98 core/controllers/installations.py:115
+#: core/controllers/installations.py:72 core/controllers/installations.py:85
+#: core/controllers/installations.py:100 core/controllers/installations.py:117
 #: core/controllers/lists.py:28 core/controllers/lists.py:58
 #: core/controllers/lists.py:71 core/controllers/lists.py:85
 #: core/controllers/lists.py:101 core/controllers/lists.py:114
@@ -138,19 +138,19 @@ msgstr "Grupo eliminado exitosamente"
 msgid "installationCreated"
 msgstr "Instalación creada exitosamente"
 
-#: core/controllers/installations.py:68
+#: core/controllers/installations.py:69
 msgid "installationUpdated"
 msgstr "Instalación actualizada exitosamente"
 
-#: core/controllers/installations.py:81
+#: core/controllers/installations.py:83
 msgid "installationDeleted"
 msgstr "Instalación eliminada exitosamente"
 
-#: core/controllers/installations.py:95
+#: core/controllers/installations.py:97
 msgid "installationApproved"
 msgstr "Instalación aprobada exitosamente"
 
-#: core/controllers/installations.py:112
+#: core/controllers/installations.py:114
 msgid "installationRejected"
 msgstr "Instalación rechazada exitosamente"
 
@@ -217,6 +217,10 @@ msgstr "Token inválido"
 #: core/controllers/users.py:206 core/controllers/users.py:236
 msgid "passwordUpdated"
 msgstr "Contraseña actualizada exitosamente"
+
+#: core/controllers/users.py:249
+msgid "sessionEnded"
+msgstr "Sesión finalizada"
 
 #: core/schemas/brands.py:35 core/schemas/brands.py:38
 #: core/schemas/categories.py:35 core/schemas/categories.py:38
@@ -323,17 +327,22 @@ msgstr "La contraseña actual es inválida"
 msgid "SOE Latam - Registro de certificado de instalación #%(id)s"
 msgstr "SOE Latam - Registro de certificado de instalación #%(id)s"
 
-#: core/services/installations.py:264
+#: core/services/installations.py:249
+#, python-format
+msgid "SOE Latam - Actualización de certificado de instalación #%(id)s"
+msgstr "SOE Latam - Actualización de certificado de instalación #%(id)s"
+
+#: core/services/installations.py:301
 #, python-format
 msgid "SOE Latam - Aprobación de instalación #%(id)s"
 msgstr "SOE Latam - Aprobación de instalación #%(id)s"
 
-#: core/services/installations.py:309
+#: core/services/installations.py:346
 #, python-format
 msgid "SOE Latam - Rechazo de instalación #%(id)s"
 msgstr "SOE Latam - Rechazo de instalación #%(id)s"
 
-#: core/services/users.py:213 templates/recover_password.html:81
+#: core/services/users.py:207 templates/recover_password.html:81
 msgid "resetPassword"
 msgstr "Restablecer contraseña"
 
@@ -357,12 +366,14 @@ msgstr "APROBADA"
 
 #: templates/installation_approved.html:50
 #: templates/installation_rejected.html:50
+#: templates/installation_updated.html:50
 #: templates/register_installation.html:38
 msgid "equipment"
 msgstr "Equipo"
 
 #: templates/installation_approved.html:52
 #: templates/installation_rejected.html:52
+#: templates/installation_updated.html:52
 #: templates/register_installation.html:40
 msgid "installedDate"
 msgstr "Fecha de instalación"
@@ -374,6 +385,7 @@ msgstr "Sede del distribuidor"
 
 #: templates/installation_approved.html:54
 #: templates/installation_rejected.html:54
+#: templates/installation_updated.html:54
 #: templates/register_installation.html:42
 msgid "client"
 msgstr "Cliente"
@@ -385,24 +397,28 @@ msgstr "Sede del cliente"
 
 #: templates/installation_approved.html:59
 #: templates/installation_rejected.html:74
+#: templates/installation_updated.html:58
 #: templates/register_installation.html:46
 msgid "makeClick"
 msgstr "Haga click"
 
 #: templates/installation_approved.html:61
 #: templates/installation_rejected.html:76
+#: templates/installation_updated.html:60
 #: templates/register_installation.html:48
 msgid "here"
 msgstr "aquí"
 
 #: templates/installation_approved.html:63
 #: templates/installation_rejected.html:78
+#: templates/installation_updated.html:62
 #: templates/register_installation.html:50
 msgid "toGoToApplication"
 msgstr "para dirigirse a la aplicación"
 
 #: templates/installation_approved.html:66
 #: templates/installation_rejected.html:81
+#: templates/installation_updated.html:65
 #: templates/register_installation.html:53
 msgid "bestRegards"
 msgstr "Saludos cordiales"
@@ -418,6 +434,29 @@ msgstr "RECHAZADA"
 #: templates/installation_rejected.html:58
 msgid "rejectionReasonsAreFollowing"
 msgstr "Los motivos de rechazo son los siguientes"
+
+#: templates/installation_updated.html:6
+msgid "installationUpdatedNotification"
+msgstr "Notificación de instalación actualizada"
+
+#: templates/installation_updated.html:32
+#: templates/register_installation.html:32
+msgid "hiAdmin"
+msgstr "Hola Administrador"
+
+#: templates/installation_updated.html:35
+msgid "installationUpdatedCheckDetails"
+msgstr "La instalación con los siguientes detalles ha sido"
+
+#: templates/installation_updated.html:45
+#, fuzzy
+msgid "updated"
+msgstr "ACTUALIZADA"
+
+#: templates/installation_updated.html:53
+#: templates/register_installation.html:41
+msgid "distributor"
+msgstr "Distribuidor"
 
 #: templates/recover_password.html:6 templates/recover_password.html:60
 msgid "resetingPassword"
@@ -448,19 +487,11 @@ msgstr "Este es un mensaje automático, por favor no responda a este correo."
 msgid "registerInstallationNotification"
 msgstr "Notificación de registro de instalación"
 
-#: templates/register_installation.html:32
-msgid "hiAdmin"
-msgstr "Hola Administrador"
-
 #: templates/register_installation.html:34
 msgid "newInstallationCheckDetails"
 msgstr ""
 "Se ha registrado una nueva instalación en el sistema. Los detalles son "
 "los siguientes"
-
-#: templates/register_installation.html:41
-msgid "distributor"
-msgstr "Distribuidor"
 
 #~ msgid "SOE Latam - Registro de certificado de instalación %(id)s"
 #~ msgstr ""

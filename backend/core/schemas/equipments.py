@@ -15,6 +15,8 @@ class EquipmentSearch(Schema):
                           validate=validate.Length(max=50), load_default='')
     reference = fields.String(required=False, allow_none=True,
                               validate=validate.Length(max=50), load_default='')
+    model_reference = fields.String(required=False, allow_none=True, data_key='modelReference',
+                              validate=validate.Length(max=150), load_default='')
     with_picture = fields.Boolean(required=False, allow_none=True, load_default=False)
     page = fields.Integer(load_default=1)
     per_page = fields.Integer(data_key='perPage', load_default=15)

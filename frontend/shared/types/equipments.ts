@@ -6,4 +6,5 @@ export interface EquipmentSearch extends Pagination {
   categoryId?: number;
   model?: string;
   reference?: string;
+  modelReference?: string;
 }

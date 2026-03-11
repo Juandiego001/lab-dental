@@ -25,6 +25,7 @@ def search_equipments(json_data):
             model=json_data['model'],
             reference=json_data['reference'],
             with_picture=json_data['with_picture'],
+            model_reference=json_data['model_reference'],
             page=json_data['page'],
             per_page=json_data['per_page'])
         return {'items': results, 'total': total}

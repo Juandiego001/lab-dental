@@ -65,8 +65,10 @@ def update_installations(installation_id, form_and_files_data):
     '''Update installation'''
     try:
         installations.update_installation(installation_id, form_and_files_data)
+        installations.notify_update(installation_id)
         return {'message': gettext('installationUpdated')}
     except Exception as ex:
+        print(ex)
         abort(500, gettext('abortException'))
 
 

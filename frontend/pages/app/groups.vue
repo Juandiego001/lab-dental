@@ -66,9 +66,10 @@
                 }" />
             </v-col>
             <v-col class="text-end">
-              <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="createDialog = false" @mousedown.prevent :disabled="loading">{{
+                $t('cancel') }}</v-btn>
               <span class="mx-1" />
-              <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
+              <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('confirm') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -110,9 +111,10 @@
                 }" />
             </v-col>
             <v-col class="text-end">
-              <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="updateDialog = false" @mousedown.prevent :disabled="loading">{{
+                $t('cancel') }}</v-btn>
               <span class="mx-1" />
-              <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
+              <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('confirm') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -134,7 +136,7 @@
         <p class="text-subtitle-1 mb-6 text-center">{{ $t('groups.delete.message') }}</p>
         <v-btn @click="deleteDialog = false" variant="outlined">{{ $t('cancel') }}</v-btn>
         <span class="mx-2" />
-        <v-btn @click="deleteGroup" class="bg-red">{{ $t('confirm') }}</v-btn>
+        <v-btn @click="deleteGroup" class="bg-red" :loading="loading">{{ $t('confirm') }}</v-btn>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -175,7 +177,7 @@
 
             <!-- Search Button -->
             <v-col class="text-end" cols="12">
-              <v-btn class="bg-primary" type="submit">{{ $t('search') }}</v-btn>
+              <v-btn class="bg-primary" type="submit" @mousedown.prevent :loading="loading">{{ $t('search') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -248,6 +250,7 @@ useHead({
   title: `SOE Latam | ${t('groups.title', 2)}`
 })
 
+const loading = ref(false);
 const searchDialog = ref(false);
 const createDialog = ref(false);
 
@@ -416,6 +419,7 @@ const getGroup = async (id) => {
 
 const createGroup = async () => {
   try {
+    loading.value = true;
     if (!createModel.value) return;
     const { message } = await $api('/api/groups/', {
       method: 'POST',
@@ -426,11 +430,14 @@ const createGroup = async () => {
     createDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const updateGroup = async () => {
   try {
+    loading.value = true;
     if (!updateModel.value) return;
     const { message } = await $api(`/api/groups/${form.value.id}`, {
       method: 'PUT',
@@ -441,11 +448,14 @@ const updateGroup = async () => {
     updateDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const deleteGroup = async () => {
   try {
+    loading.value = true;
     const { message } = await $api(`/api/groups/${form.value.id}`, {
       method: 'DELETE'
     })
@@ -454,17 +464,22 @@ const deleteGroup = async () => {
     deleteDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const doSearch = async () => {
   try {
+    loading.value = true;
     page.value = 1
     perPage.value = 15
     await getGroups()
     searchDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 

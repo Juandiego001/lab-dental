@@ -1,11 +1,11 @@
-from flask import jsonify
+from flask import jsonify, request
 from core import get_user_permissions
 from core.app import db
 from core.services import users
 from apiflask import APIBlueprint, abort
 from werkzeug.exceptions import HTTPException
 from core.schemas.utils import Message
-from flask_jwt_extended import create_access_token, set_access_cookies, jwt_required, get_jwt_identity, current_user
+from flask_jwt_extended import create_access_token, set_access_cookies, jwt_required, get_jwt_identity, current_user, unset_jwt_cookies
 from core.schemas.users import EmailIn, PasswordIn, TokenIn, UserInLogIn, UserInUpdate, UserInCreate, UserOut, UserSearch, UsersExistingIn, UsersOut, ProfileIn, ProfileOut, TokenPasswordIn
 from flask_babel import gettext, force_locale
 
@@ -236,3 +236,23 @@ def change_password_by_token(json_data):
         return {'message': gettext('passwordUpdated')}
     except Exception as ex:
         abort(500, gettext('abortException'))
+
+
+@bp.get('/logout')
+@bp.output(Message)
+def logout():
+    '''
+    Cerrar sessión de usuario
+    '''
+    try:
+        token = request.cookies.get('access_token_cookie')
+        response = jsonify({'message': gettext('sessionEnded')})
+        unset_jwt_cookies(response)
+        # if token:
+        #     jwt_payload = decode_token(token)
+        #     ex = int(os.getenv('JWT_ACCESS_TOKEN_EXPIRES')) * 60
+        #     sub, jti = jwt_payload['sub'], jwt_payload['jti']
+        #     redis.set(f'sac:blocklist:{sub}:{jti}', '', ex=ex)
+        return response
+    except Exception as ex:
+        abort(500, str(ex))

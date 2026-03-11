@@ -63,7 +63,7 @@ def get_locale():
     ''''''
 
     supported_languages = ['es', 'en']
-    lang_cookie = request.cookies.get('language_cookie')
+    lang_cookie = request.cookies.get('i18n_redirected')
     if lang_cookie:
         return lang_cookie
     return request.accept_languages.best_match(supported_languages)

@@ -12,6 +12,7 @@ export const useEquipments = () => {
     categoryId,
     model = '',
     reference = '',
+    modelReference = '',
     page = 1,
     perPage = 15,
   }: EquipmentSearch): Promise<void> => {
@@ -23,6 +24,7 @@ export const useEquipments = () => {
           categoryId,
           model,
           reference,
+          modelReference,
           page,
           perPage,
         },

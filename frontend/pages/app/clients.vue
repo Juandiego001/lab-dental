@@ -59,9 +59,10 @@
                 :rules="[phoneRequired]" counter="20" maxlength="20" />
             </v-col>
             <v-col class="text-end">
-              <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="createDialog = false" @mousedown.prevent :disabled="loading">{{
+                $t('cancel') }}</v-btn>
               <span class="mx-1"></span>
-              <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
+              <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('confirm') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -98,9 +99,10 @@
                 :rules="[phoneRequired]" counter="20" maxlength="20" />
             </v-col>
             <v-col class="text-end">
-              <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="updateDialog = false" @mousedown.prevent :disabled="loading">{{
+                $t('cancel') }}</v-btn>
               <span class="mx-1"></span>
-              <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
+              <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('confirm') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -120,9 +122,9 @@
       </v-card-title>
       <v-card-text class="text-center py-6">
         <p class="text-subtitle-1 mb-6 text-center">{{ $t('clients.delete.message') }}</p>
-        <v-btn @click="deleteDialog = false" variant="outlined">{{ $t('cancel') }}</v-btn>
+        <v-btn @click="deleteDialog = false" variant="outlined" :disabled="loading">{{ $t('cancel') }}</v-btn>
         <span class="mx-2" />
-        <v-btn @click="deleteClient" class="bg-red">{{ $t('confirm') }}</v-btn>
+        <v-btn @click="deleteClient" class="bg-red" :loading="loading">{{ $t('confirm') }}</v-btn>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -168,7 +170,7 @@
 
             <!-- Search Button -->
             <v-col class="text-end" cols="12">
-              <v-btn class="bg-primary" type="submit">{{ $t('search') }}</v-btn>
+              <v-btn class="bg-primary" type="submit" @mousedown.prevent :loading="loading">{{ $t('search') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -198,6 +200,7 @@ useHead({
   title: `SOE Latam | ${t('clients.title', 2)}`
 })
 
+const loading = ref(false);
 const searchDialog = ref(false);
 const createDialog = ref(false);
 const page = ref(1);
@@ -296,6 +299,7 @@ const resetForm = () => {
 
 const searchClients = async (defPage, defPerPage) => {
   try {
+    loading.value = true;
     await getClients({
       distributorId: searchForm.value.distributorId,
       name: searchForm.value.name,
@@ -304,6 +308,9 @@ const searchClients = async (defPage, defPerPage) => {
       perPage: defPerPage || perPage.value
     })
   } catch (err) { }
+  finally {
+    loading.value = false;
+  }
 }
 
 const getClient = async (id) => {
@@ -320,6 +327,7 @@ const getClient = async (id) => {
 
 const createClient = async () => {
   try {
+    loading.value = true;
     if (!createModel.value) return;
     const { message } = await $api('/api/clients/', {
       method: 'POST',
@@ -330,11 +338,14 @@ const createClient = async () => {
     createDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const updateClient = async () => {
   try {
+    loading.value = true;
     if (!updateModel.value) return;
     const { message } = await $api(`/api/clients/${form.value.id}`, {
       method: 'PUT',
@@ -345,11 +356,14 @@ const updateClient = async () => {
     updateDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const deleteClient = async () => {
   try {
+    loading.value = true;
     const { message } = await $api(`/api/clients/${form.value.id}`, {
       method: 'DELETE'
     })
@@ -358,6 +372,8 @@ const deleteClient = async () => {
     deleteDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 

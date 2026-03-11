@@ -79,9 +79,10 @@
                 @click:append-inner="showPassword = !showPassword" />
             </v-col>
             <v-col class="text-end">
-              <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="createDialog = false" @mousedown.prevent :disabled="loading">{{
+                $t('cancel') }}</v-btn>
               <span class="mx-1" />
-              <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
+              <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('confirm') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -137,9 +138,10 @@
                 @click:append-inner="showPassword = !showPassword" />
             </v-col>
             <v-col class="text-end">
-              <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="updateDialog = false" @mousedown.prevent :disabled="loading">{{
+                $t('cancel') }}</v-btn>
               <span class="mx-1" />
-              <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
+              <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('confirm') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -159,9 +161,9 @@
       </v-card-title>
       <v-card-text class="text-center py-6">
         <p class="text-subtitle-1 mb-6 text-center">{{ $t('users.delete.message') }}</p>
-        <v-btn @click="deleteDialog = false" variant="outlined">{{ $t('cancel') }}</v-btn>
+        <v-btn @click="deleteDialog = false" variant="outlined" :disabled="loading">{{ $t('cancel') }}</v-btn>
         <span class="mx-2" />
-        <v-btn @click="deleteUser" class="bg-red">{{ $t('confirm') }}</v-btn>
+        <v-btn @click="deleteUser" class="bg-red" :loading="loading">{{ $t('confirm') }}</v-btn>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -217,7 +219,7 @@
 
             <!-- Search Button -->
             <v-col class="text-end" cols="12">
-              <v-btn class="bg-primary" type="submit">{{ $t('search') }}</v-btn>
+              <v-btn class="bg-primary" type="submit" @mousedown.prevent :loading="loading">{{ $t('search') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -247,6 +249,7 @@ useHead({
   title: `SOE Latam | ${t('users.title', 2)}`
 })
 
+const loading = ref(false);
 const searchDialog = ref(false);
 const createDialog = ref(false);
 const page = ref(1);
@@ -368,6 +371,7 @@ const resetForm = () => {
 
 const searchUsers = async (defPage, defPerPage) => {
   try {
+    loading.value = true;
     await getUsers({
       distributorId: searchForm.value.distributorId,
       role: searchForm.value.role,
@@ -379,6 +383,9 @@ const searchUsers = async (defPage, defPerPage) => {
       perPage: defPerPage || perPage.value
     })
   } catch (err) { }
+  finally {
+    loading.value = false;
+  }
 }
 
 const getUser = async (id) => {
@@ -398,6 +405,7 @@ const getUser = async (id) => {
 
 const createUser = async () => {
   try {
+    loading.value = true;
     if (!createModel.value) return;
     const { message } = await $api('/api/users/', {
       method: 'POST',
@@ -408,11 +416,14 @@ const createUser = async () => {
     createDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const updateUser = async () => {
   try {
+    loading.value = true;
     if (!updateModel.value) return;
     const { message } = await $api(`/api/users/${form.value.id}`, {
       method: 'PUT',
@@ -425,11 +436,14 @@ const updateUser = async () => {
     updateDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const deleteUser = async () => {
   try {
+    loading.value = true;
     const { message } = await $api(`/api/users/${form.value.id}`, {
       method: 'DELETE'
     })
@@ -440,6 +454,8 @@ const deleteUser = async () => {
     deleteDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 

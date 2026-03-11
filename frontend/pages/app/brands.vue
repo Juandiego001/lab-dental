@@ -14,8 +14,8 @@
         </v-card-title>
         <v-card-text>
           <client-only>
-            <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage" :items-length="total"
-              :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
+            <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
+              :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
               @update:itemsPerPage="v => perPage = v" :disable-sort="true">
               <template v-slot:item.option="{ item }">
                 <div class="d-flex align-center justify-center ga-2">
@@ -53,9 +53,11 @@
                   counter="50" maxlength="50" />
               </v-col>
               <v-col class="text-end">
-                <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
-                <span class="mx-1"></span>
-                <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
+                <v-btn variant="outlined" @click="createDialog = false" @mousedown.prevent :disabled="loading">{{
+                  $t('cancel') }}</v-btn>
+                <span class="mx-1" />
+                <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('confirm')
+                }}</v-btn>
               </v-col>
             </v-row>
           </v-form>
@@ -85,9 +87,11 @@
                   counter="50" maxlength="50"></v-text-field>
               </v-col>
               <v-col class="text-end">
-                <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
-                <span class="mx-1"></span>
-                <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
+                <v-btn variant="outlined" @click="updateDialog = false" @mousedown.prevent :disabled="loading">{{
+                  $t('cancel') }}</v-btn>
+                <span class="mx-1" />
+                <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('confirm')
+                  }}</v-btn>
               </v-col>
             </v-row>
           </v-form>
@@ -107,9 +111,9 @@
         </v-card-title>
         <v-card-text class="text-center py-6">
           <p class="text-subtitle-1 mb-6 text-center">{{ $t('brands.delete.message') }}</p>
-          <v-btn @click="deleteDialog = false" variant="outlined">{{ $t('cancel') }}</v-btn>
+          <v-btn @click="deleteDialog = false" variant="outlined" :disabled="loading">{{ $t('cancel') }}</v-btn>
           <span class="mx-2" />
-          <v-btn @click="deleteBrand" class="bg-red">{{ $t('confirm') }}</v-btn>
+          <v-btn @click="deleteBrand" class="bg-red" :loading="loading">{{ $t('confirm') }}</v-btn>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -131,15 +135,15 @@
           }">
             <v-row dense>
               <v-col cols="6">
-                <v-text-field v-model="searchForm.name" :label="$t('brands.name')" hide-details="auto" clearable counter="50"
-                  maxlength="50" />
+                <v-text-field v-model="searchForm.name" :label="$t('brands.name')" hide-details="auto" clearable
+                  counter="50" maxlength="50" />
               </v-col>
               <v-col cols="6">
-                <v-text-field v-model="searchForm.slug" :label="$t('brands.slug')" hide-details="auto" clearable counter="50"
-                  maxlength="50" />
+                <v-text-field v-model="searchForm.slug" :label="$t('brands.slug')" hide-details="auto" clearable
+                  counter="50" maxlength="50" />
               </v-col>
               <v-col class="text-end" cols="12">
-                <v-btn class="bg-primary" type="submit">{{ $t('search') }}</v-btn>
+                <v-btn class="bg-primary" type="submit" @mousedown.prevent :loading="loading">{{ $t('search') }}</v-btn>
               </v-col>
             </v-row>
           </v-form>
@@ -167,6 +171,7 @@ useHead({
   title: `SOE Latam | ${t('brands.title', 2)}`
 })
 
+const loading = ref(false);
 const searchDialog = ref(false);
 const createDialog = ref(false);
 const page = ref(1);
@@ -252,6 +257,7 @@ const resetForm = () => {
 
 const searchBrands = async (defPage, defPerPage) => {
   try {
+    loading.value = true;
     await getBrands({
       name: searchForm.value.name,
       slug: searchForm.value.slug,
@@ -259,6 +265,9 @@ const searchBrands = async (defPage, defPerPage) => {
       perPage: defPerPage || perPage.value
     })
   } catch (err) { }
+  finally {
+    loading.value = false;
+  }
 }
 
 const getBrand = async (id) => {
@@ -275,6 +284,7 @@ const getBrand = async (id) => {
 
 const createBrand = async () => {
   try {
+    loading.value = true;
     if (!createModel.value) return;
     const { message } = await $api('/api/brands/', {
       method: 'POST',
@@ -285,11 +295,14 @@ const createBrand = async () => {
     createDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const updateBrand = async () => {
   try {
+    loading.value = true;
     if (!updateModel.value) return;
     const { message } = await $api(`/api/brands/${form.value.id}`, {
       method: 'PUT',
@@ -300,11 +313,14 @@ const updateBrand = async () => {
     updateDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const deleteBrand = async () => {
   try {
+    loading.value = true;
     const { message } = await $api(`/api/brands/${form.value.id}`, {
       method: 'DELETE'
     })
@@ -313,6 +329,8 @@ const deleteBrand = async () => {
     deleteDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 

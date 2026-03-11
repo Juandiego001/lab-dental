@@ -219,6 +219,43 @@ def update_installation(installation_id: int, data: dict):
     db.session.commit()
 
 
+def notify_update(installation_id: int):
+    '''Notify admins the installation have been updated'''
+
+    installation_data = InstallationApprovedNotification().dump(
+        get_installation_by_id(installation_id))
+    installation_data['app_url'] = f'{FRONTEND_APP_BASE_URL}/app/installations'
+
+    print(installation_data)
+
+    users_ = db.session.query(User)\
+        .join(UserList)\
+        .join(List_)\
+        .join(DistributorList)\
+        .filter(and_(DistributorList.distributor_id == installation_data['distributor_id'], User.status == 'ACTIVE', User.role == 'ADMIN'))\
+        .distinct(User.email)\
+        .order_by(User.email)\
+        .all()
+
+    users_emails_by_language = {'es': [], 'en': []}
+    for each_user in users_:
+        users_emails_by_language[each_user.language].append(
+            each_user.email)
+
+    for each_language in users_emails_by_language.keys():
+        users_filtered = users_emails_by_language[each_language]
+        if len(users_filtered) > 0:
+            with force_locale(each_language):
+                mail_subject = gettext(u'SOE Latam - Actualización de certificado de instalación #%(id)s',
+                                       id=installation_id)
+            send_mail(
+                subject=mail_subject,
+                to=users_filtered,
+                plantilla='installation_updated.html',
+                params=installation_data,
+                language=each_language)
+
+
 def delete_installation(installation_id: int):
     '''Delete installation'''
 
