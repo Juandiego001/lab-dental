@@ -1,36 +1,39 @@
-from apiflask import Schema, fields
+from apiflask import Schema
+from apiflask.fields import Boolean, DateTime, Integer, List, Nested, String
 from marshmallow import ValidationError, post_load, pre_load, validates_schema, validate
 from core.models import Equipment
-from core.schemas.utils import BaseSchema
+from core.schemas.utils import BaseSchema, SortBy
 from flask_babel import gettext
 
 
 class EquipmentSearch(Schema):
-    equipment_id = fields.Integer(required=False, allow_none=True, data_key='equipmentId', load_default=None)
-    brand_id = fields.Integer(
+    equipment_id = Integer(required=False, allow_none=True,
+                           data_key='equipmentId', load_default=None)
+    brand_id = Integer(
         required=False, allow_none=True, data_key='brandId', load_default=None)
-    category_id = fields.Integer(
+    category_id = Integer(
         required=False, allow_none=True, data_key='categoryId', load_default=None)
-    model = fields.String(required=False, allow_none=True,
-                          validate=validate.Length(max=50), load_default='')
-    reference = fields.String(required=False, allow_none=True,
-                              validate=validate.Length(max=50), load_default='')
-    model_reference = fields.String(required=False, allow_none=True, data_key='modelReference',
-                              validate=validate.Length(max=150), load_default='')
-    with_picture = fields.Boolean(required=False, allow_none=True, load_default=False)
-    page = fields.Integer(load_default=1)
-    per_page = fields.Integer(data_key='perPage', load_default=15)
+    model = String(required=False, allow_none=True,
+                   validate=validate.Length(max=50), load_default='')
+    reference = String(required=False, allow_none=True,
+                       validate=validate.Length(max=50), load_default='')
+    model_reference = String(required=False, allow_none=True, data_key='modelReference',
+                             validate=validate.Length(max=150), load_default='')
+    with_picture = Boolean(required=False, allow_none=True, load_default=False)
+    page = Integer(load_default=1)
+    per_page = Integer(data_key='perPage', load_default=15)
+    sort_by = Nested(SortBy, data_key='sortBy', load_default=None)
 
 
 class EquipmentIn(BaseSchema):
-    id = fields.Integer()
-    model = fields.String(required=True, allow_none=False,
-                          validate=validate.Length(max=50))
-    reference = fields.String(
+    id = Integer()
+    model = String(required=True, allow_none=False,
+                   validate=validate.Length(max=50))
+    reference = String(
         required=True, allow_none=False, validate=validate.Length(max=50))
-    brand_id = fields.Integer(data_key='brandId')
-    category_id = fields.Integer(data_key='categoryId')
-    status = fields.String(load_default='ACTIVE')
+    brand_id = Integer(data_key='brandId')
+    category_id = Integer(data_key='categoryId')
+    status = String(load_default='ACTIVE')
 
     @validates_schema
     def model_exists(self, data, **kwargs):
@@ -78,8 +81,8 @@ class EquipmentInUpdate(EquipmentIn):
 
 
 class EquipmentsExistingIn(BaseSchema):
-    search = fields.String(required=False, allow_none=True, load_default='')
-    equipment_id = fields.Integer(
+    search = String(required=False, allow_none=True, load_default='')
+    equipment_id = Integer(
         required=False, allow_none=True, data_key='equipmentId')
 
     @pre_load
@@ -93,20 +96,20 @@ class EquipmentsExistingIn(BaseSchema):
 
 
 class EquipmentOut(BaseSchema):
-    id = fields.Integer()
-    brand_id = fields.Integer(data_key='brandId')
-    brand_name = fields.String(data_key='brandName')
-    category_id = fields.Integer(data_key='categoryId')
-    category_name = fields.String(data_key='categoryName')
-    model_reference = fields.String(data_key='modelReference')
-    model = fields.String()
-    reference = fields.String()
-    main_picture = fields.String(data_key='mainPicture')
-    status = fields.String()
-    created_at = fields.DateTime(data_key='createdAt')
-    updated_at = fields.DateTime(data_key='updatedAt')
+    id = Integer()
+    brand_id = Integer(data_key='brandId')
+    brand_name = String(data_key='brandName')
+    category_id = Integer(data_key='categoryId')
+    category_name = String(data_key='categoryName')
+    model_reference = String(data_key='modelReference')
+    model = String()
+    reference = String()
+    main_picture = String(data_key='mainPicture')
+    status = String()
+    created_at = DateTime(data_key='createdAt')
+    updated_at = DateTime(data_key='updatedAt')
 
 
 class EquipmentsOut(Schema):
-    items = fields.List(fields.Nested(EquipmentOut))
-    total = fields.Integer()
+    items = List(Nested(EquipmentOut))
+    total = Integer()

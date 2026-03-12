@@ -1,39 +1,40 @@
-from apiflask import Schema, fields
+from apiflask import Schema
+from apiflask.fields import Integer, String, Nested, List, DateTime, Function
 from core.models import Address, Site
-from core.schemas.utils import BaseSchema
-from werkzeug.exceptions import HTTPException
+from core.schemas.utils import BaseSchema, SortBy
 from marshmallow import ValidationError, post_load, validates_schema, validate
 from flask_babel import gettext
 
 
 class SiteSearch(Schema):
-    site_id = fields.Integer(
+    site_id = Integer(
         required=False, allow_none=True, data_key='siteId', load_default=None)
-    distributor_id = fields.Integer(
+    distributor_id = Integer(
         required=False, allow_none=True, data_key='distributorId', load_default=None)
-    client_id = fields.Integer(
+    client_id = Integer(
         required=False, allow_none=True, data_key='clientId', load_default=None)
-    name = fields.String(required=False, allow_none=True,
-                         validate=validate.Length(max=50), load_default='')
-    page = fields.Integer(load_default=1)
-    per_page = fields.Integer(data_key='perPage', load_default=15)
+    name = String(required=False, allow_none=True,
+                  validate=validate.Length(max=50), load_default='')
+    page = Integer(load_default=1)
+    per_page = Integer(data_key='perPage', load_default=15)
+    sort_by = Nested(SortBy, data_key='sortBy', load_default=None)
 
 
 class SiteIn(BaseSchema):
-    distributor_id = fields.Integer(
+    distributor_id = Integer(
         data_key='distributorId', required=False, allow_none=True)
-    client_id = fields.Integer(
+    client_id = Integer(
         data_key='clientId', required=False, allow_none=True)
-    country_id = fields.Integer(data_key='countryId')
-    state_id = fields.Integer(
+    country_id = Integer(data_key='countryId')
+    state_id = Integer(
         required=False, allow_none=True, data_key='stateId')
-    city_id = fields.Integer(
+    city_id = Integer(
         required=False, allow_none=True, data_key='cityId')
-    description = fields.String(
+    description = String(
         required=True, allow_none=False, validate=validate.Length(max=255))
-    name = fields.String(required=True, allow_none=False,
-                         validate=validate.Length(max=50))
-    status = fields.String(load_default='ACTIVE')
+    name = String(required=True, allow_none=False,
+                  validate=validate.Length(max=50))
+    status = String(load_default='ACTIVE')
 
     @validates_schema
     def name_exists(self, data, **kwargs):
@@ -95,8 +96,8 @@ class SiteInCreate(SiteIn):
 
 
 class SiteInUpdate(SiteIn):
-    id = fields.Integer()
-    address_id = fields.Integer(data_key='addressId')
+    id = Integer()
+    address_id = Integer(data_key='addressId')
 
     @validates_schema
     def distributor_id_or_client_id(self, data: dict, **kwargs):
@@ -128,38 +129,37 @@ class SiteInUpdate(SiteIn):
 
 
 class SiteOut(BaseSchema):
-    id = fields.Integer()
-    name = fields.String()
-    distributor_id = fields.Integer(data_key='distributorId')
-    client_id = fields.Integer(data_key='clientId')
-    address_id = fields.Integer(data_key='addressId')
-    description = fields.String()
-    status = fields.String()
-    country_id = fields.Integer(data_key='countryId')
-    country_name = fields.String(data_key='countryName')
-    state_id = fields.Integer(required=False, data_key='stateId')
-    state_name = fields.String(required=False, data_key='stateName')
-    city_id = fields.Integer(required=False, data_key='cityId')
-    city_name = fields.String(required=False, data_key='cityName')
-    client_name = fields.String(data_key='clientName')
-    distributor_name = fields.String(data_key='distributorName')
-    created_at = fields.DateTime(data_key='createdAt')
-    updated_at = fields.DateTime(data_key='updatedAt')
-    company_type = fields.Function(
+    id = Integer()
+    name = String()
+    distributor_id = Integer(data_key='distributorId')
+    client_id = Integer(data_key='clientId')
+    address_id = Integer(data_key='addressId')
+    description = String()
+    status = String()
+    country_id = Integer(data_key='countryId')
+    country_name = String(data_key='countryName')
+    state_id = Integer(required=False, data_key='stateId')
+    state_name = String(required=False, data_key='stateName')
+    city_id = Integer(required=False, data_key='cityId')
+    city_name = String(required=False, data_key='cityName')
+    client_name = String(data_key='clientName')
+    distributor_name = String(data_key='distributorName')
+    created_at = DateTime(data_key='createdAt')
+    updated_at = DateTime(data_key='updatedAt')
+    company_type = Function(
         lambda data: 'distributors' if data.distributor_id else 'clients', data_key='companyType')
-    distributor_client = fields.Function(
-        lambda data: data._mapping['distributor_name'] if data._mapping['distributor_name'] else data._mapping['client_name'], data_key='distributorClient')
+    distributor_client = String(data_key='distributorClient')
 
 
 class SitesOut(BaseSchema):
-    items = fields.List(fields.Nested(SiteOut))
-    total = fields.Integer()
+    items = List(Nested(SiteOut))
+    total = Integer()
 
 
 class SiteInstallationOut(BaseSchema):
-    id = fields.Integer()
-    name = fields.String()
+    id = Integer()
+    name = String()
 
 
 class SitesInstallationsOut(BaseSchema):
-    items = fields.List(fields.Nested(SiteInstallationOut))
+    items = List(Nested(SiteInstallationOut))

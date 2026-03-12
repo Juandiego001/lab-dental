@@ -2,7 +2,7 @@ from flask_jwt_extended import jwt_required
 from core.app import db
 from core.services import equipments
 from apiflask import APIBlueprint, abort
-from core.schemas.utils import Message, Pagination
+from core.schemas.utils import Message
 from core.schemas.equipments import EquipmentInUpdate, EquipmentInCreate, EquipmentOut, EquipmentSearch, EquipmentsOut
 from flask_babel import gettext
 
@@ -27,7 +27,8 @@ def search_equipments(json_data):
             with_picture=json_data['with_picture'],
             model_reference=json_data['model_reference'],
             page=json_data['page'],
-            per_page=json_data['per_page'])
+            per_page=json_data['per_page'],
+            sort_by=json_data['sort_by'])
         return {'items': results, 'total': total}
     except Exception as ex:
         abort(500, gettext('abortException'))

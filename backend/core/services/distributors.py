@@ -6,8 +6,19 @@ from sqlalchemy import func, and_, select
 from werkzeug.exceptions import HTTPException
 
 
-def search_distributors(current_user: User, distributors_ids: list[int], name: str, page: int, per_page: int):
+def search_distributors(current_user: User, distributors_ids: list[int], name: str, page: int, per_page: int, sort_by: dict = None):
     '''Search distributors'''
+
+    order_by = Distributor.id.desc()
+    if sort_by and isinstance(sort_by, dict):
+        sort_key = sort_by.get('key')
+        sort_order = sort_by.get('order', 'asc')
+        if sort_key and hasattr(Distributor, sort_key):
+            column = getattr(Distributor, sort_key)
+            if sort_order == 'desc':
+                order_by = column.desc()
+            else:
+                order_by = column.asc()
 
     query = [Distributor.status == 'ACTIVE']
     with_distributors_ids = None
@@ -29,7 +40,7 @@ def search_distributors(current_user: User, distributors_ids: list[int], name: s
 
     distributors = db.session.query(Distributor)\
         .filter(*query)\
-        .order_by(Distributor.id.desc())\
+        .order_by(order_by)\
         .limit(per_page)\
         .offset((page - 1) * per_page)\
         .all()

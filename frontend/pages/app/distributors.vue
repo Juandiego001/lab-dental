@@ -16,12 +16,12 @@
         <client-only>
           <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
             :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-            @update:itemsPerPage="v => perPage = v" :disable-sort="true">
+            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
                 <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getDistributor(item.id)" />
                 <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                  @click="form.id = item.id; deleteDialog = true" />
+                  @click="form.id = item.id; deleteDialog = true" @update:sort-by="v => sortBy = v" />
               </div>
             </template>
           </v-data-table-server>
@@ -48,7 +48,8 @@
                 :rules="[nameRequired]" counter="50" maxlength="50" />
             </v-col>
             <v-col class="text-end">
-              <v-btn variant="outlined" @click="createDialog = false" @mousedown.prevent :disabled="loading">{{ $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="createDialog = false" @mousedown.prevent :disabled="loading">{{
+                $t('cancel') }}</v-btn>
               <span class="mx-1" />
               <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('confirm') }}</v-btn>
             </v-col>
@@ -76,7 +77,8 @@
                 :rules="[nameRequired]" counter="50" maxlength="50" />
             </v-col>
             <v-col class="text-end">
-              <v-btn variant="outlined" @click="updateDialog = false" @mousedown.prevent :disabled="loading">{{ $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="updateDialog = false" @mousedown.prevent :disabled="loading">{{
+                $t('cancel') }}</v-btn>
               <span class="mx-1" />
               <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('confirm') }}</v-btn>
             </v-col>
@@ -159,6 +161,7 @@ const searchDialog = ref(false);
 const createDialog = ref(false);
 const page = ref(1);
 const perPage = ref(15);
+const sortBy = ref(null);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
 const createModel = ref(false);
@@ -180,7 +183,7 @@ const itemsPerPageOptions = computed(() => [
 ])
 
 const headers = computed(() => [
-  { title: t('distributors.name'), key: 'name', sortable: false },
+  { title: t('distributors.name'), key: 'name' },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
@@ -211,6 +214,12 @@ watch(perPage, async () => {
   await searchDistributors();
 })
 
+watch(sortBy, async (v) => {
+  if (v && v.length) {
+    await searchDistributors();
+  }
+})
+
 onBeforeMount(async () => {
   if ($ability.can('read', 'distributors')) {
     await getDistributors({})
@@ -231,7 +240,8 @@ const searchDistributors = async (defPage, defPerPage) => {
     await getDistributors({
       name: searchForm.value.name,
       page: defPage || page.value,
-      perPage: defPerPage || perPage.value
+      perPage: defPerPage || perPage.value,
+      sortBy: sortBy.value?.length ? sortBy.value[0] : null
     });
   } catch (err) { }
   finally {

@@ -1,5 +1,5 @@
   <template>
-    <v-container fluid class="fill-height align-start">
+    <v-container fluid class="fill-height align-start" style="overflow-y: auto;">
       <v-card width="100%" flat>
         <v-card-title class="d-flex justify-space-between">
           <p>{{ $t('brands.title', 2) }}</p>
@@ -16,7 +16,7 @@
           <client-only>
             <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
               :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-              @update:itemsPerPage="v => perPage = v" :disable-sort="true">
+              @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
               <template v-slot:item.option="{ item }">
                 <div class="d-flex align-center justify-center ga-2">
                   <v-btn v-if="$ability.can('update', 'brands')" class="my-2 bg-primary" size="small" icon="mdi-pencil"
@@ -91,7 +91,7 @@
                   $t('cancel') }}</v-btn>
                 <span class="mx-1" />
                 <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('confirm')
-                  }}</v-btn>
+                }}</v-btn>
               </v-col>
             </v-row>
           </v-form>
@@ -176,6 +176,7 @@ const searchDialog = ref(false);
 const createDialog = ref(false);
 const page = ref(1);
 const perPage = ref(15);
+const sortBy = ref(null);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
 const createModel = ref(false);
@@ -201,8 +202,8 @@ const itemsPerPageOptions = computed(() => [
 const headers = computed(() => {
 
   const defaultHeaders = [
-    { title: t('brands.name'), key: 'name', sortable: false },
-    { title: t('brands.slug'), key: 'slug', sortable: false },
+    { title: t('brands.name'), key: 'name' },
+    { title: t('brands.slug'), key: 'slug' },
   ]
 
   if ($ability.can('update', 'brands') || $ability.can('delete', 'brands')) {
@@ -240,6 +241,12 @@ watch(perPage, async () => {
   await searchBrands();
 })
 
+watch(sortBy, async (v) => {
+  if (v && v.length) {
+    await searchBrands();
+  }
+})
+
 onBeforeMount(async () => {
   if ($ability.can('read', 'brands')) {
     await getBrands({});
@@ -262,7 +269,8 @@ const searchBrands = async (defPage, defPerPage) => {
       name: searchForm.value.name,
       slug: searchForm.value.slug,
       page: defPage || page.value,
-      perPage: defPerPage || perPage.value
+      perPage: defPerPage || perPage.value,
+      sortBy: sortBy.value?.length ? sortBy.value[0] : null
     })
   } catch (err) { }
   finally {

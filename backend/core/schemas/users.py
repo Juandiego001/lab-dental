@@ -5,7 +5,7 @@ from apiflask import Schema
 from core.models import User
 from sqlalchemy import and_, or_
 from bcrypt import hashpw, gensalt
-from core.schemas.utils import BaseSchema
+from core.schemas.utils import BaseSchema, SortBy
 from flask_jwt_extended import current_user
 from apiflask.fields import Boolean, DateTime, Integer, List, Nested, String
 from marshmallow import EXCLUDE, ValidationError, post_load, pre_load, validates_schema, validate
@@ -28,6 +28,7 @@ class UserSearch(Schema):
                    validate=validate.Length(max=250), load_default='')
     page = Integer(load_default=1)
     per_page = Integer(data_key='perPage', load_default=15)
+    sort_by = Nested(SortBy, data_key='sortBy', load_default=None)
 
     @validates_schema
     def validate_users_ids(self, data: dict, **kwargs):

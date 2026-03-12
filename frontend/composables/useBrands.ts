@@ -12,6 +12,7 @@ export const useBrands = () => {
     slug = '',
     page = 1,
     perPage = 15,
+    sortBy = undefined,
   }: BrandSearch): Promise<void> => {
     try {
       const data = await $api<ItemsTotal>('/api/brands/search', {
@@ -21,6 +22,7 @@ export const useBrands = () => {
           slug,
           page,
           perPage,
+          sortBy: sortBy,
         },
         method: 'POST',
       })

@@ -2,7 +2,7 @@ from flask_jwt_extended import jwt_required, current_user
 from core.app import db
 from core.services import clients
 from apiflask import APIBlueprint, abort
-from core.schemas.utils import Message, Pagination
+from core.schemas.utils import Message
 from core.schemas.clients import ClientInUpdate, ClientInCreate, ClientOut, ClientSearch, ClientsOut
 from flask_babel import gettext
 
@@ -25,7 +25,8 @@ def search_clients(json_data):
             name=json_data['name'],
             phone=json_data['phone'],
             page=json_data['page'],
-            per_page=json_data['per_page'])
+            per_page=json_data['per_page'],
+            sort_by=json_data['sort_by'])
 
         return {'items': results, 'total': total}
     except Exception as ex:

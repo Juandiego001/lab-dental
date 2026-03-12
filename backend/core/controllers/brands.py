@@ -3,7 +3,7 @@ from flask_babel import gettext
 from core.services import brands
 from apiflask import APIBlueprint, abort
 from flask_jwt_extended import jwt_required
-from core.schemas.utils import Message, Pagination
+from core.schemas.utils import Message
 from core.schemas.brands import BrandInUpdate, BrandInCreate, BrandOut, BrandSearch, BrandsOut
 
 
@@ -23,7 +23,8 @@ def search_brands(json_data):
             name=json_data['name'],
             slug=json_data['slug'],
             page=json_data['page'],
-            per_page=json_data['per_page'])
+            per_page=json_data['per_page'],
+            sort_by=json_data['sort_by'])
         return {'items': results, 'total': total}
     except Exception as ex:
         abort(500, gettext('abortException'))

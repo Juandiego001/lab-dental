@@ -4,7 +4,7 @@ from sqlalchemy import and_, or_, literal, func
 from werkzeug.exceptions import HTTPException
 
 
-def search_equipments(equipment_id: int, brand_id: int, category_id: int, model: str, reference: str, with_picture: bool, model_reference: str, page: int, per_page: int):
+def search_equipments(equipment_id: int, brand_id: int, category_id: int, model: str, reference: str, with_picture: bool, model_reference: str, page: int, per_page: int, sort_by: dict = None):
     '''
     Docstring for search_equipments
 
@@ -17,6 +17,19 @@ def search_equipments(equipment_id: int, brand_id: int, category_id: int, model:
     :param reference: Description
     :type reference: str
     '''
+
+    order_by = Equipment.id.desc()
+    if sort_by:
+        if sort_by['key'] == 'model':
+            order_by = Equipment.model
+        elif sort_by['key'] == 'reference':
+            order_by = Equipment.reference
+        elif sort_by['key'] == 'brandName':
+            order_by = Brand.name
+        elif sort_by['key'] == 'categoryName':
+            order_by = Category.name
+        order_by = order_by.asc(
+        ) if sort_by['order'] == 'asc' else order_by.desc()
 
     query = [Equipment.status == 'ACTIVE']
     with_equipment_id = None
@@ -62,7 +75,7 @@ def search_equipments(equipment_id: int, brand_id: int, category_id: int, model:
     equipments = list(db.session.execute(
         query_stmt
         .filter(*query)
-        .order_by(Equipment.id.desc())
+        .order_by(order_by)
         .limit(per_page)
         .offset((page - 1) * per_page)
     ).unique())

@@ -13,6 +13,7 @@ export const useClients = () => {
     phone = '',
     page = 1,
     perPage = 15,
+    sortBy = undefined,
   }: ClientSearch): Promise<void> => {
     try {
       const data = await $api<ItemsTotal>('/api/clients/search', {
@@ -23,6 +24,7 @@ export const useClients = () => {
           phone,
           page,
           perPage,
+          sortBy: sortBy,
         },
         method: 'POST',
       })

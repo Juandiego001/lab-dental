@@ -16,7 +16,7 @@
         <client-only>
           <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
             :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-            @update:itemsPerPage="v => perPage = v" :disable-sort="true">
+            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
             <template v-slot:item.isMain="{ item }">
               <v-icon v-if="item.isMain" icon="mdi-check-bold" color="success"></v-icon>
             </template>
@@ -195,6 +195,7 @@ const items = ref([]);
 const search = ref('');
 const page = ref(1);
 const perPage = ref(15);
+const sortBy = ref(null);
 const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
@@ -217,7 +218,7 @@ const itemsPerPageOptions = computed(() => [
 ])
 
 const headers = computed(() => [
-  { title: t('lists.name'), key: 'name', sortable: false },
+  { title: t('lists.name'), key: 'name' },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
@@ -257,6 +258,12 @@ watch(perPage, async () => {
   await getLists();
 })
 
+watch(sortBy, async (v) => {
+  if (v && v.length) {
+    await getLists();
+  }
+})
+
 onBeforeMount(async () => {
   if ($ability.can('read', 'lists')) {
     await getLists();
@@ -277,13 +284,14 @@ const resetForm = () => {
 const getLists = async () => {
   try {
     loading.value = true;
-    const data = await $api('/api/lists/', {
-      query: {
+    const data = await $api('/api/lists/search', {
+      body: {
         search: search.value,
         page: page.value,
-        perPage: perPage.value
+        perPage: perPage.value,
+        sortBy: sortBy.value?.length ? sortBy.value[0] : null
       },
-      method: 'GET'
+      method: 'POST'
     })
     items.value = data.items
     total.value = data.total

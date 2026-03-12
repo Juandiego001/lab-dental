@@ -14,8 +14,23 @@ from core.models import Client, Distributor, DistributorList, Equipment, Install
 from flask_babel import force_locale, gettext
 
 
-def search_installations(current_user: User, equipment_id: int, distributor_id: int, client_id: int, serial: str, page: int, per_page: int):
+def search_installations(current_user: User, equipment_id: int, distributor_id: int, client_id: int, serial: str, page: int, per_page: int, sort_by: dict = None):
     '''Get installations'''
+
+    order_by = Installation.id.desc()
+    if sort_by:
+        if sort_by['key'] == 'equipmentModelReference':
+            order_by = func.concat(Equipment.model, ' - ', Equipment.reference).label('equipment_model_reference')
+        elif sort_by['key'] == 'clientName':
+            order_by = Client.name
+        elif sort_by['key'] == 'serial':
+            order_by = Installation.serial
+        elif sort_by['key'] == 'installedDate':
+            order_by = Installation.installed_date
+        elif sort_by['key'] == 'expirationDate':
+            order_by = Installation.expiration_date
+        order_by = order_by.asc(
+        ) if sort_by['order'] == 'asc' else order_by.desc()
 
     query = [Installation.status != 'INACTIVE']
     if equipment_id:
@@ -42,7 +57,7 @@ def search_installations(current_user: User, equipment_id: int, distributor_id: 
         .join(Equipment)
         .join(Client, Client.id == Installation.client_id)
         .filter(*query)
-        .order_by(Installation.id.desc())
+        .order_by(order_by)
         .limit(per_page)
         .offset((page - 1) * per_page)
     ).unique()), total

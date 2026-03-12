@@ -3,8 +3,19 @@ from core.models import Brand
 from werkzeug.exceptions import HTTPException
 
 
-def search_brands(brand_id: int, name: str, slug: str, page: int, per_page: int):
+def search_brands(brand_id: int, name: str, slug: str, page: int, per_page: int, sort_by: dict = None):
     '''Search brands'''
+
+    order_by = Brand.id.desc()
+    if sort_by and isinstance(sort_by, dict):
+        sort_key = sort_by.get('key')
+        sort_order = sort_by.get('order', 'asc')
+        if sort_key and hasattr(Brand, sort_key):
+            column = getattr(Brand, sort_key)
+            if sort_order == 'desc':
+                order_by = column.desc()
+            else:
+                order_by = column.asc()
 
     query = [Brand.status == 'ACTIVE']
     with_brand_id = None
@@ -25,7 +36,7 @@ def search_brands(brand_id: int, name: str, slug: str, page: int, per_page: int)
 
     brands = db.session.query(Brand)\
         .filter(*query)\
-        .order_by(Brand.id.desc())\
+        .order_by(order_by)\
         .limit(per_page)\
         .offset((page - 1) * per_page)\
         .all()

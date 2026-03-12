@@ -6,9 +6,19 @@ from werkzeug.exceptions import HTTPException
 from core.services.distributors import get_distributor_from_user
 
 
-
-def search_clients(current_user: User, distributor_id: int, client_id: int, name: str, phone: str, page: int, per_page: int):
+def search_clients(current_user: User, distributor_id: int, client_id: int, name: str, phone: str, page: int, per_page: int, sort_by: dict = None):
     '''Search clients'''
+
+    order_by = Client.id.desc()
+    if sort_by:
+        if sort_by['key'] == 'name':
+            order_by = Client.name
+        elif sort_by['key'] == 'phone':
+            order_by = Client.phone
+        elif sort_by['key'] == 'distributorName':
+            order_by = Distributor.name
+        order_by = order_by.asc(
+        ) if sort_by['order'] == 'asc' else order_by.desc()
 
     query = [Client.status == 'ACTIVE']
     with_client_id = None
@@ -40,7 +50,7 @@ def search_clients(current_user: User, distributor_id: int, client_id: int, name
     total += len(with_client_id) if with_client_id else 0
     clients = query_stmt\
         .filter(*query)\
-        .order_by(Client.id.desc())\
+        .order_by(order_by)\
         .limit(per_page)\
         .offset((page - 1) * per_page)\
         .all()

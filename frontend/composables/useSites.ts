@@ -13,6 +13,7 @@ export const useSites = () => {
     name = '',
     page = 1,
     perPage = 15,
+    sortBy = undefined,
   }: SiteSearch): Promise<ItemsTotal> => {
     try {
       const data = await $api<ItemsTotal>('/api/sites/search', {
@@ -23,6 +24,7 @@ export const useSites = () => {
           name,
           page,
           perPage,
+          sortBy: sortBy,
         },
         method: 'POST',
       })

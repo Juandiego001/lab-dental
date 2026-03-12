@@ -12,17 +12,18 @@ from flask_babel import gettext
 bp = APIBlueprint('lists', __name__)
 
 
-@bp.get('/')
-@bp.input(Pagination, location='query')
+@bp.post('/search')
+@bp.input(Pagination)
 @bp.output(ListsOut)
 @jwt_required()
-def get_lists(query_data):
+def get_lists(json_data):
     '''Get lists'''
 
     try:
-        results = lists.get_lists(query_data['search'],
-                                  query_data['page'],
-                                  query_data['per_page'])
+        results = lists.get_lists(json_data['search'],
+                                  json_data['page'],
+                                  json_data['per_page'],
+                                  json_data['sort_by'])
         return {'items': results, 'total': results.total}
     except Exception as ex:
         abort(500, gettext('abortException'))

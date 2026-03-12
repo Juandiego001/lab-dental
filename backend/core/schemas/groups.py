@@ -1,26 +1,28 @@
-from apiflask import Schema, fields
+from apiflask import Schema
+from apiflask.fields import DateTime, Integer, List, Nested, String
 from marshmallow import ValidationError, post_load, pre_load, validate, validates_schema
 from core.models import Group
-from core.schemas.utils import BaseSchema
+from core.schemas.utils import BaseSchema, SortBy
 from flask_babel import gettext
 
 
 class GroupSearch(Schema):
-    distributor_id = fields.Integer(
+    distributor_id = Integer(
         required=False, allow_none=True, data_key='distributorId', load_default=None)
-    name = fields.String(required=False, allow_none=True,
-                         validate=validate.Length(max=50), load_default='')
-    page = fields.Integer(load_default=1)
-    per_page = fields.Integer(data_key='perPage', load_default=15)
+    name = String(required=False, allow_none=True,
+                  validate=validate.Length(max=50), load_default='')
+    page = Integer(load_default=1)
+    per_page = Integer(data_key='perPage', load_default=15)
+    sort_by = Nested(SortBy, data_key='sortBy', load_default=None)
 
 
 class GroupIn(BaseSchema):
-    name = fields.String(required=True, allow_none=False,
-                         validate=validate.Length(max=30))
-    distributor_id = fields.Integer(
+    name = String(required=True, allow_none=False,
+                  validate=validate.Length(max=30))
+    distributor_id = Integer(
         required=False, allow_none=True, data_key='distributorId')
-    users_ids = fields.List(fields.Integer, data_key='usersIds')
-    status = fields.String(load_default='ACTIVE')
+    users_ids = List(Integer, data_key='usersIds')
+    status = String(load_default='ACTIVE')
 
     @validates_schema
     def name_exists(self, data, **kwargs):
@@ -57,7 +59,7 @@ class GroupInCreate(GroupIn):
 
 
 class GroupInUpdate(GroupIn):
-    id = fields.Integer()
+    id = Integer()
 
     @pre_load
     # Es posible que el grupo sea creado por un distribuidor, por lo tanto no se enviaría distributor_id sino que se tomaría del usuario
@@ -76,16 +78,16 @@ class GroupInUpdate(GroupIn):
 
 
 class GroupOut(BaseSchema):
-    id = fields.Integer()
-    name = fields.String()
-    distributor_id = fields.Integer(data_key='distributorId')
-    distributor_name = fields.String(data_key='distributorName')
-    users_ids = fields.List(fields.Integer, data_key='usersIds')
-    status = fields.String()
-    created_at = fields.DateTime(data_key='createdAt')
-    updated_at = fields.DateTime(data_key='updatedAt')
+    id = Integer()
+    name = String()
+    distributor_id = Integer(data_key='distributorId')
+    distributor_name = String(data_key='distributorName')
+    users_ids = List(Integer, data_key='usersIds')
+    status = String()
+    created_at = DateTime(data_key='createdAt')
+    updated_at = DateTime(data_key='updatedAt')
 
 
 class GroupsOut(Schema):
-    items = fields.List(fields.Nested(GroupOut))
-    total = fields.Integer()
+    items = List(Nested(GroupOut))
+    total = Integer()

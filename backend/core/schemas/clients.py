@@ -1,32 +1,34 @@
 from core.models import Client
 from apiflask import Schema, fields
+from apiflask.fields import DateTime, Integer, String, List, Nested
 from marshmallow import post_load, pre_load, validates_schema, ValidationError, validate
-from core.schemas.utils import BaseSchema
+from core.schemas.utils import BaseSchema, SortBy
 from flask_babel import gettext
 
 
 class ClientSearch(Schema):
-    distributor_id = fields.Integer(
+    distributor_id = Integer(
         required=False, allow_none=True, data_key='distributorId', load_default=None)
-    client_id = fields.Integer(
+    client_id = Integer(
         required=False, allow_none=True, data_key='clientId', load_default=None)
-    name = fields.String(required=False, allow_none=True,
-                         validate=validate.Length(max=50), load_default='')
-    phone = fields.String(required=False, allow_none=True,
-                          validate=validate.Length(max=20), load_default='')
-    page = fields.Integer(load_default=1)
-    per_page = fields.Integer(data_key='perPage', load_default=15)
+    name = String(required=False, allow_none=True,
+                  validate=validate.Length(max=50), load_default='')
+    phone = String(required=False, allow_none=True,
+                   validate=validate.Length(max=20), load_default='')
+    page = Integer(load_default=1)
+    per_page = Integer(data_key='perPage', load_default=15)
+    sort_by = Nested(SortBy, data_key='sortBy', load_default=None)
 
 
 class ClientIn(BaseSchema):
-    id = fields.Integer()
-    distributor_id = fields.Integer(
+    id = Integer()
+    distributor_id = Integer(
         required=False, allow_none=True, data_key='distributorId')
-    name = fields.String(required=True, allow_none=False,
-                         validate=validate.Length(max=50))
-    phone = fields.String(required=True, allow_none=False,
-                          validate=validate.Length(max=20))
-    status = fields.String(load_default='ACTIVE')
+    name = String(required=True, allow_none=False,
+                  validate=validate.Length(max=50))
+    phone = String(required=True, allow_none=False,
+                   validate=validate.Length(max=20))
+    status = String(load_default='ACTIVE')
 
     @validates_schema
     def name_exists(self, data, **kwargs):
@@ -83,16 +85,16 @@ class ClientInUpdate(ClientIn):
 
 
 class ClientOut(BaseSchema):
-    id = fields.Integer()
-    distributor_id = fields.Integer(data_key='distributorId')
-    distributor_name = fields.String(data_key='distributorName')
-    name = fields.String()
-    phone = fields.String()
-    status = fields.String()
-    created_at = fields.DateTime()
-    updated_at = fields.DateTime()
+    id = Integer()
+    distributor_id = Integer(data_key='distributorId')
+    distributor_name = String(data_key='distributorName')
+    name = String()
+    phone = String()
+    status = String()
+    created_at = DateTime()
+    updated_at = DateTime()
 
 
 class ClientsOut(Schema):
-    items = fields.List(fields.Nested(ClientOut))
-    total = fields.Integer()
+    items = List(Nested(ClientOut))
+    total = Integer()

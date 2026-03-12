@@ -12,6 +12,7 @@ export const useCategories = () => {
     slug = '',
     page = 1,
     perPage = 15,
+    sortBy = undefined,
   }: CategorySearch): Promise<void> => {
     try {
       const data = await $api<ItemsTotal>('/api/categories/search', {
@@ -21,6 +22,7 @@ export const useCategories = () => {
           slug,
           page,
           perPage,
+          sortBy: sortBy,
         },
         method: 'POST',
       })

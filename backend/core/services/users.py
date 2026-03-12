@@ -19,8 +19,19 @@ def login(email_or_username: str, password: str):
     return user
 
 
-def search_users(current_user: User, users_ids: list[int], distributor_id: int, is_main: bool, role: str, full_name: str, username: str, email: str, page: int, per_page: int):
+def search_users(current_user: User, users_ids: list[int], distributor_id: int, is_main: bool, role: str, full_name: str, username: str, email: str, page: int, per_page: int, sort_by: dict = None):
     '''Search users'''
+
+    order_by = User.id.desc()
+    if sort_by:
+        if sort_by['key'] == 'fullName':
+            order_by = User.full_name
+        elif sort_by['key'] == 'username':
+            order_by = User.username
+        elif sort_by['key'] == 'email':
+            order_by = User.email
+        order_by = order_by.asc(
+        ) if sort_by['order'] == 'asc' else order_by.desc()
 
     query = [User.status == 'ACTIVE']
     with_users_ids = None
@@ -64,7 +75,7 @@ def search_users(current_user: User, users_ids: list[int], distributor_id: int, 
         .join(DistributorList)\
         .join(Distributor)\
         .filter(*query)\
-        .order_by(User.id.desc())\
+        .order_by(order_by)\
         .limit(per_page)\
         .offset((page - 1) * per_page)\
         .all()

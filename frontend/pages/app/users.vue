@@ -16,7 +16,7 @@
         <client-only>
           <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
             :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-            @update:itemsPerPage="v => perPage = v" :disable-sort="true">
+            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
                 <v-btn v-if="$ability.can('update', 'users')" class="my-2 bg-primary" size="small" icon="mdi-pencil"
@@ -254,6 +254,7 @@ const searchDialog = ref(false);
 const createDialog = ref(false);
 const page = ref(1);
 const perPage = ref(15);
+const sortBy = ref(null);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
 const createModel = ref(false);
@@ -296,9 +297,9 @@ const distributors = computed(() => {
 
 const headers = computed(() => {
   const defaultHeaders = [
-    { title: t('users.fullName'), key: 'fullName', sortable: false },
-    { title: t('users.username'), key: 'username', align: 'center', sortable: false },
-    { title: t('users.email'), key: 'email', align: 'center', sortable: false },
+    { title: t('users.fullName'), key: 'fullName' },
+    { title: t('users.username'), key: 'username', align: 'center' },
+    { title: t('users.email'), key: 'email', align: 'center' },
   ]
 
   if ($ability.can('update', 'users') || $ability.can('delete', 'users')) {
@@ -349,6 +350,12 @@ watch(perPage, async () => {
   await searchUsers();
 })
 
+watch(sortBy, async (v) => {
+  if (v && v.length) {
+    await searchUsers();
+  }
+})
+
 onBeforeMount(async () => {
   if ($ability.can('read', 'users')) {
     await getUsers({ isMain: true });
@@ -380,7 +387,8 @@ const searchUsers = async (defPage, defPerPage) => {
       email: searchForm.value.email,
       isMain: true,
       page: defPage || page.value,
-      perPage: defPerPage || perPage.value
+      perPage: defPerPage || perPage.value,
+      sortBy: sortBy.value?.length ? sortBy.value[0] : null
     })
   } catch (err) { }
   finally {

@@ -11,6 +11,7 @@ export const useDistributors = () => {
     name = '',
     page = 1,
     perPage = 15,
+    sortBy = undefined,
   }: DistributorSearch): Promise<void> => {
     try {
       const data = await $api<ItemsTotal>('/api/distributors/search', {
@@ -19,6 +20,7 @@ export const useDistributors = () => {
           name,
           page,
           perPage,
+          sortBy: sortBy,
         },
         method: 'POST',
       })

@@ -16,7 +16,7 @@
         <client-only>
           <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
             :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-            @update:itemsPerPage="v => perPage = v" :disable-sort="true">
+            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
                 <v-btn v-if="$ability.can('update', 'sites')" class="my-2 bg-primary" size="small" icon="mdi-pencil"
@@ -294,6 +294,7 @@ const states = ref([]);
 const cities = ref([]);
 const page = ref(1);
 const perPage = ref(15);
+const sortBy = ref(null);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
 const createModel = ref(false);
@@ -324,8 +325,8 @@ const itemsPerPageOptions = computed(() => [
 ])
 
 const headers = computed(() => [
-  { title: t('sites.name'), key: 'name', sortable: false },
-  { title: t('sites.distributorClient'), key: 'distributorClient', sortable: false },
+  { title: t('sites.name'), key: 'name' },
+  { title: t('sites.distributorClient'), key: 'distributorClient' },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
@@ -417,6 +418,12 @@ watch(perPage, async () => {
   await searchSites();
 })
 
+watch(sortBy, async (v) => {
+  if (v && v.length) {
+    await searchSites();
+  }
+})
+
 onBeforeMount(async () => {
   if ($ability.can('read', 'sites')) {
     await getSites({});
@@ -444,7 +451,8 @@ const searchSites = async (defPage, defPerPage) => {
       clientId: searchForm.value.clientId,
       name: searchForm.value.name,
       page: defPage || page.value,
-      perPage: defPerPage || perPage.value
+      perPage: defPerPage || perPage.value,
+      sortBy: sortBy.value?.length ? sortBy.value[0] : null
     })
   } catch (err) { }
   finally {

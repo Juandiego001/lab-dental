@@ -16,7 +16,7 @@
         <client-only>
           <v-data-table-server :items="items" :headers="tableHeaders" :page="page" :items-per-page="perPage"
             :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-            @update:itemsPerPage="v => perPage = v" :disable-sort="true">
+            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
                 <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getGroup(item.id)" />
@@ -258,6 +258,7 @@ const createDialog = ref(false);
 const items = ref([]);
 const page = ref(1);
 const perPage = ref(15);
+const sortBy = ref(null);
 const total = ref(15);
 
 /* Permissions */
@@ -293,8 +294,8 @@ const itemsPerPageOptions = computed(() => [
 const tableHeaders = computed(() => {
   if (isAdmin.value) {
     return [
-      { title: t('groups.name'), key: 'name', sortable: false },
-      { title: t('distributors.title'), key: 'distributorName', sortable: false },
+      { title: t('groups.name'), key: 'name' },
+      { title: t('distributors.title'), key: 'distributorName' },
       { title: t('options'), key: 'option', align: 'center', sortable: false }
     ]
   }
@@ -361,6 +362,11 @@ watch(perPage, async () => {
   await getGroups();
 })
 
+watch(sortBy, async (v) => {
+  if (v && v.length) {
+    await getGroups();
+  }
+})
 
 watch(pagePermissions, async () => {
   await getPermissions();
@@ -394,7 +400,8 @@ const getGroups = async () => {
         distributorId: searchForm.value.distributorId,
         name: searchForm.value.name,
         page: page.value,
-        perPage: perPage.value
+        perPage: perPage.value,
+        sortBy: sortBy.value?.length ? sortBy.value[0] : null
       },
       method: 'POST'
     })

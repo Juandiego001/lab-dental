@@ -1,6 +1,6 @@
 from core.services import groups
 from apiflask import APIBlueprint, abort
-from core.schemas.utils import Message, Pagination
+from core.schemas.utils import Message
 from flask_jwt_extended import jwt_required, current_user
 from core.schemas.groups import GroupInUpdate, GroupInCreate, GroupOut, GroupSearch, GroupsOut
 from flask_babel import gettext
@@ -22,7 +22,8 @@ def search_groups(json_data):
             distributor_id=json_data['distributor_id'],
             name=json_data['name'],
             page=json_data['page'],
-            per_page=json_data['per_page'])
+            per_page=json_data['per_page'],
+            sort_by=json_data['sort_by'])
         return {'items': results, 'total': total}
     except Exception as ex:
         abort(500, gettext('abortException'))

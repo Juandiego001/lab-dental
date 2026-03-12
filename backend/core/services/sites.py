@@ -1,12 +1,23 @@
 from core.app import db
-from sqlalchemy import or_, and_
+from sqlalchemy import func, or_, and_
 from werkzeug.exceptions import HTTPException
 from core.services.distributors import get_distributor_from_user
 from core.models import Address, City, Client, Country, Distributor, Site, State, User
 
 
-def search_sites(current_user: User, site_id: int, distributor_id: int, client_id: int, name: str, page: int, per_page: int):
+def search_sites(current_user: User, site_id: int, distributor_id: int, client_id: int, name: str, page: int, per_page: int, sort_by: dict = None):
     '''Get sites and total of sites in DB'''
+
+    order_by = Site.id.desc()
+    if sort_by:
+        if sort_by['key'] == 'name':
+            order_by = Site.name
+        elif sort_by['key'] == 'phone':
+            order_by = Client.phone
+        elif sort_by['key'] == 'distributorClient':
+            order_by = func.coalesce(Client.name, Distributor.name).label('distributor_client')
+        order_by = order_by.asc(
+        ) if sort_by['order'] == 'asc' else order_by.desc()
 
     query = [Site.status == 'ACTIVE']
     with_site_id = None
@@ -19,8 +30,7 @@ def search_sites(current_user: User, site_id: int, distributor_id: int, client_i
 
     query_stmt = db.session.query(
         *Site.__table__.c,
-        Client.name.label('client_name'),
-        Distributor.name.label('distributor_name'))\
+        func.coalesce(Client.name, Distributor.name).label('distributor_client'))\
         .outerjoin(Site.client)\
         .outerjoin(Site.distributor)
 
@@ -44,7 +54,7 @@ def search_sites(current_user: User, site_id: int, distributor_id: int, client_i
     sites = list(db.session.execute(
         query_stmt
         .filter(*query)
-        .order_by(Site.id.desc())
+        .order_by(order_by)
         .limit(per_page)
         .offset((page - 1) * per_page)
     ).unique())

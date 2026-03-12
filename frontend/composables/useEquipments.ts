@@ -15,6 +15,7 @@ export const useEquipments = () => {
     modelReference = '',
     page = 1,
     perPage = 15,
+    sortBy = undefined,
   }: EquipmentSearch): Promise<void> => {
     try {
       const data = await $api<ItemsTotal>('/api/equipments/search', {
@@ -27,6 +28,7 @@ export const useEquipments = () => {
           modelReference,
           page,
           perPage,
+          sortBy: sortBy,
         },
         method: 'POST',
       })

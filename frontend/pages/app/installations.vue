@@ -16,7 +16,7 @@
         <client-only>
           <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
             :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-            @update:itemsPerPage="v => perPage = v" :disable-sort="true">
+            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
             <template v-slot:item.serial="{ item }">
               <span :class="`rounded-lg py-1 px-2
                   ${item.status === 'ACTIVE' && 'bg-primary'}
@@ -477,6 +477,7 @@ const clientsSites = ref([]);
 const items = ref([]);
 const page = ref(1);
 const perPage = ref(15);
+const sortBy = ref(null);
 const total = ref(15);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
@@ -527,14 +528,14 @@ const itemsPerPageOptions = computed(() => [
 
 const headers = computed(() => {
   const defaultHeaders = [
-    { title: t('equipments.title'), key: 'equipmentModelReference', sortable: false },
-    { title: t('clients.title'), key: 'clientName', sortable: false },
-    { title: t('installations.serial'), key: 'serial', align: 'center', sortable: false },
-    { title: t('installations.installedDate'), key: 'installedDate', align: 'center', sortable: false },
+    { title: t('equipments.title'), key: 'equipmentModelReference' },
+    { title: t('clients.title'), key: 'clientName' },
+    { title: t('installations.serial'), key: 'serial', align: 'center' },
+    { title: t('installations.installedDate'), key: 'installedDate', align: 'center' },
   ]
 
   if (isAdmin.value) {
-    defaultHeaders.push({ title: t('installations.expirationDate'), key: 'expirationDate', align: 'center', sortable: false });
+    defaultHeaders.push({ title: t('installations.expirationDate'), key: 'expirationDate', align: 'center' });
   }
 
   if ($ability.can('update', 'installations') || $ability.can('delete', 'installations')) {
@@ -617,6 +618,12 @@ watch(perPage, async () => {
   await getInstallations();
 })
 
+watch(sortBy, async (v) => {
+  if (v && v.length) {
+    await getInstallations();
+  }
+})
+
 watch(() => form.value.distributorId, async (val, prev) => {
   if (!updateDialog.value && !createDialog.value) return;
   form.value.siteDistributorId = null;
@@ -693,7 +700,8 @@ const getInstallations = async () => {
         clientId: searchForm.value.clientId,
         serial: searchForm.value.serial,
         page: page.value,
-        perPage: perPage.value
+        perPage: perPage.value,
+        sortBy: sortBy.value?.length ? sortBy.value[0] : null
       },
       method: 'POST'
     })

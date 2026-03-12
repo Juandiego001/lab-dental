@@ -16,7 +16,7 @@
         <client-only>
           <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
             :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-            @update:itemsPerPage="v => perPage = v" :disable-sort="true">
+            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
                 <v-btn v-if="$ability.can('update', 'categories')" class="my-2 bg-primary" size="small"
@@ -175,6 +175,7 @@ const searchDialog = ref(false);
 const createDialog = ref(false);
 const page = ref(1);
 const perPage = ref(15);
+const sortBy = ref(null);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
 const createModel = ref(false);
@@ -199,8 +200,8 @@ const itemsPerPageOptions = computed(() => [
 
 const headers = computed(() => {
   const defaultHeaders = [
-    { title: t('categories.name'), key: 'name', sortable: false },
-    { title: t('categories.slug'), key: 'slug', sortable: false }
+    { title: t('categories.name'), key: 'name' },
+    { title: t('categories.slug'), key: 'slug' }
   ];
 
   if ($ability.can('update', 'categories') || $ability.can('delete', 'categories')) {
@@ -238,6 +239,12 @@ watch(perPage, async () => {
   await searchCategories();
 })
 
+watch(sortBy, async (v) => {
+  if (v && v.length) {
+    await searchCategories();
+  }
+})
+
 onBeforeMount(async () => {
   if ($ability.can('read', 'categories')) {
     await getCategories({});
@@ -260,7 +267,8 @@ const searchCategories = async (defPage, defPerPage) => {
       name: searchForm.value.name,
       slug: searchForm.value.slug,
       page: defPage || page.value,
-      perPage: defPerPage || perPage.value
+      perPage: defPerPage || perPage.value,
+      sortBy: sortBy.value?.length ? sortBy.value[0] : null
     })
   } catch (err) { }
   finally {

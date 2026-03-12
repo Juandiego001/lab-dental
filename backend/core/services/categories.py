@@ -3,8 +3,17 @@ from core.models import Category
 from werkzeug.exceptions import HTTPException
 
 
-def search_categories(category_id: int, name: str, slug: str, page: int, per_page: int):
+def search_categories(category_id: int, name: str, slug: str, page: int, per_page: int, sort_by: dict = None):
     '''Search categories'''
+
+    order_by = Category.id.desc()
+    if sort_by:
+        if sort_by['key'] == 'name':
+            order_by = Category.name
+        elif sort_by['key'] == 'slug':
+            order_by = Category.slug
+        order_by = order_by.asc(
+        ) if sort_by['order'] == 'asc' else order_by.desc()
 
     query = [Category.status == 'ACTIVE']
     with_category_id = None
@@ -25,7 +34,7 @@ def search_categories(category_id: int, name: str, slug: str, page: int, per_pag
 
     categories = db.session.query(Category)\
         .filter(*query)\
-        .order_by(Category.id.desc())\
+        .order_by(order_by)\
         .limit(per_page)\
         .offset((page - 1) * per_page)\
         .all()

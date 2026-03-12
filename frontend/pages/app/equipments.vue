@@ -16,7 +16,7 @@
         <client-only>
           <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
             :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-            @update:itemsPerPage="v => perPage = v">
+            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
             <template v-slot:item.picture="{ item }">
               <v-avatar size="40" rounded="lg" color="grey-lighten-2">
                 <v-img v-if="item.mainPicture" alt="Machine photo" cover
@@ -227,6 +227,7 @@ const searchDialog = ref(false);
 const createDialog = ref(false);
 const page = ref(1);
 const perPage = ref(15);
+const sortBy = ref(null);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
 const createModel = ref(false);
@@ -259,10 +260,10 @@ const itemsPerPageOptions = computed(() => [
 const headers = computed(() => {
   const defaultHeaders = [
     { key: 'picture', sortable: false },
-    { title: t('brands.title', 1), key: 'brandName', sortable: false },
-    { title: t('categories.title', 1), key: 'categoryName', align: 'center', sortable: false },
-    { title: t('equipments.model'), key: 'model', align: 'center', sortable: false },
-    { title: t('equipments.reference'), key: 'reference', align: 'center', sortable: false }
+    { title: t('brands.title', 1), key: 'brandName' },
+    { title: t('categories.title', 1), key: 'categoryName', align: 'center' },
+    { title: t('equipments.model'), key: 'model', align: 'center' },
+    { title: t('equipments.reference'), key: 'reference', align: 'center' }
   ]
 
   if ($ability.can('update', 'equipments') || $ability.can('delete', 'equipments')) {
@@ -314,6 +315,12 @@ watch(perPage, async () => {
   await searchEquipments();
 })
 
+watch(sortBy, async (v) => {  
+  if (v && v.length) {
+    await searchEquipments();
+  }
+})
+
 onBeforeMount(async () => {
   if ($ability.can('read', 'equipments')) {
     await getEquipments({})
@@ -342,7 +349,8 @@ const searchEquipments = async (defPage, defPerPage) => {
       model: searchForm.value.model,
       reference: searchForm.value.reference,
       page: defPage || page.value,
-      perPage: defPerPage || perPage.value
+      perPage: defPerPage || perPage.value,
+      sortBy: sortBy.value?.length ? sortBy.value[0] : null
     })
   } catch (err) { }
   finally {

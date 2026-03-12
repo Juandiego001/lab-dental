@@ -23,7 +23,8 @@ def categories_brands(json_data):
             name=json_data['name'],
             slug=json_data['slug'],
             page=json_data['page'],
-            per_page=json_data['per_page'])
+            per_page=json_data['per_page'],
+            sort_by=json_data['sort_by'])
         return {'items': results, 'total': total}
     except Exception as ex:
         abort(500, gettext('abortException'))

@@ -5,8 +5,17 @@ from core.services.distributors import get_distributor_from_user
 from core.models import Distributor, Group, Module, Permission, User, UserGroup
 
 
-def search_groups(current_user: User, distributor_id: int, name: str, page: int, per_page: int) -> tuple[list, int]:
+def search_groups(current_user: User, distributor_id: int, name: str, page: int, per_page: int, sort_by: dict = None) -> tuple[list, int]:
     '''Search groups'''
+
+    order_by = Group.id.desc()
+    if sort_by:
+        if sort_by['key'] == 'name':
+            order_by = Group.name
+        elif sort_by['key'] == 'distributorName':
+            order_by = Distributor.name
+        order_by = order_by.asc(
+        ) if sort_by['order'] == 'asc' else order_by.desc()
 
     query = [Group.status == 'ACTIVE']
     if distributor_id:
@@ -24,7 +33,7 @@ def search_groups(current_user: User, distributor_id: int, name: str, page: int,
             .select_from(Group)
             .join(Distributor)
             .filter(*query)
-            .order_by(Group.id.desc())
+            .order_by(order_by)
             .limit(per_page)
             .offset((page - 1) * per_page)
         ).unique()), total
@@ -41,7 +50,7 @@ def search_groups(current_user: User, distributor_id: int, name: str, page: int,
         .select_from(Group)
         .join(Distributor)
         .filter(*query)
-        .order_by(Group.id.desc())
+        .order_by(order_by)
         .limit(per_page)
         .offset((page - 1) * per_page)
     ).unique()), total

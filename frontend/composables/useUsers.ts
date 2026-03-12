@@ -16,6 +16,7 @@ export const useUsers = () => {
     email = '',
     page = 1,
     perPage = 15,
+    sortBy = undefined,
   }: UserSearch): Promise<void> => {
     try {
       const data = await $api<ItemsTotal>('/api/users/search', {
@@ -29,6 +30,7 @@ export const useUsers = () => {
           email,
           page,
           perPage,
+          sortBy: sortBy,
         },
         method: 'POST',
       })
