@@ -13,11 +13,13 @@ export const useEquipments = () => {
     model = '',
     reference = '',
     modelReference = '',
+    withPicture = false,
     page = 1,
     perPage = 15,
     sortBy = undefined,
   }: EquipmentSearch): Promise<void> => {
     try {
+      console.log({ withPicture })
       const data = await $api<ItemsTotal>('/api/equipments/search', {
         body: {
           equipmentId,
@@ -26,6 +28,7 @@ export const useEquipments = () => {
           model,
           reference,
           modelReference,
+          withPicture,
           page,
           perPage,
           sortBy: sortBy,

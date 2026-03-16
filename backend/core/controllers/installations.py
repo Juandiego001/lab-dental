@@ -51,7 +51,9 @@ def create_installations(form_and_files_data):
     '''Create installation'''
 
     try:
-        installation = installations.create_installation(form_and_files_data)
+        installation = installations.create_installation(
+            current_user=current_user,
+            data=form_and_files_data)
         installations.notify_creation(installation)
         return {'message': gettext('installationCreated')}
     except Exception as ex:

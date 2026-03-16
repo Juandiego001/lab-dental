@@ -1,8 +1,8 @@
-"""initial_migration
+"""Initial migration
 
-Revision ID: 882786e7d0d9
+Revision ID: 531a61e47525
 Revises: 
-Create Date: 2026-03-04 05:55:32.921340
+Create Date: 2026-03-14 19:43:37.853692
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '882786e7d0d9'
+revision = '531a61e47525'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,33 +22,33 @@ def upgrade():
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('slug', sa.String(length=100), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('categories',
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('slug', sa.String(length=100), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('countries',
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('code', sa.String(length=20), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('distributors',
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
@@ -56,27 +56,27 @@ def upgrade():
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('name', sa.String(length=60), nullable=False),
     sa.Column('slug', sa.String(length=60), nullable=False),
-    sa.Column('is_main', sa.Boolean(), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('is_main', sa.Boolean(), server_default=sa.text('false'), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('manuals_types',
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('slug', sa.String(length=100), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('modules',
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('name', sa.String(length=30), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('users',
@@ -86,10 +86,10 @@ def upgrade():
     sa.Column('email', sa.String(length=450), nullable=True),
     sa.Column('password', sa.String(), nullable=False),
     sa.Column('role', sa.String(length=20), nullable=False),
-    sa.Column('language', sa.String(length=10), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('language', sa.String(length=10), server_default='es', nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('users', schema=None) as batch_op:
@@ -100,9 +100,9 @@ def upgrade():
     sa.Column('distributor_id', sa.BigInteger(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('phone', sa.String(length=100), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['distributor_id'], ['distributors.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -120,10 +120,9 @@ def upgrade():
     sa.Column('category_id', sa.BigInteger(), nullable=False),
     sa.Column('model', sa.String(length=100), nullable=False),
     sa.Column('reference', sa.String(length=100), nullable=False),
-    sa.Column('main_picture', sa.String(), nullable=True),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['brand_id'], ['brands.id'], ),
     sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -132,9 +131,9 @@ def upgrade():
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('distributor_id', sa.BigInteger(), nullable=False),
     sa.Column('name', sa.String(length=30), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['distributor_id'], ['distributors.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -144,9 +143,9 @@ def upgrade():
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('slug', sa.String(length=100), nullable=False),
     sa.Column('description', sa.String(length=100), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -154,7 +153,7 @@ def upgrade():
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('country_id', sa.BigInteger(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
     sa.ForeignKeyConstraint(['country_id'], ['countries.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -170,20 +169,23 @@ def upgrade():
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('state_id', sa.BigInteger(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
     sa.ForeignKeyConstraint(['state_id'], ['states.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('equipments_files',
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('equipment_id', sa.BigInteger(), nullable=False),
-    sa.Column('name', sa.String(length=100), nullable=False),
-    sa.Column('path', sa.String(), nullable=False),
     sa.Column('original_name', sa.String(length=100), nullable=False),
-    sa.Column('file_type', sa.String(length=20), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('hash_name', sa.String(length=100), nullable=False),
+    sa.Column('path', sa.String(), nullable=False),
+    sa.Column('mimetype', sa.String(length=100), nullable=False),
+    sa.Column('extension', sa.String(length=20), nullable=False),
+    sa.Column('size', sa.BigInteger(), server_default='0', nullable=False),
+    sa.Column('is_main', sa.Boolean(), server_default=sa.text('false'), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['equipment_id'], ['equipments.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -194,9 +196,9 @@ def upgrade():
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('path', sa.String(), nullable=False),
     sa.Column('original_name', sa.String(length=100), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['equipment_id'], ['equipments.id'], ),
     sa.ForeignKeyConstraint(['manual_type_id'], ['manuals_types.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -206,9 +208,9 @@ def upgrade():
     sa.Column('equipment_id', sa.BigInteger(), nullable=False),
     sa.Column('serial', sa.String(length=100), nullable=False),
     sa.Column('description', sa.String(length=100), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['equipment_id'], ['equipments.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -220,9 +222,9 @@ def upgrade():
     sa.Column('create', sa.Boolean(), nullable=False),
     sa.Column('update', sa.Boolean(), nullable=False),
     sa.Column('delete', sa.Boolean(), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['group_id'], ['groups.id'], ),
     sa.ForeignKeyConstraint(['module_id'], ['modules.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -233,9 +235,9 @@ def upgrade():
     sa.Column('name', sa.String(length=40), nullable=False),
     sa.Column('value', sa.String(length=120), nullable=False),
     sa.Column('field_type', sa.String(length=20), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['equipment_id'], ['equipments.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -254,9 +256,9 @@ def upgrade():
     sa.Column('city_id', sa.BigInteger(), nullable=True),
     sa.Column('description', sa.String(length=100), nullable=False),
     sa.Column('zip_code', sa.String(length=40), nullable=True),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['city_id'], ['cities.id'], ),
     sa.ForeignKeyConstraint(['country_id'], ['countries.id'], ),
     sa.ForeignKeyConstraint(['state_id'], ['states.id'], ),
@@ -267,12 +269,12 @@ def upgrade():
     sa.Column('client_id', sa.BigInteger(), nullable=True),
     sa.Column('distributor_id', sa.BigInteger(), nullable=True),
     sa.Column('address_id', sa.BigInteger(), nullable=False),
-    sa.Column('is_main', sa.Boolean(), nullable=False),
+    sa.Column('is_main', sa.Boolean(), server_default=sa.text('false'), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('description', sa.String(length=200), nullable=True),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['address_id'], ['addresses.id'], ),
     sa.ForeignKeyConstraint(['client_id'], ['clients.id'], ),
     sa.ForeignKeyConstraint(['distributor_id'], ['distributors.id'], ),
@@ -289,9 +291,9 @@ def upgrade():
     sa.Column('serial', sa.String(), nullable=False),
     sa.Column('installed_date', sa.DateTime(), nullable=False),
     sa.Column('expiration_date', sa.DateTime(), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['client_id'], ['clients.id'], ),
     sa.ForeignKeyConstraint(['distributor_id'], ['distributors.id'], ),
     sa.ForeignKeyConstraint(['equipment_id'], ['equipments.id'], ),
@@ -303,13 +305,16 @@ def upgrade():
     op.create_table('installations_files',
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('installation_id', sa.BigInteger(), nullable=False),
-    sa.Column('name', sa.String(length=100), nullable=False),
-    sa.Column('path', sa.String(), nullable=False),
     sa.Column('original_name', sa.String(length=100), nullable=False),
+    sa.Column('hash_name', sa.String(length=100), nullable=True),
+    sa.Column('path', sa.String(), nullable=False),
+    sa.Column('mimetype', sa.String(length=100), nullable=True),
+    sa.Column('extension', sa.String(length=20), nullable=True),
+    sa.Column('size', sa.BigInteger(), server_default='0', nullable=True),
     sa.Column('file_type', sa.Enum('FORMAT', 'SERIAL', 'EVIDENCES', name='installation_file_type'), nullable=False, comment='Installation file type could be one of [FORMAT, SERIAL, EVIDENCES]'),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['installation_id'], ['installations.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -320,9 +325,9 @@ def upgrade():
     sa.Column('invoice', sa.String(length=40), nullable=False),
     sa.Column('problem', sa.String(length=400), nullable=False),
     sa.Column('solution', sa.String(length=400), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['installation_id'], ['installations.id'], ),
     sa.ForeignKeyConstraint(['reasons_id'], ['reasons.id'], ),
     sa.PrimaryKeyConstraint('id')

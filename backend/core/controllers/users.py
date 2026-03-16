@@ -6,7 +6,7 @@ from apiflask import APIBlueprint, abort
 from werkzeug.exceptions import HTTPException
 from core.schemas.utils import Message
 from flask_jwt_extended import create_access_token, set_access_cookies, jwt_required, get_jwt_identity, current_user, unset_jwt_cookies
-from core.schemas.users import EmailIn, PasswordIn, TokenIn, UserInLogIn, UserInUpdate, UserInCreate, UserOut, UserSearch, UsersExistingIn, UsersOut, ProfileIn, ProfileOut, TokenPasswordIn
+from core.schemas.users import EmailIn, PasswordIn, TokenIn, UserInLogIn, UserInUpdate, UserInCreate, UserOut, UserSearch, UsersExistingIn, UsersOut, ProfileIn, ProfileOut, TokenPasswordIn, PhotoIn
 from flask_babel import gettext, force_locale
 
 
@@ -62,12 +62,13 @@ def login_users(user):
             identity=str(user.id), additional_claims=user_data)
         with force_locale(user_data['language']):
             response = jsonify(access_token=access_token,
-                            message=f'{gettext('welcome')} {user_data['fullName']}')
+                               message=f'{gettext('welcome')} {user_data['fullName']}')
         set_access_cookies(response, access_token)
         return response
     except HTTPException as ex:
         abort(404, gettext('wrongUsernamePassword'))
     except Exception as ex:
+        print(ex)
         abort(500, gettext('abortException'))
 
 
@@ -99,6 +100,7 @@ def get_profile():
         user_detail = users.get_user_by_id(user_id)
         user_profile = ProfileOut().dump(user_detail)
         user_profile['full_name'] = user_profile.pop('fullName')
+        user_profile['photo_path'] = user_profile.pop('photoPath')
         user_profile['abilities'] = [
             {'subject': ability[0], 'action': ability[1]} for ability in get_user_permissions(user_id)]
         return user_profile
@@ -121,10 +123,10 @@ def update_profile(user_data: dict):
         user_data = ProfileOut().dump(user)
         access_token = create_access_token(
             identity=str(user.id), additional_claims=user_data)
-        
+
         with force_locale(user_data['language']):
             response = jsonify(access_token=access_token,
-                            message=gettext('profileUpdated'))
+                               message=gettext('profileUpdated'))
         set_access_cookies(response, access_token)
         return response
     except Exception as ex:
@@ -255,5 +257,35 @@ def logout():
         #     sub, jti = jwt_payload['sub'], jwt_payload['jti']
         #     redis.set(f'sac:blocklist:{sub}:{jti}', '', ex=ex)
         return response
+    except Exception as ex:
+        abort(500, str(ex))
+
+
+@bp.post('/photo')
+@jwt_required()
+@bp.input(PhotoIn, location='form_and_files')
+@bp.output(Message)
+def upload_user_photo(form_and_files_data: dict):
+    '''Upload user photo'''
+
+    try:
+        users.upload_user_photo(
+            current_user,
+            form_and_files_data
+        )
+        return {'message': gettext('photoUpdated')}
+    except Exception as ex:
+        abort(500, str(ex))
+
+
+@bp.delete('/photo')
+@jwt_required()
+@bp.output(Message)
+def delete_user_photo():
+    '''Delete user photo'''
+
+    try:
+        users.delete_user_photo(current_user)
+        return {'message': gettext('photoUpdated')}
     except Exception as ex:
         abort(500, str(ex))

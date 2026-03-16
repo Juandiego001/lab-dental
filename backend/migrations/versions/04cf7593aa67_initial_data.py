@@ -1,8 +1,8 @@
-"""data
+"""Initial Data
 
-Revision ID: fef0b7333d17
-Revises: 882786e7d0d9
-Create Date: 2026-03-04 05:55:44.319370
+Revision ID: 04cf7593aa67
+Revises: 531a61e47525
+Create Date: 2026-03-14 19:44:04.205723
 
 """
 from alembic import op
@@ -15,8 +15,8 @@ import pandas as pd
 
 
 # revision identifiers, used by Alembic.
-revision = 'fef0b7333d17'
-down_revision = '882786e7d0d9'
+revision = '04cf7593aa67'
+down_revision = '531a61e47525'
 branch_labels = None
 depends_on = None
 
@@ -158,6 +158,8 @@ def upgrade():
 
     # Categories
     categories = [
+        Category(name='TRUCK WHEEL ALIGNERS', slug='truck-aligner'),
+        Category(name='ATF', slug='atf-machine'),
         Category(name='TIRE CHANGERS', slug='tire-changers'),
         Category(name='BALANCERS', slug='balancers'),
         Category(name='AIR CONDITIONERS', slug='air-conditioners'),
@@ -170,19 +172,6 @@ def upgrade():
     ]
     db.session.add_all(categories)
     db.session.flush()
-
-    # Equipments
-    df = pd.read_csv('equipments_data/equipments_with_categories.csv')
-    equipments = []
-    for index, row in df.iterrows():
-        equipments.append(
-            Equipment(
-                brand_id=row['brand_id'],
-                category_id=row['category_id'],
-                model=row['model'],
-                reference=row['reference']
-            ))
-    db.session.add_all(equipments)
 
     # Manuals Types
     manuals_types = [

@@ -10,6 +10,8 @@ from email.mime.image import MIMEImage
 from flask.templating import render_template
 from flask_babel import force_locale
 from email.mime.multipart import MIMEMultipart
+from werkzeug.datastructures import FileStorage
+from werkzeug.utils import secure_filename
 
 
 def send_mail(subject: str, to: list, plantilla: str, params: dict, attachments: list = [], language: str = 'es'):
@@ -98,3 +100,24 @@ def send_mail_by_tls(smtp_server, port, user_email, password_email,
         server.starttls(context=context)
         server.login(user_email, password_email)
         server.sendmail(user_email, to, message.as_string())
+
+
+def get_file_size(file: FileStorage):
+    '''Get file size'''
+
+    file.seek(0, os.SEEK_END)
+    file_size_bytes = file.tell()
+    file.seek(0, os.SEEK_SET)
+    return file_size_bytes
+
+
+
+def process_file(file: FileStorage):
+    '''Get mimetype, extension and filename from file'''
+
+    mimetype = file.mimetype
+    size = get_file_size(file)
+    filename = secure_filename(file.filename)
+    extension: str = os.path.splitext(filename)[1]
+    extension = extension.lower()
+    return mimetype, extension, filename, size

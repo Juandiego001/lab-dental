@@ -7,7 +7,7 @@ from sqlalchemy import and_, or_
 from bcrypt import hashpw, gensalt
 from core.schemas.utils import BaseSchema, SortBy
 from flask_jwt_extended import current_user
-from apiflask.fields import Boolean, DateTime, Integer, List, Nested, String
+from apiflask.fields import Boolean, DateTime, File, Integer, List, Nested, String
 from marshmallow import EXCLUDE, ValidationError, post_load, pre_load, validates_schema, validate
 from flask_babel import gettext
 
@@ -280,6 +280,7 @@ class ProfileOut(Schema):
     role = String()
     email = String()
     language = String()
+    photo_path = String(data_key='photoPath')
     abilities = List(Nested(AbilitiesOut), dump_only=True)
 
 
@@ -355,3 +356,7 @@ class TokenPasswordIn(Schema):
         new_password = hashpw(new_password, gensalt()).decode('utf-8')
         data['password'] = new_password
         return data
+
+
+class PhotoIn(Schema):
+    photo = File(required=True)

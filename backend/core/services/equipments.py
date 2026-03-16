@@ -1,7 +1,12 @@
+import uuid
+from pathlib import Path
 from core.app import db
-from core.models import Brand, Category, Equipment
+from core.utils import process_file
 from sqlalchemy import and_, or_, literal, func
 from werkzeug.exceptions import HTTPException
+from werkzeug.datastructures import FileStorage
+from core.models import Brand, Category, Equipment, EquipmentFile
+from datetime import datetime
 
 
 def search_equipments(equipment_id: int, brand_id: int, category_id: int, model: str, reference: str, with_picture: bool, model_reference: str, page: int, per_page: int, sort_by: dict = None):
@@ -50,14 +55,34 @@ def search_equipments(equipment_id: int, brand_id: int, category_id: int, model:
             Equipment.reference.ilike(f'%{model_reference}%'),
             literal(model_reference).ilike('%' + Equipment.reference + '%')))
 
-    query_stmt = db.session.query(
+    select_cols = [
         *Equipment.__table__.c,
         func.concat(Equipment.model, ' - ',
                     Equipment.reference).label('model_reference'),
         Brand.name.label('brand_name'),
-        Category.name.label('category_name'))\
-        .join(Brand)\
-        .join(Category)
+        Category.name.label('category_name')
+    ]
+
+    if with_picture:
+        timestamp = int(datetime.now().timestamp())
+        select_cols.append(
+            EquipmentFile.path.concat(
+                f'&v={timestamp}'
+            ).label('main_picture')
+        )
+
+        query_stmt = db.session.query(*select_cols)\
+            .join(Brand)\
+            .join(Category)\
+            .outerjoin(EquipmentFile, and_(
+                EquipmentFile.equipment_id == Equipment.id,
+                EquipmentFile.is_main == True,
+                EquipmentFile.status == 'ACTIVE'
+            ))
+    else:
+        query_stmt = db.session.query(*select_cols)\
+            .join(Brand)\
+            .join(Category)
 
     if equipment_id:
         query.append(Equipment.id != equipment_id)
@@ -71,6 +96,9 @@ def search_equipments(equipment_id: int, brand_id: int, category_id: int, model:
         .join(Category, Category.id == Equipment.category_id)\
         .filter(*query).count()
     total += len(with_equipment_id) if with_equipment_id else 0
+
+    print('query_stmt: ')
+    print(query_stmt)
 
     equipments = list(db.session.execute(
         query_stmt
@@ -104,14 +132,174 @@ def check_equipment_exists(equipment_id: int):
     return db.session.query(Equipment).filter(Equipment.id == equipment_id).first()
 
 
-def update_equipment(equipment_id: int, equipment_load):
+def create_equipment_file(equipment_id: int, equipment_file: FileStorage, is_main: bool = False):
+    '''Creates an equipment file'''
+
+    mimetype, extension, original_name, size = process_file(
+        equipment_file)
+    hash_name = str(uuid.uuid4())
+    file_path = f'./equipments_files/{hash_name}{extension}'
+    new_equipment_file = EquipmentFile(
+        equipment_id=equipment_id,
+        original_name=original_name,
+        hash_name=hash_name,
+        path=file_path,
+        mimetype=mimetype,
+        extension=extension,
+        size=size,
+        is_main=is_main
+    )
+    db.session.add(new_equipment_file)
+    equipment_file.save(file_path)
+
+
+def create_equipment(data: dict):
+    '''Create equipment'''
+
+    main_picture = None
+    if 'main_picture' in data:
+        main_picture: FileStorage = data.pop('main_picture')
+
+    secondary_pictures = None
+    if 'secondary_pictures' in data:
+        secondary_pictures: list[FileStorage] = data.pop('secondary_pictures')
+
+    videos = None
+    if 'videos' in data:
+        videos: list[FileStorage] = data.pop('videos')
+
+    equipment = Equipment(**data)
+    db.session.add(equipment)
+    db.session.flush()
+
+    if main_picture:
+        create_equipment_file(
+            equipment_id=equipment.id,
+            equipment_file=main_picture,
+            is_main=True
+        )
+
+    if secondary_pictures:
+        for picture in secondary_pictures:
+            create_equipment_file(
+                equipment_id=equipment.id,
+                equipment_file=picture,
+            )
+
+    if videos:
+        for video in videos:
+            create_equipment_file(
+                equipment_id=equipment.id,
+                equipment_file=video,
+            )
+
+    db.session.commit()
+    return equipment
+
+
+def remove_equipment_file(equipment_file_id: int):
+    '''Remove equipment file'''
+
+    equipment_file = db.session.query(EquipmentFile)\
+        .filter(
+        EquipmentFile.id == equipment_file_id,
+        EquipmentFile.status == 'ACTIVE'
+    )\
+        .first()
+    try:
+        Path(equipment_file.path).unlink(missing_ok=True)
+    except Exception as e:
+        print(
+            f"Ocurrió un error al intentar eliminar el archivo: {e}")
+
+    equipment_file.status = 'INACTIVE'
+    db.session.merge(equipment_file)
+    db.session.commit()
+
+
+def update_equipment(equipment_id: int, equipment_data: dict):
     '''Update equipment'''
 
     if not check_equipment_exists(equipment_id):
         raise HTTPException('Equipment not found')
 
-    db.session.merge(equipment_load)
+    main_picture = None
+    if 'main_picture' in equipment_data:
+        main_picture: FileStorage = equipment_data.pop('main_picture')
+
+    secondary_pictures = None
+    if 'secondary_pictures' in equipment_data:
+        secondary_pictures: list[FileStorage] = equipment_data.pop(
+            'secondary_pictures')
+
+    videos = None
+    if 'videos' in equipment_data:
+        videos: list[FileStorage] = equipment_data.pop('videos')
+
+    equipment = Equipment(**equipment_data)
+    db.session.merge(equipment)
+
+    if main_picture:
+        existing_main_picture = db.session.query(EquipmentFile)\
+            .filter(
+                EquipmentFile.equipment_id == equipment_id,
+                EquipmentFile.is_main == True,
+                EquipmentFile.status == 'ACTIVE'
+        )\
+            .first()
+        if existing_main_picture:
+            main_picture.save(existing_main_picture.path)
+        else:
+            create_equipment_file(
+                equipment_id=equipment.id,
+                equipment_file=main_picture,
+                is_main=True
+            )
+
+    if secondary_pictures:
+        existing_secondary_pictures = db.session.query(EquipmentFile)\
+            .filter(
+                EquipmentFile.equipment_id == equipment_id,
+                EquipmentFile.is_main == False,
+                EquipmentFile.status == 'ACTIVE',
+                EquipmentFile.extension != '.mp4'
+        )\
+            .all()
+
+        # Remove existing secondary pictures
+        if existing_secondary_pictures:
+            for picture in existing_secondary_pictures:
+                remove_equipment_file(picture.id)
+
+        for picture in secondary_pictures:
+            create_equipment_file(
+                equipment_id=equipment.id,
+                equipment_file=picture,
+            )
+
+    if videos:
+        existing_videos = db.session.query(EquipmentFile)\
+            .filter(
+                EquipmentFile.equipment_id == equipment_id,
+                EquipmentFile.is_main == False,
+                EquipmentFile.status == 'ACTIVE',
+                EquipmentFile.extension == '.mp4'
+        )\
+            .all()
+
+        # Remove existing secondary pictures
+        if existing_videos:
+            for video in existing_videos:
+                remove_equipment_file(video.id)
+
+        for video in videos:
+            create_equipment_file(
+                equipment_id=equipment.id,
+                equipment_file=video,
+            )
+
     db.session.commit()
+    return equipment
 
 
 def delete_equipment(equipment_id: int):
@@ -119,3 +307,14 @@ def delete_equipment(equipment_id: int):
 
     db.session.merge(Equipment(id=equipment_id, status='INACTIVE'))
     db.session.commit()
+
+
+def get_equipment_files(equipment_id: int):
+    '''Get equipment files'''
+
+    equipment_files = db.session.query(EquipmentFile)\
+        .join(Equipment, Equipment.id == EquipmentFile.equipment_id)\
+        .filter(Equipment.id == equipment_id, EquipmentFile.status == 'ACTIVE')\
+        .all()
+
+    return {'equipment_files': equipment_files}

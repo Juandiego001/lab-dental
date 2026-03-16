@@ -3,9 +3,29 @@
     <h1 class="text-h6 mb-2">{{ $t('profile.title') }}</h1>
 
     <v-card class="mb-6 pa-6 d-flex align-center ga-4">
-      <v-sheet class="bg-primary rounded-circle d-inline-flex pa-2">
-        <v-icon icon="mdi-account" size="40" />
-      </v-sheet>
+      <v-hover v-slot="{ isHovering, props }">
+        <v-avatar v-bind="props" color="primary" size="72" class="position-relative cursor-pointer"
+          @click="!hasPhoto ? triggerUpload() : null">
+          <v-img v-if="hasPhoto" :src="`/api/files?path=${photoPath}`" cover>
+            <template v-slot:placeholder>
+              <v-row class="fill-height ma-0" align="center" justify="center">
+                <v-progress-circular indeterminate color="grey-lighten-5" size="20" />
+              </v-row>
+            </template>
+          </v-img>
+          <v-icon v-else icon="mdi-account" size="40" />
+
+          <v-overlay :model-value="isHovering" contained scrim="black"
+            content-class="w-100 h-100 d-flex align-center justify-center">
+            <v-btn v-if="hasPhoto" class="d-flex align-center justify-center bg-error opacity-70" height="100%"
+              width="100%" icon="mdi-trash-can" variant="text" color="white" @click.stop="deletePhoto" />
+            <v-btn v-else class="d-flex align-center justify-center" icon="mdi-camera" height="100%" width="100%"
+              variant="text" color="white" @click.stop="triggerUpload" />
+          </v-overlay>
+        </v-avatar>
+      </v-hover>
+
+      <input type="file" ref="fileInput" class="d-none" accept="image/*" @change="onFileSelected" />
 
       <div>
         <p class="text-h6">{{ fullName }}</p>
@@ -99,6 +119,7 @@ import { ref } from 'vue'
 
 const { notify } = useSnackbar();
 const { t, setLocale } = useI18n();
+const { setPhotoPath } = useProfile();
 
 definePageMeta({
   layout: 'app',
@@ -117,6 +138,10 @@ const languages = computed(() => [
 const fullName = ref('');
 const email = ref('');
 const username = ref('');
+
+const photoPath = ref(null)
+const hasPhoto = computed(() => !!photoPath.value)
+const fileInput = ref(null)
 
 const passwordForm = ref(null)
 const updateProfileModel = ref(false);
@@ -149,7 +174,9 @@ const getProfile = async () => {
     fullName.value = data.fullName;
     email.value = data.email;
     username.value = data.username;
+    photoPath.value = data.photoPath;
     await setLocale(data.language);
+    setPhotoPath(data.photoPath);
   } catch (err) {
     notify(err, 'error');
   }
@@ -171,6 +198,7 @@ const updateProfile = async () => {
 
 const updatePassword = async () => {
   try {
+    loading.value = true;
     if (!updatePasswordModel.value) return;
     const { message } = await $api('/api/users/password', {
       method: 'PUT',
@@ -183,6 +211,44 @@ const updatePassword = async () => {
     passwordForm.value.reset();
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
+  }
+}
+
+const triggerUpload = () => fileInput.value.click();
+const onFileSelected = async (event) => {
+  try {
+    loading.value = true;
+    const file = event.target.files[0]
+    if (file) {
+      const formData = new FormData();
+      formData.append('photo', file);
+      const { message } = await $api('/api/users/photo', {
+        method: 'POST',
+        body: formData
+      })
+      notify(message, 'success');
+      await getProfile();
+    }
+  } catch (err) {
+    notify(err, 'error');
+  } finally {
+    loading.value = false;
+    event.target.value = ''
+  }
+}
+
+const deletePhoto = async () => {
+  try {
+    loading.value = true;
+    const { message } = await $api('/api/users/photo', { method: 'DELETE' })
+    notify(message, 'success');
+    await getProfile();
+  } catch (err) {
+    notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 

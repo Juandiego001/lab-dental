@@ -1,17 +1,17 @@
-from datetime import datetime, timedelta
 import uuid
-from core.app import db, FRONTEND_APP_BASE_URL
-from core.services.distributors import get_distributor_from_user
-from core.utils import send_mail
 from sqlalchemy.orm import aliased
 from sqlalchemy import JSON, and_, func
+from datetime import datetime, timedelta
 from werkzeug.exceptions import HTTPException
+from flask_babel import force_locale, gettext
+from core.app import db, FRONTEND_APP_BASE_URL
+from core.utils import process_file, send_mail
 from werkzeug.datastructures import FileStorage
 from sqlalchemy.dialects.postgresql import JSONB
 from core.models import Installation, InstallationFile
+from core.services.distributors import get_distributor_from_user
 from core.schemas.installations import InstallationCreatedNotification, InstallationApprovedNotification
 from core.models import Client, Distributor, DistributorList, Equipment, Installation, List_, Site, User, UserList
-from flask_babel import force_locale, gettext
 
 
 def search_installations(current_user: User, equipment_id: int, distributor_id: int, client_id: int, serial: str, page: int, per_page: int, sort_by: dict = None):
@@ -20,7 +20,8 @@ def search_installations(current_user: User, equipment_id: int, distributor_id: 
     order_by = Installation.id.desc()
     if sort_by:
         if sort_by['key'] == 'equipmentModelReference':
-            order_by = func.concat(Equipment.model, ' - ', Equipment.reference).label('equipment_model_reference')
+            order_by = func.concat(
+                Equipment.model, ' - ', Equipment.reference).label('equipment_model_reference')
         elif sort_by['key'] == 'clientName':
             order_by = Client.name
         elif sort_by['key'] == 'serial':
@@ -126,24 +127,32 @@ def get_expiration_date(installed_date: str):
 def create_installation_file(installation_id: int, installation_file_data: FileStorage, file_type: str):
     '''Creates an installation file'''
 
-    original_name = installation_file_data.filename
-    _, extension = original_name.split('.')
-    uuid_name = str(uuid.uuid4())
-    file_path = f'./files_data/{uuid_name}.{extension}'
+    mimetype, extension, original_name, size = process_file(
+        installation_file_data)
+    hash_name = str(uuid.uuid4())
+    file_path = f'./installations_files/{hash_name}{extension}'
     installation_file1 = InstallationFile(
-        installation_id=installation_id, name=original_name, original_name=original_name, path=file_path, file_type=file_type)
+        installation_id=installation_id,
+        original_name=original_name,
+        hash_name=hash_name,
+        path=file_path,
+        mimetype=mimetype,
+        extension=extension,
+        size=size,
+        file_type=file_type
+    )
     db.session.add(installation_file1)
     installation_file_data.save(file_path)
 
 
-def create_installation(data: dict):
+def create_installation(current_user: User, data: dict):
     '''Creates an installation'''
 
     serial_picture: FileStorage = data.pop('serial_picture')
     installation_pictures: list[FileStorage] = data.pop(
         'installation_pictures')
 
-    data['user_id'] = 1
+    data['user_id'] = current_user.id
     data['expiration_date'] = get_expiration_date(data['installed_date'])
 
     installation = Installation(**data)

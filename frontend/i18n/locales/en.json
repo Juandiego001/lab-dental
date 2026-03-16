@@ -408,6 +408,19 @@
     "title": "Equipment | Equipments",
     "model": "Model",
     "reference": "Reference",
+    "media": {
+      "filename": "Filename",
+      "size": "Size",
+      "extension": "Extension",
+      "description": "Associate a main image, secondary images, and videos with the device.",
+      "main": "Main Picture",
+      "secondary": "Secondary Pictures",
+      "videos": "Videos",
+      "delete": {
+        "title": "Delete equipment media",
+        "message": "Are you sure you want to delete the equipment file?"
+      }
+    },
     "create": {
       "title": "Create equipment"
     },

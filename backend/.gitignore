@@ -2,6 +2,9 @@
 venv
 files
 files_data
+equipments_files
+installations_files
+users_files
 __pycache__
 /__pycache__
 coments.txt

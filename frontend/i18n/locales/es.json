@@ -408,6 +408,19 @@
     "title": "Equipo | Equipos",
     "model": "Modelo",
     "reference": "Referencia",
+    "media": {
+      "filename": "Archivo",
+      "size": "Tamaño",
+      "extension": "Extensión",
+      "description": "Asocie una imagen principal, imágenes secundarias y videos al equipo.",
+      "main": "Imagen Principal",
+      "secondary": "Imagenes Secundarias",
+      "videos": "Videos",
+      "delete": {
+        "title": "Eliminar archivos",
+        "message": "¿Está seguro que desea eliminar el archivo?"
+      }
+    },
     "create": {
       "title": "Create equipo"
     },

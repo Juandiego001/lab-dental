@@ -5,10 +5,15 @@ export const useProfile = () => {
     role: '',
     email: '',
     abilities: '',
+    photoPath: '',
   }))
 
   const setProfile = (profileData: any) => {
     profile.value = profileData
+  }
+
+  const setPhotoPath = (photoPath: string) => {
+    profile.value.photoPath = photoPath
   }
 
   const isAdmin = computed(() => profile.value.role === 'ADMIN');
@@ -16,6 +21,7 @@ export const useProfile = () => {
   return {
     profile,
     setProfile,
-    isAdmin
+    isAdmin,
+    setPhotoPath
   }
 }

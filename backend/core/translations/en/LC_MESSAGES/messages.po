@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-10 22:55-0500\n"
+"POT-Creation-Date: 2026-03-15 23:17-0500\n"
 "PO-Revision-Date: 2026-03-03 09:13-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -18,151 +18,155 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: core/controllers/brands.py:29 core/controllers/brands.py:41
-#: core/controllers/brands.py:55 core/controllers/brands.py:56
-#: core/controllers/brands.py:69 core/controllers/brands.py:70
-#: core/controllers/brands.py:83 core/controllers/brands.py:84
-#: core/controllers/categories.py:29 core/controllers/categories.py:41
-#: core/controllers/categories.py:55 core/controllers/categories.py:56
-#: core/controllers/categories.py:69 core/controllers/categories.py:70
-#: core/controllers/categories.py:83 core/controllers/categories.py:84
-#: core/controllers/clients.py:32 core/controllers/clients.py:44
-#: core/controllers/clients.py:57 core/controllers/clients.py:70
-#: core/controllers/clients.py:83 core/controllers/distributors.py:29
-#: core/controllers/distributors.py:41 core/controllers/distributors.py:55
-#: core/controllers/distributors.py:68 core/controllers/distributors.py:69
-#: core/controllers/distributors.py:82 core/controllers/distributors.py:83
-#: core/controllers/distributors.py:96 core/controllers/distributors.py:97
-#: core/controllers/equipments.py:32 core/controllers/equipments.py:44
-#: core/controllers/equipments.py:58 core/controllers/equipments.py:73
-#: core/controllers/equipments.py:86 core/controllers/files.py:19
-#: core/controllers/groups.py:28 core/controllers/groups.py:40
-#: core/controllers/groups.py:55 core/controllers/groups.py:69
-#: core/controllers/groups.py:82 core/controllers/installations.py:30
-#: core/controllers/installations.py:42 core/controllers/installations.py:57
-#: core/controllers/installations.py:72 core/controllers/installations.py:85
-#: core/controllers/installations.py:100 core/controllers/installations.py:117
-#: core/controllers/lists.py:28 core/controllers/lists.py:58
-#: core/controllers/lists.py:71 core/controllers/lists.py:85
-#: core/controllers/lists.py:101 core/controllers/lists.py:114
-#: core/controllers/lists.py:129 core/controllers/locations.py:26
+#: core/controllers/brands.py:30 core/controllers/brands.py:42
+#: core/controllers/brands.py:56 core/controllers/brands.py:57
+#: core/controllers/brands.py:70 core/controllers/brands.py:71
+#: core/controllers/brands.py:84 core/controllers/brands.py:85
+#: core/controllers/categories.py:30 core/controllers/categories.py:42
+#: core/controllers/categories.py:56 core/controllers/categories.py:57
+#: core/controllers/categories.py:70 core/controllers/categories.py:71
+#: core/controllers/categories.py:84 core/controllers/categories.py:85
+#: core/controllers/clients.py:33 core/controllers/clients.py:45
+#: core/controllers/clients.py:58 core/controllers/clients.py:71
+#: core/controllers/clients.py:84 core/controllers/distributors.py:30
+#: core/controllers/distributors.py:42 core/controllers/distributors.py:56
+#: core/controllers/distributors.py:69 core/controllers/distributors.py:70
+#: core/controllers/distributors.py:83 core/controllers/distributors.py:84
+#: core/controllers/distributors.py:97 core/controllers/distributors.py:98
+#: core/controllers/equipments.py:36 core/controllers/equipments.py:48
+#: core/controllers/equipments.py:62 core/controllers/equipments.py:80
+#: core/controllers/equipments.py:93 core/controllers/files.py:30
+#: core/controllers/groups.py:29 core/controllers/groups.py:41
+#: core/controllers/groups.py:56 core/controllers/groups.py:70
+#: core/controllers/groups.py:83 core/controllers/installations.py:31
+#: core/controllers/installations.py:43 core/controllers/installations.py:60
+#: core/controllers/installations.py:75 core/controllers/installations.py:88
+#: core/controllers/installations.py:103 core/controllers/installations.py:120
+#: core/controllers/lists.py:29 core/controllers/lists.py:59
+#: core/controllers/lists.py:72 core/controllers/lists.py:86
+#: core/controllers/lists.py:102 core/controllers/lists.py:115
+#: core/controllers/lists.py:130 core/controllers/locations.py:26
 #: core/controllers/locations.py:45 core/controllers/locations.py:64
 #: core/controllers/permissions.py:37 core/controllers/permissions.py:50
-#: core/controllers/sites.py:32 core/controllers/sites.py:44
-#: core/controllers/sites.py:59 core/controllers/sites.py:60
-#: core/controllers/sites.py:79 core/controllers/sites.py:80
-#: core/controllers/sites.py:93 core/controllers/sites.py:94
-#: core/controllers/users.py:37 core/controllers/users.py:49
-#: core/controllers/users.py:70 core/controllers/users.py:84
-#: core/controllers/users.py:105 core/controllers/users.py:130
-#: core/controllers/users.py:143 core/controllers/users.py:163
-#: core/controllers/users.py:176 core/controllers/users.py:177
-#: core/controllers/users.py:191 core/controllers/users.py:208
-#: core/controllers/users.py:238
+#: core/controllers/sites.py:33 core/controllers/sites.py:45
+#: core/controllers/sites.py:60 core/controllers/sites.py:61
+#: core/controllers/sites.py:80 core/controllers/sites.py:81
+#: core/controllers/sites.py:94 core/controllers/sites.py:95
+#: core/controllers/users.py:38 core/controllers/users.py:50
+#: core/controllers/users.py:72 core/controllers/users.py:86
+#: core/controllers/users.py:107 core/controllers/users.py:132
+#: core/controllers/users.py:145 core/controllers/users.py:165
+#: core/controllers/users.py:178 core/controllers/users.py:179
+#: core/controllers/users.py:193 core/controllers/users.py:210
+#: core/controllers/users.py:240
 msgid "abortException"
 msgstr "There was an internal error"
 
-#: core/controllers/brands.py:53
+#: core/controllers/brands.py:54
 msgid "brandCreated"
 msgstr "Brand created successfully"
 
-#: core/controllers/brands.py:67
+#: core/controllers/brands.py:68
 msgid "brandUpdated"
 msgstr "Brand updated successfully"
 
-#: core/controllers/brands.py:81
+#: core/controllers/brands.py:82
 msgid "brandDeleted"
 msgstr "Brand deleted successfully"
 
-#: core/controllers/categories.py:53
+#: core/controllers/categories.py:54
 msgid "categoryCreated"
 msgstr "Category created successfully"
 
-#: core/controllers/categories.py:67
+#: core/controllers/categories.py:68
 msgid "categoryUpdated"
 msgstr "Category updated successfully"
 
-#: core/controllers/categories.py:81
+#: core/controllers/categories.py:82
 msgid "categoryDeleted"
 msgstr "Category deleted successfully"
 
-#: core/controllers/clients.py:55
+#: core/controllers/clients.py:56
 msgid "clientCreated"
 msgstr "Client created successfully"
 
-#: core/controllers/clients.py:68
+#: core/controllers/clients.py:69
 msgid "clientUpdated"
 msgstr "Client updated successfully"
 
-#: core/controllers/clients.py:81
+#: core/controllers/clients.py:82
 msgid "clientDeleted"
 msgstr "Client deleted successfully"
 
-#: core/controllers/distributors.py:66
+#: core/controllers/distributors.py:67
 msgid "distributorCreated"
 msgstr "Distributor created successfully"
 
-#: core/controllers/distributors.py:80
+#: core/controllers/distributors.py:81
 msgid "distributorUpdated"
 msgstr "Distributor updated successfully"
 
-#: core/controllers/distributors.py:94
+#: core/controllers/distributors.py:95
 msgid "distributorDeleted"
 msgstr "Distributor deleted successfully"
 
-#: core/controllers/equipments.py:56
+#: core/controllers/equipments.py:59
 msgid "equipmentCreated"
 msgstr "Equipment created successfully"
 
-#: core/controllers/equipments.py:71
+#: core/controllers/equipments.py:77
 msgid "equipmentUpdated"
 msgstr "Equipment updated successfully"
 
-#: core/controllers/equipments.py:84
+#: core/controllers/equipments.py:91
 msgid "equipmentDeleted"
 msgstr "Equipment deleted successfully"
 
-#: core/controllers/groups.py:53
+#: core/controllers/equipments.py:116
+msgid "equipmentFileDeleted"
+msgstr "Equipment File deleted successfully"
+
+#: core/controllers/groups.py:54
 msgid "groupCreated"
 msgstr "Group created successfully"
 
-#: core/controllers/groups.py:67
+#: core/controllers/groups.py:68
 msgid "groupUpdated"
 msgstr "Group updated successfully"
 
-#: core/controllers/groups.py:80
+#: core/controllers/groups.py:81
 msgid "groupDeleted"
 msgstr "Group deleted successfully"
 
-#: core/controllers/installations.py:55
+#: core/controllers/installations.py:58
 msgid "installationCreated"
 msgstr "Installation created successfully"
 
-#: core/controllers/installations.py:69
+#: core/controllers/installations.py:72
 msgid "installationUpdated"
 msgstr "Installation updated successfully"
 
-#: core/controllers/installations.py:83
+#: core/controllers/installations.py:86
 msgid "installationDeleted"
 msgstr "Installation deleted successfully"
 
-#: core/controllers/installations.py:97
+#: core/controllers/installations.py:100
 msgid "installationApproved"
 msgstr "Installation approved successfully"
 
-#: core/controllers/installations.py:114
+#: core/controllers/installations.py:117
 msgid "installationRejected"
 msgstr "Installation rejected successfully"
 
-#: core/controllers/lists.py:69
+#: core/controllers/lists.py:70
 msgid "listCreated"
 msgstr "List created successfully"
 
-#: core/controllers/lists.py:83
+#: core/controllers/lists.py:84
 msgid "listUpdated"
 msgstr "List updated successfully"
 
-#: core/controllers/lists.py:112
+#: core/controllers/lists.py:113
 msgid "listDeleted"
 msgstr "List deleted successfully"
 
@@ -170,179 +174,183 @@ msgstr "List deleted successfully"
 msgid "permissionUpdated"
 msgstr "Permission updated successfully"
 
-#: core/controllers/sites.py:57
+#: core/controllers/sites.py:58
 msgid "siteCreated"
 msgstr "Site created successfully"
 
-#: core/controllers/sites.py:77
+#: core/controllers/sites.py:78
 msgid "siteUpdated"
 msgstr "Site updated successfully"
 
-#: core/controllers/sites.py:91
+#: core/controllers/sites.py:92
 msgid "siteDeleted"
 msgstr "Site deleted successfully"
 
-#: core/controllers/users.py:64
+#: core/controllers/users.py:65
 msgid "welcome"
 msgstr "Welcome"
 
-#: core/controllers/users.py:68
+#: core/controllers/users.py:69
 msgid "wrongUsernamePassword"
 msgstr "Username or password incorrect"
 
-#: core/controllers/users.py:82
+#: core/controllers/users.py:84
 msgid "userCreated"
 msgstr "User created successfully"
 
-#: core/controllers/users.py:126
+#: core/controllers/users.py:128
 msgid "profileUpdated"
 msgstr "Profile update successfully"
 
-#: core/controllers/users.py:141
+#: core/controllers/users.py:143
 msgid "userUpdated"
 msgstr "User updated successfully"
 
-#: core/controllers/users.py:174
+#: core/controllers/users.py:176
 msgid "userDeleted"
 msgstr "User deleted successfully"
 
-#: core/controllers/users.py:187
+#: core/controllers/users.py:189
 msgid "tokenValid"
 msgstr "Token valid"
 
-#: core/controllers/users.py:189
+#: core/controllers/users.py:191
 msgid "tokenInvalid"
 msgstr "Token invalid"
 
-#: core/controllers/users.py:206 core/controllers/users.py:236
+#: core/controllers/users.py:208 core/controllers/users.py:238
 msgid "passwordUpdated"
 msgstr "Password updated successfully"
 
-#: core/controllers/users.py:249
+#: core/controllers/users.py:251
 msgid "sessionEnded"
 msgstr "Session ended"
 
-#: core/schemas/brands.py:35 core/schemas/brands.py:38
-#: core/schemas/categories.py:35 core/schemas/categories.py:38
+#: core/controllers/users.py:275 core/controllers/users.py:288
+msgid "photoUpdated"
+msgstr "Photo updated"
+
+#: core/schemas/brands.py:40 core/schemas/brands.py:43
+#: core/schemas/categories.py:40 core/schemas/categories.py:43
 #: core/schemas/lists.py:25 core/schemas/lists.py:28
 msgid "nameRequired"
 msgstr "Name required"
 
-#: core/schemas/brands.py:52 core/schemas/brands.py:55
-#: core/schemas/categories.py:52 core/schemas/categories.py:55
+#: core/schemas/brands.py:56 core/schemas/brands.py:59
+#: core/schemas/categories.py:56 core/schemas/categories.py:59
 msgid "slugRequired"
 msgstr "Slug required"
 
-#: core/schemas/clients.py:42 core/schemas/clients.py:45
+#: core/schemas/clients.py:44 core/schemas/clients.py:47
 msgid "clientNameRequired"
 msgstr "Client's name required"
 
-#: core/schemas/clients.py:58 core/schemas/clients.py:61
+#: core/schemas/clients.py:60 core/schemas/clients.py:63
 msgid "clientPhoneRequired"
 msgstr "Client's phone required"
 
-#: core/schemas/distributors.py:58 core/schemas/distributors.py:61
+#: core/schemas/distributors.py:61 core/schemas/distributors.py:65
 msgid "distributorNameRequired"
 msgstr "Distributor name required"
 
-#: core/schemas/equipments.py:44 core/schemas/equipments.py:47
+#: core/schemas/equipments.py:56 core/schemas/equipments.py:59
 msgid "modelRequired"
 msgstr "Model required"
 
-#: core/schemas/equipments.py:60 core/schemas/equipments.py:63
+#: core/schemas/equipments.py:72 core/schemas/equipments.py:75
 msgid "referenceRequired"
 msgstr "Reference required"
 
-#: core/schemas/groups.py:36 core/schemas/groups.py:39
+#: core/schemas/groups.py:38 core/schemas/groups.py:41
 msgid "groupNameRequired"
 msgstr "Group name required"
 
-#: core/schemas/installations.py:45 core/schemas/installations.py:48
-#: core/schemas/installations.py:64
+#: core/schemas/installations.py:50 core/schemas/installations.py:53
+#: core/schemas/installations.py:70
 msgid "serialRequired"
 msgstr "Serial required"
 
-#: core/schemas/installations.py:61
+#: core/schemas/installations.py:67
 msgid "installedDateRequired"
 msgstr "Installed Date required"
 
-#: core/schemas/sites.py:49 core/schemas/sites.py:52
+#: core/schemas/sites.py:50 core/schemas/sites.py:53
 msgid "siteNameRequired"
 msgstr "Site name required"
 
-#: core/schemas/sites.py:65 core/schemas/sites.py:68
+#: core/schemas/sites.py:66 core/schemas/sites.py:69
 msgid "siteAddressRequired"
 msgstr "Site address is required"
 
-#: core/schemas/sites.py:118
+#: core/schemas/sites.py:119
 msgid "clientIddistributorIdRequired"
 msgstr "Client ID or Distributor ID is required"
 
-#: core/schemas/users.py:89 core/schemas/users.py:92
+#: core/schemas/users.py:90 core/schemas/users.py:93
 msgid "fullNameRequired"
 msgstr "Full name is required"
 
-#: core/schemas/users.py:105 core/schemas/users.py:108
+#: core/schemas/users.py:106 core/schemas/users.py:109
 msgid "usernameRequired"
 msgstr "Username is required"
 
-#: core/schemas/users.py:121 core/schemas/users.py:124
+#: core/schemas/users.py:122 core/schemas/users.py:125
 msgid "emailRequired"
 msgstr "Email is required"
 
-#: core/schemas/users.py:169 core/schemas/users.py:221
+#: core/schemas/users.py:170 core/schemas/users.py:222
 msgid "usernameEmailExist"
 msgstr "Username or email already exists"
 
-#: core/schemas/users.py:306
+#: core/schemas/users.py:307
 msgid "mustHaveUppercase"
 msgstr "Must contain at least one uppercase letter"
 
-#: core/schemas/users.py:308
+#: core/schemas/users.py:309
 msgid "mustHaveLowerCase"
 msgstr "Must contain at least one lowercase letter"
 
-#: core/schemas/users.py:311
+#: core/schemas/users.py:312
 msgid "mustHaveSpecialCharacter"
 msgstr "Must contain at least one special character"
 
-#: core/schemas/users.py:313
+#: core/schemas/users.py:314
 msgid "mustHaveNumber"
 msgstr "Must contain at least one number"
 
-#: core/schemas/users.py:316
+#: core/schemas/users.py:317
 msgid "mustHaveMinimum10Characters"
 msgstr "Must be at least 10 characters long"
 
-#: core/schemas/users.py:319
+#: core/schemas/users.py:320
 msgid "mustHaveMaximum24Characters"
 msgstr "Must not exceed 24 characters"
 
-#: core/schemas/users.py:328
+#: core/schemas/users.py:329
 msgid "invalidCurrentPassword"
 msgstr "Invalid current password"
 
-#: core/services/installations.py:181
+#: core/services/installations.py:205
 #, python-format
 msgid "SOE Latam - Registro de certificado de instalación #%(id)s"
 msgstr "SOE Latam - Installation certificate registration #%(id)s"
 
-#: core/services/installations.py:249
+#: core/services/installations.py:273
 #, python-format
 msgid "SOE Latam - Actualización de certificado de instalación #%(id)s"
 msgstr "SOE Latam - Installation certificate updated #%(id)s"
 
-#: core/services/installations.py:301
+#: core/services/installations.py:325
 #, python-format
 msgid "SOE Latam - Aprobación de instalación #%(id)s"
 msgstr "SOE Latam - Installation Approval #%(id)s"
 
-#: core/services/installations.py:346
+#: core/services/installations.py:370
 #, python-format
 msgid "SOE Latam - Rechazo de instalación #%(id)s"
 msgstr "SOE Latam - Installation rejection #%(id)s"
 
-#: core/services/users.py:207 templates/recover_password.html:81
+#: core/services/users.py:222 templates/recover_password.html:81
 msgid "resetPassword"
 msgstr "Reset Password"
 

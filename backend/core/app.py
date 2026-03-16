@@ -40,12 +40,23 @@ CORS(app)
 
 app.config['JWT_SECRET_KEY'] = 'fB7Cp8UoZJ6FQIG0DjLjes5E'
 
-'''Create folder files_data'''
+'''Create different folders for files'''
 base_route = Path.cwd()
-files_data_folder = "files_data"
-full_route = base_route / files_data_folder
-if not full_route.exists():
-    full_route.mkdir(parents=True, exist_ok=True)
+
+installations_files_folder = "installations_files"
+installation_files_full_route = base_route / installations_files_folder
+if not installation_files_full_route.exists():
+    installation_files_full_route.mkdir(parents=True, exist_ok=True)
+
+equipments_files_folder = "equipments_files"
+equipments_full_route = base_route / equipments_files_folder
+if not equipments_full_route.exists():
+    equipments_full_route.mkdir(parents=True, exist_ok=True)
+
+users_files_folder = "users_files"
+users_full_route = base_route / users_files_folder
+if not users_full_route.exists():
+    users_full_route.mkdir(parents=True, exist_ok=True)
 
 
 if ENV == 'development':

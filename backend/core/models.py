@@ -1,10 +1,10 @@
 import enum
 from core.app import db
 from bcrypt import checkpw
-from sqlalchemy import Column, Enum, Index
-from sqlalchemy import BigInteger, String, DateTime, ForeignKey, Boolean
+from sqlalchemy import Column, Enum, Index, func, BigInteger, String, DateTime, ForeignKey, Boolean
 from datetime import datetime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.sql import expression
 
 
 class Country(db.Model):
@@ -15,7 +15,7 @@ class Country(db.Model):
     code: Mapped[str] = mapped_column(String(20), nullable=False)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
 
 
 class State(db.Model):
@@ -27,7 +27,7 @@ class State(db.Model):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
 
 
 class City(db.Model):
@@ -39,7 +39,7 @@ class City(db.Model):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
 
 
 class Address(db.Model):
@@ -56,16 +56,16 @@ class Address(db.Model):
     zip_code: Mapped[str] = mapped_column(String(40), nullable=True)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now())
+        server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+        server_default=func.now(),
+        onupdate=func.now())
 
 
 class Distributor(db.Model):
@@ -75,16 +75,16 @@ class Distributor(db.Model):
     name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now())
+        server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+        server_default=func.now(),
+        onupdate=func.now())
     client = relationship('Client', back_populates='distributor')
     site = relationship('Site', back_populates='distributor')
 
@@ -99,16 +99,16 @@ class Client(db.Model):
     phone: Mapped[str] = mapped_column(String(100), nullable=False)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now())
+        server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+        server_default=func.now(),
+        onupdate=func.now())
     distributor = relationship('Distributor', back_populates='client')
     site = relationship('Site', back_populates='client')
 
@@ -123,22 +123,24 @@ class Site(db.Model):
         ForeignKey('distributors.id'), nullable=True)
     address_id: Mapped[int] = mapped_column(
         ForeignKey('addresses.id'), nullable=False)
-    is_main: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=False)
+
+    is_main: Mapped[str] = mapped_column(
+        Boolean, nullable=False, server_default=expression.false())
+
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str] = mapped_column(String(200), nullable=True)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now())
+        server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+        server_default=func.now(),
+        onupdate=func.now())
     distributor = relationship('Distributor', back_populates='site')
     client = relationship('Client', back_populates='site')
 
@@ -149,20 +151,20 @@ class List_(db.Model):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     name: Mapped[str] = mapped_column(String(60), nullable=False)
     slug: Mapped[str] = mapped_column(String(60), nullable=False)
-    is_main: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=False)
+    is_main: Mapped[Boolean] = mapped_column(
+        Boolean, nullable=False, server_default=expression.false())
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now())
+        server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+        server_default=func.now(),
+        onupdate=func.now())
 
 
 class DistributorList(db.Model):
@@ -192,19 +194,20 @@ class User(db.Model):
     password: Mapped[str] = mapped_column(String, nullable=False)
     role: Mapped[str] = mapped_column(String(20), nullable=False)
     language: Mapped[str] = mapped_column(
-        String(10), nullable=False, default='es')
+        String(10), nullable=False, server_default='es')
+    photo_path: Mapped[str] = mapped_column(String, nullable=True)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now())
+        server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+        server_default=func.now(),
+        onupdate=func.now())
     user_groups = relationship('UserGroup', back_populates='user')
 
     def check_password(self, password: str):
@@ -230,16 +233,16 @@ class Group(db.Model):
     name: Mapped[str] = mapped_column(String(30))
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now())
+        server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+        server_default=func.now(),
+        onupdate=func.now())
     user_groups = relationship('UserGroup', back_populates='group')
 
 
@@ -260,16 +263,16 @@ class Module(db.Model):
     name: Mapped[str] = mapped_column(String(30))
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now())
+        server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+        server_default=func.now(),
+        onupdate=func.now())
 
 
 class Permission(db.Model):
@@ -286,16 +289,16 @@ class Permission(db.Model):
     delete: Mapped[bool]
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now())
+        server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+        server_default=func.now(),
+        onupdate=func.now())
 
 
 class Brand(db.Model):
@@ -306,16 +309,16 @@ class Brand(db.Model):
     slug: Mapped[str] = mapped_column(String(100), nullable=False)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now())
+        server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+        server_default=func.now(),
+        onupdate=func.now())
     equipment = relationship('Equipment', back_populates='brand')
 
 
@@ -327,16 +330,16 @@ class Category(db.Model):
     slug: Mapped[str] = mapped_column(String(100), nullable=False)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now())
+        server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+        server_default=func.now(),
+        onupdate=func.now())
     equipment = relationship('Equipment', back_populates='category')
 
 
@@ -350,19 +353,18 @@ class Equipment(db.Model):
         ForeignKey('categories.id'), nullable=False)
     model: Mapped[str] = mapped_column(String(100), nullable=False)
     reference: Mapped[str] = mapped_column(String(100), nullable=False)
-    main_picture: Mapped[str] = mapped_column(String(), nullable=True)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now())
+        server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+        server_default=func.now(),
+        onupdate=func.now())
     brand = relationship('Brand', back_populates='equipment')
     category = relationship('Category', back_populates='equipment')
 
@@ -375,16 +377,16 @@ class ManualType(db.Model):
     slug: Mapped[str] = mapped_column(String(100), nullable=False)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now())
+        server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+        server_default=func.now(),
+        onupdate=func.now())
 
 
 class Manual(db.Model):
@@ -400,16 +402,16 @@ class Manual(db.Model):
     original_name: Mapped[str] = mapped_column(String(100), nullable=False)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now())
+        server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+        server_default=func.now(),
+        onupdate=func.now())
 
 
 class EquipmentFile(db.Model):
@@ -418,22 +420,30 @@ class EquipmentFile(db.Model):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     equipment_id: Mapped[int] = mapped_column(
         ForeignKey('equipments.id'), nullable=False)
-    name: Mapped[str] = mapped_column(String(100), nullable=False)
-    path: Mapped[str] = mapped_column(String, nullable=False)
     original_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    file_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    hash_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    path: Mapped[str] = mapped_column(String, nullable=False)
+    mimetype: Mapped[str] = mapped_column(String(100), nullable=False)
+    extension: Mapped[str] = mapped_column(String(20), nullable=False)
+    size: Mapped[int] = mapped_column(
+        BigInteger, nullable=False, server_default='0')
+    is_main: Mapped[Boolean] = mapped_column(
+        Boolean, nullable=False, server_default=expression.false())
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now())
+        server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+        server_default=func.now(),
+        onupdate=func.now())
+
+    equipment = relationship(
+        'Equipment', primaryjoin='EquipmentFile.equipment_id == Equipment.id', backref='equipment_files')
 
 
 class Part(db.Model):
@@ -446,16 +456,16 @@ class Part(db.Model):
     description: Mapped[str] = mapped_column(String(100), nullable=False)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now())
+        server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+        server_default=func.now(),
+        onupdate=func.now())
 
 
 class Specification(db.Model):
@@ -469,16 +479,16 @@ class Specification(db.Model):
     field_type: Mapped[str] = mapped_column(String(20), nullable=False)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now())
+        server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+        server_default=func.now(),
+        onupdate=func.now())
 
 
 class Installation(db.Model):
@@ -504,16 +514,16 @@ class Installation(db.Model):
         DateTime(), nullable=False)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now())
+        server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+        server_default=func.now(),
+        onupdate=func.now())
 
 
 class Installation_File_Type(enum.Enum):
@@ -528,23 +538,27 @@ class InstallationFile(db.Model):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     installation_id: Mapped[int] = mapped_column(
         ForeignKey('installations.id'), nullable=False)
-    name: Mapped[str] = mapped_column(String(100), nullable=False)
-    path: Mapped[str] = mapped_column(String, nullable=False)
     original_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    hash_name: Mapped[str] = mapped_column(String(100), nullable=True)
+    path: Mapped[str] = mapped_column(String, nullable=False)
+    mimetype: Mapped[str] = mapped_column(String(100), nullable=True)
+    extension: Mapped[str] = mapped_column(String(20), nullable=True)
+    size: Mapped[int] = mapped_column(
+        BigInteger, nullable=True, server_default='0')
     file_type: Mapped[str] = mapped_column(Enum(Installation_File_Type), nullable=False,
                                            comment='Installation file type could be one of [FORMAT, SERIAL, EVIDENCES]')
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now())
+        server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+        server_default=func.now(),
+        onupdate=func.now())
 
 
 class Reason(db.Model):
@@ -558,16 +572,16 @@ class Reason(db.Model):
     description: Mapped[str] = mapped_column(String(100), nullable=False)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now())
+        server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+        server_default=func.now(),
+        onupdate=func.now())
 
 
 class Warranty(db.Model):
@@ -583,13 +597,13 @@ class Warranty(db.Model):
     solution: Mapped[str] = mapped_column(String(400), nullable=False)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
-                                        default='ACTIVE')
+                                        server_default='ACTIVE')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now())
+        server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(),
         nullable=False,
-        default=lambda: datetime.now(),
-        onupdate=lambda: datetime.now())
+        server_default=func.now(),
+        onupdate=func.now())

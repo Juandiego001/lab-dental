@@ -1,5 +1,8 @@
+from pathlib import Path
+import uuid
+
 from core.app import db, r
-from core.utils import send_mail
+from core.utils import process_file, send_mail
 from secrets import token_urlsafe
 from sqlalchemy import or_, and_, case
 from core.app import FRONTEND_APP_BASE_URL
@@ -7,6 +10,7 @@ from werkzeug.exceptions import HTTPException
 from core.services.distributors import get_distributor_from_user
 from core.models import Distributor, DistributorList, List_, User, UserList
 from flask_babel import force_locale, gettext
+from werkzeug.datastructures import FileStorage
 
 
 def login(email_or_username: str, password: str):
@@ -279,3 +283,30 @@ def update_profile(current_user: User, user_data: dict) -> User:
     db.session.merge(user)
     db.session.commit()
     return user
+
+
+def upload_user_photo(current_user: User, data: dict):
+    '''Upload user photo'''
+
+    user_photo: FileStorage = data.pop('photo')
+    mimetype, extension, original_name, size = process_file(
+        user_photo)
+    hash_name = str(uuid.uuid4())
+    file_path = f'./users_files/{hash_name}{extension}'
+    db.session.merge(User(id=current_user.id, photo_path=file_path))
+    db.session.commit()
+    user_photo.save(file_path)
+
+
+def delete_user_photo(current_user: User):
+    '''Delete user photo'''
+
+    try:
+        Path(current_user.photo_path).unlink(missing_ok=True)
+    except Exception as e:
+        print(
+            f"Ocurrió un error al intentar eliminar el archivo: {e}")
+
+    current_user.photo_path = None
+    db.session.merge(current_user)
+    db.session.commit()

@@ -37,7 +37,16 @@
     <v-menu open-on-hover>
       <template v-slot:activator="{ props }">
         <v-btn icon v-bind="props">
-          <v-icon icon="mdi-account-circle" />
+          <v-avatar v-bind="props" color="primary" size="32" class="position-relative cursor-pointer">
+            <v-img style v-if="profile.photoPath" :src="`/api/files?path=${profile.photoPath}`" cover>
+              <template v-slot:placeholder>
+                <v-row class="fill-height ma-0" align="center" justify="center">
+                  <v-progress-circular indeterminate color="grey-lighten-5" size="20" />
+                </v-row>
+              </template>
+            </v-img>
+            <v-icon v-else icon="mdi-account-circle" />
+          </v-avatar>
         </v-btn>
       </template>
 
@@ -58,6 +67,12 @@ const { t } = useI18n();
 const { $ability } = useNuxtApp();
 const routes = ref([])
 const drawer = ref(true);
+const { profile } = useProfile();
+
+onBeforeMount(() => {
+  console.log({ profile })
+})
+
 const menu = ref([
   {
 
