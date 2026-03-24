@@ -25,7 +25,7 @@ class UserSearch(Schema):
     username = String(required=False, allow_none=True,
                       validate=validate.Length(max=20), load_default='')
     email = String(required=False, allow_none=True,
-                   validate=validate.Length(max=250), load_default='')
+                   validate=validate.Length(max=150), load_default='')
     page = Integer(load_default=1)
     per_page = Integer(data_key='perPage', load_default=15)
     sort_by = Nested(SortBy, data_key='sortBy', load_default=None)

@@ -1,3 +1,4 @@
+from flask_babel import gettext
 from flask_jwt_extended import jwt_required
 from core.app import db
 from core.services import reasons
@@ -18,11 +19,11 @@ def get_reasons(query_data):
 
     try:
         results = reasons.get_reasons(query_data['search'],
-                                         query_data['page'],
-                                         query_data['per_page'])
+                                      query_data['page'],
+                                      query_data['per_page'])
         return {'items': results, 'total': results.total}
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.get('/<int:reason_id>')
@@ -34,7 +35,7 @@ def get_reason(reason_id):
     try:
         return reasons.get_reason_by_id(reason_id)
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/')
@@ -48,8 +49,7 @@ def create_reasons(reason):
         db.session.commit()
         return {'message': 'Reason registered successfully'}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.put('/<int:reason_id>')
@@ -63,8 +63,7 @@ def update_reasons(reason_id, json_data):
         reasons.update_reason(reason_id, json_data)
         return {'message': 'Reason updated successfully'}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.delete('/<int:reason_id>')
@@ -77,5 +76,4 @@ def delete_reasons(reason_id):
         reasons.delete_reason(reason_id)
         return {'message': 'Reason deleted successfully'}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))

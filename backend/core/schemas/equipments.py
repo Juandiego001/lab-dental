@@ -1,10 +1,10 @@
 from apiflask import Schema
-from apiflask.fields import Boolean, DateTime, Dict, File, Integer, List, Nested, String, Function
-from marshmallow import ValidationError, post_load, pre_load, validates_schema, validate
-from core.models import Equipment
-from core.schemas.utils import BaseSchema, SortBy
 from flask_babel import gettext
-from datetime import datetime
+from core.utils import format_file_size
+from werkzeug.datastructures import FileStorage
+from core.schemas.utils import BaseSchema, SortBy
+from marshmallow import ValidationError, validates, validates_schema, validate
+from apiflask.fields import Boolean, DateTime, File, Integer, List, Nested, String, Function
 
 
 class EquipmentSearch(Schema):
@@ -36,10 +36,6 @@ class EquipmentIn(BaseSchema):
         required=True, allow_none=False, validate=validate.Length(max=50))
     brand_id = Integer(data_key='brandId')
     category_id = Integer(data_key='categoryId')
-    main_picture = File(data_key='mainPicture')
-    secondary_pictures = List(
-        File(), data_key='secondaryPictures')
-    videos = List(File())
     status = String(load_default='ACTIVE')
 
     @validates_schema
@@ -73,29 +69,92 @@ class EquipmentIn(BaseSchema):
 
         if not data['reference']:
             raise ValidationError({'message':  gettext('referenceRequired')})
-
-
-class EquipmentInCreate(EquipmentIn):
-    pass
-
-
-class EquipmentInUpdate(EquipmentIn):
-    pass
-
-
-class EquipmentsExistingIn(BaseSchema):
-    search = String(required=False, allow_none=True, load_default='')
-    equipment_id = Integer(
-        required=False, allow_none=True, data_key='equipmentId')
-
-    @pre_load
-    def validate_equipment_id(self, data: dict, **kwargs):
         '''Remove equipmentId key if equipmentId its None or ""'''
 
         if 'equipmentId' in data and not data['equipmentId']:
             data.pop('equipmentId', None)
 
         return data
+
+
+class EquipmentFilesSearch(BaseSchema):
+    title = String(required=False, validate=validate.Length(
+        max=50), load_default=None)
+    description = String(required=False, validate=validate.Length(
+        max=100), load_default=None)
+    original_name = String(required=False, validate=validate.Length(
+        max=100), load_default=None, data_key='originalName')
+    extension = String(required=False, validate=validate.Length(
+        max=20), load_default=None)
+    page = Integer(load_default=1)
+    per_page = Integer(data_key='perPage', load_default=15)
+
+
+class EquipmentFileIn(BaseSchema):
+    title = String(required=False, allow_none=True)
+    description = String(required=False, allow_none=True)
+
+
+ALLOWED_MIMETYPES = {'video/mp4',
+                     'image/jpeg',
+                     'image/png',
+                     'image/webp',
+                     'image/svg+xml'}
+
+
+ALLOWED_EXTENSIONS = {'mp4', 'jpg', 'jpeg', 'png', 'pdf', 'webp', 'svg'}
+
+
+def is_allowed_extension(filename: str):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+class EquipmentFilesIn(BaseSchema):
+    files = List(File(), required=True)
+
+    @validates('files')
+    def validate_file_types(self, value: list[FileStorage], **kwargs):
+        '''Validate file types'''
+
+        archivos_invalidos = []
+        for archivo in value:
+            if not archivo or not archivo.filename:
+                archivos_invalidos.append("Archivo desconocido/sin nombre")
+                continue
+
+            extension_valida = is_allowed_extension(archivo.filename)
+            mimetype_valido = archivo.mimetype in ALLOWED_MIMETYPES
+
+            if not extension_valida or not mimetype_valido:
+                archivos_invalidos.append(archivo.filename)
+
+        if archivos_invalidos:
+            nombres_erroneos = ", ".join(archivos_invalidos)
+            raise ValidationError(
+                f"Formatos de archivo no permitidos para: {nombres_erroneos}. "
+                f"Solo se permite: {', '.join(ALLOWED_EXTENSIONS)}",
+                field_name="files"
+            )
+
+
+class EquipmentFileOut(BaseSchema):
+    id = Integer()
+    title = String()
+    description = String()
+    original_name = String(data_key='originalName')
+    size = Function(lambda data: format_file_size(data.size))
+    extension = String()
+    path = String()
+    sort_order = Integer(data_key='sortOrder')
+
+
+class EquipmentFilesOut(BaseSchema):
+    items = List(Nested(EquipmentFileOut))
+    total = Integer()
+
+
+class EquipmentFileOrderIn(BaseSchema):
+    new_sort_order = Integer(data_key='newSortOrder')
 
 
 class EquipmentOut(BaseSchema):
@@ -108,24 +167,12 @@ class EquipmentOut(BaseSchema):
     model = String()
     reference = String()
     main_picture = String(data_key='mainPicture')
+    extension = String()
     status = String()
     created_at = DateTime(data_key='createdAt')
     updated_at = DateTime(data_key='updatedAt')
 
 
-class EquipmentsOut(Schema):
+class EquipmentsOut(BaseSchema):
     items = List(Nested(EquipmentOut))
     total = Integer()
-
-
-class EquipmentFileOut(Schema):
-    id = Integer()
-    original_name = String(data_key='originalName')
-    size = String(data_key='size')
-    extension = String()
-    path = String()
-    is_main = String(data_key='isMain')
-
-
-class EquipmentFilesOut(Schema):
-    equipment_files = List(Nested(EquipmentFileOut), data_key='equipmentFiles')

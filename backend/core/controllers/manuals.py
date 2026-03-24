@@ -1,80 +1,118 @@
-from flask_jwt_extended import jwt_required
-from core.app import db
+from flask_babel import gettext
 from core.services import manuals
+from core.schemas.utils import Message
 from apiflask import APIBlueprint, abort
-from core.schemas.utils import Message, Pagination
-from core.schemas.manuals import ManualInUpdate, ManualInCreate, ManualOut, ManualsOut
+from flask_jwt_extended import jwt_required
+from core.schemas.manuals import (
+    ManualOut,
+    ManualsCreateIn,
+    ManualsIn,
+    ManualsOut,
+    ManualsSearch,
+    ManualTypesSearch,
+    ManualTypesOut
+)
 
 
 bp = APIBlueprint('manuals', __name__)
 
 
-@bp.get('/')
-@bp.input(Pagination, location='query')
+@bp.post('/search')
+@jwt_required()
+@bp.input(ManualsSearch)
 @bp.output(ManualsOut)
-@jwt_required()
-def get_manuals(query_data):
-    '''Get manuals'''
+def search_manuals(json_data: dict):
+    '''Search manuals'''
 
     try:
-        results = manuals.get_manuals(query_data['search'],
-                                         query_data['page'],
-                                         query_data['per_page'])
-        return {'items': results, 'total': results.total}
+        items, total = manuals.search_manuals(
+            equipment_id=json_data['equipment_id'],
+            title=json_data['title'],
+            description=json_data['description'],
+            manual_type_id=json_data['manual_type_id'],
+            original_name=json_data['original_name'],
+            extension=json_data['extension'],
+            page=json_data['page'],
+            per_page=json_data['per_page'],
+            sort_by=json_data['sort_by'],
+        )
+        return {'items': items, 'total': total}
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
-@bp.get('/<int:manual_id>')
-@bp.output(ManualOut)
+@bp.post('')
 @jwt_required()
-def get_manual(manual_id):
-    '''Get manual'''
-
-    try:
-        return manuals.get_manual_by_id(manual_id)
-    except Exception as ex:
-        abort(500, str(ex))
-
-
-@bp.post('/')
-@bp.input(ManualInCreate, arg_name='manual')
-@jwt_required()
-def create_manuals(manual):
+@bp.input(ManualsCreateIn, location='form_and_files')
+@bp.output(Message)
+def create_manuals(form_and_files_data: dict):
     '''Create manuals'''
 
     try:
-        db.session.add(manual)
-        db.session.commit()
-        return {'message': 'Manual registered successfully'}
+        manuals.create_manual(form_and_files_data)
+        return {'message': gettext('manualCreated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
+
+
+@bp.get('/<int:manual_id>')
+@jwt_required()
+@bp.output(ManualOut)
+def get_manual(manual_id: int):
+    '''Get manual'''
+
+    try:
+        return manuals.get_manual(
+            manual_id=manual_id
+        )
+    except Exception as ex:
+        abort(500, gettext('abortException'))
 
 
 @bp.put('/<int:manual_id>')
-@bp.input(ManualInUpdate)
-@bp.output(Message)
 @jwt_required()
-def update_manuals(manual_id, json_data):
-    '''Update manuals'''
+@bp.input(ManualsIn)
+@bp.output(Message)
+def update_manual(manual_id: int, json_data: dict):
+    '''Update Manual'''
+
     try:
-        manuals.update_manual(manual_id, json_data)
-        return {'message': 'Manual updated successfully'}
+        manuals.update_manual(
+            manual_id=manual_id,
+            data=json_data
+        )
+        return {'message': gettext('manualUpdated')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.delete('/<int:manual_id>')
-@bp.output(Message)
 @jwt_required()
-def delete_manuals(manual_id):
-    '''Delete manuals'''
+@bp.output(Message)
+def delete_manual(manual_id: int):
+    '''Delete Manual'''
 
     try:
         manuals.delete_manual(manual_id)
-        return {'message': 'Manual deleted successfully'}
+        return {'message': gettext('manualDeleted')}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
+
+
+@bp.post('/types/search')
+@jwt_required()
+@bp.input(ManualTypesSearch)
+@bp.output(ManualTypesOut)
+def search_manual_types(json_data: dict):
+    '''Search manual types'''
+
+    try:
+        items, total = manuals.search_manual_types(
+            name=json_data['name'],
+            slug=json_data['slug'],
+            page=json_data['page'],
+            per_page=json_data['per_page']
+        )
+        return {'items': items, 'total': total}
+    except Exception as ex:
+        abort(500, gettext('abortException'))

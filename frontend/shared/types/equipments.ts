@@ -9,3 +9,11 @@ export interface EquipmentSearch extends Pagination {
   modelReference?: string
   withPicture?: boolean
 }
+
+export interface EquipmentFilesSearch extends Pagination {
+  equipmentId?: number
+  title?: string
+  description?: string
+  originalName?: string
+  extension?: string
+}

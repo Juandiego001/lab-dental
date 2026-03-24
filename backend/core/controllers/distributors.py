@@ -1,9 +1,14 @@
+from http.client import HTTPException
+
 from core.services import distributors
 from apiflask import APIBlueprint, abort
 from flask_jwt_extended import jwt_required, current_user
 from core.schemas.clients import ClientsOut
 from core.schemas.utils import Message, Pagination
-from core.schemas.distributors import DistributorInUpdate, DistributorInCreate, DistributorOut, DistributorSearch, DistributorsOut
+from core.schemas.distributors import (
+    ContactInCreate, ContactOut, DistributorIn, DistributorOut, DistributorSearch, DistributorsOut, ContactSearch, ContactsOut,
+    ContactIn
+)
 from flask_babel import gettext
 
 
@@ -57,7 +62,7 @@ def get_clients_by_distributor(distributor_id, query_data):
 
 
 @bp.post('/')
-@bp.input(DistributorInCreate, arg_name='distributor')
+@bp.input(DistributorIn, arg_name='distributor')
 @jwt_required()
 def create_distributors(distributor):
     '''Create distributors'''
@@ -66,12 +71,11 @@ def create_distributors(distributor):
         distributors.create_distributor(distributor)
         return {'message': gettext('distributorCreated')}
     except Exception as ex:
-        print(gettext('abortException'))
         abort(500, gettext('abortException'))
 
 
 @bp.put('/<int:distributor_id>')
-@bp.input(DistributorInUpdate)
+@bp.input(DistributorIn)
 @bp.output(Message)
 @jwt_required()
 def update_distributors(distributor_id, json_data):
@@ -80,7 +84,6 @@ def update_distributors(distributor_id, json_data):
         distributors.update_distributor(distributor_id, json_data)
         return {'message': gettext('distributorUpdated')}
     except Exception as ex:
-        print(gettext('abortException'))
         abort(500, gettext('abortException'))
 
 
@@ -94,5 +97,83 @@ def delete_distributors(distributor_id):
         distributors.delete_distributor(distributor_id)
         return {'message': gettext('distributorDeleted')}
     except Exception as ex:
-        print(gettext('abortException'))
+        abort(500, gettext('abortException'))
+
+
+@bp.post('/contacts/search')
+@bp.input(ContactSearch)
+@bp.output(ContactsOut)
+@jwt_required()
+def search_contacts(json_data: dict):
+    '''Search contacts'''
+
+    try:
+        results, total = distributors.search_contacts(
+            distributor_id=json_data['distributor_id'],
+            full_name=json_data['full_name'],
+            email=json_data['email'],
+            phone=json_data['phone'],
+            page=json_data['page'],
+            per_page=json_data['per_page'],
+            sort_by=json_data['sort_by'])
+        return {'items': results, 'total': total}
+    except Exception as ex:
+        abort(500, gettext('abortException'))
+
+
+@bp.get('/contacts/<int:contact_id>')
+@bp.output(ContactOut)
+@jwt_required()
+def get_contact(contact_id: int):
+    '''Get contact by id'''
+
+    try:
+        return distributors.get_contact_by_id(contact_id)
+    except Exception as ex:
+        abort(500, gettext('abortException'))
+
+
+@bp.post('/contacts')
+@bp.input(ContactInCreate)
+@bp.output(Message)
+@jwt_required()
+def create_contacts(json_data: dict):
+    '''Create contacts'''
+
+    try:
+        distributors.create_contacts(json_data)
+        return {'message': gettext('contactCreated')}
+    except Exception as ex:
+        abort(500, gettext('abortException'))
+
+
+@bp.put('/contacts/<int:contact_id>')
+@bp.input(ContactIn)
+@bp.output(Message)
+@jwt_required()
+def update_contacts(contact_id: int, json_data: dict):
+    '''Update contacts'''
+
+    try:
+        distributors.update_contacts(
+            contact_id=contact_id,
+            data=json_data
+        )
+        return {'message': gettext('contactUpdated')}
+    except HTTPException as ex:
+        abort(400, str(ex))
+    except Exception as ex:
+        abort(500, gettext('abortException'))
+
+
+@bp.delete('/contacts/<int:contact_id>')
+@bp.output(Message)
+@jwt_required()
+def delete_contact(contact_id: int):
+    '''Delete contact by id'''
+
+    try:
+        distributors.delete_contact_by_id(contact_id)
+        return {'message': gettext('contactDeleted')}
+    except Exception as ex:
         abort(500, gettext('abortException'))

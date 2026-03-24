@@ -71,7 +71,6 @@ def update_installations(installation_id, form_and_files_data):
         installations.notify_update(installation_id)
         return {'message': gettext('installationUpdated')}
     except Exception as ex:
-        print(ex)
         abort(500, gettext('abortException'))
 
 
@@ -99,7 +98,6 @@ def approve_installation(installation_id):
         installations.notify_approval(installation_id)
         return {'message': gettext('installationApproved')}
     except Exception as ex:
-        print(ex)
         abort(500, gettext('abortException'))
 
 
@@ -116,5 +114,4 @@ def reject_installation(installation_id, json_data):
             installation_id, json_data['reject_comments'])
         return {'message': gettext('installationRejected')}
     except Exception as ex:
-        print(ex)
         abort(500, gettext('abortException'))

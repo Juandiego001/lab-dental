@@ -1,3 +1,4 @@
+from flask_babel import gettext
 from flask_jwt_extended import jwt_required
 from core.app import db
 from core.services import warranties
@@ -19,11 +20,11 @@ def get_warranties(query_data):
 
     try:
         results = warranties.get_warranties(query_data['search'],
-                                         query_data['page'],
-                                         query_data['per_page'])
+                                            query_data['page'],
+                                            query_data['per_page'])
         return {'items': results, 'total': results.total}
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.get('/<int:warranty_id>')
@@ -35,7 +36,7 @@ def get_warranty(warranty_id):
     try:
         return warranties.get_warranty_by_id(warranty_id)
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/')
@@ -49,8 +50,7 @@ def create_warranties(warranty):
         db.session.commit()
         return {'message': 'warranty registered successfully'}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.put('/<int:warranty_id>')
@@ -63,8 +63,7 @@ def update_warranties(warranty_id, json_data):
         warranties.update_warranty(warranty_id, json_data)
         return {'message': 'Warranty updated successfully'}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.delete('/<int:warranty_id>')
@@ -77,5 +76,4 @@ def delete_warranties(warranty_id):
         warranties.delete_warranty(warranty_id)
         return {'message': 'Warranty deleted successfully'}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))

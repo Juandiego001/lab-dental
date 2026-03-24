@@ -1,3 +1,4 @@
+import math
 import os
 import ssl
 import base64
@@ -121,3 +122,21 @@ def process_file(file: FileStorage):
     extension: str = os.path.splitext(filename)[1]
     extension = extension.lower()
     return mimetype, extension, filename, size
+
+
+def format_file_size(bytes_size):
+    '''Format File Size'''
+
+    if not bytes_size or bytes_size <= 0:
+        return '0 Bytes'
+
+    k = 1024
+    decimals = 2
+    sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
+    i = math.floor(math.log(bytes_size) / math.log(k))
+    i = min(i, len(sizes) - 1)
+    valor = round(bytes_size / (k ** i), decimals)
+    if valor == int(valor):
+        valor = int(valor)
+
+    return f"{valor} {sizes[i]}"

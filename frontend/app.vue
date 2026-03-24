@@ -14,7 +14,11 @@ html {
   overflow-y: auto;
 }
 
-.v-input:not(:has(input:focus)) .v-input__details {
+.v-input:not(:has(input:focus, textarea:focus)) .v-input__details {
+  display: none;
+}
+
+.v-input__control:not(:has(textarea:focus)) .v-input__details {
   display: none;
 }
 

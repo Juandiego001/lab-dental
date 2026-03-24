@@ -57,7 +57,6 @@ def create_sites(site_and_address):
         sites.create_site(current_user, site, address)
         return {'message': gettext('siteCreated')}
     except Exception as ex:
-        print(gettext('abortException'))
         abort(500, gettext('abortException'))
 
 
@@ -77,7 +76,6 @@ def update_sites(site_id, site_and_address):
         db.session.commit()
         return {'message': gettext('siteUpdated')}
     except Exception as ex:
-        print(gettext('abortException'))
         abort(500, gettext('abortException'))
 
 
@@ -91,5 +89,4 @@ def delete_sites(site_id):
         sites.delete_site(site_id)
         return {'message': gettext('siteDeleted')}
     except Exception as ex:
-        print(gettext('abortException'))
         abort(500, gettext('abortException'))

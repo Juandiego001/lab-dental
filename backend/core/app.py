@@ -58,6 +58,11 @@ users_full_route = base_route / users_files_folder
 if not users_full_route.exists():
     users_full_route.mkdir(parents=True, exist_ok=True)
 
+users_files_folder = "manuals_files"
+users_full_route = base_route / users_files_folder
+if not users_full_route.exists():
+    users_full_route.mkdir(parents=True, exist_ok=True)
+
 
 if ENV == 'development':
     app.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']

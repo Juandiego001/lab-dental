@@ -223,6 +223,13 @@
   "distributors": {
     "title": "Distribuidor | Distribuidores",
     "name": "Nombre",
+    "notes": "Notas",
+    "emails": {
+      "title": "Correo | Correos electrónicos"
+    },
+    "phones": {
+      "title": "Teléfono | Teléfonos"
+    },
     "create": {
       "title": "Crear distribuidor"
     },
@@ -240,11 +247,35 @@
       "nameRequired": "El nombre es requerido"
     }
   },
+  "contacts": {
+    "title": "Contactos",
+    "fullName": "Nombre",
+    "email": "Correo",
+    "phone": "Teléfono",
+    "create": {
+      "title": "Crear Contacto"
+    },
+    "update": {
+      "title": "Actualizar Contacto"
+    },
+    "search": {
+      "title": "Buscar Contacto"
+    },
+    "delete": {
+      "title": "Eliminar Contacto",
+      "message": "¿Está seguro que desea eliminar el contacto?"
+    },
+    "rules": {
+      "fullNameRequired": "El nombre es requerido"
+    }
+  },
   "sites": {
     "title": "Sede | Sedes",
     "name": "Nombre",
     "address": "Dirección",
     "distributorClient": "Distribuidor/Cliente",
+    "distributorsSite": "Sede Distribuidor",
+    "clientsSite": "Sede Cliente",
     "create": {
       "title": "Crear sede",
       "companyType": "Para distribuidores o clientes",
@@ -408,21 +439,35 @@
     "title": "Equipo | Equipos",
     "model": "Modelo",
     "reference": "Referencia",
-    "media": {
+    "files": {
+      "title": "Archivos del equipo",
+      "labelTitle": "Título",
+      "description": "Descripción",
+      "files": "Archivos",
       "filename": "Archivo",
       "size": "Tamaño",
       "extension": "Extensión",
-      "description": "Asocie una imagen principal, imágenes secundarias y videos al equipo.",
-      "main": "Imagen Principal",
-      "secondary": "Imagenes Secundarias",
-      "videos": "Videos",
+      "videoNotSupported": "Tu navegador no soporta el elemento de video",
+      "create": {
+        "title": "Agregar Archivos"
+      },
+      "update": {
+        "title": "Actualizar Archivo"
+      },
       "delete": {
         "title": "Eliminar archivos",
         "message": "¿Está seguro que desea eliminar el archivo?"
+      },
+      "search": {
+        "title": "Buscar Archivos"
+      },
+      "rules": {
+        "invalidFileType": "Solo se permiten archivos de video mp4 o imágenes",
+        "filesRequired": "Por lo menos un archivo es requerido"
       }
     },
     "create": {
-      "title": "Create equipo"
+      "title": "Crear equipo"
     },
     "update": {
       "title": "Actualizar equipo"
@@ -432,8 +477,7 @@
       "message": "¿Está seguro que desea eliminar el equipo?"
     },
     "search": {
-      "title": "Buscar equipo",
-      "fields": "Modelo, referencia o ID"
+      "title": "Buscar equipo"
     },
     "rules": {
       "brandRequired": "La marca es requerida",
@@ -458,8 +502,7 @@
     },
     "search": {
       "title": "Buscar parte",
-      "message": "Buscar parte por serial o ID",
-      "fields": "Serial o ID"
+      "message": "Buscar parte por serial o ID"
     },
     "rules": {
       "serialRequired": "El serial es requerido",
@@ -494,6 +537,12 @@
       "title": "Comentarios de rechazo",
       "description": "Agrega los motivos de rechazo..."
     },
+    "statuses": {
+      "title": "Estados",
+      "active": "Activo",
+      "approved": "Aprobado",
+      "rejected": "Rechazado"
+    },
     "rules": {
       "equipmentRequired": "El equipo es requerido",
       "distributorRequired": "El distribuidor es requerido",
@@ -522,8 +571,7 @@
     },
     "search": {
       "title": "Buscar motivo",
-      "message": "Buscar motivo por name, slug o ID",
-      "fields": "Nombre, slug o ID"
+      "message": "Buscar motivo por name, slug o ID"
     },
     "rules": {
       "nameRequired": "El nombre es requerido",
@@ -547,8 +595,7 @@
     },
     "search": {
       "title": "Buscar garantía",
-      "message": "Buscar garantía por factura o ID",
-      "fields": "Factura o ID"
+      "message": "Buscar garantía por factura o ID"
     },
     "rules": {
       "invoiceRequired": "La factura es requerida",
@@ -558,9 +605,14 @@
   },
   "manuals": {
     "title": "Manual | Manuales",
-    "name": "Nombre",
-    "file": "Archivo",
-    "type": "Tipo",
+    "labelTitle": "Título",
+    "description": "Descripción",
+    "file": {
+      "title": "Archivo",
+      "size": "Tamaño",
+      "extension": "Extensión"
+    },
+    "manualType": "Tipo de manual",
     "create": {
       "title": "Crear manual"
     },
@@ -573,12 +625,12 @@
     },
     "search": {
       "title": "Buscar manual",
-      "message": "Buscar manual por nombre, tipo o ID",
-      "fields": "Nombre, tipo o ID"
+      "message": "Buscar manual por nombre, tipo o ID"
     },
     "rules": {
-      "nameRequired": "El nombre es requerido",
+      "titleRequired": "El título es requerido",
       "fileRequired": "El archivo es requerido",
+      "invalidFileType": "Solo se permiten archivos PDF, word o imágenes",
       "typeRequired": "El tipo es requerido"
     }
   },
@@ -601,8 +653,7 @@
     },
     "search": {
       "title": "Buscar lista",
-      "message": "Buscar lista por nombre, tipo o ID",
-      "fields": "Nombre, tipo o ID"
+      "message": "Buscar lista por nombre, tipo o ID"
     },
     "rules": {
       "nameRequired": "El nombre es requerido",
@@ -614,6 +665,7 @@
   "states": "Estado | Estados",
   "cities": "Ciudad | Ciudades",
   "confirm": "Confirmar",
+  "register": "Registrar",
   "approve": "Aprobar",
   "reject": "Rechazar",
   "email": "Correo",

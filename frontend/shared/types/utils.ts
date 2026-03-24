@@ -13,3 +13,8 @@ export interface Pagination {
   perPage: number
   sortBy?: SortBy
 }
+
+
+export interface Message {
+  message: string
+}

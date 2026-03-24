@@ -17,6 +17,12 @@
           <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
             :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
             @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
+            <template v-slot:item.siteType="{ item }">
+              <p class="d-inline-block py-1 px-2 rounded-lg text-caption"
+                :class="item.distributorId ? 'bg-primary' : 'bg-secondary'">
+                {{ item.distributorId ? $t('distributors.title') : $t('clients.title') }}
+              </p>
+            </template>
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
                 <v-btn v-if="$ability.can('update', 'sites')" class="my-2 bg-primary" size="small" icon="mdi-pencil"
@@ -101,7 +107,8 @@
                 counter="50" maxlength="50" />
             </v-col>
             <v-col class="text-end">
-              <v-btn variant="outlined" @click="createDialog = false" @mousedown.prevent :disabled="loading">{{ $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="createDialog = false" @mousedown.prevent :disabled="loading">{{
+                $t('cancel') }}</v-btn>
               <span class="mx-1"></span>
               <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('confirm') }}</v-btn>
             </v-col>
@@ -124,9 +131,9 @@
       <v-card-text>
         <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateSite">
           <v-row dense>
-            <v-col class="pb-0" cols="12">
+            <v-col cols="12">
               <p class="text-body-2 font-bold text-primary text-decoration-underline">
-                {{ form.companyType === 'distributors' ? 'Distributors Site' : 'Clients Site' }}
+                {{ form.companyType === 'distributors' ? $t('sites.distributorsSite') : $t('sites.clientsSite') }}
               </p>
             </v-col>
             <template v-if="isAdmin && form.companyType === 'distributors'">
@@ -179,7 +186,8 @@
                 counter="50" maxlength="50" />
             </v-col>
             <v-col class="text-end">
-              <v-btn variant="outlined" @click="updateDialog = false" @mousedown.prevent :disabled="loading">{{ $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="updateDialog = false" @mousedown.prevent :disabled="loading">{{
+                $t('cancel') }}</v-btn>
               <span class="mx-1"></span>
               <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('confirm') }}</v-btn>
             </v-col>
@@ -326,7 +334,8 @@ const itemsPerPageOptions = computed(() => [
 
 const headers = computed(() => [
   { title: t('sites.name'), key: 'name' },
-  { title: t('sites.distributorClient'), key: 'distributorClient' },
+  { title: t('sites.distributorClient'), key: 'distributorClient', align: 'center' },
+  { key: 'siteType', align: 'center', sortable: false },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 

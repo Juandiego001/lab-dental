@@ -21,6 +21,9 @@
   - [ADDRESSES](#addresses)
   - [SITES](#sites)
   - [DISTRIBUTORS](#distributors)
+  - [DISTRIBUTORS EMAILS](#distributors-emails)
+  - [DISTRIBUTORS PHONES](#distributors-phones)
+  - [CONTACTS](#contacts)
   - [DISTRIBUTORS LISTS](#distributors-lists)
   - [LISTS](#lists)
   - [USERS LISTS](#users-lists)
@@ -42,6 +45,7 @@
   - [EQUIPMENTS FILES](#equipments-files)
   - [MANUALS TYPES](#manuals-types)
   - [MANUALS](#manuals)
+  - [MANUALS FILES](#manuals-files)
 
 <div class="page"/>
 
@@ -63,6 +67,9 @@ erDiagram
 
 ```mermaid
 erDiagram
+    DISTRIBUTORS ||--o{ CONTACTS : has
+    DISTRIBUTORS ||--o{ DISTRIBUTORS_EMAILS : has
+    DISTRIBUTORS ||--o{ DISTRIBUTORS_PHONES : has
     DISTRIBUTORS ||--o{ CLIENTS : has
     DISTRIBUTORS ||--o{ SITES : has
     CLIENTS ||--o{ SITES : has
@@ -100,9 +107,12 @@ erDiagram
     EQUIPMENTS ||--o{ SPECIFICATIONS : has
     EQUIPMENTS ||--o{ MANUALS : has
     MANUALS_TYPES ||--o{ MANUALS : has
+    MANUALS ||--o| MANUALS_FILES : has
     CATEGORIES ||--o{ REASONS : has
     REASONS ||--o{ WARRANTIES : has
 ```
+
+<div class="page" />
 
 ## Diagrama de relaciones V - Installations
 
@@ -213,6 +223,60 @@ erDiagram
     DISTRIBUTORS {
         int id PK, UK "AUTO_INCREMENT, NN"
         string name UK "NN"
+        text notes "N"
+        string status "NN"
+        date created_at "NN"
+        date updated_at "NN"
+    }
+```
+
+<div class="page" />
+
+### DISTRIBUTORS EMAILS
+
+```mermaid
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '12px', 'entityPadding': '5' }}}%%
+erDiagram
+    DISTRIBUTORS_EMAILS {
+        int id PK, UK "AUTO_INCREMENT, NN"
+        int distributor_id FK
+        string email UK "NN"
+        string status "NN"
+        date created_at "NN"
+        date updated_at "NN"
+    }
+```
+
+<div class="page" />
+
+### DISTRIBUTORS PHONES
+
+```mermaid
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '12px', 'entityPadding': '5' }}}%%
+erDiagram
+    DISTRIBUTORS_PHONES {
+        int id PK, UK "AUTO_INCREMENT, NN"
+        int distributor_id FK
+        string phone UK "NN"
+        string status "NN"
+        date created_at "NN"
+        date updated_at "NN"
+    }
+```
+
+<div class="page" />
+
+### CONTACTS
+
+```mermaid
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '12px', 'entityPadding': '5' }}}%%
+erDiagram
+    CONTACTS {
+        int id PK, UK "AUTO_INCREMENT, NN"
+        string full_name "NN"
+        string email UK "N"
+        string phone "N"
+        text notes "N"
         string status "NN"
         date created_at "NN"
         date updated_at "NN"
@@ -556,6 +620,7 @@ erDiagram
         string mimetype "NN"
         string size "NN"
         boolean is_main "NN"
+        integer sort_order "NN"
         string status "NN"
         date created_at "NN"
         date updated_at "NN"
@@ -589,9 +654,30 @@ erDiagram
         int id PK, UK "AUTO_INCREMENT, NN"
         int equipment_id FK "NN"
         int manual_type_id FK "NN"
-        string name "NN"
-        string path "NN"
+        string title "N"
+        string description "N"
+        date created_at "NN"
+        date updated_at "NN"
+    }
+```
+
+<div class="page" />
+
+### MANUALS FILES
+
+```mermaid
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '12px', 'entityPadding': '5' }}}%%
+erDiagram
+    MANUALS_FILES {
+        int id PK, UK "AUTO_INCREMENT, NN"
+        int manual_id FK "NN"
         string original_name "NN"
+        string hash_name "NN"
+        string path "NN"
+        string extension "NN"
+        string mimetype "NN"
+        string size "NN"
+        string status "NN"
         date created_at "NN"
         date updated_at "NN"
     }

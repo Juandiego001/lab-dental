@@ -1,5 +1,6 @@
 <template>
   <v-container fluid class="fill-height align-start">
+    <Contacts />
     <v-card width="100%" flat>
       <v-card-title class="d-flex justify-space-between">
         <p>{{ $t('distributors.title', 2) }}</p>
@@ -21,7 +22,9 @@
               <div class="d-flex align-center justify-center ga-2">
                 <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getDistributor(item.id)" />
                 <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                  @click="form.id = item.id; deleteDialog = true" @update:sort-by="v => sortBy = v" />
+                  @click="form.id = item.id; deleteDialog = true" />
+                <v-btn class="my-2 bg-secondary" size="small" icon="mdi-account-box"
+                  @click="async () => { distributorId = item.id; await getContacts({}); dialog = true }" />
               </div>
             </template>
           </v-data-table-server>
@@ -47,6 +50,50 @@
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('distributors.name')"
                 :rules="[nameRequired]" counter="50" maxlength="50" />
             </v-col>
+
+            <!-- Emails -->
+            <v-col cols="12">
+              <div class="d-flex align-center">
+                <span class="text-subtitle-2 text-primary">{{ $t('distributors.emails.title', 2) }}</span>
+                <v-spacer />
+                <v-btn color="primary" variant="text" size="x-small" icon="mdi-plus" @mousedown.prevent
+                  @click="addEmailField" />
+              </div>
+
+              <v-slide-y-transition group>
+                <div v-for="(emailObj, index) in form.emails.filter(e => e.status !== 'INACTIVE')" :key="index"
+                  class="mb-2">
+                  <v-text-field v-if="emailObj.status == 'ACTIVE'" v-model="emailObj.email" hide-details="auto"
+                    :label="`${$t('distributors.emails.title')} ${index + 1}`" type="email" append-icon="mdi-delete"
+                    @click:append="removeEmailField(index)" counter="150" maxlength="150" />
+                </div>
+              </v-slide-y-transition>
+            </v-col>
+
+            <!-- Phones -->
+            <v-col cols="12">
+              <div class="d-flex align-center">
+                <span class="text-subtitle-2 text-primary">{{ $t('distributors.phones.title', 2) }}</span>
+                <v-spacer />
+                <v-btn color="primary" variant="text" size="x-small" icon="mdi-plus" @mousedown.prevent
+                  @click="addPhoneField" />
+              </div>
+
+              <v-slide-y-transition group>
+                <div v-for="(phoneObj, index) in form.phones.filter(e => e.status !== 'INACTIVE')" :key="index"
+                  class="mb-2">
+                  <v-text-field v-if="phoneObj.status == 'ACTIVE'" v-model="phoneObj.phone" hide-details="auto"
+                    :label="`${$t('distributors.phones.title')} ${index + 1}`" append-icon="mdi-delete"
+                    @click:append="removePhoneField(index)" counter="20" maxlength="20" />
+                </div>
+              </v-slide-y-transition>
+            </v-col>
+
+            <v-col cols="12" class="mb-2">
+              <v-textarea v-model="form.notes" hide-details="auto" :label="$t('distributors.notes')" counter="200"
+                maxlength="200" no-resize />
+            </v-col>
+
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false" @mousedown.prevent :disabled="loading">{{
                 $t('cancel') }}</v-btn>
@@ -76,6 +123,50 @@
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('distributors.name')"
                 :rules="[nameRequired]" counter="50" maxlength="50" />
             </v-col>
+
+            <!-- Emails -->
+            <v-col cols="12">
+              <div class="d-flex align-center">
+                <span class="text-subtitle-2 text-primary">{{ $t('distributors.emails.title', 2) }}</span>
+                <v-spacer />
+                <v-btn color="primary" variant="text" size="x-small" icon="mdi-plus" @mousedown.prevent
+                  @click="addEmailField" />
+              </div>
+
+              <v-slide-y-transition group>
+                <div v-for="(emailObj, index) in form.emails.filter(e => e.status !== 'INACTIVE')" :key="index"
+                  class="mb-2">
+                  <v-text-field v-if="emailObj.status == 'ACTIVE'" v-model="emailObj.email" hide-details="auto"
+                    :label="`${$t('distributors.emails.title')} ${index + 1}`" type="email" append-icon="mdi-delete"
+                    @click:append="removeEmailField(index)" counter="150" maxlength="150" />
+                </div>
+              </v-slide-y-transition>
+            </v-col>
+
+            <!-- Phones -->
+            <v-col cols="12">
+              <div class="d-flex align-center">
+                <span class="text-subtitle-2 text-primary">{{ $t('distributors.phones.title', 2) }}</span>
+                <v-spacer />
+                <v-btn color="primary" variant="text" size="x-small" icon="mdi-plus" @mousedown.prevent
+                  @click="addPhoneField" />
+              </div>
+
+              <v-slide-y-transition group>
+                <div v-for="(phoneObj, index) in form.phones.filter(e => e.status !== 'INACTIVE')" :key="index"
+                  class="mb-2">
+                  <v-text-field v-if="phoneObj.status == 'ACTIVE'" v-model="phoneObj.phone" hide-details="auto"
+                    :label="`${$t('distributors.phones.title')} ${index + 1}`" append-icon="mdi-delete"
+                    @click:append="removePhoneField(index)" counter="20" maxlength="20" />
+                </div>
+              </v-slide-y-transition>
+            </v-col>
+
+            <v-col cols="12" class="mb-2">
+              <v-textarea v-model="form.notes" hide-details="auto" :label="$t('distributors.notes')" counter="200"
+                maxlength="200" no-resize />
+            </v-col>
+
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false" @mousedown.prevent :disabled="loading">{{
                 $t('cancel') }}</v-btn>
@@ -95,7 +186,7 @@
         <v-row no-gutters align="center">
           {{ $t('distributors.delete.title') }}
           <v-spacer />
-          <v-btn class="bg-primary" icon="mdi-close" @click="deleteDialog = false" />
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="deleteDialog = false" />
         </v-row>
       </v-card-title>
       <v-card-text class="text-center py-6">
@@ -146,6 +237,7 @@ const { notify } = useSnackbar();
 const { $ability } = useNuxtApp();
 const { t } = useI18n();
 const { items, total, getDistributors } = useDistributors();
+const { distributorId, dialog, getContacts } = useContacts();
 
 definePageMeta({
   layout: 'app',
@@ -159,17 +251,22 @@ useHead({
 const loading = ref(false);
 const searchDialog = ref(false);
 const createDialog = ref(false);
+
 const page = ref(1);
 const perPage = ref(15);
 const sortBy = ref(null);
+
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
+
 const createModel = ref(false);
 const updateModel = ref(false);
 const createForm = ref();
 const updateForm = ref();
 const form = ref({
-  name: ''
+  name: '',
+  emails: [],
+  phones: [],
 })
 const searchForm = ref({
   name: ''
@@ -230,7 +327,9 @@ onBeforeMount(async () => {
 
 const resetForm = () => {
   form.value = {
-    name: ''
+    name: '',
+    emails: [],
+    phones: [],
   }
 }
 
@@ -318,6 +417,43 @@ const deleteDistributor = async () => {
   }
 }
 
+const addEmailField = () => {
+  if (updateDialog.value) {
+    const lastIndex = form.value.emails.findLastIndex(e => e.status === 'ACTIVE');
+    form.value.emails.splice(lastIndex + 1, 0, { email: '', status: 'ACTIVE' });
+  } else {
+    form.value.emails.push({ email: '', status: 'ACTIVE' });
+  }
+}
+
+const removeEmailField = (index) => {
+  if (form.value.emails.length <= 0) return;
+
+  const deletedEmail = form.value.emails.splice(index, 1)[0];
+  if (updateDialog.value && deletedEmail.id) {
+    deletedEmail.status = 'INACTIVE';
+    form.value.emails.push(deletedEmail);
+  }
+}
+
+const addPhoneField = () => {
+  if (updateDialog.value) {
+    const lastIndex = form.value.phones.findLastIndex(e => e.status === 'ACTIVE');
+    form.value.phones.splice(lastIndex + 1, 0, { phone: '', status: 'ACTIVE' })
+  } else {
+    form.value.phones.push({ phone: '', status: 'ACTIVE' });
+  }
+}
+
+const removePhoneField = (index) => {
+  if (form.value.phones.length <= 0) return;
+
+  const deletedPhone = form.value.phones.splice(index, 1)[0];
+  if (updateDialog.value && deletedPhone.id) {
+    deletedPhone.status = 'INACTIVE';
+    form.value.phones.push(deletedPhone);
+  }
+}
 
 // Rules
 const nameRequired = (v) => !!v || t('distributors.rules.nameRequired');

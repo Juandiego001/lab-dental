@@ -1,8 +1,8 @@
-"""Initial Data
+"""Initial data
 
-Revision ID: 04cf7593aa67
-Revises: 531a61e47525
-Create Date: 2026-03-14 19:44:04.205723
+Revision ID: c6f86bdbd5c3
+Revises: ae19e10b308b
+Create Date: 2026-03-16 00:16:55.974576
 
 """
 from alembic import op
@@ -15,8 +15,8 @@ import pandas as pd
 
 
 # revision identifiers, used by Alembic.
-revision = '04cf7593aa67'
-down_revision = '531a61e47525'
+revision = 'c6f86bdbd5c3'
+down_revision = 'ae19e10b308b'
 branch_labels = None
 depends_on = None
 

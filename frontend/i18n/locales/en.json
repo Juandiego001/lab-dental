@@ -223,6 +223,13 @@
   "distributors": {
     "title": "Distributor | Distributors",
     "name": "Name",
+    "notes": "Notes",
+    "emails": {
+      "title": "Email | Distributor Emails"
+    },
+    "phones": {
+      "title": "Phone | Distributor Phones"
+    },
     "create": {
       "title": "Create distributor"
     },
@@ -240,11 +247,36 @@
       "nameRequired": "The name is required"
     }
   },
+  "contacts": {
+    "title": "Contacts",
+    "fullName": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "create": {
+      "title": "Create Contact"
+    },
+    "update": {
+      "title": "Update Contact"
+    },
+    "search": {
+      "title": "Search Contact"
+    },
+    "delete": {
+      "title": "Delete Contact",
+      "message": "Are you sure you want to delete the contact?"
+    },
+    "rules": {
+      "fullNameRequired": "Name required"
+    }
+  },
   "sites": {
     "title": "Site | Sites",
     "name": "Name",
     "address": "Address",
     "distributorClient": "Distributor/Client",
+    "distributorSite": "Distributors Site",
+    "clientsSite": "Clients Site",
+    "clientSite": "",
     "create": {
       "title": "Create site",
       "companyType": "For distributors or clients",
@@ -408,17 +440,31 @@
     "title": "Equipment | Equipments",
     "model": "Model",
     "reference": "Reference",
-    "media": {
+    "files": {
+      "title": "Equipment Files",
+      "labelTitle": "Title",
+      "description": "Description",
+      "files": "Files",
       "filename": "Filename",
       "size": "Size",
       "extension": "Extension",
-      "description": "Associate a main image, secondary images, and videos with the device.",
-      "main": "Main Picture",
-      "secondary": "Secondary Pictures",
-      "videos": "Videos",
+      "videoNotSupported": "Your browser does not support the video element",
+      "create": {
+        "title": "Add Equipment Files"
+      },
+      "update": {
+        "title": "Update Equipment File"
+      },
       "delete": {
-        "title": "Delete equipment media",
+        "title": "Delete Equipment File",
         "message": "Are you sure you want to delete the equipment file?"
+      },
+      "search": {
+        "title": "Search Equipment File"
+      },
+      "rules": {
+        "invalidFileType": "Only MP4 video files or images are allowed",
+        "filesRequired": "At least one file is required"
       }
     },
     "create": {
@@ -432,8 +478,7 @@
       "message": "Are you sure you want to delete the equipment?"
     },
     "search": {
-      "title": "Equipments search",
-      "fields": "Model, reference or ID"
+      "title": "Equipments search"
     },
     "rules": {
       "brandRequired": "The brand is required",
@@ -459,8 +504,7 @@
     },
     "search": {
       "title": "Parts search",
-      "message": "Search part by serial or ID",
-      "fields": "Serial or ID"
+      "message": "Search part by serial or ID"
     },
     "rules": {
       "serialRequired": "The serial is required",
@@ -495,6 +539,12 @@
       "title": "Reject comments",
       "description": "Add the reasons for rejection..."
     },
+    "statuses": {
+      "title": "Statuses",
+      "active": "Active",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
     "rules": {
       "equipmentRequired": "The equipment is required",
       "distributorRequired": "The distributor is required",
@@ -523,8 +573,7 @@
     },
     "search": {
       "title": "Reasons search",
-      "message": "Search reason by name, slug or ID",
-      "fields": "Name, slug or ID"
+      "message": "Search reason by name, slug or ID"
     },
     "rules": {
       "nameRequired": "The name is required",
@@ -548,8 +597,7 @@
     },
     "search": {
       "title": "Warranties search",
-      "message": "Search warranty by invoice or ID",
-      "fields": "Invoice or ID"
+      "message": "Search warranty by invoice or ID"
     },
     "rules": {
       "invoiceRequired": "The invoice is required",
@@ -559,9 +607,14 @@
   },
   "manuals": {
     "title": "Manual | Manuals",
-    "name": "Name",
-    "file": "File",
-    "type": "Type",
+    "labelTitle": "Title",
+    "description": "Description",
+    "file": {
+      "title": "File",
+      "size": "Size",
+      "extension": "Extension"
+    },
+    "manualType": "Manual Type",
     "create": {
       "title": "Create manual"
     },
@@ -574,13 +627,13 @@
     },
     "search": {
       "title": "Manuals search",
-      "message": "Search manual by name, type or ID",
-      "fields": "Name, type or ID"
+      "message": "Search manual by name, type or ID"
     },
     "rules": {
-      "nameRequired": "The name is required",
+      "titleRequired": "The title is required",
       "fileRequired": "The file is required",
-      "typeRequired": "The type is required"
+      "invalidFileType": "Only PDF, docx or images are allowed",
+      "typeRequired": "The manual type is required"
     }
   },
   "lists": {
@@ -602,8 +655,7 @@
     },
     "search": {
       "title": "Lists search",
-      "message": "Search list by name, type or ID",
-      "fields": "Name, type or ID"
+      "message": "Search list by name, type or ID"
     },
     "rules": {
       "nameRequired": "The name is required",
@@ -615,6 +667,8 @@
   "states": "State | States",
   "cities": "City | Cities",
   "confirm": "Confirm",
+  "add": "Add",
+  "register": "Register",
   "approve": "Approve",
   "reject": "Reject",
   "email": "Email",

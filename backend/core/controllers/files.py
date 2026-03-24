@@ -26,5 +26,4 @@ def get_file(query_data: str):
         else:
             return send_file(path)
     except Exception as ex:
-        print(ex)
         abort(500, gettext('abortException'))

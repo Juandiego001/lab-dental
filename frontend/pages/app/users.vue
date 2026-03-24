@@ -66,7 +66,7 @@
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.email" type="email" hide-details="auto" :label="$t('users.email')"
-                :rules="[emailRequired]" counter="250" maxlength="250" />
+                :rules="[emailRequired]" counter="150" maxlength="150" />
             </v-col>
             <v-col cols="12">
               <v-select v-model="form.language" item-title="title" item-value="value" hide-details="auto"
@@ -214,7 +214,7 @@
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="searchForm.email" :label="$t('users.email')" hide-details="auto" clearable
-                counter="250" maxlength="250" />
+                counter="150" maxlength="150" />
             </v-col>
 
             <!-- Search Button -->
@@ -401,10 +401,7 @@ const getUser = async (id) => {
     const user = await $api(`/api/users/${id}`, {
       method: 'GET'
     })
-    console.log({ user });
-
     form.value = user
-
     updateDialog.value = true;
   } catch (err) {
     notify(err, 'error');

@@ -39,10 +39,14 @@
         </client-only>
       </v-card-text>
       <v-card-actions class="w-100 d-flex align-center justify-end ga-2 flex-wrap">
-        <p class="text-body-2 rounded-lg bg-grey py-1 px-2">Installation statuses</p>
-        <p class="d-inline-block py-1 px-2 rounded-lg bg-primary text-caption">Active</p>
-        <p class="d-inline-block py-1 px-2 rounded-lg bg-success text-caption">Approved</p>
-        <p class="d-inline-block py-1 px-2 rounded-lg bg-error text-caption">Rejected</p>
+        <p class="text-body-2 rounded-lg bg-grey py-1 px-2">{{ $t("installations.statuses.title") }}</p>
+        <p class="d-inline-block py-1 px-2 rounded-lg bg-primary text-caption">{{ $t("installations.statuses.active") }}
+        </p>
+        <p class="d-inline-block py-1 px-2 rounded-lg bg-success text-caption">
+          {{ $t("installations.statuses.approved") }}
+        </p>
+        <p class="d-inline-block py-1 px-2 rounded-lg bg-error text-caption">{{ $t("installations.statuses.rejected") }}
+        </p>
       </v-card-actions>
     </v-card>
   </v-container>
@@ -67,7 +71,8 @@
                   if (!createDialog) return;
                   getEquipments({
                     equipmentId: form.equipmentId,
-                    modelReference
+                    modelReference,
+                    withPicture: false
                   })
                 }" />
             </v-col>
@@ -138,7 +143,7 @@
               <v-btn variant="outlined" @click="createDialog = false" @mousedown.prevent :disabled="loading">{{
                 $t('cancel') }}</v-btn>
               <span class="mx-1"></span>
-              <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('confirm') }}</v-btn>
+              <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('register') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -166,7 +171,8 @@
                   if (!updateDialog) return;
                   getEquipments({
                     equipmentId: form.equipmentId,
-                    modelReference
+                    modelReference,
+                    withPicture: false
                   })
                 }" />
             </v-col>
@@ -248,7 +254,7 @@
               <v-btn variant="outlined" @click="updateDialog = false" @mousedown.prevent :disabled="loading">{{
                 $t('cancel') }}</v-btn>
               <span class="mx-1" />
-              <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('confirm') }}</v-btn>
+              <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('register') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -402,7 +408,7 @@
             <v-col class="pb-4" cols="12">
               <v-autocomplete v-model="searchForm.equipmentId" :label="$t('equipments.title')" :items="equipments"
                 item-title="modelReference" item-value="id" hide-details="auto" clearable @update:search="(modelReference) => {
-                  getEquipments({ equipmentId: searchForm.equipmentId, modelReference })
+                  getEquipments({ equipmentId: searchForm.equipmentId, modelReference, withPicture: false })
                 }" />
             </v-col>
 
@@ -551,7 +557,7 @@ watch(createDialog, async (val) => {
     resetForm();
     return;
   }
-  await getEquipments({});
+  await getEquipments({ withPicture: false });
   if (isAdmin.value) {
     await getDistributors({});
   } else {
@@ -566,7 +572,7 @@ watch(updateDialog, async (val) => {
     resetForm();
     return;
   }
-  await getEquipments({ equipmentId: form.value.equipmentId });
+  await getEquipments({ equipmentId: form.value.equipmentId, withPicture: false });
   if (isAdmin.value) {
     await getDistributors({ distributorsIds: [form.value.distributorId] });
   }
@@ -585,7 +591,7 @@ watch(approvalDialog, async (val) => {
     resetForm();
     return;
   }
-  await getEquipments({ equipmentId: form.value.equipmentId });
+  await getEquipments({ equipmentId: form.value.equipmentId, withPicture: false });
   if (isAdmin.value) {
     await getDistributors({ distributorsIds: [form.value.distributorId] });
   }
@@ -601,6 +607,7 @@ watch(searchDialog, async (val) => {
   if (!val) return;
   getEquipments({
     equipmentId: searchForm.value.equipmentId,
+    withPicture: false
   });
   getDistributors({
     distributorsIds: [searchForm.value.distributorId]

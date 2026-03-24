@@ -69,10 +69,6 @@ const routes = ref([])
 const drawer = ref(true);
 const { profile } = useProfile();
 
-onBeforeMount(() => {
-  console.log({ profile })
-})
-
 const menu = ref([
   {
 

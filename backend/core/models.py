@@ -1,7 +1,7 @@
 import enum
 from core.app import db
 from bcrypt import checkpw
-from sqlalchemy import Column, Enum, Index, func, BigInteger, String, DateTime, ForeignKey, Boolean
+from sqlalchemy import Column, Enum, Index, Integer, Text, func, BigInteger, String, DateTime, ForeignKey, Boolean
 from datetime import datetime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import expression
@@ -73,6 +73,7 @@ class Distributor(db.Model):
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    notes: Mapped[str] = mapped_column(String(), nullable=True)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
                                         server_default='ACTIVE')
@@ -87,6 +88,110 @@ class Distributor(db.Model):
         onupdate=func.now())
     client = relationship('Client', back_populates='distributor')
     site = relationship('Site', back_populates='distributor')
+    distributors_emails = relationship(
+        'DistributorEmail', back_populates='distributor')
+    distributors_phones = relationship(
+        'DistributorPhone', back_populates='distributor')
+    contacts = relationship(
+        'Contact', back_populates='distributor')
+
+
+class DistributorEmail(db.Model):
+    __tablename__ = 'distributors_emails'
+    __table_args__ = (
+        Index(
+            'unique_email_status_distributor_email',  # Index name
+            'email', 'status',  # Columns which are part of the index
+            unique=True,
+            postgresql_where=Column('status') == 'ACTIVE'),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    distributor_id: Mapped[int] = mapped_column(
+        ForeignKey('distributors.id'), nullable=False)
+    email: Mapped[str] = mapped_column(
+        String(450), nullable=False, unique=True)
+    status: Mapped[str] = mapped_column(String(20),
+                                        nullable=False,
+                                        server_default='ACTIVE')
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(),
+        nullable=False,
+        server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now())
+
+    distributor = relationship(
+        'Distributor', back_populates='distributors_emails')
+
+
+class DistributorPhone(db.Model):
+    __tablename__ = 'distributors_phones'
+    __table_args__ = (
+        Index(
+            'unique_phone_status',  # Index name
+            'phone', 'status',  # Columns which are part of the index
+            unique=True,
+            postgresql_where=Column('status') == 'ACTIVE'),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    distributor_id: Mapped[int] = mapped_column(
+        ForeignKey('distributors.id'), nullable=False)
+    phone: Mapped[str] = mapped_column(
+        String(100), nullable=False, unique=True)
+    status: Mapped[str] = mapped_column(String(20),
+                                        nullable=False,
+                                        server_default='ACTIVE')
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(),
+        nullable=False,
+        server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now())
+
+    distributor = relationship(
+        'Distributor', back_populates='distributors_phones')
+
+
+class Contact(db.Model):
+    __tablename__ = 'contacts'
+    __table_args__ = (
+        Index(
+            'unique_email_status_contact',  # Index name
+            'email', 'status',  # Columns which are part of the index
+            unique=True,
+            postgresql_where=Column('status') == 'ACTIVE'),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    distributor_id: Mapped[int] = mapped_column(
+        ForeignKey('distributors.id'), nullable=False)
+    full_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    email: Mapped[str] = mapped_column(String(450), nullable=True)
+    phone: Mapped[str] = mapped_column(
+        String(100), nullable=True)
+    notes: Mapped[str] = mapped_column(String(), nullable=True)
+    status: Mapped[str] = mapped_column(String(20),
+                                        nullable=False,
+                                        server_default='ACTIVE')
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(),
+        nullable=False,
+        server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now())
+    distributor = relationship(
+        'Distributor', back_populates='contacts')
 
 
 class Client(db.Model):
@@ -190,7 +295,7 @@ class User(db.Model):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     full_name: Mapped[str] = mapped_column(String(100), nullable=False)
     username: Mapped[str] = mapped_column(String(20), nullable=True)
-    email: Mapped[str] = mapped_column(String(450), nullable=True)
+    email: Mapped[str] = mapped_column(String(450), nullable=True, unique=True)
     password: Mapped[str] = mapped_column(String, nullable=False)
     role: Mapped[str] = mapped_column(String(20), nullable=False)
     language: Mapped[str] = mapped_column(
@@ -367,6 +472,7 @@ class Equipment(db.Model):
         onupdate=func.now())
     brand = relationship('Brand', back_populates='equipment')
     category = relationship('Category', back_populates='equipment')
+    equipment_files = relationship('EquipmentFile', back_populates='equipment')
 
 
 class ManualType(db.Model):
@@ -387,6 +493,8 @@ class ManualType(db.Model):
         nullable=False,
         server_default=func.now(),
         onupdate=func.now())
+    
+    manual = relationship('Manual', back_populates='manual_type')
 
 
 class Manual(db.Model):
@@ -397,9 +505,8 @@ class Manual(db.Model):
         ForeignKey('equipments.id'), nullable=False)
     manual_type_id: Mapped[int] = mapped_column(
         ForeignKey('manuals_types.id'), nullable=False)
-    name: Mapped[str] = mapped_column(String(100), nullable=False)
-    path: Mapped[str] = mapped_column(String, nullable=False)
-    original_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    title: Mapped[str] = mapped_column(String(50), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=True)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
                                         server_default='ACTIVE')
@@ -412,6 +519,38 @@ class Manual(db.Model):
         nullable=False,
         server_default=func.now(),
         onupdate=func.now())
+
+    manual_type = relationship('ManualType', back_populates='manual', uselist=False)
+    manual_file = relationship('ManualFile', back_populates='manual', uselist=False)
+
+
+class ManualFile(db.Model):
+    __tablename__ = 'manuals_files'
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    manual_id: Mapped[int] = mapped_column(
+        ForeignKey('manuals.id'), nullable=False)
+    original_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    hash_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    path: Mapped[str] = mapped_column(String, nullable=False)
+    mimetype: Mapped[str] = mapped_column(String(100), nullable=False)
+    extension: Mapped[str] = mapped_column(String(20), nullable=False)
+    size: Mapped[int] = mapped_column(
+        BigInteger, nullable=False, server_default='0')
+    status: Mapped[str] = mapped_column(String(20),
+                                        nullable=False,
+                                        server_default='ACTIVE')
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(),
+        nullable=False,
+        server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now())
+
+    manual = relationship('Manual', back_populates='manual_file')
 
 
 class EquipmentFile(db.Model):
@@ -420,6 +559,8 @@ class EquipmentFile(db.Model):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     equipment_id: Mapped[int] = mapped_column(
         ForeignKey('equipments.id'), nullable=False)
+    title: Mapped[str] = mapped_column(String(50), nullable=True)
+    description: Mapped[str] = mapped_column(String(100), nullable=True)
     original_name: Mapped[str] = mapped_column(String(100), nullable=False)
     hash_name: Mapped[str] = mapped_column(String(100), nullable=False)
     path: Mapped[str] = mapped_column(String, nullable=False)
@@ -427,8 +568,8 @@ class EquipmentFile(db.Model):
     extension: Mapped[str] = mapped_column(String(20), nullable=False)
     size: Mapped[int] = mapped_column(
         BigInteger, nullable=False, server_default='0')
-    is_main: Mapped[Boolean] = mapped_column(
-        Boolean, nullable=False, server_default=expression.false())
+    sort_order: Mapped[int] = mapped_column(
+        Integer, nullable=False, server_default='0')
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
                                         server_default='ACTIVE')
@@ -442,8 +583,7 @@ class EquipmentFile(db.Model):
         server_default=func.now(),
         onupdate=func.now())
 
-    equipment = relationship(
-        'Equipment', primaryjoin='EquipmentFile.equipment_id == Equipment.id', backref='equipment_files')
+    equipment = relationship('Equipment', back_populates='equipment_files')
 
 
 class Part(db.Model):

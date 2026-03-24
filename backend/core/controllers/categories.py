@@ -53,7 +53,6 @@ def create_categories(category):
         db.session.commit()
         return {'message': gettext('categoryCreated')}
     except Exception as ex:
-        print(gettext('abortException'))
         abort(500, gettext('abortException'))
 
 
@@ -67,7 +66,6 @@ def update_categories(category_id, json_data):
         categories.update_category(category_id, json_data)
         return {'message': gettext('categoryUpdated')}
     except Exception as ex:
-        print(gettext('abortException'))
         abort(500, gettext('abortException'))
 
 
@@ -81,5 +79,4 @@ def delete_categories(category_id):
         categories.delete_category(category_id)
         return {'message': gettext('categoryDeleted')}
     except Exception as ex:
-        print(gettext('abortException'))
         abort(500, gettext('abortException'))

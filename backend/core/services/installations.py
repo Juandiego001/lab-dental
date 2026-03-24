@@ -250,8 +250,6 @@ def notify_update(installation_id: int):
         get_installation_by_id(installation_id))
     installation_data['app_url'] = f'{FRONTEND_APP_BASE_URL}/app/installations'
 
-    print(installation_data)
-
     users_ = db.session.query(User)\
         .join(UserList)\
         .join(List_)\

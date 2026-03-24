@@ -32,7 +32,7 @@ def search_clients(current_user: User, distributor_id: int, client_id: int, name
     query_stmt = db.session.query(
         *Client.__table__.c,
         Distributor.name.label('distributor_name'))\
-        .join(Distributor)\
+        .join(Distributor)
 
     if client_id:
         query.append(Client.id != client_id)

@@ -53,7 +53,6 @@ def create_brands(brand):
         db.session.commit()
         return {'message': gettext('brandCreated')}
     except Exception as ex:
-        print(gettext('abortException'))
         abort(500, gettext('abortException'))
 
 
@@ -67,7 +66,6 @@ def update_brands(brand_id, json_data):
         brands.update_brand(brand_id, json_data)
         return {'message': gettext('brandUpdated')}
     except Exception as ex:
-        print(gettext('abortException'))
         abort(500, gettext('abortException'))
 
 
@@ -81,5 +79,4 @@ def delete_brands(brand_id):
         brands.delete_brand(brand_id)
         return {'message': gettext('brandDeleted')}
     except Exception as ex:
-        print(gettext('abortException'))
         abort(500, gettext('abortException'))

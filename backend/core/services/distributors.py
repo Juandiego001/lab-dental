@@ -1,9 +1,11 @@
 import re
 import unicodedata
 from core.app import db
-from core.models import Client, Distributor, DistributorList, List_, User, UserList
+from flask_babel import gettext
+from core.models import Client, Contact, Distributor, DistributorEmail, DistributorList, DistributorPhone, List_, User, UserList
 from sqlalchemy import func, and_, select
-from werkzeug.exceptions import HTTPException
+from sqlalchemy.orm import joinedload
+from http.client import HTTPException
 
 
 def search_distributors(current_user: User, distributors_ids: list[int], name: str, page: int, per_page: int, sort_by: dict = None):
@@ -79,7 +81,17 @@ def get_distributor_from_user(user: User) -> Distributor:
 def get_distributor_by_id(distributor_id: int):
     '''Get distributor by distributor id'''
 
-    return db.session.query(Distributor).filter(Distributor.id == distributor_id).first()
+    return db.session.query(Distributor)\
+        .options(
+            joinedload(Distributor.distributors_emails.and_(
+                DistributorEmail.status == 'ACTIVE'
+            )),
+            joinedload(Distributor.distributors_phones.and_(
+                DistributorPhone.status == 'ACTIVE'
+            ))
+    )\
+        .filter(Distributor.id == distributor_id)\
+        .first()
 
 
 def check_distributor_exists(distributor_id: int):
@@ -88,37 +100,97 @@ def check_distributor_exists(distributor_id: int):
     return db.session.query(Distributor).filter(Distributor.id == distributor_id).first()
 
 
-def create_distributor(distributor: Distributor):
+def save_distributor_emails(distributor_id: int, emails: list[str]):
+    '''Save distributor emails'''
+
+    for email_dict in emails:
+        if 'id' in email_dict:
+            db.session.merge(DistributorEmail(**email_dict))
+        else:
+            db.session.add(DistributorEmail(
+                distributor_id=distributor_id,
+                email=email_dict['email']
+            ))
+
+    db.session.commit()
+
+
+def save_distributor_phones(distributor_id: int, phones: list[str]):
+    '''Save distributor phones'''
+
+    for phone_dict in phones:
+        if 'id' in phone_dict:
+            db.session.merge(DistributorPhone(**phone_dict))
+        else:
+            db.session.add(DistributorPhone(
+                distributor_id=distributor_id,
+                phone=phone_dict['phone']
+            ))
+
+    db.session.commit()
+
+
+def create_distributor(data: dict):
     '''Create distributor'''
 
-    distributor_name = distributor.name
-    db.session.add(distributor)
+    emails = data.pop('emails')
+    phones = data.pop('phones')
+    name = data['name']
+
+    new_distributor = Distributor(**data)
+    db.session.add(new_distributor)
 
     # Slug generation process
-    slug = f'Main {distributor_name}'.lower()
+    slug = f'Main {name}'.lower()
     slug = unicodedata.normalize('NFKD', slug).encode(
         'ascii', 'ignore').decode('utf-8')
     slug = re.sub(r'[^a-z0-9]+', '-', slug)
     slug = slug.strip('-')
 
-    list_ = List_(name=f'Main {distributor_name}', slug=slug, is_main=True)
+    list_ = List_(name=f'Main {name}', slug=slug, is_main=True)
     db.session.add(list_)
     db.session.flush()
 
     distributor_list = DistributorList(
-        distributor_id=distributor.id, list_id=list_.id)
+        distributor_id=new_distributor.id, list_id=list_.id)
     db.session.add(distributor_list)
     db.session.commit()
 
+    if emails and len(emails):
+        save_distributor_emails(
+            distributor_id=new_distributor.id,
+            emails=emails
+        )
 
-def update_distributor(distributor_id: int, distributor_load):
+    if phones and len(phones):
+        save_distributor_phones(
+            distributor_id=new_distributor.id,
+            phones=phones
+        )
+
+
+def update_distributor(distributor_id: int, data: dict):
     '''Update distributor'''
 
     if not check_distributor_exists(distributor_id):
         raise HTTPException('Distributor not found')
 
-    db.session.merge(distributor_load)
+    emails = data.pop('emails')
+    phones = data.pop('phones')
+    db.session.merge(Distributor(**data))
     db.session.commit()
+
+    if emails and len(emails):
+        save_distributor_emails(
+            distributor_id=distributor_id,
+            emails=emails
+        )
+
+    if phones and len(phones):
+        save_distributor_phones(
+            distributor_id=distributor_id,
+            phones=phones
+        )
 
 
 def delete_distributor(distributor_id: int):
@@ -144,4 +216,83 @@ def delete_distributor(distributor_id: int):
         db.session.merge(List_(id=list_id, status='INACTIVE'))
 
     db.session.merge(Distributor(id=distributor_id, status='INACTIVE'))
+    db.session.commit()
+
+
+def search_contacts(distributor_id: int, full_name: str, email: str, phone: str, page: int, per_page: int, sort_by: dict = None):
+    '''Search contacts'''
+
+    order_by = Contact.id.desc()
+    if sort_by:
+        if sort_by['key'] == 'fullName':
+            order_by = Contact.full_name
+        elif sort_by['key'] == 'email':
+            order_by = Contact.email
+        elif sort_by['key'] == 'phone':
+            order_by = Contact.phone
+        order_by = order_by.asc(
+        ) if sort_by['order'] == 'asc' else order_by.desc()
+
+    query = [Contact.status == 'ACTIVE',
+             Contact.distributor_id == distributor_id]
+    if full_name:
+        query.append(Contact.full_name.ilike(f'%{full_name}%'))
+    if email:
+        query.append(Contact.email.ilike(f'%{email}%'))
+    if phone:
+        query.append(Contact.phone.ilike(f'%{phone}%'))
+
+    total = db.session.query(Contact)\
+        .filter(*query).count()
+    contacts = db.session.query(Contact)\
+        .filter(*query)\
+        .order_by(order_by)\
+        .limit(per_page)\
+        .offset((page - 1) * per_page)\
+        .all()
+
+    return contacts, total
+
+
+def create_contacts(data: dict):
+    '''Create contacts'''
+
+    db.session.add(Contact(**data))
+    db.session.commit()
+
+
+def get_contact_by_email(email: str):
+    '''Get contact by email'''
+
+    return db.session.query(Contact)\
+        .filter(Contact.email == email, Contact.status == 'ACTIVE')\
+        .first()
+
+
+def update_contacts(contact_id: int, data: dict):
+    '''Update contacts'''
+
+    the_contact = get_contact_by_id(contact_id=contact_id)
+    if not the_contact:
+        raise HTTPException(gettext('contactNotFound'))
+
+    if 'email' in data and (data['email'] != the_contact.email) and get_contact_by_email(email=data['email']):
+        raise HTTPException(gettext('contactEmailExistsError'))
+
+    db.session.merge(Contact(**data))
+    db.session.commit()
+
+
+def get_contact_by_id(contact_id: int):
+    '''Get contact by ID'''
+
+    return db.session.query(Contact)\
+        .filter(Contact.id == contact_id)\
+        .first()
+
+
+def delete_contact_by_id(contact_id: int):
+    '''Delete contact by ID'''
+
+    db.session.merge(Contact(id=contact_id, status='INACTIVE'))
     db.session.commit()

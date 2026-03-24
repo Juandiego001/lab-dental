@@ -158,9 +158,7 @@ onBeforeMount(async () => {
   try {
     // const { data } = await $api('/strapi/articles?populate=*');
     articles.value = data;
-  } catch (err) {
-    console.log('Ocurrió un error al intentar obtener las entradas de blog');
-  }
+  } catch (err) { }
 })
 
 </script>

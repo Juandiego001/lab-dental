@@ -1,3 +1,4 @@
+from flask_babel import gettext
 from flask_jwt_extended import jwt_required
 from core.app import db
 from core.services import parts
@@ -18,11 +19,11 @@ def get_parts(query_data):
 
     try:
         results = parts.get_parts(query_data['search'],
-                                         query_data['page'],
-                                         query_data['per_page'])
+                                  query_data['page'],
+                                  query_data['per_page'])
         return {'items': results, 'total': results.total}
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.get('/<int:part_id>')
@@ -34,7 +35,7 @@ def get_part(part_id):
     try:
         return parts.get_part_by_id(part_id)
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/')
@@ -48,8 +49,7 @@ def create_parts(part):
         db.session.commit()
         return {'message': 'Part registered successfully'}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.put('/<int:part_id>')
@@ -63,8 +63,7 @@ def update_parts(part_id, json_data):
         parts.update_part(part_id, json_data)
         return {'message': 'Part updated successfully'}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.delete('/<int:part_id>')
@@ -77,5 +76,4 @@ def delete_parts(part_id):
         parts.delete_part(part_id)
         return {'message': 'Part deleted successfully'}
     except Exception as ex:
-        print(str(ex))
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))

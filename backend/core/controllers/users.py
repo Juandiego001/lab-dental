@@ -68,7 +68,6 @@ def login_users(user):
     except HTTPException as ex:
         abort(404, gettext('wrongUsernamePassword'))
     except Exception as ex:
-        print(ex)
         abort(500, gettext('abortException'))
 
 
@@ -176,7 +175,6 @@ def delete_users(user_id):
         users.delete_user(user_id)
         return {'message': gettext('userDeleted')}
     except Exception as ex:
-        print(gettext('abortException'))
         abort(500, gettext('abortException'))
 
 
@@ -258,7 +256,7 @@ def logout():
         #     redis.set(f'sac:blocklist:{sub}:{jti}', '', ex=ex)
         return response
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.post('/photo')
@@ -275,7 +273,7 @@ def upload_user_photo(form_and_files_data: dict):
         )
         return {'message': gettext('photoUpdated')}
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
 
 
 @bp.delete('/photo')
@@ -288,4 +286,4 @@ def delete_user_photo():
         users.delete_user_photo(current_user)
         return {'message': gettext('photoUpdated')}
     except Exception as ex:
-        abort(500, str(ex))
+        abort(500, gettext('abortException'))
