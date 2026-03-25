@@ -64,19 +64,15 @@ if not users_full_route.exists():
     users_full_route.mkdir(parents=True, exist_ok=True)
 
 
-if ENV == 'development':
-    app.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']
-else:
-    app.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']
-
-
+app.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
-app.config['JWT_COOKIE_CSRF_PROTECT'] = False
+app.config["JWT_COOKIE_SECURE"] = ENV == 'production'
+app.config['JWT_COOKIE_CSRF_PROTECT'] = ENV == 'production'
 
 
 def get_locale():
-    ''''''
+    '''Get locale'''
 
     supported_languages = ['es', 'en']
     lang_cookie = request.cookies.get('i18n_redirected')

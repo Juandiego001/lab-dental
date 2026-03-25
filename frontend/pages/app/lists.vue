@@ -155,7 +155,7 @@
         <v-form @submit.prevent="doSearch">
           <v-row dense>
             <v-col cols="12">
-              <v-text-field v-model="search" :label="$t('lists.search.fields')" hide-details="auto"
+              <v-text-field v-model="search" :label="$t('lists.search.message')" hide-details="auto"
                 prepend-inner-icon="mdi-magnify" clearable />
             </v-col>
             <v-col class="text-end" cols="12">
