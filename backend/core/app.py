@@ -23,7 +23,7 @@ MAIL_PORT = os.getenv('MAIL_PORT')
 MAIL_SENDER = os.getenv('MAIL_SENDER')
 MAIL_SERVER = os.getenv('MAIL_SERVER')
 FRONTEND_APP_BASE_URL = os.getenv(
-    'FRONTEND_APP_BASE_URL', 'http://localhost:3000')
+    'FRONTEND_APP_BASE_URL', 'http://localhost')
 REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
 
 app = APIFlask(__name__, title='SOE Latam API', version='0.0.1', enable_openapi=ENV ==

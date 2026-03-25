@@ -32,7 +32,9 @@
           </v-col>
 
           <v-col cols="12">
-            <v-btn class="text-white" block variant="outlined" type="submit">{{ $t('confirm') }}</v-btn>
+            <v-btn class="text-white" block variant="outlined" type="submit" :loading="loading">
+              {{ $t('confirm') }}
+            </v-btn>
           </v-col>
         </v-row>
       </v-form>
@@ -61,6 +63,7 @@ const isVisibleNewPassword = ref(false);
 const isVisibleConfirmPassword = ref(false);
 const newPassword = ref('');
 const confirmPassword = ref('');
+const loading = ref(false);
 
 // Verificar si el link todavía está activo
 onBeforeMount(async () => {
@@ -79,6 +82,7 @@ onBeforeMount(async () => {
 
 const changePassword = async () => {
   try {
+    loading.value = true;
     if (!newPassword.value || !confirmPassword.value) {
       notify(t('recoverPassword.rules.passwordRequired'), 'error');
       return;
@@ -102,6 +106,8 @@ const changePassword = async () => {
     navigateTo('/login');
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 </script>

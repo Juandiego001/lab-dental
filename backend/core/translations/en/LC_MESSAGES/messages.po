@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-23 19:49-0500\n"
+"POT-Creation-Date: 2026-03-24 21:47-0500\n"
 "PO-Revision-Date: 2026-03-03 09:13-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -25,12 +25,12 @@ msgstr ""
 #: core/controllers/categories.py:69 core/controllers/categories.py:82
 #: core/controllers/clients.py:33 core/controllers/clients.py:45
 #: core/controllers/clients.py:58 core/controllers/clients.py:71
-#: core/controllers/clients.py:84 core/controllers/distributors.py:33
-#: core/controllers/distributors.py:45 core/controllers/distributors.py:59
-#: core/controllers/distributors.py:72 core/controllers/distributors.py:85
-#: core/controllers/distributors.py:98 core/controllers/distributors.py:119
-#: core/controllers/distributors.py:131 core/controllers/distributors.py:145
-#: core/controllers/distributors.py:162 core/controllers/distributors.py:175
+#: core/controllers/clients.py:84 core/controllers/distributors.py:35
+#: core/controllers/distributors.py:47 core/controllers/distributors.py:61
+#: core/controllers/distributors.py:74 core/controllers/distributors.py:87
+#: core/controllers/distributors.py:100 core/controllers/distributors.py:121
+#: core/controllers/distributors.py:133 core/controllers/distributors.py:147
+#: core/controllers/distributors.py:166 core/controllers/distributors.py:179
 #: core/controllers/equipments.py:44 core/controllers/equipments.py:56
 #: core/controllers/equipments.py:69 core/controllers/equipments.py:86
 #: core/controllers/equipments.py:99 core/controllers/equipments.py:121
@@ -49,8 +49,8 @@ msgstr ""
 #: core/controllers/lists.py:130 core/controllers/locations.py:26
 #: core/controllers/locations.py:45 core/controllers/locations.py:64
 #: core/controllers/manuals.py:41 core/controllers/manuals.py:55
-#: core/controllers/manuals.py:69 core/controllers/manuals.py:87
-#: core/controllers/manuals.py:101 core/controllers/manuals.py:120
+#: core/controllers/manuals.py:69 core/controllers/manuals.py:86
+#: core/controllers/manuals.py:99 core/controllers/manuals.py:118
 #: core/controllers/parts.py:26 core/controllers/parts.py:38
 #: core/controllers/parts.py:52 core/controllers/parts.py:66
 #: core/controllers/parts.py:79 core/controllers/permissions.py:37
@@ -60,11 +60,11 @@ msgstr ""
 #: core/controllers/sites.py:33 core/controllers/sites.py:45
 #: core/controllers/sites.py:60 core/controllers/sites.py:79
 #: core/controllers/sites.py:92 core/controllers/users.py:38
-#: core/controllers/users.py:50 core/controllers/users.py:72
-#: core/controllers/users.py:86 core/controllers/users.py:108
-#: core/controllers/users.py:133 core/controllers/users.py:146
-#: core/controllers/users.py:166 core/controllers/users.py:179
-#: core/controllers/users.py:193 core/controllers/users.py:210
+#: core/controllers/users.py:50 core/controllers/users.py:71
+#: core/controllers/users.py:85 core/controllers/users.py:107
+#: core/controllers/users.py:132 core/controllers/users.py:145
+#: core/controllers/users.py:165 core/controllers/users.py:178
+#: core/controllers/users.py:192 core/controllers/users.py:209
 #: core/controllers/users.py:240 core/controllers/users.py:260
 #: core/controllers/users.py:277 core/controllers/users.py:290
 #: core/controllers/warranties.py:27 core/controllers/warranties.py:39
@@ -109,27 +109,27 @@ msgstr "Client updated successfully"
 msgid "clientDeleted"
 msgstr "Client deleted successfully"
 
-#: core/controllers/distributors.py:70
+#: core/controllers/distributors.py:72
 msgid "distributorCreated"
 msgstr "Distributor created successfully"
 
-#: core/controllers/distributors.py:83
+#: core/controllers/distributors.py:85
 msgid "distributorUpdated"
 msgstr "Distributor updated successfully"
 
-#: core/controllers/distributors.py:96
+#: core/controllers/distributors.py:98
 msgid "distributorDeleted"
 msgstr "Distributor deleted successfully"
 
-#: core/controllers/distributors.py:143
+#: core/controllers/distributors.py:145
 msgid "contactCreated"
 msgstr "Contact created successfully"
 
-#: core/controllers/distributors.py:160
+#: core/controllers/distributors.py:162
 msgid "contactUpdated"
 msgstr "Contact updated successfully"
 
-#: core/controllers/distributors.py:173
+#: core/controllers/distributors.py:177
 msgid "contactDeleted"
 msgstr "Contact deleted successfully"
 
@@ -213,7 +213,7 @@ msgstr "Manual created successfully"
 msgid "manualUpdated"
 msgstr "Manual updated successfully"
 
-#: core/controllers/manuals.py:98
+#: core/controllers/manuals.py:97
 msgid "manualDeleted"
 msgstr "Manual deleted successfully"
 
@@ -241,33 +241,37 @@ msgstr "Welcome"
 msgid "wrongUsernamePassword"
 msgstr "Username or password incorrect"
 
-#: core/controllers/users.py:84
+#: core/controllers/users.py:83
 msgid "userCreated"
 msgstr "User created successfully"
 
-#: core/controllers/users.py:129
+#: core/controllers/users.py:128
 msgid "profileUpdated"
 msgstr "Profile update successfully"
 
-#: core/controllers/users.py:144
+#: core/controllers/users.py:143
 msgid "userUpdated"
 msgstr "User updated successfully"
 
-#: core/controllers/users.py:177
+#: core/controllers/users.py:176
 msgid "userDeleted"
 msgstr "User deleted successfully"
 
-#: core/controllers/users.py:189
+#: core/controllers/users.py:188
 msgid "tokenValid"
 msgstr "Token valid"
 
-#: core/controllers/users.py:191
+#: core/controllers/users.py:190
 msgid "tokenInvalid"
 msgstr "Token invalid"
 
-#: core/controllers/users.py:208 core/controllers/users.py:238
+#: core/controllers/users.py:207 core/controllers/users.py:238
 msgid "passwordUpdated"
 msgstr "Password updated successfully"
+
+#: core/controllers/users.py:223
+msgid "recoveryLinkSent"
+msgstr "A recovery link has been sent. Please check your email"
 
 #: core/controllers/users.py:251
 msgid "sessionEnded"
@@ -421,7 +425,7 @@ msgstr "SOE Latam - Installation Approval #%(id)s"
 msgid "SOE Latam - Rechazo de instalación #%(id)s"
 msgstr "SOE Latam - Installation rejection #%(id)s"
 
-#: core/services/users.py:222 templates/recover_password.html:81
+#: core/services/users.py:222 templates/recover_password.html:135
 msgid "resetPassword"
 msgstr "Reset Password"
 
@@ -536,27 +540,27 @@ msgstr "UPDATED"
 msgid "distributor"
 msgstr "Distributor"
 
-#: templates/recover_password.html:6 templates/recover_password.html:60
+#: templates/recover_password.html:6 templates/recover_password.html:82
 msgid "resetingPassword"
 msgstr "Reset Password"
 
-#: templates/recover_password.html:64
+#: templates/recover_password.html:100
 msgid "requestResetPasswordParagraph"
 msgstr ""
 "We have received a request to reset your account password. To continue "
 "with the process, please click on the following button"
 
-#: templates/recover_password.html:86
+#: templates/recover_password.html:155
 msgid "ifButtonDoesntWork"
 msgstr ""
 "If the button does not work, please copy and paste the following link "
 "into your browser:"
 
-#: templates/recover_password.html:102
+#: templates/recover_password.html:198
 msgid "ignoreMessageIfNotRequested"
 msgstr "If you did not request this change, you can safely ignore this message."
 
-#: templates/recover_password.html:112
+#: templates/recover_password.html:216
 msgid "thisIsAutomaticMessage"
 msgstr ""
 "This is an automatically generated message, please do not reply to this "

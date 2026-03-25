@@ -220,11 +220,11 @@ def send_mail_recover_password(json_data):
     '''
 
     try:
-        return {'message': 'A recovery link has been sent. Please check your email'}
+        return {'message': gettext('recoveryLinkSent')}
     finally:
         try:
             users.send_mail_recover_password(json_data['email'])
-        except:
+        except Exception as ex:
             pass
 
 

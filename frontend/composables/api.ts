@@ -5,7 +5,7 @@ export function $api<T>(
   const config = useRuntimeConfig()
   const csrf_access_token: any = useCookie('csrf_access_token').value
   const baseURL = import.meta.server ? (config.public.appUrl as string) : '/'
-
+  console.log({ baseURL })
   let customHeaders: any = {
     'X-CSRF-TOKEN': csrf_access_token || '',
     ...opts?.headers,

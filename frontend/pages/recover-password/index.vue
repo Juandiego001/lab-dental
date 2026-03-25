@@ -19,7 +19,9 @@
           </v-col>
 
           <v-col cols="12">
-            <v-btn class="text-white" block variant="outlined" type="submit">{{ $t('send') }}</v-btn>
+            <v-btn class="text-white" block variant="outlined" type="submit" :loading="loading">
+              {{ $t('send') }}
+            </v-btn>
           </v-col>
         </v-row>
       </v-form>
@@ -41,9 +43,11 @@ useHead({
 
 const { notify } = useSnackbar();
 const email = ref('')
+const loading = ref(false);
 
 const sendEmail = async () => {
   try {
+    loading.value = true;
     const response = await $api('/api/users/password', {
       method: 'POST',
       body: { email: email.value }
@@ -51,6 +55,8 @@ const sendEmail = async () => {
     notify(response.message, 'success')
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 </script>
