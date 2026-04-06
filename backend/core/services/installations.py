@@ -56,9 +56,11 @@ def search_installations(current_user: User, equipment_id: int, distributor_id: 
         db.session.query(
             *Installation.__table__.c,
             Client.name.label('client_name'),
+            Distributor.name.label('distributor_name'),
             func.concat(Equipment.model, ' - ', Equipment.reference).label('equipment_model_reference'))
         .join(Equipment)
         .join(Client, Client.id == Installation.client_id)
+        .join(Distributor, Distributor.id == Installation.distributor_id)
         .filter(*query)
         .order_by(order_by)
         .limit(per_page)

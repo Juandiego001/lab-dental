@@ -560,10 +560,16 @@ const itemsPerPageOptions = computed(() => [
 const headers = computed(() => {
   const defaultHeaders = [
     { title: t('equipments.title'), key: 'equipmentModelReference' },
-    { title: t('clients.title'), key: 'clientName' },
-    { title: t('installations.serial'), key: 'serial', align: 'center' },
-    { title: t('installations.installedDate'), key: 'installedDate', align: 'center' },
   ]
+
+  if (isAdmin.value) {
+    defaultHeaders.push({ title: t('distributors.title'), key: 'distributorName' });
+  } else {
+    defaultHeaders.push({ title: t('clients.title'), key: 'clientName' });
+  }
+
+  defaultHeaders.push({ title: t('installations.serial'), key: 'serial', align: 'center' });
+  defaultHeaders.push({ title: t('installations.installedDate'), key: 'installedDate', align: 'center' });
 
   if (isAdmin.value) {
     defaultHeaders.push({ title: t('installations.expirationDate'), key: 'expirationDate', align: 'center' });
