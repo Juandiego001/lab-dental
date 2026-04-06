@@ -201,7 +201,7 @@ class Client(db.Model):
     distributor_id: Mapped[int] = mapped_column(
         ForeignKey('distributors.id'), nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    phone: Mapped[str] = mapped_column(String(100), nullable=False)
+    phone: Mapped[str] = mapped_column(String(100), nullable=True)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
                                         server_default='ACTIVE')

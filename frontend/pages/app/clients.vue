@@ -55,8 +55,8 @@
                 counter="50" maxlength="50" />
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.phone" hide-details="auto" :label="$t('clients.phone')"
-                :rules="[phoneRequired]" counter="20" maxlength="20" />
+              <v-text-field v-model="form.phone" hide-details="auto" :label="$t('clients.phone')" counter="20"
+                maxlength="20" />
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false" @mousedown.prevent :disabled="loading">{{
@@ -95,8 +95,8 @@
                 counter="50" maxlength="50" />
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.phone" hide-details="auto" :label="$t('clients.phone')"
-                :rules="[phoneRequired]" counter="20" maxlength="20" />
+              <v-text-field v-model="form.phone" hide-details="auto" :label="$t('clients.phone')" counter="20"
+                maxlength="20" />
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false" @mousedown.prevent :disabled="loading">{{
@@ -215,12 +215,12 @@ const updateForm = ref();
 const form = ref({
   distributorName: '',
   name: '',
-  phone: ''
+  phone: null
 })
 const searchForm = ref({
   distributorName: '',
   name: '',
-  phone: ''
+  phone: null
 })
 
 const itemsPerPageOptions = computed(() => [
@@ -300,7 +300,7 @@ const resetForm = () => {
   form.value = {
     distributorId: null,
     name: '',
-    phone: ''
+    phone: null
   }
 }
 
@@ -388,6 +388,5 @@ const deleteClient = async () => {
 // Rules
 const distributorRequired = (v) => !!v || t('clients.rules.distributorRequired');
 const nameRequired = (v) => !!v || t('clients.rules.nameRequired');
-const phoneRequired = (v) => !!v || t('clients.rules.phoneRequired');
 
 </script>

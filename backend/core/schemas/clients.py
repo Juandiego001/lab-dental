@@ -26,7 +26,7 @@ class ClientIn(BaseSchema):
         required=False, allow_none=True, data_key='distributorId')
     name = String(required=True, allow_none=False,
                   validate=validate.Length(max=50))
-    phone = String(required=True, allow_none=False,
+    phone = String(required=False, allow_none=True,
                    validate=validate.Length(max=20))
     status = String(load_default='ACTIVE')
 
@@ -45,22 +45,6 @@ class ClientIn(BaseSchema):
 
         if not data['name']:
             raise ValidationError({'message':  gettext('clientNameRequired')})
-
-    @validates_schema
-    def phone_exists(self, data, **kwargs):
-        '''
-        Validate the phone exists and have a value
-
-        :param self: Description
-        :param data: Description
-        :param kwargs: Description
-        '''
-
-        if not 'phone' in data:
-            raise ValidationError({'message':  gettext('clientPhoneRequired')})
-
-        if not data['phone']:
-            raise ValidationError({'message':  gettext('clientPhoneRequired')})
 
 
 class ClientInCreate(ClientIn):
