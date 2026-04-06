@@ -431,11 +431,20 @@
             </v-col>
 
             <!-- Installations -->
-            <v-col class="d-flex flex-column" :cols="isAdmin ? 12 : 6" :class="isAdmin && 'mt-2'">
+            <v-col class="mt-2 d-flex flex-column" cols="12">
               <p class="text-body-2 text-primary pb-2">{{ $t('installations.title', 2) }}</p>
+            </v-col>
+
+            <v-col cols="6">
               <v-text-field v-model="searchForm.serial" :label="$t('installations.serial')" hide-details="auto"
                 counter="30" maxlength="30" clearable />
             </v-col>
+
+            <v-col cols="6">
+              <v-select v-model="searchForm.status" :item-title="title" item-value="value" :items="installationStatuses"
+                hide-details="auto" :label="$t('installations.statuses.label')" clearable />
+            </v-col>
+
 
             <!-- Search Button -->
             <v-col class="text-end" cols="12">
@@ -519,11 +528,27 @@ const searchForm = ref({
   equipmentId: null,
   distributorId: null,
   clientId: null,
-  serial: ''
+  serial: null,
+  status: null,
 })
 
 const isApproved = computed(() => form.value.status === 'APPROVED');
 const todayDate = computed(() => (new Date()).toISOString().split('T')[0])
+
+const installationStatuses = computed(() => [
+  {
+    title: t('installations.statuses.active'),
+    value: "ACTIVE"
+  },
+  {
+    title: t('installations.statuses.approved'),
+    value: "APPROVED"
+  },
+  {
+    title: t('installations.statuses.rejected'),
+    value: "REJECTED"
+  }
+])
 
 const itemsPerPageOptions = computed(() => [
   { value: 15, title: '15' },
@@ -706,6 +731,7 @@ const getInstallations = async () => {
         distributorId: searchForm.value.distributorId,
         clientId: searchForm.value.clientId,
         serial: searchForm.value.serial,
+        status: searchForm.value.status,
         page: page.value,
         perPage: perPage.value,
         sortBy: sortBy.value?.length ? sortBy.value[0] : null

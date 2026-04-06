@@ -15,6 +15,8 @@ class InstallationSearch(Schema):
         required=False, allow_none=True, data_key='clientId', load_default=None)
     serial = String(required=False, allow_none=True,
                     validate=validate.Length(max=50), load_default='')
+    status = String(required=False, allow_none=True,
+                    validate=validate.Length(max=20))
     page = Integer(load_default=1)
     per_page = Integer(data_key='perPage', load_default=15)
     sort_by = Nested(SortBy, data_key='sortBy', load_default=None)

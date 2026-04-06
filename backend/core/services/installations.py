@@ -14,7 +14,7 @@ from core.schemas.installations import InstallationCreatedNotification, Installa
 from core.models import Client, Distributor, DistributorList, Equipment, Installation, List_, Site, User, UserList
 
 
-def search_installations(current_user: User, equipment_id: int, distributor_id: int, client_id: int, serial: str, page: int, per_page: int, sort_by: dict = None):
+def search_installations(current_user: User, equipment_id: int, distributor_id: int, client_id: int, serial: str, status: str, page: int, per_page: int, sort_by: dict = None):
     '''Get installations'''
 
     order_by = Installation.id.desc()
@@ -42,6 +42,8 @@ def search_installations(current_user: User, equipment_id: int, distributor_id: 
         query.append(Installation.client_id == client_id)
     if serial:
         query.append(Installation.serial.ilike(f'%{serial}%'))
+    if status:
+        query.append(Installation.status == status)
 
     if current_user.role != 'ADMIN':
         distributor: Distributor = get_distributor_from_user(current_user)

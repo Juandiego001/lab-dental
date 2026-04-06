@@ -23,6 +23,7 @@ def search_installations(json_data):
             distributor_id=json_data['distributor_id'],
             client_id=json_data['client_id'],
             serial=json_data['serial'],
+            status=json_data['status'],
             page=json_data['page'],
             per_page=json_data['per_page'],
             sort_by=json_data['sort_by'])

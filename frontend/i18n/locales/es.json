@@ -538,6 +538,7 @@
       "description": "Agrega los motivos de rechazo..."
     },
     "statuses": {
+      "label": "Estado",
       "title": "Estados",
       "active": "Activo",
       "approved": "Aprobado",

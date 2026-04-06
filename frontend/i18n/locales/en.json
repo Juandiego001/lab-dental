@@ -540,6 +540,7 @@
       "description": "Add the reasons for rejection..."
     },
     "statuses": {
+      "label": "Status",
       "title": "Statuses",
       "active": "Active",
       "approved": "Approved",
