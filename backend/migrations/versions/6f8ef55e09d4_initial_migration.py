@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: ae19e10b308b
+Revision ID: 6f8ef55e09d4
 Revises: 
-Create Date: 2026-03-16 00:16:40.106293
+Create Date: 2026-04-09 19:20:06.161248
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ae19e10b308b'
+revision = '6f8ef55e09d4'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -46,6 +46,7 @@ def upgrade():
     op.create_table('distributors',
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
+    sa.Column('notes', sa.String(), nullable=True),
     sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
@@ -91,7 +92,8 @@ def upgrade():
     sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('email')
     )
     with op.batch_alter_table('users', schema=None) as batch_op:
         batch_op.create_index('unique_email_status', ['email', 'status'], unique=True, postgresql_where=sa.text("status = 'ACTIVE'"))
@@ -100,13 +102,43 @@ def upgrade():
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('distributor_id', sa.BigInteger(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
-    sa.Column('phone', sa.String(length=100), nullable=False),
+    sa.Column('phone', sa.String(length=100), nullable=True),
     sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['distributor_id'], ['distributors.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('contacts',
+    sa.Column('id', sa.BigInteger(), nullable=False),
+    sa.Column('distributor_id', sa.BigInteger(), nullable=False),
+    sa.Column('full_name', sa.String(length=100), nullable=False),
+    sa.Column('email', sa.String(length=450), nullable=True),
+    sa.Column('phone', sa.String(length=100), nullable=True),
+    sa.Column('notes', sa.String(), nullable=True),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.ForeignKeyConstraint(['distributor_id'], ['distributors.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    with op.batch_alter_table('contacts', schema=None) as batch_op:
+        batch_op.create_index('unique_email_status_contact', ['email', 'status'], unique=True, postgresql_where=sa.text("status = 'ACTIVE'"))
+
+    op.create_table('distributors_emails',
+    sa.Column('id', sa.BigInteger(), nullable=False),
+    sa.Column('distributor_id', sa.BigInteger(), nullable=False),
+    sa.Column('email', sa.String(length=450), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.ForeignKeyConstraint(['distributor_id'], ['distributors.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('email')
+    )
+    with op.batch_alter_table('distributors_emails', schema=None) as batch_op:
+        batch_op.create_index('unique_email_status_distributor_email', ['email', 'status'], unique=True, postgresql_where=sa.text("status = 'ACTIVE'"))
+
     op.create_table('distributors_lists',
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('distributor_id', sa.BigInteger(), nullable=False),
@@ -115,6 +147,20 @@ def upgrade():
     sa.ForeignKeyConstraint(['list_id'], ['lists.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('distributors_phones',
+    sa.Column('id', sa.BigInteger(), nullable=False),
+    sa.Column('distributor_id', sa.BigInteger(), nullable=False),
+    sa.Column('phone', sa.String(length=100), nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.ForeignKeyConstraint(['distributor_id'], ['distributors.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('phone')
+    )
+    with op.batch_alter_table('distributors_phones', schema=None) as batch_op:
+        batch_op.create_index('unique_phone_status', ['phone', 'status'], unique=True, postgresql_where=sa.text("status = 'ACTIVE'"))
+
     op.create_table('equipments',
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('brand_id', sa.BigInteger(), nullable=False),
@@ -177,13 +223,15 @@ def upgrade():
     op.create_table('equipments_files',
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('equipment_id', sa.BigInteger(), nullable=False),
+    sa.Column('title', sa.String(length=50), nullable=True),
+    sa.Column('description', sa.String(length=100), nullable=True),
     sa.Column('original_name', sa.String(length=100), nullable=False),
     sa.Column('hash_name', sa.String(length=100), nullable=False),
     sa.Column('path', sa.String(), nullable=False),
     sa.Column('mimetype', sa.String(length=100), nullable=False),
     sa.Column('extension', sa.String(length=20), nullable=False),
     sa.Column('size', sa.BigInteger(), server_default='0', nullable=False),
-    sa.Column('is_main', sa.Boolean(), server_default=sa.text('false'), nullable=False),
+    sa.Column('sort_order', sa.Integer(), server_default='0', nullable=False),
     sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
@@ -194,9 +242,8 @@ def upgrade():
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('equipment_id', sa.BigInteger(), nullable=False),
     sa.Column('manual_type_id', sa.BigInteger(), nullable=False),
-    sa.Column('name', sa.String(length=100), nullable=False),
-    sa.Column('path', sa.String(), nullable=False),
-    sa.Column('original_name', sa.String(length=100), nullable=False),
+    sa.Column('title', sa.String(length=50), nullable=False),
+    sa.Column('description', sa.Text(), nullable=True),
     sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
@@ -263,6 +310,21 @@ def upgrade():
     sa.ForeignKeyConstraint(['city_id'], ['cities.id'], ),
     sa.ForeignKeyConstraint(['country_id'], ['countries.id'], ),
     sa.ForeignKeyConstraint(['state_id'], ['states.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('manuals_files',
+    sa.Column('id', sa.BigInteger(), nullable=False),
+    sa.Column('manual_id', sa.BigInteger(), nullable=False),
+    sa.Column('original_name', sa.String(length=100), nullable=False),
+    sa.Column('hash_name', sa.String(length=100), nullable=False),
+    sa.Column('path', sa.String(), nullable=False),
+    sa.Column('mimetype', sa.String(length=100), nullable=False),
+    sa.Column('extension', sa.String(length=20), nullable=False),
+    sa.Column('size', sa.BigInteger(), server_default='0', nullable=False),
+    sa.Column('status', sa.String(length=20), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.ForeignKeyConstraint(['manual_id'], ['manuals.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('sites',
@@ -342,6 +404,7 @@ def downgrade():
     op.drop_table('installations_files')
     op.drop_table('installations')
     op.drop_table('sites')
+    op.drop_table('manuals_files')
     op.drop_table('addresses')
     op.drop_table('user_groups')
     op.drop_table('specifications')
@@ -355,7 +418,19 @@ def downgrade():
     op.drop_table('reasons')
     op.drop_table('groups')
     op.drop_table('equipments')
+    with op.batch_alter_table('distributors_phones', schema=None) as batch_op:
+        batch_op.drop_index('unique_phone_status', postgresql_where=sa.text("status = 'ACTIVE'"))
+
+    op.drop_table('distributors_phones')
     op.drop_table('distributors_lists')
+    with op.batch_alter_table('distributors_emails', schema=None) as batch_op:
+        batch_op.drop_index('unique_email_status_distributor_email', postgresql_where=sa.text("status = 'ACTIVE'"))
+
+    op.drop_table('distributors_emails')
+    with op.batch_alter_table('contacts', schema=None) as batch_op:
+        batch_op.drop_index('unique_email_status_contact', postgresql_where=sa.text("status = 'ACTIVE'"))
+
+    op.drop_table('contacts')
     op.drop_table('clients')
     with op.batch_alter_table('users', schema=None) as batch_op:
         batch_op.drop_index('unique_email_status', postgresql_where=sa.text("status = 'ACTIVE'"))
