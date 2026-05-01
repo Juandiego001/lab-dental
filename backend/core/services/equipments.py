@@ -2,14 +2,15 @@ import uuid
 from core.app import db
 from pathlib import Path
 from datetime import datetime
+from core.services.distributors import get_distributor_from_user
 from core.utils import process_file
 from werkzeug.exceptions import HTTPException
 from sqlalchemy import and_, or_, literal, func
 from werkzeug.datastructures import FileStorage
-from core.models import Brand, Category, Equipment, EquipmentFile
+from core.models import Brand, Category, Distributor, DistributorBrand, Equipment, EquipmentFile, User
 
 
-def search_equipments(equipment_id: int, brand_id: int, category_id: int, model: str, reference: str, with_picture: bool, model_reference: str, page: int, per_page: int, sort_by: dict = None):
+def search_equipments(current_user: User, equipment_id: int, brand_id: int, category_id: int, model: str, reference: str, with_picture: bool, model_reference: str, page: int, per_page: int, sort_by: dict = None):
     '''
     Docstring for search_equipments
 
@@ -54,6 +55,12 @@ def search_equipments(equipment_id: int, brand_id: int, category_id: int, model:
                 '%' + Equipment.model + '%'),
             Equipment.reference.ilike(f'%{model_reference}%'),
             literal(model_reference).ilike('%' + Equipment.reference + '%')))
+
+    if current_user.role != 'ADMIN':
+        distributor: Distributor = get_distributor_from_user(current_user)
+        brands_ids = db.session.scalars(db.session.query(DistributorBrand.brand_id).filter(
+            DistributorBrand.distributor_id == distributor.id)).all()
+        query.append(Brand.id.in_(brands_ids))
 
     select_cols = [
         *Equipment.__table__.c,

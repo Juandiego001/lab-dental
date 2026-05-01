@@ -88,12 +88,29 @@ class Distributor(db.Model):
         onupdate=func.now())
     client = relationship('Client', back_populates='distributor')
     site = relationship('Site', back_populates='distributor')
+    distributors_brands = relationship(
+        'DistributorBrand', back_populates='distributor')
     distributors_emails = relationship(
         'DistributorEmail', back_populates='distributor')
     distributors_phones = relationship(
         'DistributorPhone', back_populates='distributor')
     contacts = relationship(
         'Contact', back_populates='distributor')
+
+
+class DistributorBrand(db.Model):
+    __tablename__ = 'distributors_brands'
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    distributor_id: Mapped[int] = mapped_column(
+        ForeignKey('distributors.id'), nullable=False)
+    brand_id: Mapped[int] = mapped_column(
+        ForeignKey('brands.id'), nullable=False)
+    
+    distributor = relationship(
+        'Distributor', back_populates='distributors_brands')
+    brand = relationship(
+        'Brand', back_populates='distributors_brands')
 
 
 class DistributorEmail(db.Model):
@@ -424,7 +441,10 @@ class Brand(db.Model):
         nullable=False,
         server_default=func.now(),
         onupdate=func.now())
+    
     equipment = relationship('Equipment', back_populates='brand')
+    distributors_brands = relationship(
+        'DistributorBrand', back_populates='brand')
 
 
 class Category(db.Model):

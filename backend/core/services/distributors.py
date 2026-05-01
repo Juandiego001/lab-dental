@@ -2,9 +2,9 @@ import re
 import unicodedata
 from core.app import db
 from flask_babel import gettext
-from core.models import Client, Contact, Distributor, DistributorEmail, DistributorList, DistributorPhone, List_, User, UserList
-from sqlalchemy import func, and_, select
-from sqlalchemy.orm import joinedload
+from core.models import Client, Contact, Distributor, DistributorBrand, DistributorEmail, DistributorList, DistributorPhone, List_, User, UserList
+from sqlalchemy import delete, func, and_, select
+from sqlalchemy.orm import selectinload, joinedload
 from http.client import HTTPException
 
 
@@ -41,7 +41,11 @@ def search_distributors(current_user: User, distributors_ids: list[int], name: s
     total += len(with_distributors_ids) if with_distributors_ids else 0
 
     distributors = db.session.query(Distributor)\
+        .options(
+            joinedload(Distributor.distributors_brands)
+    )\
         .filter(*query)\
+        .group_by(Distributor.id, Distributor.name)\
         .order_by(order_by)\
         .limit(per_page)\
         .offset((page - 1) * per_page)\
@@ -88,9 +92,11 @@ def get_distributor_by_id(distributor_id: int):
             )),
             joinedload(Distributor.distributors_phones.and_(
                 DistributorPhone.status == 'ACTIVE'
-            ))
+            )),
+            joinedload(Distributor.distributors_brands)
     )\
         .filter(Distributor.id == distributor_id)\
+        .group_by(Distributor.id)\
         .first()
 
 
@@ -130,9 +136,27 @@ def save_distributor_phones(distributor_id: int, phones: list[str]):
     db.session.commit()
 
 
+def save_distributors_brands(distributor_id: int, brands_ids: list[int]):
+    '''Save distributors brands'''
+
+    # Se remueven los distributors_brands creados previamente
+    db.session.execute(delete(DistributorBrand).where(
+        DistributorBrand.distributor_id == distributor_id))
+
+    # Se crean los nuevos distributors_brands
+    distributors_brands = [
+        DistributorBrand(distributor_id=distributor_id, brand_id=brand_id)
+        for brand_id in brands_ids
+    ]
+    db.session.add_all(distributors_brands)
+
+    db.session.commit()
+
+
 def create_distributor(data: dict):
     '''Create distributor'''
 
+    brands_ids = data.pop('brands_ids')
     emails = data.pop('emails')
     phones = data.pop('phones')
     name = data['name']
@@ -156,6 +180,12 @@ def create_distributor(data: dict):
     db.session.add(distributor_list)
     db.session.commit()
 
+    if brands_ids:
+        save_distributors_brands(
+            distributor_id=new_distributor.id,
+            brands_ids=brands_ids
+        )
+
     if emails and len(emails):
         save_distributor_emails(
             distributor_id=new_distributor.id,
@@ -175,10 +205,16 @@ def update_distributor(distributor_id: int, data: dict):
     if not check_distributor_exists(distributor_id):
         raise HTTPException('Distributor not found')
 
+    brands_ids = data.pop('brands_ids')
     emails = data.pop('emails')
     phones = data.pop('phones')
     db.session.merge(Distributor(**data))
     db.session.commit()
+    
+    save_distributors_brands(
+        distributor_id=distributor_id,
+        brands_ids=brands_ids
+    )
 
     if emails and len(emails):
         save_distributor_emails(

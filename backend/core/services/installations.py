@@ -217,11 +217,23 @@ def notify_creation(installation: Installation = None):
                 language=each_language)
 
 
+def is_installation_approved(installation_id: int):
+    '''Check if installation is approved'''
+
+    return db.session.query(Installation)\
+        .filter(and_(Installation.id == installation_id, Installation.status == 'APPROVED'))\
+        .first()
+
+
 def update_installation(installation_id: int, data: dict):
     '''Update installation'''
 
     if not check_installation_exists(installation_id):
         raise HTTPException('Installation not found')
+
+    # Check if installation is not approved
+    if is_installation_approved(installation_id):
+        raise HTTPException('The installation was already approved')
 
     serial_picture: FileStorage = data.pop(
         'serial_picture') if 'serial_picture' in data else None

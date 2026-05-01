@@ -21,6 +21,7 @@
   - [ADDRESSES](#addresses)
   - [SITES](#sites)
   - [DISTRIBUTORS](#distributors)
+  - [DISTRIBUTORS BRANDS](#distributors-brands)
   - [DISTRIBUTORS EMAILS](#distributors-emails)
   - [DISTRIBUTORS PHONES](#distributors-phones)
   - [CONTACTS](#contacts)
@@ -77,6 +78,8 @@ erDiagram
     LISTS ||--o{ DISTRIBUTORS_LISTS : has
     DISTRIBUTORS ||--o{ INSTALLATIONS : has
     CLIENTS ||--o{ INSTALLATIONS : has
+    DISTRIBUTORS ||--o{ DISTRIBUTORS_BRANDS : has
+    BRANDS ||--o{ DISTRIBUTORS_BRANDS : has
 ```
 
 <div class="page"/>
@@ -227,6 +230,20 @@ erDiagram
         string status "NN"
         date created_at "NN"
         date updated_at "NN"
+    }
+```
+
+<div class="page" />
+
+### DISTRIBUTORS BRANDS
+
+```mermaid
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '12px', 'entityPadding': '5' }}}%%
+erDiagram
+    DISTRIBUTORS_BRANDS {
+        int id PK, UK "AUTO_INCREMENT, NN"
+        int distributor_id FK
+        int brand_id FK
     }
 ```
 

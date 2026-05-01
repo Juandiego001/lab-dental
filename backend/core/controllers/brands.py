@@ -2,7 +2,7 @@ from core.app import db
 from flask_babel import gettext
 from core.services import brands
 from apiflask import APIBlueprint, abort
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import current_user, jwt_required
 from core.schemas.utils import Message
 from core.schemas.brands import BrandInUpdate, BrandInCreate, BrandOut, BrandSearch, BrandsOut
 
@@ -19,7 +19,8 @@ def search_brands(json_data):
 
     try:
         results, total = brands.search_brands(
-            brand_id=json_data['brand_id'],
+            current_user=current_user,
+            brands_ids=json_data['brands_ids'],
             name=json_data['name'],
             slug=json_data['slug'],
             page=json_data['page'],

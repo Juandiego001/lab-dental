@@ -6,7 +6,8 @@
       </v-col>
 
       <v-col style="min-width: 180px; max-width: 250px;" v-for="route in routes">
-        <NuxtLink class="d-flex align-center justify-space-between w-100 pa-2 text-white rounded-lg text-decoration-none"
+        <NuxtLink
+          class="d-flex align-center justify-space-between w-100 pa-2 text-white rounded-lg text-decoration-none"
           :style="{ background: route.background, cursor: 'pointer' }" :to="route.path">
           <span class="text-h6">{{ $t(`${route.subject}.title`, 2) }}</span>
           <v-icon :icon="route.icon" />
@@ -164,8 +165,6 @@ const menu = ref([
 onMounted(() => {
   try {
     routes.value = menu.value.filter(item => $ability.can('read', item.subject));
-  } catch (err) {
-    console.error(err);
-  }
+  } catch (err) { }
 })
 </script>

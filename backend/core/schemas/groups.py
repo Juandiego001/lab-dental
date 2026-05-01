@@ -1,9 +1,9 @@
 from apiflask import Schema
+from core.models import Group
+from flask_babel import gettext
+from core.schemas.utils import BaseSchema, SortBy
 from apiflask.fields import DateTime, Integer, List, Nested, String
 from marshmallow import ValidationError, post_load, pre_load, validate, validates_schema
-from core.models import Group
-from core.schemas.utils import BaseSchema, SortBy
-from flask_babel import gettext
 
 
 class GroupSearch(Schema):

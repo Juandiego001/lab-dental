@@ -2,7 +2,7 @@ from flask_babel import gettext
 from core.services import equipments
 from core.schemas.utils import Message
 from apiflask import APIBlueprint, abort
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import current_user, jwt_required
 from core.schemas.equipments import (
     EquipmentIn,
     EquipmentOut,
@@ -29,6 +29,7 @@ def search_equipments(json_data):
 
     try:
         items, total = equipments.search_equipments(
+            current_user=current_user,
             equipment_id=json_data['equipment_id'],
             brand_id=json_data['brand_id'],
             category_id=json_data['category_id'],

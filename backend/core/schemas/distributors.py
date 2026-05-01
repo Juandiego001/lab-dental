@@ -1,14 +1,13 @@
-from sqlalchemy import and_
 from core.app import db
-from core.models import Contact, DistributorEmail, DistributorPhone
-from apiflask import Schema
-from apiflask.fields import DateTime, String, List, Integer, Nested
-from marshmallow import validates_schema, ValidationError, validate
-from core.schemas.utils import BaseSchema, SortBy
+from sqlalchemy import and_
 from flask_babel import gettext
+from core.schemas.utils import BaseSchema, SortBy
+from marshmallow import validates_schema, ValidationError, validate
+from apiflask.fields import DateTime, Function, String, List, Integer, Nested
+from core.models import Brand, Contact, Distributor, DistributorEmail, DistributorPhone
 
 
-class DistributorSearch(Schema):
+class DistributorSearch(BaseSchema):
     distributors_ids = List(Integer(required=False, allow_none=True, load_default=None),
                             required=False, allow_none=True, data_key='distributorsIds', load_default=None)
     name = String(required=False, allow_none=True,
@@ -42,13 +41,13 @@ class DistributorSearch(Schema):
         return data
 
 
-class DistributorEmailSchema(Schema):
+class DistributorEmailSchema(BaseSchema):
     id = Integer(required=False, allow_none=False)
     email = String()
     status = String()
 
 
-class DistributorPhoneSchema(Schema):
+class DistributorPhoneSchema(BaseSchema):
     id = Integer(required=False, allow_none=False)
     phone = String()
     status = String()
@@ -58,6 +57,8 @@ class DistributorIn(BaseSchema):
     id = Integer()
     name = String(required=True, allow_none=False,
                   validate=validate.Length(max=50))
+    brands_ids = List(Integer, data_key='brandsIds', required=False,
+                      allow_none=True, load_default=[])
     emails = List(Nested(DistributorEmailSchema), required=False,
                   allow_none=True, load_default=[])
     phones = List(Nested(DistributorPhoneSchema), required=False,
@@ -83,6 +84,24 @@ class DistributorIn(BaseSchema):
         if not data['name']:
             raise ValidationError(
                 {'message':  gettext('distributorNameRequired')})
+
+    @validates_schema
+    def brands_exists(self, data, **kwargs):
+        '''Validate the brands exists'''
+
+        if not 'brands_ids' in data:
+            return data
+
+        if not data['brands_ids']:
+            return data
+
+        for brand_id in data['brands_ids']:
+            the_brand = db.session.query(Brand)\
+                .filter(Brand.id == brand_id, Brand.status == 'ACTIVE')\
+                .first()
+            if not the_brand:
+                raise ValidationError(
+                    {'message':  gettext('brandDoesntExist')})
 
     @validates_schema
     def emails_exists(self, data, **kwargs):
@@ -141,10 +160,19 @@ class DistributorIn(BaseSchema):
                 {'message':  gettext('distributorPhoneExistsError')})
 
 
+def get_brands_ids(d: Distributor):
+    '''Process distributors_brands list object and return only the ids'''
+
+    if not d.distributors_brands:
+        return []
+    return [distributor_brand.brand_id for distributor_brand in d.distributors_brands]
+
+
 class DistributorOut(BaseSchema):
     id = Integer()
     name = String()
     notes = String()
+    brands_ids = Function(lambda d: get_brands_ids(d), data_key='brandsIds')
     distributors_emails = List(
         Nested(DistributorEmailSchema), data_key='emails')
     distributors_phones = List(
@@ -154,7 +182,7 @@ class DistributorOut(BaseSchema):
     updated_at = DateTime(data_key='updatedAt')
 
 
-class DistributorsOut(Schema):
+class DistributorsOut(BaseSchema):
     items = List(Nested(DistributorOut))
     total = Integer()
 

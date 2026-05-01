@@ -7,8 +7,8 @@ from flask_babel import gettext
 
 
 class BrandSearch(Schema):
-    brand_id = Integer(required=False, allow_none=True,
-                       data_key='brandId', load_default=None)
+    brands_ids = List(Integer(required=False, allow_none=True, load_default=None),
+                            required=False, allow_none=True, data_key='brandsIds', load_default=None)
     name = String(required=False, allow_none=True,
                   validate=validate.Length(max=50), load_default='')
     slug = String(required=False, allow_none=True,

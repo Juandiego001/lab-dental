@@ -50,6 +50,13 @@
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('distributors.name')"
                 :rules="[nameRequired]" counter="50" maxlength="50" />
             </v-col>
+            <v-col>
+              <v-autocomplete v-model="form.brandsIds" hide-details="auto" :label="$t('brands.title', 1)"
+                :items="brands" item-title="name" item-value="id" clearable multiple chips @update:search="(name) => {
+                  if (!createDialog) return;
+                  getBrands({ brandsIds: form.brandsIds, name })
+                }" />
+            </v-col>
 
             <!-- Emails -->
             <v-col cols="12">
@@ -123,6 +130,11 @@
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('distributors.name')"
                 :rules="[nameRequired]" counter="50" maxlength="50" />
             </v-col>
+            <v-autocomplete v-model="form.brandsIds" hide-details="auto" :label="$t('brands.title', 1)" :items="brands"
+              item-title="name" item-value="id" clearable multiple chips @update:search="(name) => {
+                if (!updateDialog) return;
+                getBrands({ brandsIds: form.brandsIds, name })
+              }" />
 
             <!-- Emails -->
             <v-col cols="12">
@@ -238,6 +250,7 @@ const { $ability } = useNuxtApp();
 const { t } = useI18n();
 const { items, total, getDistributors } = useDistributors();
 const { distributorId, dialog, getContacts } = useContacts();
+const { items: brands, getBrands } = useBrands();
 
 definePageMeta({
   layout: 'app',
@@ -267,6 +280,7 @@ const form = ref({
   name: '',
   emails: [],
   phones: [],
+  brandsIds: []
 })
 const searchForm = ref({
   name: ''
@@ -284,19 +298,21 @@ const headers = computed(() => [
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
-watch(createDialog, (val) => {
+watch(createDialog, async (val) => {
   if (!val) {
     createForm.value.reset();
     resetForm();
     return;
   }
+  await getBrands({});
 })
 
-watch(updateDialog, (val) => {
+watch(updateDialog, async (val) => {
   if (!val) {
     updateForm.value.reset();
     resetForm();
   }
+  await getBrands({ brandsIds: form.value.brandsIds });
 })
 
 watch(deleteDialog, (val) => {
@@ -330,6 +346,7 @@ const resetForm = () => {
     name: '',
     emails: [],
     phones: [],
+    brandsIds: []
   }
 }
 

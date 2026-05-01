@@ -1,9 +1,11 @@
 from core.app import db
-from core.models import Brand
+from core.models import Brand, Distributor, DistributorBrand, User
 from werkzeug.exceptions import HTTPException
 
+from core.services.distributors import get_distributor_from_user
 
-def search_brands(brand_id: int, name: str, slug: str, page: int, per_page: int, sort_by: dict = None):
+
+def search_brands(current_user: User, brands_ids: list[int], name: str, slug: str, page: int, per_page: int, sort_by: dict = None):
     '''Search brands'''
 
     order_by = Brand.id.desc()
@@ -23,11 +25,18 @@ def search_brands(brand_id: int, name: str, slug: str, page: int, per_page: int,
         query.append(Brand.name.ilike(f'%{name}%'))
     if slug:
         query.append(Brand.slug.ilike(f'%{slug}%'))
-    if brand_id:
-        query.append(Brand.id != brand_id)
+
+    if brands_ids:
+        query.append(Brand.id.not_in(brands_ids))
         with_brand_id = db.session.query(Brand)\
-            .filter(Brand.id == brand_id)\
+            .filter(Brand.id.in_(brands_ids))\
             .all()
+
+    if current_user.role != 'ADMIN':
+        distributor: Distributor = get_distributor_from_user(current_user)
+        brands_ids = db.session.scalars(db.session.query(DistributorBrand.brand_id).filter(
+            DistributorBrand.distributor_id == distributor.id)).all()
+        query.append(Brand.id.in_(brands_ids))
 
     total = db.session.query(Brand)\
         .filter(*query)\

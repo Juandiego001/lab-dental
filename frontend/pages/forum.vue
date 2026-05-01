@@ -57,9 +57,7 @@ onBeforeMount(async () => {
       return a;
     })
     posts.value = latest_posts
-  } catch (err) {
-    console.error(err);
-  }
+  } catch (err) { }
 })
 
 </script>

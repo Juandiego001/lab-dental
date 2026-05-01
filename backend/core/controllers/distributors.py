@@ -1,5 +1,5 @@
+from flask_babel import gettext
 from http.client import HTTPException
-
 from core.services import distributors
 from apiflask import APIBlueprint, abort
 from flask_jwt_extended import jwt_required, current_user
@@ -9,7 +9,6 @@ from core.schemas.distributors import (
     ContactInCreate, ContactOut, DistributorIn, DistributorOut, DistributorSearch, DistributorsOut, ContactSearch, ContactsOut,
     ContactIn
 )
-from flask_babel import gettext
 
 
 bp = APIBlueprint('distributors', __name__)
@@ -64,7 +63,7 @@ def get_clients_by_distributor(distributor_id, query_data):
 @bp.post('/')
 @bp.input(DistributorIn, arg_name='distributor')
 @jwt_required()
-def create_distributors(distributor):
+def create_distributors(distributor: dict):
     '''Create distributors'''
 
     try:

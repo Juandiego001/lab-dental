@@ -173,9 +173,7 @@ const menu = ref([
 onMounted(() => {
   try {
     routes.value = menu.value.filter(item => $ability.can('read', item.subject));
-  } catch (err) {
-    console.error(err);
-  }
+  } catch (err) { }
 })
 
 const logout = async () => {

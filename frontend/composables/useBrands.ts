@@ -7,7 +7,7 @@ export const useBrands = () => {
   const total: any = ref(15)
 
   const getBrands = async ({
-    brandId,
+    brandsIds,
     name = '',
     slug = '',
     page = 1,
@@ -17,7 +17,7 @@ export const useBrands = () => {
     try {
       const data = await $api<ItemsTotal>('/api/brands/search', {
         body: {
-          brandId,
+          brandsIds,
           name,
           slug,
           page,

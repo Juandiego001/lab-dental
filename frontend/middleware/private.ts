@@ -14,7 +14,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     setProfile(data)
     await $i18n.setLocale(data.language)
   } catch (err) {
-    console.error('Error validando sesión:', err)
     setProfile(null)
     return navigateTo('/login')
   }
