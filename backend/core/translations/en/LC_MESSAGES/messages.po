@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-01 16:17-0500\n"
+"POT-Creation-Date: 2026-05-03 00:08-0500\n"
 "PO-Revision-Date: 2026-03-03 09:13-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -300,27 +300,31 @@ msgstr "Client's name required"
 msgid "distributorNameRequired"
 msgstr "Distributor name required"
 
-#: core/schemas/distributors.py:104
+#: core/schemas/distributors.py:94 core/schemas/distributors.py:98
+msgid "brandRequired"
+msgstr "At least one brand is required"
+
+#: core/schemas/distributors.py:106
 msgid "brandDoesntExist"
 msgstr "Brand doesnt exist"
 
-#: core/schemas/distributors.py:120
+#: core/schemas/distributors.py:122
 msgid "distributorEmailLengthExceededError"
 msgstr "Distributor email max length exceeded"
 
-#: core/schemas/distributors.py:134
+#: core/schemas/distributors.py:136
 msgid "distributorEmailExistsError"
 msgstr "Distributor email already exists"
 
-#: core/schemas/distributors.py:150
+#: core/schemas/distributors.py:152
 msgid "distributorPhoneLengthExceededError"
 msgstr "Distributor phone max length exceeded"
 
-#: core/schemas/distributors.py:160
+#: core/schemas/distributors.py:162
 msgid "distributorPhoneExistsError"
 msgstr "Distributor phone already exists"
 
-#: core/schemas/distributors.py:261 core/services/distributors.py:316
+#: core/schemas/distributors.py:263 core/services/distributors.py:316
 msgid "contactEmailExistsError"
 msgstr "Contact email already exists"
 

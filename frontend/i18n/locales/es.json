@@ -244,7 +244,8 @@
       "title": "Buscar distribuidor"
     },
     "rules": {
-      "nameRequired": "El nombre es requerido"
+      "nameRequired": "El nombre es requerido",
+      "brandsRequired": "Al menos una marca es requerida"
     }
   },
   "contacts": {

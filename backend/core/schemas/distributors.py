@@ -90,10 +90,12 @@ class DistributorIn(BaseSchema):
         '''Validate the brands exists'''
 
         if not 'brands_ids' in data:
-            return data
+            raise ValidationError(
+                {'message':  gettext('brandRequired')})
 
         if not data['brands_ids']:
-            return data
+            raise ValidationError(
+                {'message':  gettext('brandRequired')})
 
         for brand_id in data['brands_ids']:
             the_brand = db.session.query(Brand)\

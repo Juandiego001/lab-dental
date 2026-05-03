@@ -52,7 +52,7 @@
             </v-col>
             <v-col>
               <v-autocomplete v-model="form.brandsIds" hide-details="auto" :label="$t('brands.title', 1)"
-                :items="brands" item-title="name" item-value="id" clearable multiple chips @update:search="(name) => {
+                :items="brands" item-title="name" item-value="id" clearable multiple chips :rules="[brandsRequired]" @update:search="(name) => {
                   if (!createDialog) return;
                   getBrands({ brandsIds: form.brandsIds, name })
                 }" />
@@ -131,7 +131,7 @@
                 :rules="[nameRequired]" counter="50" maxlength="50" />
             </v-col>
             <v-autocomplete v-model="form.brandsIds" hide-details="auto" :label="$t('brands.title', 1)" :items="brands"
-              item-title="name" item-value="id" clearable multiple chips @update:search="(name) => {
+              item-title="name" item-value="id" clearable multiple chips :rules="[brandsRequired]" @update:search="(name) => {
                 if (!updateDialog) return;
                 getBrands({ brandsIds: form.brandsIds, name })
               }" />
@@ -474,5 +474,6 @@ const removePhoneField = (index) => {
 
 // Rules
 const nameRequired = (v) => !!v || t('distributors.rules.nameRequired');
+const brandsRequired = (v) => (v && v.length > 0) || t('distributors.rules.brandsRequired');
 
 </script>
