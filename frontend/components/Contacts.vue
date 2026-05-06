@@ -43,6 +43,14 @@
               </div>
             </template>
 
+            <template v-slot:item.position="{ item }">
+              <div class="d-inline-flex" style="max-width: 240px;">
+                <span class="text-caption text-truncate" :title="item.position">
+                  {{ item.position }}
+                </span>
+              </div>
+            </template>
+
             <template v-slot:item.phone="{ item }">
               <span class="text-caption">
                 {{ item.phone }}
@@ -55,7 +63,7 @@
   </v-dialog>
 
   <!-- Create Dialog -->
-  <v-dialog v-model="createDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
+  <v-dialog v-model="createDialog" max-width="600" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row class="text-body-1" no-gutters align="center">
@@ -75,7 +83,11 @@
               <v-text-field v-model="form.email" hide-details="auto" :label="$t('contacts.email')" counter="150"
                 maxlength="150" />
             </v-col>
-            <v-col cols="12">
+            <v-col cols="6">
+              <v-text-field v-model="form.position" hide-details="auto" :label="$t('contacts.position')" counter="150"
+                maxlength="150" />
+            </v-col>
+            <v-col cols="6">
               <v-text-field v-model="form.phone" hide-details="auto" :label="$t('contacts.phone')" counter="20"
                 maxlength="20" />
             </v-col>
@@ -96,7 +108,7 @@
   </v-dialog>
 
   <!-- Update Dialog -->
-  <v-dialog v-model="updateDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
+  <v-dialog v-model="updateDialog" max-width="600" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row class="text-body-1" no-gutters align="center">
@@ -116,7 +128,11 @@
               <v-text-field v-model="form.email" hide-details="auto" :label="$t('contacts.email')" counter="150"
                 maxlength="150" />
             </v-col>
-            <v-col cols="12">
+            <v-col cols="6">
+              <v-text-field v-model="form.position" hide-details="auto" :label="$t('contacts.position')" counter="150"
+                maxlength="150" />
+            </v-col>
+            <v-col cols="6">
               <v-text-field v-model="form.phone" hide-details="auto" :label="$t('contacts.phone')" counter="20"
                 maxlength="20" />
             </v-col>
@@ -230,6 +246,7 @@ const form = ref({
   fullName: '',
   email: '',
   phone: '',
+  position: ''
 })
 const searchForm = ref({
   name: '',
@@ -240,6 +257,7 @@ const resetForm = () => {
     fullName: '',
     email: '',
     phone: '',
+    position: ''
   }
 }
 
@@ -253,6 +271,7 @@ const itemsPerPageOptions = computed(() => [
 const headers = computed(() => [
   { title: t('contacts.fullName'), key: 'fullName' },
   { title: t('contacts.email'), align: 'center', key: 'email' },
+  { title: t('contacts.position'), align: 'center', key: 'position' },
   { title: t('contacts.phone'), align: 'center', key: 'phone' },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])

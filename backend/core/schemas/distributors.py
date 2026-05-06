@@ -167,7 +167,17 @@ def get_brands_ids(d: Distributor):
 
     if not d.distributors_brands:
         return []
+
     return [distributor_brand.brand_id for distributor_brand in d.distributors_brands]
+
+
+def get_brands(d: Distributor):
+    '''Process distributors_brands list object and return only the brands names'''
+
+    if not d.distributors_brands:
+        return []
+
+    return [distributor_brand.brand.name for distributor_brand in d.distributors_brands]
 
 
 class DistributorOut(BaseSchema):
@@ -175,6 +185,7 @@ class DistributorOut(BaseSchema):
     name = String()
     notes = String()
     brands_ids = Function(lambda d: get_brands_ids(d), data_key='brandsIds')
+    brands = Function(lambda d: get_brands(d))
     distributors_emails = List(
         Nested(DistributorEmailSchema), data_key='emails')
     distributors_phones = List(
@@ -221,6 +232,7 @@ class ContactOut(BaseSchema):
     full_name = String(data_key='fullName')
     email = String()
     phone = String()
+    position = String()
 
 
 class ContactsOut(BaseSchema):
@@ -240,6 +252,7 @@ class ContactIn(BaseSchema):
     )
     email = String(required=False, validate=validate.Length(max=150))
     phone = String(required=False, validate=validate.Length(max=20))
+    position = String(required=False, validate=validate.Length(max=150))
 
 
 class ContactInCreate(ContactIn):

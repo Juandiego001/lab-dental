@@ -253,6 +253,7 @@
     "fullName": "Name",
     "email": "Email",
     "phone": "Phone",
+    "position": "Position",
     "create": {
       "title": "Create Contact"
     },

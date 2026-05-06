@@ -191,6 +191,7 @@ class Contact(db.Model):
     distributor_id: Mapped[int] = mapped_column(
         ForeignKey('distributors.id'), nullable=False)
     full_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    position: Mapped[str] = mapped_column(String(150), nullable=True)
     email: Mapped[str] = mapped_column(String(450), nullable=True)
     phone: Mapped[str] = mapped_column(
         String(100), nullable=True)

@@ -18,6 +18,15 @@
           <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
             :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
             @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
+            
+            <template v-slot:item.brands="{ item }">
+              <div class="d-flex flex-wrap ga-1 my-2">
+                <v-chip v-for="brand in item.brands" class="text-caption">
+                  {{ brand }}
+                </v-chip>
+              </div>
+            </template>
+
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
                 <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getDistributor(item.id)" />
@@ -295,6 +304,7 @@ const itemsPerPageOptions = computed(() => [
 
 const headers = computed(() => [
   { title: t('distributors.name'), key: 'name' },
+  { title: t('brands.title', 2), key: 'brands' },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 

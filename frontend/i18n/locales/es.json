@@ -253,6 +253,7 @@
     "fullName": "Nombre",
     "email": "Correo",
     "phone": "Teléfono",
+    "position": "Cargo",
     "create": {
       "title": "Crear Contacto"
     },
