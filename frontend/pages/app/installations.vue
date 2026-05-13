@@ -628,6 +628,7 @@ watch(approvalDialog, async (val) => {
   }
   await getDistributorsSites();
   await getClients({ clientId: form.value.clientId });
+  await getClientsSites();
 })
 
 watch(rejectDialog, async (val) => {
