@@ -52,7 +52,7 @@ class Address(db.Model):
         ForeignKey('states.id'), nullable=True)
     city_id: Mapped[int] = mapped_column(
         ForeignKey('cities.id'), nullable=True)
-    description: Mapped[str] = mapped_column(String(100), nullable=False)
+    description: Mapped[str] = mapped_column(String(255), nullable=False)
     zip_code: Mapped[str] = mapped_column(String(40), nullable=True)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
