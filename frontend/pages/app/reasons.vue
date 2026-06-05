@@ -1,7 +1,17 @@
 <template>
   <v-container fluid class="fill-height align-start">
     <v-card width="100%" flat>
-      <v-card-title>{{ $t('reasons.title', 2) }}</v-card-title>
+      <v-card-title class="d-flex justify-space-between">
+        <p>{{ $t('reasons.title', 2) }}</p>
+        <div>
+          <client-only>
+            <v-btn v-if="$ability.can('create', 'reasons')" class="me-2" icon="mdi-plus" size="small" variant="text"
+              @click="createDialog = !createDialog" />
+            <v-btn v-if="$ability.can('read', 'reasons')" class="me-2" icon="mdi-magnify" size="small" variant="text"
+              @click="searchDialog = !searchDialog" />
+          </client-only>
+        </div>
+      </v-card-title>
       <v-card-text>
         <v-data-table :items="items" :headers="headers" :page="page" :items-per-page="perPage" :items-length="total"
           :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
@@ -176,7 +186,7 @@ const itemsPerPageOptions = computed(() => [
 ])
 
 const headers = computed(() => [
-  { title: t('reasons.name'), key: 'name', align: 'center', sortable: false },
+  { title: t('reasons.name'), key: 'name', align: 'start', sortable: false },
   { title: t('reasons.slug'), key: 'slug', align: 'center', sortable: false },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])

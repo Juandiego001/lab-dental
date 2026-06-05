@@ -5,6 +5,7 @@ from werkzeug.datastructures import FileStorage
 from core.schemas.utils import BaseSchema, SortBy
 from marshmallow import ValidationError, validates, validates_schema, validate
 from apiflask.fields import Boolean, DateTime, File, Integer, List, Nested, String, Function
+import filetype
 
 
 class EquipmentSearch(Schema):
@@ -112,29 +113,30 @@ def is_allowed_extension(filename: str):
 class EquipmentFilesIn(BaseSchema):
     files = List(File(), required=True)
 
-    @validates('files')
-    def validate_file_types(self, value: list[FileStorage], **kwargs):
+    @validates_schema
+    def validate_file_types(self, data: dict, **kwargs):
         '''Validate file types'''
 
         archivos_invalidos = []
-        for archivo in value:
+        for archivo in data['files']:
             if not archivo or not archivo.filename:
                 archivos_invalidos.append("Archivo desconocido/sin nombre")
                 continue
 
             extension_valida = is_allowed_extension(archivo.filename)
             mimetype_valido = archivo.mimetype in ALLOWED_MIMETYPES
+            header_bytes = archivo.read(2048)
+            archivo.seek(0)
+            real_file_type = filetype.guess(header_bytes)
 
-            if not extension_valida or not mimetype_valido:
+            if real_file_type is None or not extension_valida or not mimetype_valido or real_file_type.mime not in ALLOWED_MIMETYPES:
                 archivos_invalidos.append(archivo.filename)
 
         if archivos_invalidos:
             nombres_erroneos = ", ".join(archivos_invalidos)
-            raise ValidationError(
-                f"Formatos de archivo no permitidos para: {nombres_erroneos}. "
-                f"Solo se permite: {', '.join(ALLOWED_EXTENSIONS)}",
-                field_name="files"
-            )
+            raise ValidationError({
+                "message": f"Formatos de archivo no permitidos para: {nombres_erroneos}."
+            })
 
 
 class EquipmentFileOut(BaseSchema):

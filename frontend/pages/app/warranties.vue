@@ -1,7 +1,17 @@
 <template>
   <v-container fluid class="fill-height align-start">
     <v-card width="100%" flat>
-      <v-card-title>{{ $t('warranties.title', 2) }}</v-card-title>
+      <v-card-title class="d-flex justify-space-between">
+        <p>{{ $t('warranties.title', 2) }}</p>
+        <div>
+          <client-only>
+            <v-btn v-if="$ability.can('create', 'warranties')" class="me-2" icon="mdi-plus" size="small" variant="text"
+              @click="createDialog = !createDialog" />
+            <v-btn v-if="$ability.can('read', 'warranties')" class="me-2" icon="mdi-magnify" size="small" variant="text"
+              @click="searchDialog = !searchDialog" />
+          </client-only>
+        </div>
+      </v-card-title>
       <v-card-text>
         <v-data-table :items="items" :headers="headers" :page="page" :items-per-page="perPage" :items-length="total"
           :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
@@ -184,7 +194,7 @@ const itemsPerPageOptions = computed(() => [
 ])
 
 const headers = computed(() => [
-  { title: t('warranties.invoice'), key: 'invoice', align: 'center', sortable: false },
+  { title: t('warranties.invoice'), key: 'invoice', align: 'start', sortable: false },
   { title: t('warranties.problemDescription'), key: 'problemDescription', align: 'center', sortable: false },
   { title: t('warranties.solutionDescription'), key: 'solutionDescription', align: 'center', sortable: false },
   { title: t('options'), key: 'option', align: 'center', sortable: false }

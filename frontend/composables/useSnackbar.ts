@@ -27,6 +27,7 @@ export const useSnackbar = () => {
       else if (response.data) {
         if (response.data.detail?.json?.message)
           message = response.data?.detail?.json.message
+        else if (response.data.detail?.form_and_files?.message) message = response.data?.detail?.form_and_files.message
         else if (response.data?.message) message = response.data.message
       } else message = response
     }
