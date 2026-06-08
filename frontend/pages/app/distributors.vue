@@ -18,7 +18,7 @@
           <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
             :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
             @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
-            
+
             <template v-slot:item.brands="{ item }">
               <div class="d-flex flex-wrap ga-1 my-2">
                 <v-chip v-for="brand in item.brands" class="text-caption">
@@ -61,7 +61,8 @@
             </v-col>
             <v-col>
               <v-autocomplete v-model="form.brandsIds" hide-details="auto" :label="$t('brands.title', 1)"
-                :items="brands" item-title="name" item-value="id" clearable multiple chips :rules="[brandsRequired]" @update:search="(name) => {
+                :items="brands" item-title="name" item-value="id" clearable multiple chips :rules="[brandsRequired]"
+                @update:search="(name) => {
                   if (!createDialog) return;
                   getBrands({ brandsIds: form.brandsIds, name })
                 }" />
@@ -304,7 +305,7 @@ const itemsPerPageOptions = computed(() => [
 
 const headers = computed(() => [
   { title: t('distributors.name'), key: 'name' },
-  { title: t('brands.title', 2), key: 'brands' },
+  { title: t('brands.title', 2), key: 'brands', sortable: false },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
