@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-03 00:08-0500\n"
+"POT-Creation-Date: 2026-06-08 20:36-0500\n"
 "PO-Revision-Date: 2026-03-03 09:13-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -39,10 +39,10 @@ msgstr ""
 #: core/controllers/equipments.py:201 core/controllers/files.py:29
 #: core/controllers/groups.py:29 core/controllers/groups.py:41
 #: core/controllers/groups.py:56 core/controllers/groups.py:70
-#: core/controllers/groups.py:83 core/controllers/installations.py:32
-#: core/controllers/installations.py:44 core/controllers/installations.py:61
-#: core/controllers/installations.py:75 core/controllers/installations.py:88
-#: core/controllers/installations.py:102 core/controllers/installations.py:118
+#: core/controllers/groups.py:83 core/controllers/installations.py:33
+#: core/controllers/installations.py:45 core/controllers/installations.py:62
+#: core/controllers/installations.py:79 core/controllers/installations.py:92
+#: core/controllers/installations.py:108 core/controllers/installations.py:126
 #: core/controllers/lists.py:29 core/controllers/lists.py:59
 #: core/controllers/lists.py:72 core/controllers/lists.py:86
 #: core/controllers/lists.py:102 core/controllers/lists.py:115
@@ -173,23 +173,23 @@ msgstr "Grupo actualizado exitosamente"
 msgid "groupDeleted"
 msgstr "Grupo eliminado exitosamente"
 
-#: core/controllers/installations.py:59
+#: core/controllers/installations.py:60
 msgid "installationCreated"
 msgstr "Instalación creada exitosamente"
 
-#: core/controllers/installations.py:73
+#: core/controllers/installations.py:74
 msgid "installationUpdated"
 msgstr "Instalación actualizada exitosamente"
 
-#: core/controllers/installations.py:86
+#: core/controllers/installations.py:90
 msgid "installationDeleted"
 msgstr "Instalación eliminada exitosamente"
 
-#: core/controllers/installations.py:100
+#: core/controllers/installations.py:104
 msgid "installationApproved"
 msgstr "Instalación aprobada exitosamente"
 
-#: core/controllers/installations.py:116
+#: core/controllers/installations.py:122
 msgid "installationRejected"
 msgstr "Instalación rechazada exitosamente"
 
@@ -326,17 +326,22 @@ msgstr "La longitud máxima del teléfono ha sido excedida"
 msgid "distributorPhoneExistsError"
 msgstr "El teléfono del distribuidor ya existe"
 
-#: core/schemas/distributors.py:263 core/services/distributors.py:316
+#: core/schemas/distributors.py:276 core/services/distributors.py:316
 msgid "contactEmailExistsError"
 msgstr "El correo del contacto ya existe"
 
-#: core/schemas/equipments.py:52 core/schemas/equipments.py:55
+#: core/schemas/equipments.py:53 core/schemas/equipments.py:56
 msgid "modelRequired"
 msgstr "El modelo es obligatorio"
 
-#: core/schemas/equipments.py:68 core/schemas/equipments.py:71
+#: core/schemas/equipments.py:69 core/schemas/equipments.py:72
 msgid "referenceRequired"
 msgstr "La referencia es obligatoria"
+
+#: core/schemas/equipments.py:138
+#, python-format
+msgid "Unsupported file formats for: %(invalids)s"
+msgstr "Formatos de archivo no permitidos para: %(invalids)s"
 
 #: core/schemas/groups.py:38 core/schemas/groups.py:41
 msgid "groupNameRequired"
@@ -415,6 +420,15 @@ msgstr "Contacto no encontrado"
 #, python-format
 msgid "SOE Latam - Registro de certificado de instalación #%(id)s"
 msgstr "SOE Latam - Registro de certificado de instalación #%(id)s"
+
+#: core/services/installations.py:232 core/services/installations.py:308
+#: core/services/installations.py:353
+msgid "installationNotFound"
+msgstr "Instalación no encontrada"
+
+#: core/services/installations.py:236
+msgid "installationAlreadyApproved"
+msgstr "La instalación ya ha sido aprobada"
 
 #: core/services/installations.py:287
 #, python-format

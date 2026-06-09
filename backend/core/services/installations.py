@@ -229,11 +229,11 @@ def update_installation(installation_id: int, data: dict):
     '''Update installation'''
 
     if not check_installation_exists(installation_id):
-        raise HTTPException('Installation not found')
+        raise HTTPException(gettext('installationNotFound'))
 
     # Check if installation is not approved
     if is_installation_approved(installation_id):
-        raise HTTPException('The installation was already approved')
+        raise HTTPException(gettext('installationAlreadyApproved'))
 
     serial_picture: FileStorage = data.pop(
         'serial_picture') if 'serial_picture' in data else None
@@ -305,7 +305,7 @@ def approve_installation(installation_id: int):
     '''Approve installation'''
 
     if not check_installation_exists(installation_id):
-        raise HTTPException('Installation not found')
+        raise HTTPException(gettext('installationNotFound'))
 
     db.session.merge(Installation(id=installation_id, status='APPROVED'))
     db.session.commit()
@@ -350,7 +350,7 @@ def reject_installation(installation_id: int):
     '''Reject installation'''
 
     if not check_installation_exists(installation_id):
-        raise HTTPException('Installation not found')
+        raise HTTPException(gettext('installationNotFound'))
 
     db.session.merge(Installation(id=installation_id, status='REJECTED'))
     db.session.commit()

@@ -2,6 +2,7 @@ from flask_babel import gettext
 from core.schemas.utils import Message
 from core.services import installations
 from apiflask import APIBlueprint, abort
+from werkzeug.exceptions import HTTPException
 from flask_jwt_extended import jwt_required, current_user
 from core.schemas.installations import InstallationInUpdate, InstallationInCreate, InstallationOut, InstallationRejectCommentsIn, InstallationSearch, InstallationsOut
 
@@ -71,7 +72,10 @@ def update_installations(installation_id, form_and_files_data):
         installations.update_installation(installation_id, form_and_files_data)
         installations.notify_update(installation_id)
         return {'message': gettext('installationUpdated')}
+    except HTTPException as ex:
+        abort(400, ex.description)
     except Exception as ex:
+        print(str(ex))
         abort(500, gettext('abortException'))
 
 
@@ -98,6 +102,8 @@ def approve_installation(installation_id):
         installations.approve_installation(installation_id)
         installations.notify_approval(installation_id)
         return {'message': gettext('installationApproved')}
+    except HTTPException as ex:
+        abort(400, ex.description)
     except Exception as ex:
         abort(500, gettext('abortException'))
 
@@ -114,5 +120,7 @@ def reject_installation(installation_id, json_data):
         installations.notify_rejection(
             installation_id, json_data['reject_comments'])
         return {'message': gettext('installationRejected')}
+    except HTTPException as ex:
+        abort(400, ex.description)
     except Exception as ex:
         abort(500, gettext('abortException'))

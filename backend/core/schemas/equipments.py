@@ -133,9 +133,9 @@ class EquipmentFilesIn(BaseSchema):
                 archivos_invalidos.append(archivo.filename)
 
         if archivos_invalidos:
-            nombres_erroneos = ", ".join(archivos_invalidos)
+            invalids = ", ".join(archivos_invalidos)
             raise ValidationError({
-                "message": f"Formatos de archivo no permitidos para: {nombres_erroneos}."
+                "message": gettext(u"Unsupported file formats for: %(invalids)s", invalids=invalids)
             })
 
 
