@@ -44,7 +44,6 @@ def search_installations(current_user: User, equipment_id: int, distributor_id: 
         query.append(Installation.serial.ilike(f'%{serial}%'))
     if status:
         query.append(Installation.status == status)
-
     if current_user.role != 'ADMIN':
         distributor: Distributor = get_distributor_from_user(current_user)
         query.append(Installation.distributor_id == distributor.id)

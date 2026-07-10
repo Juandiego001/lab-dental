@@ -6,7 +6,7 @@ export interface DistributorSearch extends Pagination {
 }
 
 export interface ContactSearch extends Pagination {
-  distributorId: number;
+  theDistributorId?: number;
   fullName?: string;
   email?: string;
   phone?: string;

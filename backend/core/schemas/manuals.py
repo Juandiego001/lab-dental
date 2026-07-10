@@ -1,8 +1,7 @@
-from core.models import Manual
-from apiflask.fields import List, Nested, String, Integer, File, Function
-from marshmallow import post_load, pre_load, validate
-from core.schemas.utils import BaseSchema, SortBy
+from marshmallow import validate
 from core.utils import format_file_size
+from core.schemas.utils import BaseSchema, SortBy
+from apiflask.fields import List, Nested, String, Integer, File, Function
 
 
 class ManualsSearch(BaseSchema):

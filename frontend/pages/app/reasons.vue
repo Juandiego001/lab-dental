@@ -13,9 +13,9 @@
         </div>
       </v-card-title>
       <v-card-text>
-        <v-data-table :items="items" :headers="headers" :page="page" :items-per-page="perPage" :items-length="total"
-          :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-          @update:itemsPerPage="v => perPage = v" :disable-sort="true">
+        <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
+          :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
+          @update:itemsPerPage="v => perPage = v">
           <template v-slot:item.option="{ item }">
             <div class="d-flex align-center justify-center ga-2">
               <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getReason(item.id)" />
@@ -23,7 +23,7 @@
                 @click="form.id = item.id; deleteDialog = true" />
             </div>
           </template>
-        </v-data-table>
+        </v-data-table-server>
       </v-card-text>
     </v-card>
   </v-container>
@@ -42,16 +42,26 @@
         <v-form ref="createForm" v-model="createModel" @submit.prevent="createReason">
           <v-row dense>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('reasons.name')"
-                :rules="[nameRequired]"></v-text-field>
+              <v-autocomplete v-model="form.categoryId" :label="$t('categories.title', 1)" :items="categories"
+                item-title="name" item-value="id" hide-details="auto" :rules="[categoryRequired]" @update:search="(name) => {
+                  if (!createDialog) return;
+                  getCategories({ name })
+                }" />
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('reasons.slug')"
-                :rules="[slugRequired]"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('reasons.name')"
+                :rules="[nameRequired]" />
+            </v-col>
+            <v-col cols="12">
+              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('reasons.slug')" :rules="[slugRequired]"
+                @input="(v) => form.slug = $generateSlug(v)" />
+            </v-col>
+            <v-col cols="12">
+              <v-textarea v-model="form.description" hide-details="auto" :label="$t('reasons.description')" />
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
-              <span class="mx-1"></span>
+              <span class="mx-1" />
               <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
             </v-col>
           </v-row>
@@ -74,16 +84,26 @@
         <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateReason">
           <v-row dense>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('reasons.name')"
-                :rules="[nameRequired]"></v-text-field>
+              <v-autocomplete v-model="form.categoryId" :label="$t('categories.title', 1)" :items="categories"
+                item-title="name" item-value="id" hide-details="auto" :rules="[categoryRequired]" @update:search="(name) => {
+                  if (!createDialog) return;
+                  getCategories({ name })
+                }" />
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('reasons.slug')"
-                :rules="[slugRequired]"></v-text-field>
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('reasons.name')"
+                :rules="[nameRequired]" />
+            </v-col>
+            <v-col cols="12">
+              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('reasons.slug')" :rules="[slugRequired]"
+                @input="() => form.slug = $generateSlug(form.slug)" />
+            </v-col>
+            <v-col cols="12">
+              <v-textarea v-model="form.description" hide-details="auto" :label="$t('reasons.description')" />
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
-              <span class="mx-1"></span>
+              <span class="mx-1" />
               <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
             </v-col>
           </v-row>
@@ -122,11 +142,14 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="doSearch">
+        <v-form @submit.prevent="async () => {
+          await searchReasons(1, 15);
+          searchDialog = false
+        }">
           <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="search" :label="$t('reasons.search.fields')" hide-details="auto"
-                prepend-inner-icon="mdi-magnify" clearable></v-text-field>
+                prepend-inner-icon="mdi-magnify" clearable />
             </v-col>
             <v-col class="text-end" cols="12">
               <v-btn class="bg-primary" type="submit">{{ $t('search') }}</v-btn>
@@ -144,8 +167,15 @@ import { useI18n } from 'vue-i18n'
 
 const { back } = useBack()
 const { notify } = useSnackbar();
-const { $ability } = useNuxtApp();
+const { $ability, $generateSlug } = useNuxtApp();
 const { t } = useI18n();
+const { items, total, categoryId, reasonsDialog, getReasons, get, create, update, remove } = useReasons();
+const { items: categories, getCategories } = useCategories();
+
+const loading = ref(false);
+const page = ref(1);
+const perPage = ref(15);
+const sortBy = ref(null);
 
 definePageMeta({
   layout: 'app',
@@ -156,15 +186,12 @@ useHead({
   title: `SOE Latam | ${t('reasons.title', 2)}`
 })
 
-const searchDialog = ref(false);
-const createDialog = ref(false);
-const items = ref([]);
+
 const search = ref('');
-const page = ref(1);
-const perPage = ref(15);
-const total = ref(15);
+const createDialog = ref(false);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
+const searchDialog = ref(false);
 const createModel = ref(false);
 const updateModel = ref(false);
 const createForm = ref(false);
@@ -172,10 +199,13 @@ const updateForm = ref(false);
 const form = ref({
   id: '',
   name: '',
-  slug: '',
-  status: '',
-  created_at: '',
-  updated_at: ''
+  slug: ''
+})
+const searchForm = ref({
+  categoryId: null,
+  name: null,
+  slug: null,
+  description: null
 })
 
 const itemsPerPageOptions = computed(() => [
@@ -192,19 +222,21 @@ const headers = computed(() => [
 ])
 
 watch(createDialog, async (val) => {
-  if (val) { }
-  else {
+  if (!val) {
     createForm.value.reset();
     resetForm();
+    return;
   }
+  await getCategories({});
 })
 
 watch(updateDialog, async (val) => {
-  if (val) { }
-  else {
+  if (!val) {
     updateForm.value.reset();
     resetForm();
+    return;
   }
+  await getCategories({ categoryId: form.value.categoryId });
 })
 
 watch(deleteDialog, async (val) => {
@@ -212,19 +244,28 @@ watch(deleteDialog, async (val) => {
 })
 
 watch(page, async () => {
-  await getReasons();
+  await searchReasons();
 })
 
 watch(perPage, async () => {
-  await getReasons();
+  await searchReasons();
+})
+
+watch(sortBy, async (v) => {
+  if (v && v.length) {
+    await searchReasons();
+  }
+})
+
+watch(() => form.value.name, (v) => {
+  form.value.slug = $generateSlug(v);
 })
 
 onBeforeMount(async () => {
   if ($ability.can('read', 'reasons')) {
-    await getReasons();
+    await searchReasons();
     return;
   }
-
   back();
 })
 
@@ -232,27 +273,30 @@ const resetForm = () => {
   form.value = {
     id: '',
     name: '',
-    slug: '',
-    status: '',
-    created_at: '',
-    updated_at: ''
+    slug: ''
   }
 }
 
-const getReasons = async () => {
+const formatManualSlug = () => {
+  form.value.slug = $generateSlug(form.value.slug);
+}
+
+const searchReasons = async (defPage, defPerPage) => {
   try {
-    const data = await $api('/api/reasons/', {
-      query: {
-        search: search.value,
-        page: page.value,
-        perPage: perPage.value
-      },
-      method: 'GET'
+    loading.value = true;
+    await getReasons({
+      categoryId: searchForm.value.categoryId,
+      name: searchForm.value.name,
+      slug: searchForm.value.slug,
+      description: searchForm.value.description,
+      page: defPage || page.value,
+      perPage: defPerPage || perPage.value,
+      sortBy: sortBy.value?.length ? sortBy.value[0] : null
     })
-    items.value = data.items
-    total.value = data.total
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
@@ -271,12 +315,9 @@ const getReason = async (id) => {
 const createReason = async () => {
   try {
     if (!createModel.value) return;
-    const { message } = await $api('/api/reasons/', {
-      method: 'POST',
-      body: form.value
-    })
+    const { message } = await create(form.value);
     notify(message, 'success');
-    await getReasons()
+    await getReasons({})
     createDialog.value = false
   } catch (err) {
     notify(err, 'error');
@@ -286,12 +327,9 @@ const createReason = async () => {
 const updateReason = async () => {
   try {
     if (!updateModel.value) return;
-    const { message } = await $api(`/api/reasons/${form.value.id}`, {
-      method: 'PUT',
-      body: form.value
-    })
+    const { message } = await update(form.value.id, form.value);
     notify(message, 'success');
-    await getReasons()
+    await getReasons({})
     updateDialog.value = false
   } catch (err) {
     notify(err, 'error');
@@ -300,23 +338,10 @@ const updateReason = async () => {
 
 const deleteReason = async () => {
   try {
-    const { message } = await $api(`/api/reasons/${form.value.id}`, {
-      method: 'DELETE'
-    })
+    const { message } = await remove(form.value);
     notify(message, 'success');
-    await getReasons()
+    await getReasons({})
     deleteDialog.value = false
-  } catch (err) {
-    notify(err, 'error');
-  }
-}
-
-const doSearch = async () => {
-  try {
-    page.value = 1
-    perPage.value = 15
-    await getReasons()
-    searchDialog.value = false
   } catch (err) {
     notify(err, 'error');
   }
@@ -325,5 +350,6 @@ const doSearch = async () => {
 // Rules
 const nameRequired = (v) => !!v || t('reasons.rules.nameRequired');
 const slugRequired = (v) => !!v || t('reasons.rules.slugRequired');
+const categoryRequired = (v) => !!v || t('equipments.rules.categoryRequired');
 
 </script>

@@ -1,4 +1,4 @@
-import type { SiteSearch } from '~/shared/types/sites'
+import type { Address, SiteSearch } from '~/shared/types/sites'
 import type { ItemsTotal } from '~/shared/types/utils'
 
 export const useSites = () => {
@@ -37,9 +37,25 @@ export const useSites = () => {
     }
   }
 
+  const getAddress = async ({
+    addressId,
+  }: {
+    addressId?: number
+  }): Promise<Address> => {
+    try {
+      return await $api<Address>(`/api/sites/addresses/${addressId}`, {
+        method: 'GET',
+      })
+    } catch (err) {
+      notify(err, 'error')
+      return {}
+    }
+  }
+
   return {
     items,
     total,
     getSites,
+    getAddress
   }
 }

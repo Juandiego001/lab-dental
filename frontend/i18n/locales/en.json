@@ -491,6 +491,7 @@
   },
   "parts": {
     "title": "Part | Parts",
+    "partNumber": "Part Number",
     "serial": "Serial",
     "description": "Description",
     "slug": "Slug",
@@ -509,8 +510,10 @@
       "message": "Search part by serial or ID"
     },
     "rules": {
+      "partNumberRequired": "The part number is required",
       "serialRequired": "The serial is required",
-      "descriptionRequired": "The description is required"
+      "descriptionRequired": "The description is required",
+      "invoiceParts": "The invoice parts is required"
     }
   },
   "installations": {
@@ -564,6 +567,7 @@
     "title": "Reason | Reasons",
     "name": "Name",
     "slug": "Slug",
+    "description": "Description",
     "create": {
       "title": "Create reason"
     },
@@ -585,9 +589,45 @@
   },
   "warranties": {
     "title": "Warranty | Warranties",
+    "distributorContact": "Distributor Contact",
+    "contact": "Contact",
+    "distributorSite": "Distributor Site",
+    "equipmentInfo": "Equipment Info",
+    "saleDate": "Sale Date",
     "invoice": "Invoice",
-    "problemDescription": "Problem description",
-    "solutionDescription": "Solution description",
+    "info": "Warranty Info",
+    "issueType": "Issue Type",
+    "shippingInstructions": "Shipping Instructions",
+    "shiptTo": "Shipt To",
+    "problem": "Problem description",
+    "solution": "Solution description",
+    "parts": {
+      "title": "Parts used in reparation (parts required)",
+      "create": "Create part",
+      "update": "Update part",
+      "delete": {
+        "title": "Delete part",
+        "message": "Are you sure you want to delete the part?"
+      },
+      "partNumber": "Part Number",
+      "serial": "Serial",
+      "description": "Description",
+      "invoiceParts": "Invoice Parts",
+      "quantity": "Quantity",
+      "price": "Price",
+      "total": "Total",
+      "rules": {
+        "partNumberRequired": "The part number is required",
+        "serialRequired": "The serial is required",
+        "descriptionRequired": "The description is required",
+        "invoicePartsRequired": "The invoice parts is required",
+        "quantityRequired": "The quantity is required",
+        "priceRequired": "The price is required"
+      }
+    },
+    "warrantyApprovals": "Warranty Approvals",
+    "technicalApproval": "Technical Approval",
+    "dateReceived": "Date Received",
     "create": {
       "title": "Create warranty"
     },
@@ -603,9 +643,21 @@
       "message": "Search warranty by invoice or ID"
     },
     "rules": {
+      "siteDistributorRequired": "The distributor site is required",
+      "contactDistributorRequired": "The distributor contact is required",
+      "equipmentRequired": "The equipment is required",
+      "saleDateRequired": "The sale date is required",
       "invoiceRequired": "The invoice is required",
-      "problemDescriptionRequired": "The problem description is required",
-      "solutionDescriptionRequired": "The solution description is required"
+      "reasonRequired": "The reason is required",
+      "shiptToRequired": "The delivery address is required",
+      "problemRequired": "The problem description is required",
+      "solutionRequired": "The solution description is required"
+    },
+    "statuses": {
+      "label": "Status",
+      "active": "Active",
+      "approved": "Approved",
+      "rejected": "Rejected"
     }
   },
   "manuals": {

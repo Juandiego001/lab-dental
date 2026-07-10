@@ -441,7 +441,7 @@
             </v-col>
 
             <v-col cols="6">
-              <v-select v-model="searchForm.status" :item-title="title" item-value="value" :items="installationStatuses"
+              <v-select v-model="searchForm.status" item-title="title" item-value="value" :items="installationStatuses"
                 hide-details="auto" :label="$t('installations.statuses.label')" clearable />
             </v-col>
 
@@ -710,23 +710,37 @@ const resetForm = () => {
 }
 
 const getDistributorsSites = async (name) => {
-  if (!form.value.distributorId && !profile.value.distributor_id) return;
-  const data = await getSites({
-    siteId: form.value.siteDistributorId,
-    distributorId: form.value.distributorId || profile.value.distributor_id,
-    name
-  })
-  distributorsSites.value = data.items
+  try {
+    loading.value = true;
+    if (!form.value.distributorId && !profile.value.distributor_id) return;
+    const data = await getSites({
+      siteId: form.value.siteDistributorId,
+      distributorId: form.value.distributorId || profile.value.distributor_id,
+      name
+    })
+    distributorsSites.value = data.items
+  } catch (err) {
+    notify(err, 'error');
+  } finally {
+    loading.value = false;
+  }
 }
 
 const getClientsSites = async (name) => {
-  if (!form.value.clientId) return;
-  const data = await getSites({
-    siteId: form.value.siteClientId,
-    clientId: form.value.clientId,
-    name,
-  })
-  clientsSites.value = data.items
+  try {
+    loading.value = true;
+    if (!form.value.clientId) return;
+    const data = await getSites({
+      siteId: form.value.siteClientId,
+      clientId: form.value.clientId,
+      name,
+    })
+    clientsSites.value = data.items
+  } catch (err) {
+    notify(err, 'error');
+  } finally {
+    loading.value = false;
+  }
 }
 
 const getInstallations = async () => {
@@ -756,6 +770,7 @@ const getInstallations = async () => {
 
 const getInstallation = async (id) => {
   try {
+    loading.value = true;
     const data = await $api(`/api/installations/${id}`, {
       method: 'GET'
     })
@@ -763,6 +778,8 @@ const getInstallation = async (id) => {
     selectedDate.value = new Date(form.value.installedDate);
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 

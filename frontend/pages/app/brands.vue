@@ -50,7 +50,7 @@
               </v-col>
               <v-col cols="12">
                 <v-text-field v-model="form.slug" hide-details="auto" :label="$t('brands.slug')" :rules="[slugRequired]"
-                  counter="50" maxlength="50" />
+                  counter="50" maxlength="50" @input="() => form.slug = $generateSlug(form.slug)" />
               </v-col>
               <v-col class="text-end">
                 <v-btn variant="outlined" @click="createDialog = false" @mousedown.prevent :disabled="loading">{{
@@ -80,11 +80,11 @@
             <v-row dense>
               <v-col cols="12">
                 <v-text-field v-model="form.name" hide-details="auto" :label="$t('brands.name')" :rules="[nameRequired]"
-                  counter="50" maxlength="50"></v-text-field>
+                  counter="50" maxlength="50" />
               </v-col>
               <v-col cols="12">
                 <v-text-field v-model="form.slug" hide-details="auto" :label="$t('brands.slug')" :rules="[slugRequired]"
-                  counter="50" maxlength="50"></v-text-field>
+                  counter="50" maxlength="50" @input="() => form.slug = $generateSlug(form.slug)" />
               </v-col>
               <v-col class="text-end">
                 <v-btn variant="outlined" @click="updateDialog = false" @mousedown.prevent :disabled="loading">{{
@@ -158,7 +158,7 @@ import { useI18n } from 'vue-i18n'
 
 const { back } = useBack()
 const { notify } = useSnackbar();
-const { $ability } = useNuxtApp();
+const { $ability, $generateSlug } = useNuxtApp();
 const { t } = useI18n();
 const { items, total, getBrands } = useBrands();
 
@@ -245,6 +245,10 @@ watch(sortBy, async (v) => {
   if (v && v.length) {
     await searchBrands();
   }
+})
+
+watch(() => form.value.name, (v) => {
+  form.value.slug = $generateSlug(v);
 })
 
 onBeforeMount(async () => {

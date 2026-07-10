@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-06-08 20:36-0500\n"
+"POT-Creation-Date: 2026-07-08 15:28-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -40,8 +40,8 @@ msgstr ""
 #: core/controllers/groups.py:56 core/controllers/groups.py:70
 #: core/controllers/groups.py:83 core/controllers/installations.py:33
 #: core/controllers/installations.py:45 core/controllers/installations.py:62
-#: core/controllers/installations.py:79 core/controllers/installations.py:92
-#: core/controllers/installations.py:108 core/controllers/installations.py:126
+#: core/controllers/installations.py:78 core/controllers/installations.py:91
+#: core/controllers/installations.py:107 core/controllers/installations.py:125
 #: core/controllers/lists.py:29 core/controllers/lists.py:59
 #: core/controllers/lists.py:72 core/controllers/lists.py:86
 #: core/controllers/lists.py:102 core/controllers/lists.py:115
@@ -53,22 +53,22 @@ msgstr ""
 #: core/controllers/parts.py:26 core/controllers/parts.py:38
 #: core/controllers/parts.py:52 core/controllers/parts.py:66
 #: core/controllers/parts.py:79 core/controllers/permissions.py:37
-#: core/controllers/permissions.py:50 core/controllers/reasons.py:26
-#: core/controllers/reasons.py:38 core/controllers/reasons.py:52
-#: core/controllers/reasons.py:66 core/controllers/reasons.py:79
+#: core/controllers/permissions.py:50 core/controllers/reasons.py:34
+#: core/controllers/reasons.py:46 core/controllers/reasons.py:60
+#: core/controllers/reasons.py:75 core/controllers/reasons.py:88
 #: core/controllers/sites.py:33 core/controllers/sites.py:45
 #: core/controllers/sites.py:60 core/controllers/sites.py:79
-#: core/controllers/sites.py:92 core/controllers/users.py:38
-#: core/controllers/users.py:50 core/controllers/users.py:71
-#: core/controllers/users.py:85 core/controllers/users.py:107
-#: core/controllers/users.py:132 core/controllers/users.py:145
-#: core/controllers/users.py:165 core/controllers/users.py:178
-#: core/controllers/users.py:192 core/controllers/users.py:209
-#: core/controllers/users.py:239 core/controllers/users.py:259
-#: core/controllers/users.py:276 core/controllers/users.py:289
-#: core/controllers/warranties.py:27 core/controllers/warranties.py:39
-#: core/controllers/warranties.py:53 core/controllers/warranties.py:66
-#: core/controllers/warranties.py:79
+#: core/controllers/sites.py:92 core/controllers/sites.py:104
+#: core/controllers/users.py:38 core/controllers/users.py:50
+#: core/controllers/users.py:71 core/controllers/users.py:85
+#: core/controllers/users.py:107 core/controllers/users.py:132
+#: core/controllers/users.py:145 core/controllers/users.py:165
+#: core/controllers/users.py:178 core/controllers/users.py:192
+#: core/controllers/users.py:209 core/controllers/users.py:239
+#: core/controllers/users.py:259 core/controllers/users.py:276
+#: core/controllers/users.py:289 core/controllers/warranties.py:27
+#: core/controllers/warranties.py:39 core/controllers/warranties.py:53
+#: core/controllers/warranties.py:66 core/controllers/warranties.py:79
 msgid "abortException"
 msgstr ""
 
@@ -180,15 +180,15 @@ msgstr ""
 msgid "installationUpdated"
 msgstr ""
 
-#: core/controllers/installations.py:90
+#: core/controllers/installations.py:89
 msgid "installationDeleted"
 msgstr ""
 
-#: core/controllers/installations.py:104
+#: core/controllers/installations.py:103
 msgid "installationApproved"
 msgstr ""
 
-#: core/controllers/installations.py:122
+#: core/controllers/installations.py:121
 msgid "installationRejected"
 msgstr ""
 
@@ -218,6 +218,18 @@ msgstr ""
 
 #: core/controllers/permissions.py:48
 msgid "permissionUpdated"
+msgstr ""
+
+#: core/controllers/reasons.py:58
+msgid "reasonCreated"
+msgstr ""
+
+#: core/controllers/reasons.py:72
+msgid "reasonUpdated"
+msgstr ""
+
+#: core/controllers/reasons.py:86
+msgid "reasonDeleted"
 msgstr ""
 
 #: core/controllers/sites.py:58
@@ -278,6 +290,18 @@ msgstr ""
 
 #: core/controllers/users.py:274 core/controllers/users.py:287
 msgid "photoUpdated"
+msgstr ""
+
+#: core/controllers/warranties.py:51
+msgid "warrantyCreated"
+msgstr ""
+
+#: core/controllers/warranties.py:64
+msgid "warrantyUpdated"
+msgstr ""
+
+#: core/controllers/warranties.py:77
+msgid "warrantyDeleted"
 msgstr ""
 
 #: core/schemas/brands.py:40 core/schemas/brands.py:43
@@ -351,6 +375,10 @@ msgstr ""
 
 #: core/schemas/installations.py:69
 msgid "installedDateRequired"
+msgstr ""
+
+#: core/schemas/reasons.py:48 core/schemas/reasons.py:70
+msgid "reasonSlugExist"
 msgstr ""
 
 #: core/schemas/sites.py:50 core/schemas/sites.py:53

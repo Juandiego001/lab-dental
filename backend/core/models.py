@@ -1,10 +1,11 @@
 import enum
 from core.app import db
 from bcrypt import checkpw
-from sqlalchemy import Column, Enum, Index, Integer, Text, func, BigInteger, String, DateTime, ForeignKey, Boolean
+from sqlalchemy import Column, Enum, Index, Integer, Text, func, BigInteger, String, DateTime, ForeignKey, Boolean, text
 from datetime import datetime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import expression
+from sqlalchemy.dialects.postgresql import JSONB
 
 
 class Country(db.Model):
@@ -16,6 +17,7 @@ class Country(db.Model):
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
                                         server_default='ACTIVE')
+    address = relationship('Address', back_populates='country')
 
 
 class State(db.Model):
@@ -28,6 +30,7 @@ class State(db.Model):
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
                                         server_default='ACTIVE')
+    address = relationship('Address', back_populates='state')
 
 
 class City(db.Model):
@@ -40,6 +43,7 @@ class City(db.Model):
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
                                         server_default='ACTIVE')
+    address = relationship('Address', back_populates='city')
 
 
 class Address(db.Model):
@@ -66,6 +70,15 @@ class Address(db.Model):
         nullable=False,
         server_default=func.now(),
         onupdate=func.now())
+
+    site = relationship(
+        'Site', back_populates='address')
+    city = relationship(
+        'City', back_populates='address')
+    state = relationship(
+        'State', back_populates='address')
+    country = relationship(
+        'Country', back_populates='address')
 
 
 class Distributor(db.Model):
@@ -106,7 +119,7 @@ class DistributorBrand(db.Model):
         ForeignKey('distributors.id'), nullable=False)
     brand_id: Mapped[int] = mapped_column(
         ForeignKey('brands.id'), nullable=False)
-    
+
     distributor = relationship(
         'Distributor', back_populates='distributors_brands')
     brand = relationship(
@@ -266,6 +279,7 @@ class Site(db.Model):
         onupdate=func.now())
     distributor = relationship('Distributor', back_populates='site')
     client = relationship('Client', back_populates='site')
+    address = relationship('Address', back_populates='site')
 
 
 class List_(db.Model):
@@ -442,7 +456,7 @@ class Brand(db.Model):
         nullable=False,
         server_default=func.now(),
         onupdate=func.now())
-    
+
     equipment = relationship('Equipment', back_populates='brand')
     distributors_brands = relationship(
         'DistributorBrand', back_populates='brand')
@@ -514,7 +528,7 @@ class ManualType(db.Model):
         nullable=False,
         server_default=func.now(),
         onupdate=func.now())
-    
+
     manual = relationship('Manual', back_populates='manual_type')
 
 
@@ -541,8 +555,10 @@ class Manual(db.Model):
         server_default=func.now(),
         onupdate=func.now())
 
-    manual_type = relationship('ManualType', back_populates='manual', uselist=False)
-    manual_file = relationship('ManualFile', back_populates='manual', uselist=False)
+    manual_type = relationship(
+        'ManualType', back_populates='manual', uselist=False)
+    manual_file = relationship(
+        'ManualFile', back_populates='manual', uselist=False)
 
 
 class ManualFile(db.Model):
@@ -724,13 +740,22 @@ class InstallationFile(db.Model):
 
 class Reason(db.Model):
     __tablename__ = 'reasons'
+    __table_args__ = (
+        Index(
+            'uq_active_reason_category_slug',
+            'category_id',
+            'slug',
+            unique=True,
+            postgresql_where=text("status = 'ACTIVE'")
+        ),
+    )
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     category_id: Mapped[int] = mapped_column(
         ForeignKey('categories.id'), nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     slug: Mapped[str] = mapped_column(String(100), nullable=False)
-    description: Mapped[str] = mapped_column(String(100), nullable=False)
+    description: Mapped[str] = mapped_column(String(100), nullable=True)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
                                         server_default='ACTIVE')
@@ -749,13 +774,28 @@ class Warranty(db.Model):
     __tablename__ = 'warranties'
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    distributor_id: Mapped[int] = mapped_column(
+        ForeignKey('distributors.id'), nullable=False)
+    site_id: Mapped[int] = mapped_column(
+        ForeignKey('sites.id'), nullable=False)
+    equipment_id: Mapped[int] = mapped_column(
+        ForeignKey('equipments.id'), nullable=False)
+    contact_id: Mapped[int] = mapped_column(
+        ForeignKey('contacts.id'), nullable=False)
+    user_approval_id: Mapped[int] = mapped_column(
+        ForeignKey('users.id'), nullable=True)
     installation_id: Mapped[int] = mapped_column(
-        ForeignKey('installations.id'), nullable=False)
-    reasons_id: Mapped[int] = mapped_column(
-        ForeignKey('reasons.id'), nullable=False)
+        ForeignKey('installations.id'), nullable=True)
+
+    sale_date: Mapped[datetime] = mapped_column(DateTime(), nullable=False)
     invoice: Mapped[str] = mapped_column(String(40), nullable=False)
+    shipt_to: Mapped[str] = mapped_column(String(400), nullable=False)
     problem: Mapped[str] = mapped_column(String(400), nullable=False)
     solution: Mapped[str] = mapped_column(String(400), nullable=False)
+    received_at: Mapped[datetime] = mapped_column(DateTime(), nullable=True)
+    contact: Mapped[dict] = mapped_column(JSONB, nullable=True)
+    parts: Mapped[dict] = mapped_column(JSONB, nullable=True)
+
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
                                         server_default='ACTIVE')
@@ -768,3 +808,13 @@ class Warranty(db.Model):
         nullable=False,
         server_default=func.now(),
         onupdate=func.now())
+
+
+class WarrantyReason(db.Model):
+    __tablename__ = 'warranties_reasons'
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    warranty_id: Mapped[int] = mapped_column(
+        ForeignKey('warranties.id'), nullable=False)
+    reason_id: Mapped[int] = mapped_column(
+        ForeignKey('reasons.id'), nullable=False)

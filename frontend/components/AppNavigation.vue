@@ -131,16 +131,16 @@ const menu = ref([
     path: '/app/installations',
     icon: 'mdi-train-car-flatbed-car'
   },
-  // {
-  //   subject: 'reasons',
-  //   path: '/app/reasons',
-  //   icon: 'mdi-file-cancel'
-  // },
-  // {
-  //   subject: 'warranties',
-  //   path: '/app/warranties',
-  //   icon: 'mdi-certificate'
-  // },
+  {
+    subject: 'reasons',
+    path: '/app/reasons',
+    icon: 'mdi-file-cancel'
+  },
+  {
+    subject: 'warranties',
+    path: '/app/warranties',
+    icon: 'mdi-certificate'
+  },
   // {
   //   subject: 'manuals',
   //   path: '/app/manuals',

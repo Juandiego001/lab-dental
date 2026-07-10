@@ -9,7 +9,7 @@ def get_permissions_by_group_id(current_user: User, group_id: int, search: str =
     query = and_(
         Group.id == group_id,
         Module.name.not_in(
-            ['manuals', 'forums', 'reasons', 'parts', 'warranties', 'strapi'])
+            ['manuals', 'forums', 'parts', 'strapi'])
     )
 
     # Distributors users should not have access to some modules

@@ -75,7 +75,6 @@ def update_installations(installation_id, form_and_files_data):
     except HTTPException as ex:
         abort(400, ex.description)
     except Exception as ex:
-        print(str(ex))
         abort(500, gettext('abortException'))
 
 

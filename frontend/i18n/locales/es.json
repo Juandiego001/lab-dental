@@ -490,6 +490,7 @@
   },
   "parts": {
     "title": "Parte | Partes",
+    "partNumber": "Número de parte",
     "serial": "Serial",
     "description": "Descripción",
     "create": {
@@ -507,8 +508,10 @@
       "message": "Buscar parte por serial o ID"
     },
     "rules": {
+      "partNumberRequired": "El número de parte es requerido",
       "serialRequired": "El serial es requerido",
-      "descriptionRequired": "La descripción es requerida"
+      "descriptionRequired": "La descripción es requerida",
+      "invoiceParts": "Las partes de la factura son requeridas"
     }
   },
   "installations": {
@@ -562,6 +565,7 @@
     "title": "Motivo | Motivos",
     "name": "Nombre",
     "slug": "Slug",
+    "description": "Descripción",
     "create": {
       "title": "Crear motivo"
     },
@@ -583,9 +587,45 @@
   },
   "warranties": {
     "title": "Garantía | Garantías",
+    "distributorContact": "Contacto del distribuidor",
+    "contact": "Contacto",
+    "distributorSite": "Sede del distribuidor",
+    "equipmentInfo": "Información del equipo",
+    "saleDate": "Fecha de venta",
     "invoice": "Factura",
-    "problemDescription": "Descripción del problema",
-    "solutionDescription": "Descripción de la solución",
+    "info": "Información de la garantía",
+    "issueType": "Motivo de reclamación",
+    "shippingInstructions": "Instrucciones de envío",
+    "shiptTo": "Enviar a",
+    "problem": "Descripción del problema",
+    "solution": "Descripción de la solución",
+    "parts": {
+      "title": "Piezas usadas en reparación (partes requeridas)",
+      "create": "Crear pieza",
+      "update": "Actualizar pieza",
+      "delete": {
+        "title": "Eliminar pieza",
+        "message": "¿Está seguro que desea eliminar la pieza?"
+      },
+      "partNumber": "Número de pieza",
+      "serial": "Serial",
+      "description": "Description",
+      "invoiceParts": "Piezas de factura",
+      "quantity": "Cantidad",
+      "price": "Precio",
+      "total": "Total",
+      "rules": {
+        "partNumberRequired": "El número de pieza es requerido",
+        "serialRequired": "El serial es requerido",
+        "descriptionRequired": "La descripción es requerida",
+        "invoicePartsRequired": "Las piezas de la factura son requeridas",
+        "quantityRequired": "La cantidad es requerida",
+        "priceRequired": "El precio es requerido"
+      }
+    },
+    "warrantyApprovals": "Aprobaciones de la garantía",
+    "dateReceived": "Fecha de recibido",
+    "technicalApproval": "Técnico Aprobador",
     "create": {
       "title": "Crear garantía"
     },
@@ -601,9 +641,20 @@
       "message": "Buscar garantía por factura o ID"
     },
     "rules": {
+      "siteDistributorRequired": "La sede del distribuidor es requerida",
+      "contactDistributorRequired": "El contacto del distribuidor es requerido",
+      "saleDateRequired": "La fecha de venta es requerida",
       "invoiceRequired": "La factura es requerida",
-      "problemDescriptionRequired": "La descripción del problema es requerida",
-      "solutionDescriptionRequired": "La descripción de la solución es requerida"
+      "reasonRequired": "El motivo de garantía es requerido",
+      "shiptToRequired": "El lugar de envío es requerido",
+      "problemRequired": "La descripción del problema es requerida",
+      "solutionRequired": "La descripción de la solución es requerida"
+    },
+    "statuses": {
+      "label": "Estado",
+      "active": "Activo",
+      "approved": "Aprobado",
+      "rejected": "Rechazado"
     }
   },
   "manuals": {

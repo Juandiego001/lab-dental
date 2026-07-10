@@ -4,7 +4,7 @@ from core.app import db
 from flask_babel import gettext
 from core.models import Client, Contact, Distributor, DistributorBrand, DistributorEmail, DistributorList, DistributorPhone, List_, User, UserList
 from sqlalchemy import delete, func, and_, select
-from sqlalchemy.orm import selectinload, joinedload
+from sqlalchemy.orm import joinedload
 from http.client import HTTPException
 
 

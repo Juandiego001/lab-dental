@@ -1,5 +1,6 @@
 from core.app import db
 from sqlalchemy import func, or_, and_
+from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import HTTPException
 from core.services.distributors import get_distributor_from_user
 from core.models import Address, City, Client, Country, Distributor, Site, State, User
@@ -15,7 +16,8 @@ def search_sites(current_user: User, site_id: int, distributor_id: int, client_i
         elif sort_by['key'] == 'phone':
             order_by = Client.phone
         elif sort_by['key'] == 'distributorClient':
-            order_by = func.coalesce(Client.name, Distributor.name).label('distributor_client')
+            order_by = func.coalesce(
+                Client.name, Distributor.name).label('distributor_client')
         order_by = order_by.asc(
         ) if sort_by['order'] == 'asc' else order_by.desc()
 
@@ -156,3 +158,15 @@ def delete_site(site_id: int):
 
     db.session.merge(Site(id=site_id, status='INACTIVE'))
     db.session.commit()
+
+
+def get_address(address_id: int):
+    '''Get address'''
+
+    return db.session.query(Address)\
+        .options(
+            joinedload(Address.city),
+            joinedload(Address.state),
+            joinedload(Address.country),
+    )\
+        .filter(Address.id == address_id).first()

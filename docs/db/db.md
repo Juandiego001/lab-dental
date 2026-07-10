@@ -14,6 +14,7 @@
 - [Diagrama de relaciones III - Users](#diagrama-de-relaciones-iii---users)
 - [Diagrama de relaciones IV - Equipments](#diagrama-de-relaciones-iv---equipments)
 - [Diagrama de relaciones V - Installations](#diagrama-de-relaciones-v---installations)
+- [Diagrama de relaciones VI - Warranties](#diagrama-de-relaciones-vi---warranties)
 - [Tablas con atributos](#tablas-con-atributos)
   - [COUNTRIES](#countries)
   - [STATES](#states)
@@ -47,6 +48,7 @@
   - [MANUALS TYPES](#manuals-types)
   - [MANUALS](#manuals)
   - [MANUALS FILES](#manuals-files)
+  - [WARRANTIES REASONS](#warranties-reasons)
 
 <div class="page"/>
 
@@ -111,8 +113,6 @@ erDiagram
     EQUIPMENTS ||--o{ MANUALS : has
     MANUALS_TYPES ||--o{ MANUALS : has
     MANUALS ||--o| MANUALS_FILES : has
-    CATEGORIES ||--o{ REASONS : has
-    REASONS ||--o{ WARRANTIES : has
 ```
 
 <div class="page" />
@@ -126,10 +126,24 @@ erDiagram
     DISTRIBUTORS ||--o{ INSTALLATIONS : has
     CLIENTS ||--o{ INSTALLATIONS : has
     SITES ||--o{ INSTALLATIONS : has
-    INSTALLATIONS ||--o| WARRANTIES : has
 ```
 
 <div class="page"/>
+
+## Diagrama de relaciones VI - Warranties
+
+```mermaid
+erDiagram
+  WARRANTIES ||--o{ WARRANTIES_REASONS : has
+  CATEGORIES ||--o{ REASONS : has
+  REASONS ||--o{ WARRANTIES_REASONS : has
+  EQUIPMENTS ||--o{ WARRANTIES : has
+  DISTRIBUTORS ||--o{ WARRANTIES : has
+  SITES ||--o{ WARRANTIES : has
+  USERS ||--o{ WARRANTIES : approve
+```
+
+<div class="page" />
 
 ## Tablas con atributos
 
@@ -556,6 +570,7 @@ erDiagram
         int category_id FK "NN"
         string name "NN"
         string slug "NN"
+        string description "NN"
         string status "NN"
         date created_at "NN"
         date updated_at "NN"
@@ -571,11 +586,16 @@ erDiagram
 erDiagram
     WARRANTIES {
         int id PK, UK "AUTO_INCREMENT, NN"
-        int installation_id FK "NN"
-        int reason_id FK "NN"
+        int distributor_id FK "NN"
+        int site_id FK "NN"
+        int equipment_id FK "NN"
+        int user_approval_id "N"
+        date sale_date "NN"
         string invoice "NN"
+        string ship_to "NN"
         string problem "NN"
         string solution "NN"
+        date received_at "N"
         string status "NN"
         date created_at "NN"
         date updated_at "NN"
@@ -699,3 +719,19 @@ erDiagram
         date updated_at "NN"
     }
 ```
+
+<div class="page" />
+
+### WARRANTIES REASONS
+
+```mermaid
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '12px', 'entityPadding': '5' }}}%%
+erDiagram
+    WARRANTIES_REASONS {
+        int id PK, UK "AUTO_INCREMENT, NN"
+        int warranty_id FK "NN"
+        int reason_id FK "NN"
+    }
+```
+
+

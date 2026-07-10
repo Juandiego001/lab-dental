@@ -4,7 +4,7 @@ from core.services import sites
 from apiflask import APIBlueprint, abort
 from flask_jwt_extended import jwt_required, current_user
 from core.schemas.utils import Message
-from core.schemas.sites import SiteInUpdate, SiteInCreate, SiteOut, SiteSearch, SitesInstallationsOut, SitesOut
+from core.schemas.sites import AddressOut, SiteInUpdate, SiteInCreate, SiteOut, SiteSearch, SitesInstallationsOut, SitesOut
 from flask_babel import gettext
 
 
@@ -88,5 +88,17 @@ def delete_sites(site_id):
     try:
         sites.delete_site(site_id)
         return {'message': gettext('siteDeleted')}
+    except Exception as ex:
+        abort(500, gettext('abortException'))
+
+
+@bp.get('/addresses/<int:address_id>')
+@bp.output(AddressOut)
+@jwt_required()
+def get_address(address_id: int):
+    '''Get address'''
+
+    try:
+        return sites.get_address(address_id=address_id)
     except Exception as ex:
         abort(500, gettext('abortException'))

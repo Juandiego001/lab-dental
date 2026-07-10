@@ -1,28 +1,63 @@
 from core.models import Warranty
-from apiflask import Schema, fields
-from marshmallow import post_load
-from core.schemas.utils import BaseSchema
+from marshmallow import post_load, validate
+from core.schemas.utils import BaseSchema, SortBy
+from apiflask.fields import Dict, Float, String, Integer, DateTime, List, Nested
+
+
+class WarrantySearch(BaseSchema):
+    distributor_id = Integer(
+        required=False, allow_none=True, data_key='distributorId', load_default=None)
+    equipment_id = Integer(
+        required=False, allow_none=True, data_key='equipmentId', load_default=None)
+    sale_date = DateTime(
+        required=False, allow_none=True, data_key='saleDate', load_default=None)
+    invoice = String(required=False, allow_none=True, load_default=None)
+    status = String(required=False, allow_none=True, load_default=None)
+    page = Integer(load_default=1)
+    per_page = Integer(data_key='perPage', load_default=15)
+    sort_by = Nested(SortBy, data_key='sortBy', load_default=None)
+
+
+class PartIn(BaseSchema):
+    part_number = String(required=True, allow_none=False,
+                         data_key='partNumber')
+    description = String(required=True, allow_none=False)
+    invoice_parts = String(
+        required=True, allow_none=False, data_key='invoiceParts')
+    quantity = Float(required=True, allow_none=False)
+    price = Float(required=True, allow_none=False)
+    total = Float(required=True, allow_none=False)
 
 
 class WarrantyIn(BaseSchema):
-    id = fields.Integer()
-    full_name = fields.String(data_key='fullName')
-    email = fields.String()
-    password = fields.String()
-    status = fields.String(load_default='ACTIVE')
+    distributor_id = Integer(
+        required=True, allow_none=False, data_key='distributorId')
+    site_id = Integer(required=True, allow_none=False, data_key='siteId')
+    equipment_id = Integer(
+        required=True, allow_none=False, data_key='equipmentId')
+    reasons_ids = List(Integer(), required=True, allow_none=False,
+                       data_key='reasonsIds')
+    contact_id = Integer(
+        required=True, allow_none=False, data_key='contactId')
+    parts = List(Nested(PartIn), required=False,
+                 allow_none=True, load_default=None)
+    sale_date = String(required=True, allow_none=False, data_key='saleDate')
+    invoice = String(required=True, allow_none=False,
+                     validate=validate.Length(max=40))
+    shipt_to = String(required=True, allow_none=False,
+                      validate=validate.Length(max=400), data_key='shiptTo')
+    problem = String(required=True, allow_none=False,
+                     validate=validate.Length(max=400))
+    solution = String(required=True, allow_none=False,
+                      validate=validate.Length(max=400))
 
 
 class WarrantyInCreate(WarrantyIn):
-    full_name = fields.String(data_key='fullName')
-    email = fields.String()
-    password = fields.String()
-
-    @post_load
-    def make_object(self, data, **kwargs):
-        return Warranty(**data)
+    pass
 
 
 class WarrantyInUpdate(WarrantyIn):
+    id = Integer()
 
     @post_load
     def make_object(self, data, **kwargs):
@@ -30,14 +65,20 @@ class WarrantyInUpdate(WarrantyIn):
 
 
 class WarrantyOut(BaseSchema):
-    id = fields.Integer()
-    full_name = fields.String(data_key='fullName')
-    email = fields.String()
-    status = fields.String()
-    created_at = fields.DateTime()
-    updated_at = fields.DateTime()
+    id = Integer()
+    equipment_model_reference = String(
+        data_key='equipmentModelReference')
+    distributor_name = String(data_key='distributorName')
+    invoice = String()
+    sale_date = String(data_key='saleDate')
+    shipt_to = String(data_key='shiptTo')
+    problem = String()
+    solution = String()
+    status = String()
+    created_at = DateTime()
+    updated_at = DateTime()
 
 
-class WarrantiesOut(Schema):
-    items = fields.List(fields.Nested(WarrantyOut))
-    total = fields.Integer()
+class WarrantiesOut(BaseSchema):
+    items = List(Nested(WarrantyOut))
+    total = Integer()

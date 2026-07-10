@@ -6,3 +6,15 @@ export interface SiteSearch extends Pagination {
   clientId?: number;
   name?: string;
 }
+
+export interface Location {
+  id?: number;
+  name?: string;
+}
+
+export interface Address {
+  id?: number;
+  city?: Location;
+  state?: Location;
+  country?: Location;
+}

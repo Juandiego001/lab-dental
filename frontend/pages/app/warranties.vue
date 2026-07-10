@@ -13,23 +13,54 @@
         </div>
       </v-card-title>
       <v-card-text>
-        <v-data-table :items="items" :headers="headers" :page="page" :items-per-page="perPage" :items-length="total"
-          :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-          @update:itemsPerPage="v => perPage = v" :disable-sort="true">
-          <template v-slot:item.option="{ item }">
-            <div class="d-flex align-center justify-center ga-2">
-              <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getWarranty(item.id)" />
-              <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                @click="form.id = item.id; deleteDialog = true" />
-            </div>
+        <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
+          :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
+          @update:itemsPerPage="v => perPage = v" :disable-sort="true" show-expand :loading="loading">
+          <template v-slot:expanded-row="{ columns, item }">
+            <tr>
+              <td :colspan="columns.length" class="bg-grey-lighten-4 pa-3">
+                <div class="d-flex flex-column ga-1 mb-2">
+                  <p class="text-caption text-decoration-underline">{{ $t('warranties.shiptTo') }}</p>
+                  <pre class="text-body-2" style="white-space: pre-wrap;">{{ item.shiptTo }}</pre>
+                </div>
+                <div class="d-flex flex-column ga-1 mb-2">
+                  <p class="text-caption text-decoration-underline">{{ $t('warranties.problem') }}</p>
+                  <pre class="text-body-2" style="white-space: pre-wrap;">{{ item.problem }}</pre>
+                </div>
+                <div class="d-flex flex-column ga-1 mb-2">
+                  <p class="text-caption text-decoration-underline">{{ $t('warranties.solution') }}</p>
+                  <pre class="text-body-2" style="white-space: pre-wrap;">{{ item.solution }}</pre>
+                </div>
+              </td>
+            </tr>
           </template>
-        </v-data-table>
+
+          <template v-slot:item.invoice="{ item }">
+            <span :class="`rounded-lg py-1 px-2
+                  ${item.status === 'ACTIVE' && 'bg-primary'}
+                  ${item.status === 'APPROVED' && 'bg-success'}
+                  ${item.status === 'REJECTED' && 'bg-error'}
+                `">
+              {{ item.invoice }}
+            </span>
+          </template>
+          <template v-slot:item.saleDate="{ item }">{{ date.format(item.saleDate, 'fullDate') }}</template>
+
+          <template v-slot:item.option="{ item }">
+            <v-btn v-if="$ability.can('update', 'installations')" class="my-2 bg-primary me-2" size="small"
+              icon="mdi-pencil" @click="async () => { await getWarranty(item.id); updateDialog = true }" />
+            <v-btn v-if="$ability.can('delete', 'installations')" class="my-2 bg-red me-2" size="small"
+              icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" />
+            <v-btn v-if="isAdmin" class="my-2 bg-secondary" size="small" icon="mdi-eye"
+              @click="async () => { await getWarranty(item.id); }" />
+          </template>
+        </v-data-table-server>
       </v-card-text>
     </v-card>
   </v-container>
 
   <!-- Create Dialog -->
-  <v-dialog v-model="createDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
+  <v-dialog v-model="createDialog" max-width="800" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -41,21 +72,201 @@
       <v-card-text>
         <v-form ref="createForm" v-model="createModel" @submit.prevent="createWarranty">
           <v-row dense>
+
+            <!-- Distributor -->
+            <v-col cols="6">
+              <v-row dense>
+                <v-col cols="12" class="text-body-2 text-primary">
+                  {{ $t('distributors.title') }}
+                </v-col>
+                <v-col cols="12">
+                  <v-autocomplete class="flex-grow-0" v-model="form.distributorId" :label="$t('distributors.title')"
+                    :items="distributors" item-title="name" item-value="id" hide-details="auto" clearable
+                    @update:search="(name) => {
+                      getDistributors({ distributorsIds: [form.distributorId], name })
+                    }" />
+                </v-col>
+
+                <!-- Distributor Contact -->
+                <v-col cols="12" class="text-body-2 text-primary">
+                  {{ $t('warranties.distributorContact') }}
+                </v-col>
+                <v-col>
+                  <v-autocomplete v-model="contact" :label="$t('warranties.contact')" :items="distributorsContacts"
+                    item-title="fullName" hide-details="auto" clearable :readonly="!form.distributorId"
+                    :rules="[contactDistributorRequired]" return-object @update:search="async (name) => {
+                      if (!createDialog) return;
+                      await getDistributorsContacts(name)
+                    }" />
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field :label="$t('contacts.fullName')" hide-details readonly
+                    :model-value="contact?.fullName" />
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field :label="$t('contacts.email')" hide-details readonly :model-value="contact?.email" />
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field :label="$t('contacts.position')" hide-details readonly
+                    :model-value="contact?.position" />
+                </v-col>
+              </v-row>
+            </v-col>
+
+            <!-- Distributor Site -->
+            <v-col cols="6">
+              <v-row dense>
+                <v-col cols="12" class="text-body-2 text-primary">
+                  {{ $t('warranties.distributorSite') }}
+                </v-col>
+                <v-col cols="12">
+                  <v-autocomplete v-model="site" :label="`${$t('sites.title')} ${$t('distributors.title')}`"
+                    :items="distributorsSites" item-title="name" return-object hide-details="auto" clearable
+                    :readonly="!form.distributorId" :rules="[siteDistributorRequired]" @update:search="(name) => {
+                      if (!createDialog) return;
+                      getDistributorsSites(name)
+                    }" />
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field :label="$t('countries')" hide-details :model-value="address?.country?.name" readonly />
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field :label="$t('states')" hide-details :model-value="address?.state?.name" readonly />
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field :label="$t('cities')" hide-details :model-value="address?.city?.name" readonly />
+                </v-col>
+              </v-row>
+            </v-col>
+
+            <!-- Equipment Info -->
+            <v-col cols="12" class="text-body-2 text-primary mt-2">
+              {{ $t('warranties.equipmentInfo') }}
+            </v-col>
             <v-col cols="12">
+              <v-autocomplete v-model="equipment" :label="$t('equipments.title')" :items="equipments"
+                item-title="modelReference" return-object hide-details="auto" clearable :rules="[equipmentRequired]"
+                @update:search="(modelReference) => {
+                  if (!createDialog) return;
+                  getEquipments({
+                    equipmentId: equipment.id,
+                    modelReference,
+                    withPicture: false
+                  })
+                }" />
+            </v-col>
+            <v-col cols="6">
+              <v-text-field v-model="equipment.model" :label="$t('equipments.model')" hide-details readonly />
+            </v-col>
+            <v-col cols="6">
+              <v-text-field v-model="equipment.reference" :label="$t('equipments.reference')" hide-details readonly />
+            </v-col>
+
+            <!-- Warranty Info -->
+            <v-col cols="12" class="text-body-2 text-primary mt-2">
+              {{ $t('warranties.info') }}
+            </v-col>
+            <v-col cols="6">
+              <v-menu v-model="showPicker" :close-on-content-click="false" transition="scale-transition" offset-y
+                full-width max-width="290px" min-width="290px">
+                <template v-slot:activator="{ props }">
+                  <v-text-field v-model="form.saleDate" :label="$t('warranties.saleDate')" readonly hide-details="auto"
+                    v-bind="props" :rules="[saleDateRequired]" />
+                </template>
+                <v-date-picker v-model="selectedDate" title="" hide-header @update:model-value="showPicker = false"
+                  :max="todayDate" />
+              </v-menu>
+            </v-col>
+            <v-col cols="6">
               <v-text-field v-model="form.invoice" hide-details="auto" :label="$t('warranties.invoice')"
-                :rules="[invoiceRequired]"></v-text-field>
+                :rules="[invoiceRequired]" counter="40" maxlength="40" />
+            </v-col>
+
+            <!-- Issue Type -->
+            <v-col cols="12" class="text-body-2 text-primary mt-2">
+              {{ $t('warranties.issueType') }}
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.problemDescription" hide-details="auto"
-                :label="$t('warranties.problemDescription')" :rules="[problemDescriptionRequired]"></v-text-field>
+              <v-autocomplete v-model="form.reasonsIds" :label="$t('warranties.issueType')" :items="reasons"
+                item-title="name" item-value="id" hide-details="auto" clearable multiple chips
+                :readonly="!equipment.categoryId" :rules="[reasonRequired]" @update:search="(name) => {
+                  if (!createDialog && !equipment.categoryId) return;
+                  getReasons({ categoryId: equipment.categoryId, name })
+                }" />
+            </v-col>
+
+            <!-- Shipping Instructions -->
+            <v-col cols="12" class="text-body-2 text-primary mt-2">
+              {{ $t('warranties.shippingInstructions') }}
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.solutionDescription" hide-details="auto"
-                :label="$t('warranties.solutionDescription')" :rules="[solutionDescriptionRequired]"></v-text-field>
+              <v-text-field v-model="form.shiptTo" hide-details="auto" :label="$t('warranties.shiptTo')"
+                :rules="[shiptToRequired]" />
             </v-col>
+            <v-col cols="12">
+              <v-textarea v-model="form.problem" hide-details="auto" :label="$t('warranties.problem')"
+                :rules="[problemRequired]" />
+            </v-col>
+            <v-col cols="12">
+              <v-textarea v-model="form.solution" hide-details="auto" :label="$t('warranties.solution')"
+                :rules="[solutionRequired]" />
+            </v-col>
+
+            <!-- Parts -->
+            <v-col cols="12">
+              <div class="d-flex align-center my-4">
+                <span class="text-subtitle-2 text-primary">
+                  {{ $t('warranties.parts.title', 2) }}
+                </span>
+                <v-spacer />
+                <v-btn color="primary" variant="text" size=" x-small" icon="mdi-plus" @click="partsDialog = true" />
+              </div>
+
+              <v-data-table-server :items="parts" :headers="headersParts" :page="pageParts"
+                :items-per-page="perPageParts" :items-length="totalParts" :items-per-page-options="itemsPerPageOptions"
+                @update:page="v => pageParts = v" @update:itemsPerPage="v => perPageParts = v"
+                @update:sort-by="v => sortByParts = v" density="compact" :loading="loading" show-expand>
+                <template v-slot:expanded-row="{ columns, item }">
+                  <tr>
+                    <td :colspan="columns.length" class="bg-grey-lighten-4 pa-3">
+                      <div class="d-flex flex-column ga-3">
+                        <p class="text-caption text-decoration-underline">{{ $t('warranties.parts.invoiceParts') }}</p>
+                        <pre class="text-body-2" style="white-space: pre-wrap;">{{ item.invoiceParts }}</pre>
+                      </div>
+                      <div class="d-flex flex-column ga-3">
+                        <p class="text-caption text-decoration-underline">{{ $t('warranties.parts.description') }}</p>
+                        <pre class="text-body-2" style="white-space: pre-wrap;">{{ item.description }}</pre>
+                      </div>
+                    </td>
+                  </tr>
+                </template>
+
+                <template v-slot:item.option="{ item }">
+                  <div class="d-flex align-center justify-center ga-2 my-2">
+                    <v-btn class="bg-primary" size="x-small" icon="mdi-pencil"
+                      @click="partData = item; partsDialog = true" />
+                    <v-btn class="bg-red" size="x-small" icon="mdi-trash-can"
+                      @click="partData = item; deletePartDialog = true" />
+                  </div>
+                </template>
+              </v-data-table-server>
+            </v-col>
+
+            <!-- Warranty Approval -->
+            <v-col cols="12" class="text-body-2 text-primary mt-2">
+              {{ $t('warranties.warrantyApprovals') }}
+            </v-col>
+            <v-col cols="6">
+              <v-text-field :label="$t('warranties.dateReceived')" readonly hide-details="auto" density="compact" />
+            </v-col>
+            <v-col cols="6">
+              <v-text-field :label="$t('warranties.technicalApproval')" readonly hide-details="auto"
+                density="compact" />
+            </v-col>
+
             <v-col class="text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
-              <span class="mx-1"></span>
+              <span class="mx-1" />
               <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
             </v-col>
           </v-row>
@@ -65,7 +276,7 @@
   </v-dialog>
 
   <!-- Update Dialog -->
-  <v-dialog v-model="updateDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
+  <v-dialog v-model="updateDialog" max-width="800" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -77,22 +288,224 @@
       <v-card-text>
         <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateWarranty">
           <v-row dense>
-            <v-col cols="12">
-              <v-text-field v-model="form.invoice" hide-details="auto" label="Full name"></v-text-field>
+            <!-- Distributor -->
+            <v-col cols="6">
+              <v-row dense>
+                <v-col cols="12" class="text-body-2 text-primary">
+                  {{ $t('distributors.title') }}
+                </v-col>
+                <v-col cols="12">
+                  <v-autocomplete class="flex-grow-0" v-model="form.distributorId" :label="$t('distributors.title')"
+                    :items="distributors" item-title="name" item-value="id" hide-details="auto" clearable
+                    @update:search="(name) => {
+                      getDistributors({ distributorsIds: [form.distributorId], name })
+                    }" />
+                </v-col>
+
+                <!-- Distributor Contact -->
+                <v-col cols="12" class="text-body-2 text-primary">
+                  {{ $t('warranties.distributorContact') }}
+                </v-col>
+                <v-col>
+                  <v-autocomplete v-model="contact" :label="$t('warranties.contact')" :items="distributorsContacts"
+                    item-title="fullName" hide-details="auto" clearable :readonly="!form.distributorId"
+                    :rules="[contactDistributorRequired]" return-object @update:search="async (name) => {
+                      if (!createDialog) return;
+                      await getDistributorsContacts(name)
+                    }" />
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field :label="$t('contacts.fullName')" hide-details readonly
+                    :model-value="contact?.fullName" />
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field :label="$t('contacts.email')" hide-details readonly :model-value="contact?.email" />
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field :label="$t('contacts.position')" hide-details readonly
+                    :model-value="contact?.position" />
+                </v-col>
+              </v-row>
+            </v-col>
+
+            <!-- Distributor Site -->
+            <v-col cols="6">
+              <v-row dense>
+                <v-col cols="12" class="text-body-2 text-primary">
+                  {{ $t('warranties.distributorSite') }}
+                </v-col>
+                <v-col cols="12">
+                  <v-autocomplete v-model="site" :label="`${$t('sites.title')} ${$t('distributors.title')}`"
+                    :items="distributorsSites" item-title="name" return-object hide-details="auto" clearable
+                    :readonly="!form.distributorId" :rules="[siteDistributorRequired]" @update:search="(name) => {
+                      if (!createDialog) return;
+                      getDistributorsSites(name)
+                    }" />
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field :label="$t('countries')" hide-details :model-value="address?.country?.name" readonly />
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field :label="$t('states')" hide-details :model-value="address?.state?.name" readonly />
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field :label="$t('cities')" hide-details :model-value="address?.city?.name" readonly />
+                </v-col>
+              </v-row>
+            </v-col>
+
+            <!-- Equipment Info -->
+            <v-col cols="12" class="text-body-2 text-primary mt-2">
+              {{ $t('warranties.equipmentInfo') }}
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.problemDescription" hide-details="auto" label="Email"></v-text-field>
+              <v-autocomplete v-model="equipment" :label="$t('equipments.title')" :items="equipments"
+                item-title="modelReference" return-object hide-details="auto" clearable :rules="[equipmentRequired]"
+                @update:search="(modelReference) => {
+                  if (!createDialog) return;
+                  getEquipments({
+                    equipmentId: equipment.id,
+                    modelReference,
+                    withPicture: false
+                  })
+                }" />
+            </v-col>
+            <v-col cols="6">
+              <v-text-field v-model="equipment.model" :label="$t('equipments.model')" hide-details readonly />
+            </v-col>
+            <v-col cols="6">
+              <v-text-field v-model="equipment.reference" :label="$t('equipments.reference')" hide-details readonly />
+            </v-col>
+
+            <!-- Warranty Info -->
+            <v-col cols="12" class="text-body-2 text-primary mt-2">
+              {{ $t('warranties.info') }}
+            </v-col>
+            <v-col cols="6">
+              <v-menu v-model="showPicker" :close-on-content-click="false" transition="scale-transition" offset-y
+                full-width max-width="290px" min-width="290px">
+                <template v-slot:activator="{ props }">
+                  <v-text-field v-model="form.saleDate" :label="$t('warranties.saleDate')" readonly hide-details="auto"
+                    v-bind="props" :rules="[saleDateRequired]" />
+                </template>
+                <v-date-picker v-model="selectedDate" title="" hide-header @update:model-value="showPicker = false"
+                  :max="todayDate" />
+              </v-menu>
+            </v-col>
+            <v-col cols="6">
+              <v-text-field v-model="form.invoice" hide-details="auto" :label="$t('warranties.invoice')"
+                :rules="[invoiceRequired]" counter="40" maxlength="40" />
+            </v-col>
+
+            <!-- Issue Type -->
+            <v-col cols="12" class="text-body-2 text-primary mt-2">
+              {{ $t('warranties.issueType') }}
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.solutionDescription" hide-details="auto" label="Password"></v-text-field>
+              <v-autocomplete v-model="form.reasonsIds" :label="$t('warranties.issueType')" :items="reasons"
+                item-title="name" item-value="id" hide-details="auto" clearable multiple chips
+                :readonly="!equipment.categoryId" :rules="[reasonRequired]" @update:search="(name) => {
+                  if (!createDialog && !equipment.categoryId) return;
+                  getReasons({ categoryId: equipment.categoryId, name })
+                }" />
             </v-col>
+
+            <!-- Shipping Instructions -->
+            <v-col cols="12" class="text-body-2 text-primary mt-2">
+              {{ $t('warranties.shippingInstructions') }}
+            </v-col>
+            <v-col cols="12">
+              <v-text-field v-model="form.shiptTo" hide-details="auto" :label="$t('warranties.shiptTo')"
+                :rules="[shiptToRequired]" />
+            </v-col>
+            <v-col cols="12">
+              <v-textarea v-model="form.problem" hide-details="auto" :label="$t('warranties.problem')"
+                :rules="[problemRequired]" />
+            </v-col>
+            <v-col cols="12">
+              <v-textarea v-model="form.solution" hide-details="auto" :label="$t('warranties.solution')"
+                :rules="[solutionRequired]" />
+            </v-col>
+
+            <!-- Parts -->
+            <v-col cols="12">
+              <div class="d-flex align-center my-4">
+                <span class="text-subtitle-2 text-primary">
+                  {{ $t('warranties.parts.title', 2) }}
+                </span>
+                <v-spacer />
+                <v-btn color="primary" variant="text" size=" x-small" icon="mdi-plus" @click="partsDialog = true" />
+              </div>
+
+              <v-data-table-server :items="parts" :headers="headersParts" :page="pageParts"
+                :items-per-page="perPageParts" :items-length="totalParts" :items-per-page-options="itemsPerPageOptions"
+                @update:page="v => pageParts = v" @update:itemsPerPage="v => perPageParts = v"
+                @update:sort-by="v => sortByParts = v" density="compact" :loading="loading" show-expand>
+                <template v-slot:expanded-row="{ columns, item }">
+                  <tr>
+                    <td :colspan="columns.length" class="bg-grey-lighten-4 pa-3">
+                      <div class="d-flex flex-column ga-3">
+                        <p class="text-caption text-decoration-underline">{{ $t('warranties.parts.invoiceParts') }}</p>
+                        <pre class="text-body-2" style="white-space: pre-wrap;">{{ item.invoiceParts }}</pre>
+                      </div>
+                      <div class="d-flex flex-column ga-3">
+                        <p class="text-caption text-decoration-underline">{{ $t('warranties.parts.description') }}</p>
+                        <pre class="text-body-2" style="white-space: pre-wrap;">{{ item.description }}</pre>
+                      </div>
+                    </td>
+                  </tr>
+                </template>
+
+                <template v-slot:item.option="{ item }">
+                  <div class="d-flex align-center justify-center ga-2 my-2">
+                    <v-btn class="bg-primary" size="x-small" icon="mdi-pencil"
+                      @click="partData = item; partsDialog = true" />
+                    <v-btn class="bg-red" size="x-small" icon="mdi-trash-can"
+                      @click="partData = item; deletePartDialog = true" />
+                  </div>
+                </template>
+              </v-data-table-server>
+            </v-col>
+
+            <!-- Warranty Approval -->
+            <v-col cols="12" class="text-body-2 text-primary mt-2">
+              {{ $t('warranties.warrantyApprovals') }}
+            </v-col>
+            <v-col cols="6">
+              <v-text-field :label="$t('warranties.dateReceived')" readonly hide-details="auto" density="compact" />
+            </v-col>
+            <v-col cols="6">
+              <v-text-field :label="$t('warranties.technicalApproval')" readonly hide-details="auto"
+                density="compact" />
+            </v-col>
+
             <v-col class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
-              <span class="mx-1"></span>
+              <span class="mx-1" />
               <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+
+  <!-- Delete Part Dialog -->
+  <v-dialog v-model="deletePartDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
+    <v-card tile>
+      <v-card-title class="bg-primary">
+        <v-row no-gutters align="center">
+          {{ $t('warranties.parts.delete.title') }}
+          <v-spacer />
+          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="deletePartDialog = false" />
+        </v-row>
+      </v-card-title>
+      <v-card-text class="text-center py-6">
+        <p class="text-subtitle-1 mb-6 text-center">{{ $t('warranties.parts.delete.message') }}</p>
+        <v-btn @click="deletePartDialog = false" variant="outlined">{{ $t('cancel') }}</v-btn>
+        <span class="mx-2" />
+        <v-btn @click="deletePart(partData.id); deletePartDialog = false" class="bg-red">{{ $t('confirm')
+        }}</v-btn>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -118,7 +531,7 @@
   </v-dialog>
 
   <!-- Search Dialog -->
-  <v-dialog v-model="searchDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
+  <v-dialog v-model="searchDialog" max-width="700" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -130,9 +543,54 @@
       <v-card-text>
         <v-form @submit.prevent="doSearch">
           <v-row dense>
+            <!-- Equipments -->
             <v-col cols="12">
-              <v-text-field v-model="search" :label="$t('warranties.search.fields')" hide-details="auto"
-                prepend-inner-icon="mdi-magnify" clearable></v-text-field>
+              <p class="text-body-2 text-primary">{{ $t('equipments.title', 2) }}</p>
+            </v-col>
+            <v-col class="pb-4" cols="12">
+              <v-autocomplete v-model="searchForm.equipmentId" :label="$t('equipments.title')" :items="equipments"
+                item-title="modelReference" item-value="id" hide-details="auto" clearable @update:search="(modelReference) => {
+                  getEquipments({ equipmentId: searchForm.equipmentId, modelReference, withPicture: false })
+                }" />
+            </v-col>
+
+            <!-- Distributors -->
+            <v-col v-if="isAdmin" class="d-flex flex-column" cols="12">
+              <p class="text-body-2 text-primary pb-2">{{ $t('distributors.title', 2) }}</p>
+              <v-autocomplete class="flex-grow-0" v-model="searchForm.distributorId" :label="$t('distributors.title')"
+                :items="distributors" item-title="name" item-value="id" hide-details="auto" clearable @update:search="(name) => {
+                  getDistributors({ distributorsIds: [searchForm.distributorId], name })
+                }" />
+            </v-col>
+
+            <!-- Warranties -->
+            <v-col class="mt-2 d-flex flex-column" cols="12">
+              <p class="text-body-2 text-primary pb-2">{{ $t('warranties.title', 2) }}</p>
+            </v-col>
+
+            <!-- Sale Date -->
+            <v-col cols="6">
+              <v-menu v-model="searchShowPicker" :close-on-content-click="false" transition="scale-transition" offset-y
+                full-width max-width="290px" min-width="290px">
+                <template v-slot:activator="{ props }">
+                  <v-text-field v-model="searchForm.saleDate" :label="$t('warranties.saleDate')" readonly
+                    hide-details="auto" v-bind="props" />
+                </template>
+                <v-date-picker v-model="searchSelectedDate" title="" hide-header
+                  @update:model-value="searchShowPicker = false" :max="todayDate" />
+              </v-menu>
+            </v-col>
+
+            <!-- Invoice -->
+            <v-col cols="6">
+              <v-text-field v-model="searchForm.invoice" :label="$t('warranties.invoice')" hide-details="auto"
+                counter="40" maxlength="40" clearable />
+            </v-col>
+
+            <!-- Status -->
+            <v-col cols="12">
+              <v-select v-model="searchForm.status" item-title="title" item-value="value" :items="warrantiesStatuses"
+                hide-details="auto" :label="$t('warranties.statuses.label')" clearable />
             </v-col>
 
             <v-col class="text-end" cols="12">
@@ -143,16 +601,27 @@
       </v-card-text>
     </v-card>
   </v-dialog>
+
+  <WarrantiesParts />
 </template>
 
 <script setup>
 import { ref, computed, watch, onBeforeMount, } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useDate } from 'vuetify'
 
+const { profile, isAdmin } = useProfile();
 const { back } = useBack()
 const { notify } = useSnackbar();
 const { $ability } = useNuxtApp();
 const { t } = useI18n();
+const date = useDate();
+const { items: equipments, getEquipments } = useEquipments();
+const { items: distributors, getDistributors } = useDistributors();
+const { items: parts, partsDialog, partData, remove: deletePart } = useWarrantiesParts();
+const { getSites, getAddress } = useSites();
+const { getContacts } = useContacts();
+const { items: reasons, getReasons } = useReasons();
 
 definePageMeta({
   layout: 'app',
@@ -163,28 +632,73 @@ useHead({
   title: `SOE Latam | ${t('warranties.title', 2)}`
 })
 
+const loading = ref(false);
+
+// Warranties
 const searchDialog = ref(false);
 const createDialog = ref(false);
 const items = ref([]);
-const search = ref('');
 const page = ref(1);
 const perPage = ref(15);
+const sortBy = ref(null);
 const total = ref(15);
+
+// Parts
+const deletePartDialog = ref(false);
+const pageParts = ref(1);
+const perPageParts = ref(15);
+const sortByParts = ref(null);
+const totalParts = ref(15);
+
+// Distributor Contact
+const distributorsContacts = ref([]);
+const contact = ref(null);
+
+// Distributor Site
+const distributorsSites = ref([]);
+const site = ref(null)
+const address = ref(null)
+
+// Equipment
+const equipment = ref({
+  id: null,
+  modelReference: null,
+  model: null,
+  reference: null,
+  categoryId: null
+})
+
+const showPicker = ref(false);
+const selectedDate = ref(null);
 const updateDialog = ref(false);
 const deleteDialog = ref(false);
 const createModel = ref(false);
 const updateModel = ref(false);
-const createForm = ref();
-const updateForm = ref();
 const form = ref({
   id: '',
+  distributorId: null,
+  siteId: null,
+  saleDate: null,
   invoice: '',
-  problemDescription: '',
-  solutionDescription: '',
+  problem: '',
+  solution: '',
   status: '',
   created_at: '',
   updated_at: ''
 })
+
+// For search
+const searchShowPicker = ref(false);
+const searchSelectedDate = ref(null);
+const searchForm = ref({
+  equipmentId: null,
+  distributorId: null,
+  saleDate: null,
+  invoice: null,
+  status: null,
+})
+
+const todayDate = computed(() => (new Date()).toISOString().split('T')[0])
 
 const itemsPerPageOptions = computed(() => [
   { value: 15, title: '15' },
@@ -193,26 +707,68 @@ const itemsPerPageOptions = computed(() => [
   { value: 100, title: '100' }
 ])
 
-const headers = computed(() => [
-  { title: t('warranties.invoice'), key: 'invoice', align: 'start', sortable: false },
-  { title: t('warranties.problemDescription'), key: 'problemDescription', align: 'center', sortable: false },
-  { title: t('warranties.solutionDescription'), key: 'solutionDescription', align: 'center', sortable: false },
+const headers = computed(() => {
+  const defaultHeaders = [
+    { title: t('equipments.title'), key: 'equipmentModelReference' },
+  ]
+
+  if (isAdmin.value) {
+    defaultHeaders.push({ title: t('distributors.title'), key: 'distributorName' });
+  }
+
+  defaultHeaders.push({ title: t('warranties.invoice'), key: 'invoice', align: 'center' });
+  defaultHeaders.push({ title: t('warranties.saleDate'), key: 'saleDate', align: 'center' });
+
+  if ($ability.can('update', 'installations') || $ability.can('delete', 'installations')) {
+    defaultHeaders.push({ title: t('options'), key: 'option', align: 'center', sortable: false })
+  }
+
+  return defaultHeaders;
+})
+
+const headersParts = computed(() => [
+  { title: t('warranties.parts.partNumber'), key: 'partNumber', align: 'start', sortable: false },
+  { title: t('warranties.parts.quantity'), key: 'quantity', align: 'center', sortable: false },
+  { title: t('warranties.parts.price'), key: 'price', align: 'center', sortable: false },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
-watch(createDialog, async (val) => {
-  if (val) { }
-  else {
-    createForm.value.reset();
-    resetForm();
+const warrantiesStatuses = computed(() => [
+  {
+    title: t('warranties.statuses.active'),
+    value: "ACTIVE"
+  },
+  {
+    title: t('warranties.statuses.approved'),
+    value: "APPROVED"
+  },
+  {
+    title: t('warranties.statuses.rejected'),
+    value: "REJECTED"
   }
+])
+
+watch(selectedDate, async (val) => {
+  if (val) form.value.saleDate = date.format(val, 'fullDate');
+})
+
+watch(searchSelectedDate, async (val) => {
+  if (val) searchForm.value.saleDate = date.format(val, 'fullDate');
+})
+
+watch(createDialog, async (val) => {
+  if (!val) {
+    resetForm();
+    return;
+  }
+  await getEquipments({ withPicture: false });
+  await getDistributors({});
 })
 
 watch(updateDialog, async (val) => {
-  if (val) { }
-  else {
-    updateForm.value.reset();
+  if (!val) {
     resetForm();
+    return;
   }
 })
 
@@ -228,14 +784,73 @@ watch(perPage, async () => {
   await getEquipments();
 })
 
+watch(contact, (v) => {
+  if (!v) return;
+  form.value.contactDistributorId = v;
+})
+
+watch(site, async (v) => {
+  if (!v) return;
+  form.value.siteId = v.id;
+  address.value = await getAddress({ addressId: site.value.addressId });
+})
+
+watch(() => equipment.value.categoryId, async (v) => {
+  if (!v) return;
+  await getReasons({ categoryId: v });
+})
+
 onBeforeMount(async () => {
   if ($ability.can('read', 'warranties')) {
     await getWarranties();
     return;
   }
-
   back();
 })
+
+watch(() => form.value.distributorId, async (val, prev) => {
+  if (!updateDialog.value && !createDialog.value) return;
+  form.value.siteDistributorId = null;
+  form.value.siteDistributorName = null;
+  await getDistributorsSites(form.value.siteDistributorName);
+  await getDistributorsContacts(form.value.contactDistributorName);
+})
+
+watch(partsDialog, (v) => {
+  if (!v) {
+    resetPartData();
+    return;
+  }
+})
+
+watch(deletePartDialog, (v) => {
+  if (!v) {
+    resetPartData();
+    return;
+  }
+})
+
+watch(searchDialog, async (val) => {
+  if (!val) return;
+  getEquipments({
+    equipmentId: searchForm.value.equipmentId,
+    withPicture: false
+  });
+  getDistributors({
+    distributorsIds: [searchForm.value.distributorId]
+  });
+})
+
+const resetPartData = () => {
+  partData.value = {
+    partNumber: null,
+    description: null,
+    invoiceParts: null,
+    quantity: null,
+    price: null,
+    total: null
+  }
+}
 
 const resetForm = () => {
   form.value = {
@@ -247,27 +862,48 @@ const resetForm = () => {
     created_at: '',
     updated_at: ''
   }
+
+  equipment.value = {
+    id: null,
+    modelReference: null,
+    model: null,
+    reference: null,
+  }
+
+  contact.value = null;
+  site.value = null;
+  address.value = null;
+  parts.value = new Array(0);
 }
 
 const getWarranties = async () => {
   try {
-    const data = await $api('/api/warranties/', {
-      query: {
-        search: search.value,
+    loading.value = true;
+    const data = await $api('/api/warranties/search', {
+      body: {
+        distributorId: searchForm.value.distributorId,
+        equipmentId: searchForm.value.equipmentId,
+        saleDate: searchForm.value.saleDate,
+        invoice: searchForm.value.invoice,
+        status: searchForm.value.status,
         page: page.value,
-        perPage: perPage.value
+        perPage: perPage.value,
+        sortBy: sortBy.value?.length ? sortBy.value[0] : null
       },
-      method: 'GET'
+      method: 'POST'
     })
     items.value = data.items
     total.value = data.total
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const getWarranty = async (id) => {
   try {
+    loading.value = true;
     const user = await $api(`/api/warranties/${id}`, {
       method: 'GET'
     })
@@ -275,13 +911,22 @@ const getWarranty = async (id) => {
     updateDialog.value = true
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = true;
   }
 }
 
 const createWarranty = async () => {
   try {
+    loading.value = true;
     if (!createModel.value) return;
-    const { message } = await $api('/api/warranties/', {
+
+    // Complete form before sending
+    form.value.equipmentId = equipment.value.id;
+    form.value.contactId = contact.value.id;
+    form.value.parts = parts.value;
+
+    const { message } = await $api('/api/warranties', {
       method: 'POST',
       body: form.value
     })
@@ -290,11 +935,14 @@ const createWarranty = async () => {
     createDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const updateWarranty = async () => {
   try {
+    loading.value = true;
     if (!updateModel.value) return;
     const { message } = await $api(`/api/warranties/${form.value.id}`, {
       method: 'PUT',
@@ -305,11 +953,14 @@ const updateWarranty = async () => {
     updateDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const deleteWarranty = async () => {
   try {
+    loading.value = true;
     const { message } = await $api(`/api/warranties/${form.value.id}`, {
       method: 'DELETE'
     })
@@ -318,23 +969,66 @@ const deleteWarranty = async () => {
     deleteDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const doSearch = async () => {
   try {
+    loading.value = true;
     page.value = 1
     perPage.value = 15
     await getWarranties()
     searchDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
+  }
+}
+
+const getDistributorsSites = async (name) => {
+  try {
+    loading.value = true;
+    if (!form.value.distributorId && !profile.value.distributor_id) return;
+    const data = await getSites({
+      siteId: form.value.siteDistributorId,
+      distributorId: form.value.distributorId || profile.value.distributor_id,
+      name
+    })
+    distributorsSites.value = data.items
+  } catch (err) {
+    notify(err, 'error');
+  } finally {
+    loading.value = false;
+  }
+}
+
+const getDistributorsContacts = async (name) => {
+  try {
+    loading.value = true;
+    if (!form.value.distributorId && !profile.value.distributor_id) return;
+    const data = await getContacts({
+      theDistributorId: form.value.distributorId || profile.value.distributor_id,
+      name
+    })
+    distributorsContacts.value = data.items
+  } catch (err) {
+    notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 // Rules
+const siteDistributorRequired = (v) => !!v || t('warranties.rules.siteDistributorRequired');
+const contactDistributorRequired = (v) => !!v || t('warranties.rules.contactDistributorRequired');
+const equipmentRequired = (v) => !!v || t('warranties.rules.equipmentRequired');
+const saleDateRequired = (v) => !!v || t('warranties.rules.saleDateRequired');
 const invoiceRequired = (v) => !!v || t('warranties.rules.invoiceRequired');
-const problemDescriptionRequired = (v) => !!v || t('warranties.rules.problemDescriptionRequired');
-const solutionDescriptionRequired = (v) => !!v || t('warranties.rules.solutionDescriptionRequired');
-
+const reasonRequired = (v) => !!v || t('warranties.rules.reasonRequired');
+const shiptToRequired = (v) => !!v || t('warranties.rules.shiptToRequired');
+const problemRequired = (v) => !!v || t('warranties.rules.problemRequired');
+const solutionRequired = (v) => !!v || t('warranties.rules.solutionRequired');
 </script>

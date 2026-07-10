@@ -128,6 +128,17 @@ class SiteInUpdate(SiteIn):
         return Address(id=address_id, country_id=country_id, state_id=state_id, city_id=city_id, description=description), Site(**data)
 
 
+class LocationOut(BaseSchema):
+    name = String()
+
+
+class AddressOut(BaseSchema):
+    id = Integer()
+    city = Nested(LocationOut)
+    state = Nested(LocationOut)
+    country = Nested(LocationOut)
+
+
 class SiteOut(BaseSchema):
     id = Integer()
     name = String()

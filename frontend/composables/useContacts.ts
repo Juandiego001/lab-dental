@@ -3,23 +3,24 @@ import type { ItemsTotal } from '~/shared/types/utils'
 
 export const useContacts = () => {
   const { notify } = useSnackbar()
-  const items = useState('items', () => new Array())
-  const total = useState('total', () => 0)
+  const items: any = ref([])
+  const total: any = ref(0)
   const distributorId = useState('distributorId', () => null)
   const dialog = useState('dialog', () => false)
 
   const getContacts = async ({
+    theDistributorId = undefined,
     fullName = '',
     email = '',
     phone = '',
     page = 1,
     perPage = 15,
     sortBy = undefined,
-  }: ContactSearch): Promise<void> => {
+  }: ContactSearch): Promise<ItemsTotal> => {
     try {
       const data = await $api<ItemsTotal>(`/api/distributors/contacts/search`, {
         body: {
-          distributorId: distributorId.value,
+          distributorId: theDistributorId || distributorId.value,
           fullName,
           email,
           phone,
@@ -31,8 +32,10 @@ export const useContacts = () => {
       })
       items.value = data.items
       total.value = data.total
+      return data
     } catch (err) {
       notify(err, 'error')
+      return { items: [], total: 0 }
     }
   }
 

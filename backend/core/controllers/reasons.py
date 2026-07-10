@@ -1,28 +1,36 @@
 from flask_babel import gettext
 from flask_jwt_extended import jwt_required
 from core.app import db
+from core.models import Reason
 from core.services import reasons
 from apiflask import APIBlueprint, abort
 from core.schemas.utils import Message, Pagination
-from core.schemas.reasons import ReasonInUpdate, ReasonInCreate, ReasonOut, ReasonsOut
+from core.schemas.reasons import ReasonInUpdate, ReasonInCreate, ReasonOut, ReasonsOut, ReasonsSearch
 
 
 bp = APIBlueprint('reasons', __name__)
 
 
-@bp.get('/')
-@bp.input(Pagination, location='query')
+@bp.post('/search')
+@jwt_required()
+@bp.input(ReasonsSearch)
 @bp.output(ReasonsOut)
 @jwt_required()
-def get_reasons(query_data):
-    '''Get reasons'''
+def search_reasons(json_data: dict):
+    '''Search reasons'''
 
     try:
-        results = reasons.get_reasons(query_data['search'],
-                                      query_data['page'],
-                                      query_data['per_page'])
-        return {'items': results, 'total': results.total}
+        items, total = reasons.search_reasons(
+            category_id=json_data['category_id'],
+            name=json_data['name'],
+            slug=json_data['slug'],
+            description=json_data['description'],
+            page=json_data['page'],
+            per_page=json_data['per_page'],
+            sort_by=json_data['sort_by'])
+        return {'items': items, 'total': total}
     except Exception as ex:
+        print(ex)
         abort(500, gettext('abortException'))
 
 
@@ -38,16 +46,16 @@ def get_reason(reason_id):
         abort(500, gettext('abortException'))
 
 
-@bp.post('/')
+@bp.post('')
 @bp.input(ReasonInCreate, arg_name='reason')
 @jwt_required()
-def create_reasons(reason):
+def create_reasons(reason: dict):
     '''Create reasons'''
 
     try:
-        db.session.add(reason)
+        db.session.add(Reason(**reason))
         db.session.commit()
-        return {'message': 'Reason registered successfully'}
+        return {'message': gettext('reasonCreated')}
     except Exception as ex:
         abort(500, gettext('abortException'))
 
@@ -56,13 +64,14 @@ def create_reasons(reason):
 @bp.input(ReasonInUpdate)
 @bp.output(Message)
 @jwt_required()
-def update_reasons(reason_id, json_data):
+def update_reasons(reason_id: int, json_data: dict):
     '''Update reason'''
 
     try:
         reasons.update_reason(reason_id, json_data)
-        return {'message': 'Reason updated successfully'}
+        return {'message': gettext('reasonUpdated')}
     except Exception as ex:
+        print(ex)
         abort(500, gettext('abortException'))
 
 
@@ -74,6 +83,6 @@ def delete_reasons(reason_id):
 
     try:
         reasons.delete_reason(reason_id)
-        return {'message': 'Reason deleted successfully'}
+        return {'message': gettext('reasonDeleted')}
     except Exception as ex:
         abort(500, gettext('abortException'))

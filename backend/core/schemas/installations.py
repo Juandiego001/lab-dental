@@ -109,14 +109,13 @@ class InstallationOut(BaseSchema):
     client_name = String(data_key='clientName')
     site_client_id = Integer(data_key='siteClientId')
     site_client_name = String(data_key='siteClientName')
-    serial = String(data_key='serial')
+    serial = String()
     installed_date = String(data_key='installedDate')
     expiration_date = Function(
         lambda row: process_expiration_date(row), data_key='expirationDate')
     installation_serial_file = Dict(data_key='installationSerialFile')
     installation_evidences_files = List(
         Dict, data_key='installationEvidencesFiles')
-
     status = String()
 
 
