@@ -1070,6 +1070,9 @@ onBeforeMount(async () => {
 
 watch(() => form.value.distributorId, async (val, prev) => {
   if (!val || (!updateDialog.value && !createDialog.value)) return;
+  contact.value = null;
+  site.value = null;
+  address.value = null;
   await getDistributorsSites();
   await getDistributorsContacts();
 })
