@@ -1,13 +1,14 @@
-import type { Pagination } from "./utils";
+import type { Pagination } from './utils'
 
 export interface DistributorSearch extends Pagination {
-  distributorsIds: number[];
-  name?: string;
+  distributorsIds: number[]
+  name?: string
 }
 
 export interface ContactSearch extends Pagination {
-  theDistributorId?: number;
-  fullName?: string;
-  email?: string;
-  phone?: string;
+  theDistributorId?: number
+  contactsIds?: number[]
+  fullName?: string
+  email?: string
+  phone?: string
 }

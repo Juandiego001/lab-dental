@@ -793,7 +793,6 @@ class Warranty(db.Model):
     problem: Mapped[str] = mapped_column(String(400), nullable=False)
     solution: Mapped[str] = mapped_column(String(400), nullable=False)
     received_at: Mapped[datetime] = mapped_column(DateTime(), nullable=True)
-    contact: Mapped[dict] = mapped_column(JSONB, nullable=True)
     parts: Mapped[dict] = mapped_column(JSONB, nullable=True)
 
     status: Mapped[str] = mapped_column(String(20),

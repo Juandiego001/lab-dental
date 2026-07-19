@@ -210,7 +210,7 @@ def update_distributor(distributor_id: int, data: dict):
     phones = data.pop('phones')
     db.session.merge(Distributor(**data))
     db.session.commit()
-    
+
     save_distributors_brands(
         distributor_id=distributor_id,
         brands_ids=brands_ids
@@ -255,7 +255,7 @@ def delete_distributor(distributor_id: int):
     db.session.commit()
 
 
-def search_contacts(distributor_id: int, full_name: str, email: str, phone: str, page: int, per_page: int, sort_by: dict = None):
+def search_contacts(distributor_id: int, contacts_ids: list[int], full_name: str, email: str, phone: str, page: int, per_page: int, sort_by: dict = None):
     '''Search contacts'''
 
     order_by = Contact.id.desc()
@@ -271,15 +271,23 @@ def search_contacts(distributor_id: int, full_name: str, email: str, phone: str,
 
     query = [Contact.status == 'ACTIVE',
              Contact.distributor_id == distributor_id]
+    with_contacts_ids = None
     if full_name:
         query.append(Contact.full_name.ilike(f'%{full_name}%'))
     if email:
         query.append(Contact.email.ilike(f'%{email}%'))
     if phone:
         query.append(Contact.phone.ilike(f'%{phone}%'))
+    if contacts_ids:
+        query.append(Contact.id.not_in(contacts_ids))
+        with_contacts_ids = db.session.query(Contact)\
+            .filter(Contact.id.in_(contacts_ids))\
+            .all()
 
     total = db.session.query(Contact)\
         .filter(*query).count()
+    total += len(with_contacts_ids) if with_contacts_ids else 0
+
     contacts = db.session.query(Contact)\
         .filter(*query)\
         .order_by(order_by)\
@@ -287,7 +295,9 @@ def search_contacts(distributor_id: int, full_name: str, email: str, phone: str,
         .offset((page - 1) * per_page)\
         .all()
 
-    return contacts, total
+    if not with_contacts_ids:
+        return contacts, total
+    return with_contacts_ids + contacts, total
 
 
 def create_contacts(data: dict):

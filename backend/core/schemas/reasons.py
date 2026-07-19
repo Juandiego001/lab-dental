@@ -9,6 +9,9 @@ from core.app import db
 
 
 class ReasonsSearch(BaseSchema):
+    reasons_ids = List(
+        Integer(), required=False, allow_none=True,
+        load_default=None, data_key='reasonsIds')
     category_id = Integer(required=False, allow_none=True,
                           load_default=None, data_key='categoryId')
     name = String(required=False, validate=validate.Length(

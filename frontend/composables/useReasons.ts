@@ -9,6 +9,7 @@ export const useReasons = () => {
   const total = useState('total', () => 0)
 
   const getReasons = async ({
+    reasonsIds,
     categoryId = undefined,
     name = '',
     slug = '',
@@ -20,6 +21,7 @@ export const useReasons = () => {
     try {
       const data = await $api<ItemsTotal>(`/api/reasons/search`, {
         body: {
+          reasonsIds,
           categoryId: categoryId,
           name,
           slug,

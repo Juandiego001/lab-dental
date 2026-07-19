@@ -216,6 +216,9 @@ class DistributorsExistingIn(BaseSchema):
 class ContactSearch(BaseSchema):
     distributor_id = Integer(
         required=True, allow_none=False, data_key='distributorId')
+    contacts_ids = List(
+        Integer(), required=False,
+        allow_none=True, load_default=None, data_key='contactsIds')
     full_name = String(required=False, allow_none=True,
                        validate=validate.Length(max=50), load_default='', data_key='fullName')
     email = String(required=False, allow_none=True,

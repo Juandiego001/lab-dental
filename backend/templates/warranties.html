@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Reporte de Garantía</title>
+    <link rel="icon" type="image/x-icon" href="/logo2.png">
+    <style>
+      @page {
+        size: A3;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        font-family: Calibri, sans-serif;
+      }
+      body {
+        padding: 20px;
+      }
+      .title {
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 0px;
+      }
+      .subtitle {
+        text-align: center;
+        font-family: Calibri, sans-serif;
+        font-size: 14px;
+        margin-top: 0px;
+        margin-bottom: 10px;
+      }
+      .header-note {
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+      .warning {
+        text-align: center;
+        font-size: 14px;
+        margin-bottom: 10px;
+        font-weight: bold;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      th,
+      td {
+        border: 1px solid black;
+        padding: 4px 8px;
+        vertical-align: middle;
+      }
+      .header-section th {
+        text-align: center;
+        font-weight: bold;
+      }
+      .section-title {
+        text-align: center;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+      .input-field {
+        border: none;
+        color: white;
+        width: 100%;
+        height: 20px;
+        box-sizing: border-box;
+      }
+      input[type="text"] {
+        background-color: transparent;
+        border: none;
+        color: white;
+        width: 90%;
+        outline: none;
+      }
+      .checkbox-cell {
+        display: flex;
+        align-items: center;
+        border: none;
+      }
+      .checkbox-cell input {
+        margin-right: 5px;
+      }
+      .footer-note {
+        font-size: 12px;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <h1 class="title">Warranty Service Claim Report</h1>
+      <img style="width: 200px; position: absolute; right: 20px; top: 20px;" src="data:image/png;base64,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" />
+    </div>
+
+    <h6 class="subtitle">(International)</h1>
+
+    <div class="header-note">
+        <p>309 Exchange Avenue</p>
+        <p>Conway, Arkansas 72032</p>
+        <p>Ph: (501) 450 1568</p>
+        <p>Fax: (501) 450 2086</p>
+    </div>
+
+    <p class="warning">
+        Before to fill out this form please save as Distributor name and your reference
+    </p>
+
+    <table>
+      <tr>
+        <td colspan="4">
+          Distributor:
+          <span>Snap-on</span>
+        </td>
+        <td colspan="2">
+          Date:
+          <span>{{ date }}</span>
+        </td>
+      </tr>
+    </table>
+
+    <table>
+      <tr class="header-section">
+        <th colspan="2">Customer Info</th>
+        <th colspan="2">Equipment Info</th>
+      </tr>
+      <tr>
+        <td style="width: 115px;">Name</td>
+        <td style="width: 35%;">{{ distributor }}</td>
+        <td style="width: 140px;">Commercial Name</td>
+        <td style="width: 40%;">{{ distributor }}</td>
+      </tr>
+      <tr>
+        <td>Contact</td>
+        <td>{{ contact.full_name }}</td>
+        <td>Model</td>
+        <td>{{ equipment.model }}</td>
+      </tr>
+      <tr>
+        <td>E-mail</td>
+        <td>{{ contact.email }}</td>
+        <td>Serial</td>
+        <td>{{ equipment.reference }}</td>
+      </tr>
+      <tr>
+        <td>Address</td>
+        <td>{{ site.address }}</td>
+        <td>Voltage/N° Phases</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>City & Country</td>
+        <td>{{ site.city + ', ' + site.country }}</td>
+        <td>Date of selling</td>
+        <td>{{ sale_date }}</td>
+      </tr>
+      <tr>
+        <td colspan="2" style="font-weight: bold">
+          Distributor Reference Number
+        </td>
+        <td>Service Date</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="2"></td>
+        <td>Invoice Number</td>
+        <td>{{ invoice }}</td>
+      </tr>
+    </table>
+
+    <table>
+        {% for group_reasons in grouped_reasons %}
+        <tr>
+            {% for reason in group_reasons %}
+                <td>&#9745; {{ reason }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+      <tr>
+        <td colspan="3">
+          <span style="font-weight: bold;">Shipt to:</span>
+          <span>{{ shipt_to }}</span>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="3">
+          <p style="font-weight: bold; margin-bottom: 8px;">Problem Description</p>
+          <p>{{ problem }}</p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="3">
+          <p style="font-weight: bold; margin-bottom: 8px;">Solution Description</p>
+          <p>{{ solution }}</p>
+        </td>
+      </tr>
+    </table>
+
+    <table>
+      <tr>
+        <td colspan="6" style="font-weight: bold">
+          Parts used in reparation
+          <span style="font-weight: normal">(Parts Required)</span>
+        </td>
+      </tr>
+      <tr style="text-align: left">
+        <th>Part Number</th>
+        <th>Description</th>
+        <th>Invoice Parts</th>
+        <th>Qty.</th>
+        <th>Price</th>
+        <th>Total</th>
+      </tr>
+      {% for part in parts %}
+      <tr>
+        <td style="font-size: 12px;">{{ part.part_number }}</td>
+        <td style="font-size: 12px;">{{ part.description }}</td>
+        <td style="font-size: 12px;">{{ part.invoice_parts }}</td>
+        <td style="font-size: 12px;">{{ part.quantity }}</td>
+        <td style="font-size: 12px;">{{ part.price }}</td>
+        <td style="font-size: 12px;">{{ part.total }}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <td colspan="6" style="text-align: right;"><span style="font-weight: bold;">Total Price:</span> {{ total_price }}</td>
+      </tr>
+    </table>
+
+    <table>
+      <tr>
+        <td colspan="4" style="text-align: center; font-weight: bold">
+          For Official use Only
+        </td>
+      </tr>
+      <tr>
+        <td colspan="4" class="section-title" style="text-transform: none">
+          <strong>Credit Authorization</strong>
+          <span style="font-weight: normal; font-size: 0.9em"
+            >(Warranty approvals)</span
+          >
+        </td>
+      </tr>
+      <tr>
+        <td>Date received</td>
+        <td>{{ recieved_at }}</td>
+        <td>By</td>
+        <td>{{ user }}</td>
+      </tr>
+      <tr>
+        <td>Technical Approval</td>
+        <td></td>
+        <td>By</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Warranty Approval</td>
+        <td></td>
+        <td>By</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Order Approval</td>
+        <td></td>
+        <td>By</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="4" class="footer-note">
+          Parts return and this format, together with the invoice proof the
+          parts or equipment were purchased to<br />
+          Snap-on Equipment.
+        </td>
+      </tr>
+      <tr>
+        <td colspan="4" class="footer-note">
+          Note: If invoice numbers are not specified or this form is not fully filled, could delay the credit or shipment applied to the distributor account. Incomplete forms will be returned
+          and no credit will be issued.
+        </td>
+      </tr>
+    </table>
+    </table>
+  </body>
+</html>

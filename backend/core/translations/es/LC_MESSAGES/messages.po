@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-07-08 15:28-0500\n"
+"POT-Creation-Date: 2026-07-18 21:46-0500\n"
 "PO-Revision-Date: 2026-03-03 09:13-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -28,9 +28,9 @@ msgstr ""
 #: core/controllers/clients.py:84 core/controllers/distributors.py:34
 #: core/controllers/distributors.py:46 core/controllers/distributors.py:60
 #: core/controllers/distributors.py:73 core/controllers/distributors.py:86
-#: core/controllers/distributors.py:99 core/controllers/distributors.py:120
-#: core/controllers/distributors.py:132 core/controllers/distributors.py:146
-#: core/controllers/distributors.py:165 core/controllers/distributors.py:178
+#: core/controllers/distributors.py:99 core/controllers/distributors.py:121
+#: core/controllers/distributors.py:133 core/controllers/distributors.py:147
+#: core/controllers/distributors.py:166 core/controllers/distributors.py:179
 #: core/controllers/equipments.py:45 core/controllers/equipments.py:57
 #: core/controllers/equipments.py:70 core/controllers/equipments.py:87
 #: core/controllers/equipments.py:100 core/controllers/equipments.py:122
@@ -54,9 +54,9 @@ msgstr ""
 #: core/controllers/parts.py:26 core/controllers/parts.py:38
 #: core/controllers/parts.py:52 core/controllers/parts.py:66
 #: core/controllers/parts.py:79 core/controllers/permissions.py:37
-#: core/controllers/permissions.py:50 core/controllers/reasons.py:34
-#: core/controllers/reasons.py:46 core/controllers/reasons.py:60
-#: core/controllers/reasons.py:75 core/controllers/reasons.py:88
+#: core/controllers/permissions.py:50 core/controllers/reasons.py:35
+#: core/controllers/reasons.py:47 core/controllers/reasons.py:61
+#: core/controllers/reasons.py:76 core/controllers/reasons.py:89
 #: core/controllers/sites.py:33 core/controllers/sites.py:45
 #: core/controllers/sites.py:60 core/controllers/sites.py:79
 #: core/controllers/sites.py:92 core/controllers/sites.py:104
@@ -67,9 +67,11 @@ msgstr ""
 #: core/controllers/users.py:178 core/controllers/users.py:192
 #: core/controllers/users.py:209 core/controllers/users.py:239
 #: core/controllers/users.py:259 core/controllers/users.py:276
-#: core/controllers/users.py:289 core/controllers/warranties.py:27
-#: core/controllers/warranties.py:39 core/controllers/warranties.py:53
-#: core/controllers/warranties.py:66 core/controllers/warranties.py:79
+#: core/controllers/users.py:289 core/controllers/warranties.py:36
+#: core/controllers/warranties.py:48 core/controllers/warranties.py:61
+#: core/controllers/warranties.py:74 core/controllers/warranties.py:87
+#: core/controllers/warranties.py:105 core/controllers/warranties.py:122
+#: core/controllers/warranties.py:141
 msgid "abortException"
 msgstr "Ha ocurrido un error interno"
 
@@ -121,15 +123,15 @@ msgstr "Distribuidor actualizado exitosamente"
 msgid "distributorDeleted"
 msgstr "Distribuidor eliminado exitosamente"
 
-#: core/controllers/distributors.py:144
+#: core/controllers/distributors.py:145
 msgid "contactCreated"
 msgstr "Contacto creado exitosamente"
 
-#: core/controllers/distributors.py:161
+#: core/controllers/distributors.py:162
 msgid "contactUpdated"
 msgstr "Contacto actualizado exitosamente"
 
-#: core/controllers/distributors.py:176
+#: core/controllers/distributors.py:177
 msgid "contactDeleted"
 msgstr "Contacto eliminado exitosamente"
 
@@ -221,15 +223,15 @@ msgstr "Manual eliminado exitosamente"
 msgid "permissionUpdated"
 msgstr "Permiso actualizado exitosamente"
 
-#: core/controllers/reasons.py:58
+#: core/controllers/reasons.py:59
 msgid "reasonCreated"
 msgstr "Motivo creado exitosamente"
 
-#: core/controllers/reasons.py:72
+#: core/controllers/reasons.py:73
 msgid "reasonUpdated"
 msgstr "Motivo actualizado exitosamente"
 
-#: core/controllers/reasons.py:86
+#: core/controllers/reasons.py:87
 msgid "reasonDeleted"
 msgstr "Motivo eliminado exitosamente"
 
@@ -295,17 +297,25 @@ msgstr "Sesión finalizada"
 msgid "photoUpdated"
 msgstr "Foto actualizada"
 
-#: core/controllers/warranties.py:51
+#: core/controllers/warranties.py:59
 msgid "warrantyCreated"
 msgstr "Garantía creada exitosamente"
 
-#: core/controllers/warranties.py:64
+#: core/controllers/warranties.py:72
 msgid "warrantyUpdated"
 msgstr "Garantía actualizada exitosamente"
 
-#: core/controllers/warranties.py:77
+#: core/controllers/warranties.py:85
 msgid "warrantyDeleted"
 msgstr "Garantía eliminada exitosamente"
+
+#: core/controllers/warranties.py:117
+msgid "warrantyApproved"
+msgstr "Garantía aprobada exitosamente"
+
+#: core/controllers/warranties.py:136
+msgid "warrantyRejected"
+msgstr "Garantía rechazada exitosamente"
 
 #: core/schemas/brands.py:40 core/schemas/brands.py:43
 #: core/schemas/categories.py:40 core/schemas/categories.py:43
@@ -350,7 +360,7 @@ msgstr "La longitud máxima del teléfono ha sido excedida"
 msgid "distributorPhoneExistsError"
 msgstr "El teléfono del distribuidor ya existe"
 
-#: core/schemas/distributors.py:276 core/services/distributors.py:316
+#: core/schemas/distributors.py:279 core/services/distributors.py:326
 msgid "contactEmailExistsError"
 msgstr "El correo del contacto ya existe"
 
@@ -380,7 +390,7 @@ msgstr "El número de serie es obligatorio"
 msgid "installedDateRequired"
 msgstr "La fecha de instalación es obligatoria"
 
-#: core/schemas/reasons.py:48 core/schemas/reasons.py:70
+#: core/schemas/reasons.py:51 core/schemas/reasons.py:73
 msgid "reasonSlugExist"
 msgstr "El slug del motivo de garantía ya existe"
 
@@ -440,35 +450,35 @@ msgstr "Debe tener un máximo de 24 caracteres"
 msgid "invalidCurrentPassword"
 msgstr "La contraseña actual es inválida"
 
-#: core/services/distributors.py:313
+#: core/services/distributors.py:323
 msgid "contactNotFound"
 msgstr "Contacto no encontrado"
 
-#: core/services/installations.py:209
+#: core/services/installations.py:208
 #, python-format
 msgid "SOE Latam - Registro de certificado de instalación #%(id)s"
 msgstr "SOE Latam - Registro de certificado de instalación #%(id)s"
 
-#: core/services/installations.py:232 core/services/installations.py:308
-#: core/services/installations.py:353
+#: core/services/installations.py:231 core/services/installations.py:307
+#: core/services/installations.py:352
 msgid "installationNotFound"
 msgstr "Instalación no encontrada"
 
-#: core/services/installations.py:236
+#: core/services/installations.py:235
 msgid "installationAlreadyApproved"
 msgstr "La instalación ya ha sido aprobada"
 
-#: core/services/installations.py:287
+#: core/services/installations.py:286
 #, python-format
 msgid "SOE Latam - Actualización de certificado de instalación #%(id)s"
 msgstr "SOE Latam - Actualización de certificado de instalación #%(id)s"
 
-#: core/services/installations.py:339
+#: core/services/installations.py:338
 #, python-format
 msgid "SOE Latam - Aprobación de instalación #%(id)s"
 msgstr "SOE Latam - Aprobación de instalación #%(id)s"
 
-#: core/services/installations.py:384
+#: core/services/installations.py:383
 #, python-format
 msgid "SOE Latam - Rechazo de instalación #%(id)s"
 msgstr "SOE Latam - Rechazo de instalación #%(id)s"
@@ -477,12 +487,28 @@ msgstr "SOE Latam - Rechazo de instalación #%(id)s"
 msgid "resetPassword"
 msgstr "Restablecer contraseña"
 
-#: templates/installation_approved.html:6
+#: core/services/warranties.py:303 core/services/warranties.py:358
+msgid "warrantyNotFound"
+msgstr "Garantía no encontrada"
+
+#: core/services/warranties.py:344
+#, python-format
+msgid "SOE Latam - Aprobación de garantía #%(id)s"
+msgstr "SOE Latam - Aprobación de garantía #%(id)s"
+
+#: core/services/warranties.py:399
+#, python-format
+msgid "SOE Latam - Rechazo de garantía #%(id)s"
+msgstr "SOE Latam - Rechazo de garantía #%(id)s"
+
+#: templates/installation_approved.html:6 templates/warranty_approved.html:6
+#: templates/warranty_rejected.html:6
 msgid "approvedInstallationNotification"
 msgstr "Notificación de instalación aprobada"
 
 #: templates/installation_approved.html:32
-#: templates/installation_rejected.html:32
+#: templates/installation_rejected.html:32 templates/warranty_approved.html:47
+#: templates/warranty_rejected.html:47
 msgid "dearColleagues"
 msgstr "Estimados"
 
@@ -491,7 +517,7 @@ msgstr "Estimados"
 msgid "installationWithFollowingData"
 msgstr "La instalación con los siguientes datos ha sido"
 
-#: templates/installation_approved.html:45
+#: templates/installation_approved.html:45 templates/warranty_approved.html:63
 msgid "approved"
 msgstr "APROBADA"
 
@@ -529,28 +555,32 @@ msgstr "Sede del cliente"
 #: templates/installation_approved.html:59
 #: templates/installation_rejected.html:74
 #: templates/installation_updated.html:58
-#: templates/register_installation.html:46
+#: templates/register_installation.html:46 templates/warranty_approved.html:213
+#: templates/warranty_rejected.html:227
 msgid "makeClick"
 msgstr "Haga click"
 
 #: templates/installation_approved.html:61
 #: templates/installation_rejected.html:76
 #: templates/installation_updated.html:60
-#: templates/register_installation.html:48
+#: templates/register_installation.html:48 templates/warranty_approved.html:218
+#: templates/warranty_rejected.html:232
 msgid "here"
 msgstr "aquí"
 
 #: templates/installation_approved.html:63
 #: templates/installation_rejected.html:78
 #: templates/installation_updated.html:62
-#: templates/register_installation.html:50
+#: templates/register_installation.html:50 templates/warranty_approved.html:220
+#: templates/warranty_rejected.html:234
 msgid "toGoToApplication"
 msgstr "para dirigirse a la aplicación"
 
 #: templates/installation_approved.html:66
 #: templates/installation_rejected.html:81
 #: templates/installation_updated.html:65
-#: templates/register_installation.html:53
+#: templates/register_installation.html:53 templates/warranty_approved.html:223
+#: templates/warranty_rejected.html:237
 msgid "bestRegards"
 msgstr "Saludos cordiales"
 
@@ -558,11 +588,11 @@ msgstr "Saludos cordiales"
 msgid "rejectedInstallationNotification"
 msgstr "Notificación de instalación rechazada"
 
-#: templates/installation_rejected.html:45
+#: templates/installation_rejected.html:45 templates/warranty_rejected.html:64
 msgid "rejected"
 msgstr "RECHAZADA"
 
-#: templates/installation_rejected.html:58
+#: templates/installation_rejected.html:58 templates/warranty_rejected.html:210
 msgid "rejectionReasonsAreFollowing"
 msgstr "Los motivos de rechazo son los siguientes"
 
@@ -622,6 +652,70 @@ msgid "newInstallationCheckDetails"
 msgstr ""
 "Se ha registrado una nueva instalación en el sistema. Los detalles son "
 "los siguientes"
+
+#: templates/warranty_approved.html:51 templates/warranty_rejected.html:51
+msgid "warrantyWithFollowingData"
+msgstr "La garantía con los siguientes datos ha sido"
+
+#: templates/warranty_approved.html:69 templates/warranty_rejected.html:70
+msgid "warrantyContactInfo"
+msgstr "Información de contacto"
+
+#: templates/warranty_approved.html:80 templates/warranty_rejected.html:81
+msgid "warrantyContactName"
+msgstr "Nombre"
+
+#: templates/warranty_approved.html:84 templates/warranty_rejected.html:85
+msgid "warrantyContactEmail"
+msgstr "Correo"
+
+#: templates/warranty_approved.html:88
+msgid "warrantyContactPosition"
+msgstr "Cargo"
+
+#: templates/warranty_approved.html:95 templates/warranty_rejected.html:92
+msgid "warrantySiteInfo"
+msgstr "Información de la sede"
+
+#: templates/warranty_approved.html:106 templates/warranty_rejected.html:103
+msgid "warrantyAddress"
+msgstr "Dirección"
+
+#: templates/warranty_approved.html:110 templates/warranty_rejected.html:107
+msgid "warrantyCityCountry"
+msgstr "Ciudad & País"
+
+#: templates/warranty_approved.html:119 templates/warranty_rejected.html:116
+msgid "warrantyEquipmentInfo"
+msgstr "Información del equipo"
+
+#: templates/warranty_approved.html:130 templates/warranty_rejected.html:127
+msgid "warrantyEquipmentModel"
+msgstr "Modelo"
+
+#: templates/warranty_approved.html:134 templates/warranty_rejected.html:131
+msgid "warrantyEquipmentReference"
+msgstr "Referencia"
+
+#: templates/warranty_approved.html:141 templates/warranty_rejected.html:138
+msgid "warrantyReasons"
+msgstr "Motivos de garantía"
+
+#: templates/warranty_approved.html:158 templates/warranty_rejected.html:155
+msgid "warrantyShiptTo"
+msgstr "Enviar a"
+
+#: templates/warranty_approved.html:163 templates/warranty_rejected.html:160
+msgid "warrantyProblem"
+msgstr "Problema"
+
+#: templates/warranty_approved.html:168 templates/warranty_rejected.html:165
+msgid "warrantySolution"
+msgstr "Solución"
+
+#: templates/warranty_approved.html:174 templates/warranty_rejected.html:171
+msgid "warrantyPartsInfo"
+msgstr "Información de las partes"
 
 #~ msgid "SOE Latam - Registro de certificado de instalación %(id)s"
 #~ msgstr ""

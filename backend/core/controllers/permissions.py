@@ -11,13 +11,6 @@ from flask_babel import gettext
 bp = APIBlueprint('permissions', __name__)
 
 
-@bp.get('/')
-@jwt_required()
-def get_permissions():
-    '''Get permissions'''
-    pass
-
-
 @bp.get('/groups/<int:group_id>')
 @bp.input(Pagination, location='query')
 @bp.output(PermissionsGroupOut)

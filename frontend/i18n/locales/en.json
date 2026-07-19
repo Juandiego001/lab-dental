@@ -642,6 +642,13 @@
       "title": "Warranties search",
       "message": "Search warranty by invoice or ID"
     },
+    "approval": {
+      "title": "Approve warranty"
+    },
+    "reject": {
+      "title": "Reject comments",
+      "description": "Add the reasons for rejection..."
+    },
     "rules": {
       "siteDistributorRequired": "The distributor site is required",
       "contactDistributorRequired": "The distributor contact is required",

@@ -640,6 +640,13 @@
       "title": "Buscar garantía",
       "message": "Buscar garantía por factura o ID"
     },
+    "approval": {
+      "title": "Aprobar warranty"
+    },
+    "reject": {
+      "title": "Comentarios de rechazo",
+      "description": "Agrega los motivos de rechazo..."
+    },
     "rules": {
       "siteDistributorRequired": "La sede del distribuidor es requerida",
       "contactDistributorRequired": "El contacto del distribuidor es requerido",

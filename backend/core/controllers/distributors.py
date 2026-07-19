@@ -109,6 +109,7 @@ def search_contacts(json_data: dict):
     try:
         results, total = distributors.search_contacts(
             distributor_id=json_data['distributor_id'],
+            contacts_ids=json_data['contacts_ids'],
             full_name=json_data['full_name'],
             email=json_data['email'],
             phone=json_data['phone'],

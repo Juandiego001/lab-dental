@@ -21,6 +21,7 @@ def search_reasons(json_data: dict):
 
     try:
         items, total = reasons.search_reasons(
+            reasons_ids=json_data['reasons_ids'],
             category_id=json_data['category_id'],
             name=json_data['name'],
             slug=json_data['slug'],
@@ -30,7 +31,6 @@ def search_reasons(json_data: dict):
             sort_by=json_data['sort_by'])
         return {'items': items, 'total': total}
     except Exception as ex:
-        print(ex)
         abort(500, gettext('abortException'))
 
 
@@ -71,7 +71,6 @@ def update_reasons(reason_id: int, json_data: dict):
         reasons.update_reason(reason_id, json_data)
         return {'message': gettext('reasonUpdated')}
     except Exception as ex:
-        print(ex)
         abort(500, gettext('abortException'))
 
 

@@ -1,9 +1,11 @@
+from flask import send_file
 from flask_babel import gettext
 from core.services import warranties
 from apiflask import APIBlueprint, abort
 from flask_jwt_extended import current_user, jwt_required
-from core.schemas.utils import Message, Pagination
-from core.schemas.warranties import WarrantyInUpdate, WarrantyInCreate, WarrantyOut, WarrantiesOut, WarrantySearch
+from werkzeug.exceptions import HTTPException
+from core.schemas.utils import Message
+from core.schemas.warranties import WarrantyInUpdate, WarrantyInCreate, WarrantyOut, WarrantiesOut, WarrantyRejectCommentsIn, WarrantySearch
 
 
 bp = APIBlueprint('warranties', __name__)
@@ -30,7 +32,6 @@ def get_warranties(json_data):
         )
         return {'items': results, 'total': total}
     except Exception as ex:
-        print(ex)
         abort(500, gettext('abortException'))
 
 
@@ -56,7 +57,6 @@ def create_warranties(warranty: dict):
         warranties.create_warranty(warranty)
         return {'message': gettext('warrantyCreated')}
     except Exception as ex:
-        print(ex)
         abort(500, gettext('abortException'))
 
 
@@ -64,7 +64,7 @@ def create_warranties(warranty: dict):
 @bp.input(WarrantyInUpdate)
 @bp.output(Message)
 @jwt_required()
-def update_warranties(warranty_id, json_data):
+def update_warranties(warranty_id: int, json_data: dict):
     '''Update warranties'''
     try:
         warranties.update_warranty(warranty_id, json_data)
@@ -82,5 +82,56 @@ def delete_warranties(warranty_id):
     try:
         warranties.delete_warranty(warranty_id)
         return {'message': gettext('warrantyDeleted')}
+    except Exception as ex:
+        abort(500, gettext('abortException'))
+
+
+@bp.get('/<int:warranty_id>/pdf')
+@jwt_required()
+def get_warranty_pdf(warranty_id: int):
+    '''Get warranty PDF'''
+
+    try:
+        pdf_buffer = warranties.get_warranty_pdf(warranty_id)
+        return send_file(
+            pdf_buffer,
+            mimetype='application/pdf',
+            as_attachment=False,
+            download_name=f'{warranty_id}.pdf'
+        )
+    except Exception as ex:
+        abort(500, gettext('abortException'))
+
+
+@bp.patch('/approve/<int:warranty_id>')
+@bp.output(Message)
+@jwt_required()
+def approve_installation(warranty_id):
+    '''Approve installation'''
+
+    try:
+        warranties.approve_warranty(warranty_id)
+        warranties.notify_approval(warranty_id)
+        return {'message': gettext('warrantyApproved')}
+    except HTTPException as ex:
+        abort(400, ex.description)
+    except Exception as ex:
+        abort(500, gettext('abortException'))
+
+
+@bp.post('/reject/<int:warranty_id>')
+@bp.input(WarrantyRejectCommentsIn)
+@bp.output(Message)
+@jwt_required()
+def reject_installation(warranty_id: int, json_data: dict):
+    '''Reject installation'''
+
+    try:
+        warranties.reject_warranty(warranty_id)
+        warranties.notify_rejection(
+            warranty_id, json_data['reject_comments'])
+        return {'message': gettext('warrantyRejected')}
+    except HTTPException as ex:
+        abort(400, ex.description)
     except Exception as ex:
         abort(500, gettext('abortException'))

@@ -15,7 +15,7 @@ def get_permissions_by_group_id(current_user: User, group_id: int, search: str =
     # Distributors users should not have access to some modules
     if current_user.role != 'ADMIN':
         module_filter = Module.name.not_in(
-            ['distributors', 'lists'])
+            ['distributors', 'lists', 'reasons'])
         query = and_(query, module_filter)
 
     total = db.session.query(Module).filter(query).count()
