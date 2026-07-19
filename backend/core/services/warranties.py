@@ -100,6 +100,7 @@ def get_warranty_by_id(warranty_id: int):
         # Equipment data
         func.jsonb_build_object(
             'id', Equipment.id,
+            'category_id', Equipment.category_id,
             'model', Equipment.model,
             'reference', Equipment.reference
         ).label('equipment'),
@@ -233,18 +234,18 @@ def create_warranty(warranty: dict):
 def group_reasons(reasons: list):
     '''Group reasons for PDF print'''
 
-    group_flag = 0
-    group_reason = []
-    grouped_reasons = []
+    counter = 0
+    group_level = 0
+    grouped_reasons = [[]]
     for reason in reasons:
-        if group_flag < 2:
-            group_flag += 1
-            group_reason.append(reason)
+        if counter < 2:
+            counter += 1
+            grouped_reasons[group_level].append(reason)
         else:
-            group_flag = 0
-            group_reason.append(reason)
-            grouped_reasons.append(group_reason)
-            group_reason = []
+            counter = 0
+            grouped_reasons[group_level].append(reason)
+            grouped_reasons.append([])
+            group_level += 1
 
     return grouped_reasons
 

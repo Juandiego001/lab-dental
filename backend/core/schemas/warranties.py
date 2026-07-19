@@ -76,6 +76,7 @@ class WarrantySiteOut(BaseSchema):
 
 class WarrantyEquipmentOut(BaseSchema):
     id = Integer()
+    category_id = Integer(data_key='categoryId')
     model = String()
     reference = String()
     model_reference = Function(
