@@ -117,19 +117,19 @@
     <v-form>
       <v-row class="justify-center align-center">
         <v-col sm="12" md="6" lg="6" cols="12">
-          <v-text-field :label="$t('email')" hide-details="auto"></v-text-field>
+          <v-text-field :label="$t('email')" hide-details="auto" autocomplete="off" />
         </v-col>
 
         <v-col sm="12" md="6" lg="6" cols="12">
-          <v-text-field :label="$t('phone')" hide-details="auto"></v-text-field>
+          <v-text-field :label="$t('phone')" hide-details="auto" autocomplete="off" />
         </v-col>
 
         <v-col sm="12" md="12" lg="12" cols="12">
-          <v-text-field :label="$t('name')" hide-details="auto"></v-text-field>
+          <v-text-field :label="$t('name')" hide-details="auto" autocomplete="off" />
         </v-col>
 
         <v-col sm="12" md="12" lg="12" cols="12">
-          <v-textarea :label="$t('message')" hide-details="auto"></v-textarea>
+          <v-textarea :label="$t('message')" hide-details="auto" />
         </v-col>
 
         <v-col class="text-end" cols="12">

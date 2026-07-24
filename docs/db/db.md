@@ -49,6 +49,8 @@
   - [MANUALS](#manuals)
   - [MANUALS FILES](#manuals-files)
   - [WARRANTIES REASONS](#warranties-reasons)
+  - [WARRANTIES WCOS](#warranties-wcos)
+  - [WARRANTIES FILES](#warranties-files)
 
 <div class="page"/>
 
@@ -135,12 +137,14 @@ erDiagram
 ```mermaid
 erDiagram
   WARRANTIES ||--o{ WARRANTIES_REASONS : has
+  WARRANTIES ||--o{ WARRANTIES_FILES : has
   CATEGORIES ||--o{ REASONS : has
   REASONS ||--o{ WARRANTIES_REASONS : has
   EQUIPMENTS ||--o{ WARRANTIES : has
   DISTRIBUTORS ||--o{ WARRANTIES : has
   SITES ||--o{ WARRANTIES : has
   USERS ||--o{ WARRANTIES : approve
+  WARRANTIES ||--o| WARRANTIES_WCOS : has
 ```
 
 <div class="page" />
@@ -734,4 +738,34 @@ erDiagram
     }
 ```
 
+<div class="page" />
 
+### WARRANTIES WCOS
+
+```mermaid
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '12px', 'entityPadding': '5' }}}%%
+erDiagram
+    WARRANTIES_WCOS {
+        int id PK, UK "AUTO_INCREMENT, NN"
+        int code "NN"
+        int year "NN"
+    }
+```
+
+<div class="page" />
+
+### WARRANTIES FILES
+
+```mermaid
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '12px', 'entityPadding': '5' }}}%%
+erDiagram
+    WARRANTIES_FILES {
+        int id PK, UK "AUTO_INCREMENT, NN"
+        int warranty_id FK "NN"
+        string original_name "NN"
+        string path "NN"
+        string status "NN"
+        date created_at "NN"
+        date updated_at "NN"
+    }
+```

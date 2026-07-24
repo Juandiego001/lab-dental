@@ -58,10 +58,16 @@ users_full_route = base_route / users_files_folder
 if not users_full_route.exists():
     users_full_route.mkdir(parents=True, exist_ok=True)
 
-users_files_folder = "manuals_files"
-users_full_route = base_route / users_files_folder
-if not users_full_route.exists():
-    users_full_route.mkdir(parents=True, exist_ok=True)
+manuals_files_folder = "manuals_files"
+manuals_full_route = base_route / manuals_files_folder
+if not manuals_full_route.exists():
+    manuals_full_route.mkdir(parents=True, exist_ok=True)
+
+
+warranties_files_folder = "warranties_files"
+warranties_full_route = base_route / warranties_files_folder
+if not warranties_full_route.exists():
+    warranties_full_route.mkdir(parents=True, exist_ok=True)
 
 
 app.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']

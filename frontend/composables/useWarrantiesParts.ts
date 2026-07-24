@@ -7,10 +7,7 @@ export const useWarrantiesParts = () => {
   const partData = useState('partData', () => ({
     partNumber: null,
     description: null,
-    invoiceParts: null,
     quantity: null,
-    price: null,
-    total: null,
   }))
   const items: any = useState('itemsParts', () => new Array(0))
   const total: any = useState('totalParts', () => 0)

@@ -46,6 +46,10 @@
                 {{ item.invoice }}
               </span>
             </template>
+            <template v-slot:item.wco="{ item }">
+              <span v-if="!item.wco" class="text-gray">-</span>
+              <span v-else class="bg-secondary rounded-lg py-1 px-2">{{ item.wco }}</span>
+            </template>
             <template v-slot:item.saleDate="{ item }">{{ date.format(item.saleDate, 'fullDate') }}</template>
 
             <template v-slot:item.option="{ item }">
@@ -54,7 +58,9 @@
                 @click="async () => { await getWarranty(item.id); updateDialog = true }" />
               <v-btn v-if="isAdmin" class="my-2 me-2 bg-secondary" size="small" icon="mdi-eye"
                 @click="async () => { await getWarranty(item.id); approvalDialog = true }" />
-              <v-btn v-if="isAdmin" class="my-2 bg-primary me-2" size="small" icon="mdi-open-in-new"
+              <v-btn class="my-2 bg-secondary me-2" size="small" icon="mdi-image-area"
+                @click="async () => { warrantyId = item.id; await getWarrantyFiles({}); tableDialog = true; }" />
+              <v-btn class="my-2 bg-secondary me-2" size="small" icon="mdi-open-in-new"
                 :href="`/api/warranties/${item.id}/pdf`" target="_blank" />
               <v-btn v-if="$ability.can('delete', 'installations')" class="my-2 bg-red" size="small"
                 icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" />
@@ -95,7 +101,7 @@
             <v-col cols="12">
               <v-autocomplete v-model="equipment" :label="$t('equipments.title')" :items="equipments"
                 item-title="modelReference" return-object hide-details="auto" clearable :rules="[equipmentRequired]"
-                @update:search="(modelReference) => {
+                autocomplete="off" @update:search="(modelReference) => {
                   if (!createDialog) return;
                   getEquipments({
                     equipmentId: equipment.id,
@@ -121,7 +127,7 @@
                   <v-col cols="12">
                     <v-autocomplete class="flex-grow-0" v-model="form.distributorId" :label="$t('distributors.title')"
                       :items="distributors" item-title="name" item-value="id" hide-details="auto" clearable
-                      @update:search="(name) => {
+                      autocomplete="off" @update:search="(name) => {
                         getDistributors({ distributorsIds: [form.distributorId], name })
                       }" />
                   </v-col>
@@ -134,7 +140,7 @@
                 <v-col>
                   <v-autocomplete v-model="contact" :label="$t('warranties.contact')" :items="distributorsContacts"
                     item-title="fullName" hide-details="auto" clearable :readonly="!form.distributorId"
-                    :rules="[contactDistributorRequired]" return-object @update:search="async (name) => {
+                    :rules="[contactDistributorRequired]" return-object autocomplete="off" @update:search="async (name) => {
                       if (!createDialog) return;
                       await getDistributorsContacts(name)
                     }" />
@@ -162,7 +168,8 @@
                 <v-col cols="12">
                   <v-autocomplete v-model="site" :label="`${$t('sites.title')} ${$t('distributors.title')}`"
                     :items="distributorsSites" item-title="name" return-object hide-details="auto" clearable
-                    :readonly="!form.distributorId" :rules="[siteDistributorRequired]" @update:search="(name) => {
+                    :readonly="!form.distributorId" :rules="[siteDistributorRequired]" autocomplete="off"
+                    @update:search="(name) => {
                       if (!createDialog) return;
                       getDistributorsSites(name)
                     }" />
@@ -204,9 +211,9 @@
               {{ $t('warranties.issueType') }}
             </v-col>
             <v-col cols="12">
-              <v-autocomplete v-model="form.reasonsIds" :label="$t('warranties.issueType')" :items="reasons"
+              <v-autocomplete v-model="reasonsIds" :label="$t('warranties.issueType')" :items="reasons"
                 item-title="name" item-value="id" hide-details="auto" clearable multiple chips
-                :readonly="!equipment.categoryId" :rules="[reasonRequired]" @update:search="(name) => {
+                :readonly="!equipment.categoryId" autocomplete="off" :rules="[reasonRequired]" @update:search="(name) => {
                   if (!createDialog && !equipment.categoryId) return;
                   getReasons({ categoryId: equipment.categoryId, name })
                 }" />
@@ -247,10 +254,6 @@
                   <tr>
                     <td :colspan="columns.length" class="bg-grey-lighten-4 pa-3">
                       <div class="d-flex flex-column ga-3">
-                        <p class="text-caption text-decoration-underline">{{ $t('warranties.parts.invoiceParts') }}</p>
-                        <pre class="text-body-2" style="white-space: pre-wrap;">{{ item.invoiceParts }}</pre>
-                      </div>
-                      <div class="d-flex flex-column ga-3">
                         <p class="text-caption text-decoration-underline">{{ $t('warranties.parts.description') }}</p>
                         <pre class="text-body-2" style="white-space: pre-wrap;">{{ item.description }}</pre>
                       </div>
@@ -269,19 +272,23 @@
               </v-data-table-server>
             </v-col>
 
-            <!-- Warranty Approval -->
+            <!-- Media -->
             <v-col cols="12" class="text-body-2 text-primary mt-2">
-              {{ $t('warranties.warrantyApprovals') }}
+              {{ $t('warranties.files.title') }}
             </v-col>
-            <v-col cols="6">
-              <v-text-field :label="$t('warranties.dateReceived')" readonly hide-details="auto" density="compact" />
-            </v-col>
-            <v-col cols="6">
-              <v-text-field :label="$t('warranties.technicalApproval')" readonly hide-details="auto"
-                density="compact" />
+            <v-col cols="12">
+              <v-file-input v-model="files" :prepend-icon="null" prepend-inner-icon="mdi-paperclip" hide-details="auto"
+                :label="$t('warranties.files.description')" multiple chips accept=".mp4, .jpg, .jpeg, .png, .webp, .svg"
+                :rules="fileRules">
+                <template v-slot:selection="{ fileNames }">
+                  <v-chip v-for="fileName in fileNames" :key="fileName" size="small" label>
+                    {{ fileName }}
+                  </v-chip>
+                </template>
+              </v-file-input>
             </v-col>
 
-            <v-col class="text-end">
+            <v-col class="mt-2 text-end">
               <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
               <span class="mx-1" />
               <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
@@ -312,7 +319,7 @@
             <v-col cols="12">
               <v-autocomplete v-model="equipment" :label="$t('equipments.title')" :items="equipments"
                 item-title="modelReference" return-object hide-details="auto" clearable :rules="[equipmentRequired]"
-                @update:search="(modelReference) => {
+                autocomplete="off" @update:search="(modelReference) => {
                   if (!updateDialog) return;
                   getEquipments({
                     equipmentId: equipment.id,
@@ -338,7 +345,7 @@
                   <v-col cols="12">
                     <v-autocomplete class="flex-grow-0" v-model="form.distributorId" :label="$t('distributors.title')"
                       :items="distributors" item-title="name" item-value="id" hide-details="auto" clearable
-                      @update:search="(name) => {
+                      autocomplete="off" @update:search="(name) => {
                         getDistributors({ distributorsIds: [form.distributorId], name })
                       }" />
                   </v-col>
@@ -351,7 +358,7 @@
                 <v-col>
                   <v-autocomplete v-model="contact" :label="$t('warranties.contact')" :items="distributorsContacts"
                     item-title="fullName" hide-details="auto" clearable :readonly="!form.distributorId"
-                    :rules="[contactDistributorRequired]" return-object @update:search="async (name) => {
+                    :rules="[contactDistributorRequired]" return-object autocomplete="off" @update:search="async (name) => {
                       if (!updateDialog) return;
                       await getDistributorsContacts(name)
                     }" />
@@ -379,7 +386,8 @@
                 <v-col cols="12">
                   <v-autocomplete v-model="site" :label="`${$t('sites.title')} ${$t('distributors.title')}`"
                     :items="distributorsSites" item-value="id" item-title="name" return-object hide-details="auto"
-                    clearable :readonly="!form.distributorId" :rules="[siteDistributorRequired]" @update:search="(name) => {
+                    clearable :readonly="!form.distributorId" :rules="[siteDistributorRequired]" autocomplete="off"
+                    @update:search="(name) => {
                       if (!updateDialog) return;
                       getDistributorsSites(name)
                     }" />
@@ -421,9 +429,9 @@
               {{ $t('warranties.issueType') }}
             </v-col>
             <v-col cols="12">
-              <v-autocomplete v-model="form.reasonsIds" :label="$t('warranties.issueType')" :items="reasons"
+              <v-autocomplete v-model="reasonsIds" :label="$t('warranties.issueType')" :items="reasons"
                 item-title="name" item-value="id" hide-details="auto" clearable multiple chips
-                :readonly="!equipment.categoryId" :rules="[reasonRequired]" @update:search="(name) => {
+                :readonly="!equipment.categoryId" :rules="[reasonRequired]" autocomplete="off" @update:search="(name) => {
                   if (!createDialog && !equipment.categoryId) return;
                   getReasons({ categoryId: equipment.categoryId, name })
                 }" />
@@ -464,10 +472,6 @@
                   <tr>
                     <td :colspan="columns.length" class="bg-grey-lighten-4 pa-3">
                       <div class="d-flex flex-column ga-3">
-                        <p class="text-caption text-decoration-underline">{{ $t('warranties.parts.invoiceParts') }}</p>
-                        <pre class="text-body-2" style="white-space: pre-wrap;">{{ item.invoiceParts }}</pre>
-                      </div>
-                      <div class="d-flex flex-column ga-3">
                         <p class="text-caption text-decoration-underline">{{ $t('warranties.parts.description') }}</p>
                         <pre class="text-body-2" style="white-space: pre-wrap;">{{ item.description }}</pre>
                       </div>
@@ -486,18 +490,12 @@
               </v-data-table-server>
             </v-col>
 
-            <!-- Warranty Approval -->
-            <v-col cols="12" class="text-body-2 text-primary mt-2">
-              {{ $t('warranties.warrantyApprovals') }}
+            <!-- Recieved At -->
+            <v-col v-if="form.receivedAt" cols="12" class="text-body-2 mt-2">
+              <p class="text-primary">{{ $t('warranties.receivedAt') }}:
+                <span class="font-weight-bold">{{ date.format(form.receivedAt, 'fullDateTime') }}</span>
+              </p>
             </v-col>
-            <v-col cols="6">
-              <v-text-field :label="$t('warranties.dateReceived')" readonly hide-details="auto" density="compact" />
-            </v-col>
-            <v-col cols="6">
-              <v-text-field :label="$t('warranties.technicalApproval')" readonly hide-details="auto"
-                density="compact" />
-            </v-col>
-
             <v-col v-if="!isApproved" class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
               <span class="mx-1" />
@@ -548,7 +546,8 @@
             </v-col>
             <v-col class="pb-4" cols="12">
               <v-autocomplete v-model="searchForm.equipmentId" :label="$t('equipments.title')" :items="equipments"
-                item-title="modelReference" item-value="id" hide-details="auto" clearable @update:search="(modelReference) => {
+                item-title="modelReference" item-value="id" hide-details="auto" clearable autocomplete="off"
+                @update:search="(modelReference) => {
                   getEquipments({ equipmentId: searchForm.equipmentId, modelReference, withPicture: false })
                 }" />
             </v-col>
@@ -557,7 +556,8 @@
             <v-col v-if="isAdmin" class="d-flex flex-column" cols="12">
               <p class="text-body-2 text-primary pb-2">{{ $t('distributors.title', 2) }}</p>
               <v-autocomplete class="flex-grow-0" v-model="searchForm.distributorId" :label="$t('distributors.title')"
-                :items="distributors" item-title="name" item-value="id" hide-details="auto" clearable @update:search="(name) => {
+                :items="distributors" item-title="name" item-value="id" hide-details="auto" clearable autocomplete="off"
+                @update:search="(name) => {
                   getDistributors({ distributorsIds: [searchForm.distributorId], name })
                 }" />
             </v-col>
@@ -567,13 +567,22 @@
               <p class="text-body-2 text-primary pb-2">{{ $t('warranties.title', 2) }}</p>
             </v-col>
 
+            <v-col cols="6">
+              <v-text-field v-model="searchForm.wcoCode" :label="$t('warranties.wcoCode')" hide-details="auto"
+                counter="20" maxlength="20" clearable type="number" />
+            </v-col>
+            <v-col cols="6">
+              <v-text-field v-model="searchForm.wcoYear" :label="$t('warranties.wcoYear')" hide-details="auto"
+                counter="20" maxlength="20" clearable type="number" />
+            </v-col>
+
             <!-- Sale Date -->
             <v-col cols="6">
               <v-menu v-model="searchShowPicker" :close-on-content-click="false" transition="scale-transition" offset-y
                 full-width max-width="290px" min-width="290px">
                 <template v-slot:activator="{ props }">
                   <v-text-field v-model="searchForm.saleDate" :label="$t('warranties.saleDate')" readonly
-                    hide-details="auto" v-bind="props" />
+                    hide-details="auto" v-bind="props" clearable />
                 </template>
                 <v-date-picker v-model="searchSelectedDate" title="" hide-header
                   @update:model-value="searchShowPicker = false" :max="todayDate" />
@@ -589,7 +598,7 @@
             <!-- Status -->
             <v-col cols="12">
               <v-select v-model="searchForm.status" item-title="title" item-value="value" :items="warrantiesStatuses"
-                hide-details="auto" :label="$t('warranties.statuses.label')" clearable />
+                hide-details="auto" :label="$t('warranties.statuses.label')" clearable autocomplete="off" />
             </v-col>
 
             <v-col class="text-end" cols="12">
@@ -622,7 +631,8 @@
                 </v-col>
                 <v-col cols="12">
                   <v-autocomplete class="flex-grow-0" v-model="form.distributorId" :label="$t('distributors.title')"
-                    :items="distributors" item-title="name" item-value="id" hide-details="auto" readonly />
+                    :items="distributors" item-title="name" item-value="id" hide-details="auto" readonly
+                    autocomplete="off" />
                 </v-col>
 
                 <!-- Distributor Contact -->
@@ -631,7 +641,7 @@
                 </v-col>
                 <v-col>
                   <v-autocomplete v-model="contact" :label="$t('warranties.contact')" :items="distributorsContacts"
-                    item-title="fullName" hide-details="auto" return-object readonly />
+                    item-title="fullName" hide-details="auto" return-object readonly autocomplete="off" />
                 </v-col>
                 <v-col cols="12">
                   <v-text-field :label="$t('contacts.fullName')" hide-details readonly
@@ -656,7 +666,7 @@
                 <v-col cols="12">
                   <v-autocomplete v-model="site" :label="`${$t('sites.title')} ${$t('distributors.title')}`"
                     :items="distributorsSites" item-value="id" item-title="name" return-object hide-details="auto"
-                    readonly />
+                    readonly autocomplete="off" />
                 </v-col>
                 <v-col cols="12">
                   <v-text-field :label="$t('countries')" hide-details :model-value="address?.country?.name" readonly />
@@ -676,7 +686,7 @@
             </v-col>
             <v-col cols="12">
               <v-autocomplete v-model="equipment" :label="$t('equipments.title')" :items="equipments"
-                item-title="modelReference" return-object hide-details="auto" readonly />
+                item-title="modelReference" return-object hide-details="auto" readonly autocomplete="off" />
             </v-col>
             <v-col cols="6">
               <v-text-field v-model="equipment.model" :label="$t('equipments.model')" hide-details readonly />
@@ -702,8 +712,8 @@
               {{ $t('warranties.issueType') }}
             </v-col>
             <v-col cols="12">
-              <v-autocomplete v-model="form.reasonsIds" :label="$t('warranties.issueType')" :items="reasons"
-                item-title="name" item-value="id" hide-details="auto" multiple chips readonly />
+              <v-autocomplete v-model="reasonsIds" :label="$t('warranties.issueType')" :items="reasons"
+                item-title="name" item-value="id" hide-details="auto" multiple chips readonly autocomplete="off" />
             </v-col>
 
             <!-- Shipping Instructions -->
@@ -736,10 +746,6 @@
                   <tr>
                     <td :colspan="columns.length" class="bg-grey-lighten-4 pa-3">
                       <div class="d-flex flex-column ga-3">
-                        <p class="text-caption text-decoration-underline">{{ $t('warranties.parts.invoiceParts') }}</p>
-                        <pre class="text-body-2" style="white-space: pre-wrap;">{{ item.invoiceParts }}</pre>
-                      </div>
-                      <div class="d-flex flex-column ga-3">
                         <p class="text-caption text-decoration-underline">{{ $t('warranties.parts.description') }}</p>
                         <pre class="text-body-2" style="white-space: pre-wrap;">{{ item.description }}</pre>
                       </div>
@@ -749,25 +755,24 @@
               </v-data-table-server>
             </v-col>
 
-            <!-- Warranty Approval -->
-            <v-col cols="12" class="text-body-2 text-primary mt-2">
-              {{ $t('warranties.warrantyApprovals') }}
+            <!-- Recieved At -->
+            <v-col v-if="form.receivedAt" cols="12" class="text-body-2 mt-2">
+              <p class="text-primary">{{ $t('warranties.receivedAt') }}:
+                <span class="font-weight-bold"> {{ date.format(form.receivedAt, 'fullDateTime') }}</span>
+              </p>
             </v-col>
-            <v-col cols="6">
-              <v-text-field :label="$t('warranties.dateReceived')" readonly hide-details="auto" density="compact" />
-            </v-col>
-            <v-col cols="6">
-              <v-text-field :label="$t('warranties.technicalApproval')" readonly hide-details="auto"
-                density="compact" />
-            </v-col>
-
-            <v-col class="text-end mt-2">
-              <v-btn variant="outlined" @click="approvalDialog = false" @mousedown.prevent :disabled="approveLoading">{{
-                $t('cancel') }}</v-btn>
-              <v-btn class="bg-error mx-1" @click="rejectDialog = true" @mousedown.prevent :disabled="approveLoading">{{
-                $t('reject') }}</v-btn>
-              <v-btn type="submit" class="bg-success" @mousedown.prevent :disabled="approveLoading">{{ $t('approve')
-              }}</v-btn>
+            <v-col class="d-flex justify-end mt-2 ga-2">
+              <v-btn variant="outlined" @click="approvalDialog = false" @mousedown.prevent :disabled="approveLoading">
+                {{ $t('cancel') }}
+              </v-btn>
+              <v-btn v-if="form.status !== 'REJECTED'" class="bg-error" @click="rejectDialog = true" @mousedown.prevent
+                :disabled="approveLoading">
+                {{ $t('reject') }}
+              </v-btn>
+              <v-btn v-if="form.status !== 'APPROVED'" type="submit" class="bg-success" @mousedown.prevent
+                :disabled="approveLoading">
+                {{ $t('approve') }}
+              </v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -826,6 +831,7 @@
   </v-dialog>
 
   <WarrantiesParts />
+  <WarrantiesFiles />
 </template>
 
 <script setup>
@@ -845,6 +851,7 @@ const { items: parts, partsDialog, partData, remove: deletePart } = useWarrantie
 const { getSites, getAddress } = useSites();
 const { getContacts } = useContacts();
 const { items: reasons, getReasons } = useReasons();
+const { warrantyId, getWarrantyFiles, tableDialog } = useWarrantiesFiles();
 
 definePageMeta({
   layout: 'app',
@@ -902,12 +909,13 @@ const rejectComments = ref('');
 const deleteDialog = ref(false);
 const createModel = ref(false);
 const updateModel = ref(false);
+const files = ref(null);
+const reasonsIds = ref([]);
 const form = ref({
   id: '',
   distributorId: null,
   saleDate: null,
   invoice: '',
-  reasonsIds: [],
   shiptTo: '',
   problem: '',
   solution: ''
@@ -919,6 +927,7 @@ const searchSelectedDate = ref(null);
 const searchForm = ref({
   equipmentId: null,
   distributorId: null,
+  wco: null,
   saleDate: null,
   invoice: null,
   status: null,
@@ -943,10 +952,10 @@ const headers = computed(() => {
     defaultHeaders.push({ title: t('distributors.title'), key: 'distributorName' });
   }
 
+  defaultHeaders.push({ title: 'WCO', key: 'wco', align: 'center' });
   defaultHeaders.push({ title: t('warranties.invoice'), key: 'invoice', align: 'center' });
-  defaultHeaders.push({ title: t('warranties.saleDate'), key: 'saleDate', align: 'center' });
 
-  if ($ability.can('update', 'installations') || $ability.can('delete', 'installations')) {
+  if ($ability.can('update', 'warranties') || $ability.can('delete', 'warranties')) {
     defaultHeaders.push({ title: t('options'), key: 'option', align: 'center', sortable: false })
   }
 
@@ -956,14 +965,12 @@ const headers = computed(() => {
 const headersParts = computed(() => [
   { title: t('warranties.parts.partNumber'), key: 'partNumber', align: 'start', sortable: false },
   { title: t('warranties.parts.quantity'), key: 'quantity', align: 'center', sortable: false },
-  { title: t('warranties.parts.price'), key: 'price', align: 'center', sortable: false },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
 const approvalHeadersParts = computed(() => [
   { title: t('warranties.parts.partNumber'), key: 'partNumber', align: 'start', sortable: false },
   { title: t('warranties.parts.quantity'), key: 'quantity', align: 'center', sortable: false },
-  { title: t('warranties.parts.price'), key: 'price', align: 'center', sortable: false }
 ])
 
 const warrantiesStatuses = computed(() => [
@@ -1016,7 +1023,7 @@ watch(updateDialog, async (val) => {
     form.value.distributorId = profile.value.distributor_id
   }
   await getDistributorsSites();
-  await getReasons({ reasonsIds: form.value.reasonsIds });
+  await getReasons({ reasonsIds: reasonsIds.value });
 })
 
 watch(approvalDialog, async (val) => {
@@ -1029,7 +1036,7 @@ watch(approvalDialog, async (val) => {
     await getDistributors({ distributorsIds: [form.value.distributorId] });
   }
   await getDistributorsSites();
-  await getReasons({ reasonsIds: form.value.reasonsIds });
+  await getReasons({ reasonsIds: reasonsIds.value });
 })
 
 watch(deleteDialog, async (val) => {
@@ -1042,11 +1049,6 @@ watch(page, async () => {
 
 watch(perPage, async () => {
   await getEquipments();
-})
-
-watch(contact, (v) => {
-  if (!v) return;
-  form.value.contactDistributorId = v;
 })
 
 watch(site, async (v) => {
@@ -1106,10 +1108,7 @@ const resetPartData = () => {
   partData.value = {
     partNumber: null,
     description: null,
-    invoiceParts: null,
-    quantity: null,
-    price: null,
-    total: null
+    quantity: null
   }
 }
 
@@ -1119,12 +1118,12 @@ const resetForm = () => {
     distributorId: null,
     saleDate: null,
     invoice: '',
-    reasonsIds: [],
     shiptTo: '',
     problem: '',
     solution: '',
   }
 
+  reasonsIds.value = [];
   equipment.value = {
     id: null,
     modelReference: null,
@@ -1136,6 +1135,9 @@ const resetForm = () => {
   site.value = null;
   address.value = null;
   parts.value = new Array(0);
+  files.value = [];
+
+  selectedDate.value = null;
 }
 
 const getWarranties = async () => {
@@ -1145,6 +1147,8 @@ const getWarranties = async () => {
       body: {
         distributorId: searchForm.value.distributorId,
         equipmentId: searchForm.value.equipmentId,
+        wcoCode: searchForm.value.wcoCode,
+        wcoYear: searchForm.value.wcoYear,
         saleDate: searchForm.value.saleDate,
         invoice: searchForm.value.invoice,
         status: searchForm.value.status,
@@ -1175,6 +1179,7 @@ const getWarranty = async (id) => {
     site.value = data.site;
     equipment.value = data.equipment;
     parts.value = data.parts;
+    reasonsIds.value = data.reasonsIds;
     selectedDate.value = new Date(form.value.saleDate);
   } catch (err) {
     notify(err, 'error');
@@ -1187,19 +1192,35 @@ const createWarranty = async () => {
   try {
     loading.value = true;
     if (!createModel.value) return;
+    if (parts.value && !parts.value.length) {
+      notify(t('warranties.rules.warrantyMissingParts'), 'error');
+      return;
+    };
 
-    // Complete form before sending
-    form.value.equipmentId = equipment.value.id;
-    form.value.contactId = contact.value.id;
-    form.value.parts = parts.value;
+    const formData = new FormData();
+    formData.append('equipmentId', equipment.value.id);
+    formData.append('contactId', contact.value.id);
+
+    for (const eachReason of reasonsIds.value) {
+      formData.append('reasonsIds', eachReason);
+    }
+
+    formData.append('parts', JSON.stringify(parts.value));
+    for (const warrantyFile of files.value) {
+      formData.append('warrantyFiles', warrantyFile);
+    }
+
+    for (const [key, value] of Object.entries(form.value)) {
+      formData.append(key, value);
+    }
 
     if (!form.value.distributorId) {
-      form.value.distributorId = profile.value.distributor_id;
+      formData.set('distributorId', profile.value.distributor_id);
     }
 
     const { message } = await $api('/api/warranties', {
       method: 'POST',
-      body: form.value
+      body: formData
     })
     notify(message, 'success');
     await getWarranties()
@@ -1220,6 +1241,7 @@ const updateWarranty = async () => {
     form.value.equipmentId = equipment.value.id;
     form.value.contactId = contact.value.id;
     form.value.parts = parts.value;
+    form.value.reasonsIds = reasonsIds.value;
 
     if (!form.value.distributorId) {
       form.value.distributorId = profile.value.distributor_id;
@@ -1339,6 +1361,38 @@ const rejectWarranty = async () => {
 }
 
 // Rules
+const allowedMimeTypes = [
+  'video/mp4',
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/svg+xml'
+];
+
+const max50MB = 50 * 1024 * 1024;
+
+const fileRules = [
+  (value) => {
+    if (!value || !value.length) {
+      return t('warranties.files.rules.filesRequired')
+    }
+
+    for (let i = 0; i < value.length; i++) {
+      const file = value[i]
+
+      if (!allowedMimeTypes.includes(file.type)) {
+        return t('warranties.files.rules.invalidFileType')
+      }
+
+      if (file.size > max50MB) {
+        return t('warranties.files.rules.max50MBExceed')
+      }
+    }
+
+    return true
+  }
+]
+
 const siteDistributorRequired = (v) => !!v || t('warranties.rules.siteDistributorRequired');
 const contactDistributorRequired = (v) => !!v || t('warranties.rules.contactDistributorRequired');
 const equipmentRequired = (v) => !!v || t('warranties.rules.equipmentRequired');

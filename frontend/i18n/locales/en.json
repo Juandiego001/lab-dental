@@ -466,7 +466,8 @@
       },
       "rules": {
         "invalidFileType": "Only MP4 video files or images are allowed",
-        "filesRequired": "At least one file is required"
+        "filesRequired": "At least one file is required",
+        "max50MBExceed": "Files must be no larger than 50 MB"
       }
     },
     "create": {
@@ -512,8 +513,7 @@
     "rules": {
       "partNumberRequired": "The part number is required",
       "serialRequired": "The serial is required",
-      "descriptionRequired": "The description is required",
-      "invoiceParts": "The invoice parts is required"
+      "descriptionRequired": "The description is required"
     }
   },
   "installations": {
@@ -612,22 +612,44 @@
       "partNumber": "Part Number",
       "serial": "Serial",
       "description": "Description",
-      "invoiceParts": "Invoice Parts",
       "quantity": "Quantity",
-      "price": "Price",
-      "total": "Total",
       "rules": {
         "partNumberRequired": "The part number is required",
-        "serialRequired": "The serial is required",
         "descriptionRequired": "The description is required",
-        "invoicePartsRequired": "The invoice parts is required",
-        "quantityRequired": "The quantity is required",
-        "priceRequired": "The price is required"
+        "quantityRequired": "The quantity is required"
       }
     },
-    "warrantyApprovals": "Warranty Approvals",
-    "technicalApproval": "Technical Approval",
-    "dateReceived": "Date Received",
+    "files": {
+      "title": "Warranty Files",
+      "description": "Description",
+      "labelTitle": "Title",
+      "files": "Files",
+      "filename": "Filename",
+      "size": "Size",
+      "extension": "Extension",
+      "videoNotSupported": "Your browser does not support the video element",
+      "create": {
+        "title": "Add Warranty Files"
+      },
+      "update": {
+        "title": "Update Warranty File"
+      },
+      "delete": {
+        "title": "Delete Warranty File",
+        "message": "Are you sure you want to delete the warranty file?"
+      },
+      "search": {
+        "title": "Search Warranty File"
+      },
+      "rules": {
+        "invalidFileType": "Only MP4 video files or images are allowed",
+        "filesRequired": "At least one file is required",
+        "max50MBExceed": "Files must be no larger than 50 MB"
+      }
+    },
+    "receivedAt": "Received At",
+    "wcoCode": "WCO Code",
+    "wcoYear": "WCO Year",
     "create": {
       "title": "Create warranty"
     },
@@ -658,7 +680,8 @@
       "reasonRequired": "The reason is required",
       "shiptToRequired": "The delivery address is required",
       "problemRequired": "The problem description is required",
-      "solutionRequired": "The solution description is required"
+      "solutionRequired": "The solution description is required",
+      "warrantyMissingParts": "You must register at least one part of the warranty"
     },
     "statuses": {
       "label": "Status",

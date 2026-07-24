@@ -1,11 +1,9 @@
 from apiflask import Schema
 from flask_babel import gettext
-from core.utils import format_file_size
-from werkzeug.datastructures import FileStorage
+from core.utils import format_file_size, validate_file_types
 from core.schemas.utils import BaseSchema, SortBy
-from marshmallow import ValidationError, validates, validates_schema, validate
+from marshmallow import ValidationError, validates_schema, validate
 from apiflask.fields import Boolean, DateTime, File, Integer, List, Nested, String, Function
-import filetype
 
 
 class EquipmentSearch(Schema):
@@ -96,44 +94,24 @@ class EquipmentFileIn(BaseSchema):
     description = String(required=False, allow_none=True)
 
 
-ALLOWED_MIMETYPES = {'video/mp4',
-                     'image/jpeg',
-                     'image/png',
-                     'image/webp',
-                     'image/svg+xml'}
-
-
-ALLOWED_EXTENSIONS = {'mp4', 'jpg', 'jpeg', 'png', 'pdf', 'webp', 'svg'}
-
-
-def is_allowed_extension(filename: str):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
 class EquipmentFilesIn(BaseSchema):
     files = List(File(), required=True)
 
     @validates_schema
-    def validate_file_types(self, data: dict, **kwargs):
-        '''Validate file types'''
+    def validate_files_types(self, data: dict, **kwargs):
+        '''Validate files types'''
 
-        archivos_invalidos = []
-        for archivo in data['files']:
-            if not archivo or not archivo.filename:
-                archivos_invalidos.append("Archivo desconocido/sin nombre")
-                continue
-
-            extension_valida = is_allowed_extension(archivo.filename)
-            mimetype_valido = archivo.mimetype in ALLOWED_MIMETYPES
-            header_bytes = archivo.read(2048)
-            archivo.seek(0)
-            real_file_type = filetype.guess(header_bytes)
-
-            if real_file_type is None or not extension_valida or not mimetype_valido or real_file_type.mime not in ALLOWED_MIMETYPES:
-                archivos_invalidos.append(archivo.filename)
-
-        if archivos_invalidos:
-            invalids = ", ".join(archivos_invalidos)
+        allowed_mimetypes = {'video/mp4',
+                             'image/jpeg',
+                             'image/png',
+                             'image/webp',
+                             'image/svg+xml'}
+        allowed_extensions = {'mp4', 'jpg',
+                              'jpeg', 'png', 'pdf', 'webp', 'svg'}
+        invalids = validate_file_types(
+            allowed_extensions, allowed_mimetypes, data['files'])
+        if invalids:
+            invalids = ", ".join(invalids)
             raise ValidationError({
                 "message": gettext(u"Unsupported file formats for: %(invalids)s", invalids=invalids)
             })

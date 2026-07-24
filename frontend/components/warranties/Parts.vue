@@ -13,26 +13,15 @@
           <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="form.partNumber" hide-details="auto" :label="$t('warranties.parts.partNumber')"
-                :rules="[partNumberRequired]" counter="50" maxlength="50" />
+                :rules="[partNumberRequired]" counter="50" maxlength="50" autocomplete="off" />
             </v-col>
             <v-col cols="12">
               <v-textarea v-model="form.description" hide-details="auto" :label="$t('warranties.parts.description')"
-                :rules="[descriptionRequired]" counter="50" maxlength="50" />
-            </v-col>
-            <v-col cols="12">
-              <v-text-field v-model="form.invoiceParts" hide-details="auto" :label="$t('warranties.parts.invoiceParts')"
-                :rules="[invoicePartsRequired]" counter="50" maxlength="50" />
+                :rules="[descriptionRequired]" counter="50" maxlength="50" autocomplete="off" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.quantity" hide-details="auto" :label="$t('warranties.parts.quantity')"
-                :rules="[quantityRequired]" counter="50" maxlength="50" type="number" />
-            </v-col>
-            <v-col cols="12">
-              <v-text-field v-model="form.price" hide-details="auto" :label="$t('warranties.parts.price')"
-                :rules="[priceRequired]" type="number" />
-            </v-col>
-            <v-col cols="12">
-              <v-text-field v-model="form.total" hide-details :label="$t('warranties.parts.total')" readonly />
+                :rules="[quantityRequired]" counter="50" maxlength="50" type="number" autocomplete="off" />
             </v-col>
             <v-col class="text-end">
               <v-btn variant="outlined" @click="partsDialog = false" @mousedown.prevent :disabled="loading">
@@ -55,7 +44,6 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n();
-const { $isNum } = useNuxtApp();
 const { items: parts, partsDialog, partData } = useWarrantiesParts();
 const loading = ref(false);
 const { notify } = useSnackbar();
@@ -63,19 +51,8 @@ const formModel = ref(false);
 const form = ref({
   partNumber: null,
   description: null,
-  invoiceParts: null,
   quantity: null,
-  price: null,
-  total: null,
 });
-
-
-const setTotal = () => {
-  if (!$isNum(form.value.quantity)) return;
-  if (!$isNum(form.value.price)) return;
-
-  form.value.total = parseFloat(form.value.quantity) * parseFloat(form.value.price);
-}
 
 watch(partsDialog, (v) => {
   if (!v) {
@@ -85,17 +62,11 @@ watch(partsDialog, (v) => {
   form.value = { ...partData.value };
 })
 
-watch(() => form.value.quantity, () => setTotal());
-watch(() => form.value.price, () => setTotal());
-
 const resetForm = () => {
   form.value = {
     partNumber: null,
     description: null,
-    invoiceParts: null,
-    quantity: null,
-    price: null,
-    total: null
+    quantity: null
   }
 }
 
@@ -125,7 +96,5 @@ const savePart = () => {
 
 const partNumberRequired = (v) => !!v || t('warranties.parts.rules.partNumberRequired');
 const descriptionRequired = (v) => !!v || t('warranties.parts.rules.descriptionRequired');
-const invoicePartsRequired = (v) => !!v || t('warranties.parts.rules.invoicePartsRequired');
 const quantityRequired = (v) => !!v || t('warranties.parts.rules.quantityRequired');
-const priceRequired = (v) => !!v || t('warranties.parts.rules.priceRequired');
 </script>

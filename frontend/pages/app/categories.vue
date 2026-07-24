@@ -21,7 +21,7 @@
               <div class="d-flex align-center justify-center ga-2">
                 <v-btn v-if="$ability.can('update', 'categories')" class="my-2 bg-primary" size="small"
                   icon="mdi-pencil" @click="getCategory(item.id)" />
-                <v-btn v-if="isAdmin" class="bg-info" size="small" icon="mdi-file-cancel"
+                <v-btn v-if="isAdmin" class="bg-secondary" size="small" icon="mdi-file-cancel"
                   @click="async () => { categoryId = item.id; await getReasons({ categoryId: item.id }); reasonsDialog = true }" />
                 <v-btn v-if="$ability.can('delete', 'categories')" class="my-2 bg-red" size="small" icon="mdi-trash-can"
                   @click="form.id = item.id; deleteDialog = true" />
@@ -48,11 +48,11 @@
           <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('categories.name')"
-                :rules="[nameRequired]" counter="50" maxlength="50" />
+                :rules="[nameRequired]" counter="50" maxlength="50" autocomplete="off" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.slug" hide-details="auto" :label="$t('categories.slug')"
-                :rules="[slugRequired]" counter="50" maxlength="50"
+                :rules="[slugRequired]" counter="50" maxlength="50" autocomplete="off"
                 @input="() => form.slug = $generateSlug(form.slug)" />
             </v-col>
             <v-col class="text-end">
@@ -83,11 +83,11 @@
           <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('categories.name')"
-                :rules="[nameRequired]" counter="50" maxlength="50" />
+                :rules="[nameRequired]" counter="50" maxlength="50" autocomplete="off" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.slug" hide-details="auto" :label="$t('categories.slug')"
-                :rules="[slugRequired]" counter="50" maxlength="50"
+                :rules="[slugRequired]" counter="50" maxlength="50" autocomplete="off"
                 @input="() => form.slug = $generateSlug(form.slug)" />
             </v-col>
             <v-col class="text-end">
@@ -139,11 +139,11 @@
           <v-row dense>
             <v-col cols="6">
               <v-text-field v-model="searchForm.name" :label="$t('categories.name')" hide-details="auto" clearable
-                counter="50" maxlength="50" />
+                counter="50" maxlength="50" autocomplete="off" />
             </v-col>
             <v-col cols="6">
               <v-text-field v-model="searchForm.slug" :label="$t('categories.slug')" hide-details="auto" clearable
-                counter="50" maxlength="50" />
+                counter="50" maxlength="50" autocomplete="off" />
             </v-col>
             <v-col class="text-end" cols="12">
               <v-btn class="bg-primary" type="submit" @mousedown.prevent :loading="loading">{{ $t('search') }}</v-btn>

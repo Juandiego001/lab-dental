@@ -13,6 +13,8 @@ from flask_babel import force_locale
 from email.mime.multipart import MIMEMultipart
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
+import filetype
+from flask_babel import gettext
 
 
 def send_mail(subject: str, to: list, plantilla: str, params: dict, attachments: list = [], language: str = 'es'):
@@ -32,7 +34,7 @@ def send_mail(subject: str, to: list, plantilla: str, params: dict, attachments:
             sender_email = os.getenv('MAIL_SENDER')
             user_email = os.getenv('MAIL_SENDER')
             password_email = os.getenv('MAIL_PASSWORD')
-            
+
             message = MIMEMultipart('related')
             with force_locale(language):
                 msg = render_template(plantilla, **params)
@@ -112,7 +114,6 @@ def get_file_size(file: FileStorage):
     return file_size_bytes
 
 
-
 def process_file(file: FileStorage):
     '''Get mimetype, extension and filename from file'''
 
@@ -140,3 +141,43 @@ def format_file_size(bytes_size):
         valor = int(valor)
 
     return f"{valor} {sizes[i]}"
+
+
+def is_allowed_extension(filename: str, allowed_extensions: set[str]):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
+
+
+def validate_files_size(files_list: list[FileStorage], max_size_mb: int = 50):
+    '''Validate file size'''
+
+    invalids = []
+    for file_obj in files_list:
+        max_size_bytes = max_size_mb * 1024 * 1024
+        file_obj.seek(0, 2)
+        file_size = file_obj.tell()
+        file_obj.seek(0)
+        if file_size > max_size_bytes:
+            invalids.append(file_obj.filename)
+    return invalids
+
+
+def validate_file_types(allowed_extensions: set[str], allowed_mimetypes: set[str], files_list: list[FileStorage]) -> list:
+    '''Validate files types'''
+
+    invalids = []
+    for file in files_list:
+        if not file or not file.filename:
+            invalids.append(gettext("Archivo desconocido/sin nombre"))
+            continue
+
+        extension_valida = is_allowed_extension(
+            file.filename, allowed_extensions)
+        mimetype_valido = file.mimetype in allowed_mimetypes
+        header_bytes = file.read(2048)
+        file.seek(0)
+        real_file_type = filetype.guess(header_bytes)
+
+        if real_file_type is None or not extension_valida or not mimetype_valido or real_file_type.mime not in allowed_mimetypes:
+            invalids.append(file.filename)
+
+    return invalids

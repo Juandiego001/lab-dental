@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-07-18 21:46-0500\n"
+"POT-Creation-Date: 2026-07-23 19:57-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,10 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
+
+#: core/utils.py:170
+msgid "Archivo desconocido/sin nombre"
+msgstr ""
 
 #: core/controllers/brands.py:31 core/controllers/brands.py:43
 #: core/controllers/brands.py:57 core/controllers/brands.py:70
@@ -52,10 +56,10 @@ msgstr ""
 #: core/controllers/manuals.py:99 core/controllers/manuals.py:118
 #: core/controllers/parts.py:26 core/controllers/parts.py:38
 #: core/controllers/parts.py:52 core/controllers/parts.py:66
-#: core/controllers/parts.py:79 core/controllers/permissions.py:37
-#: core/controllers/permissions.py:50 core/controllers/reasons.py:35
-#: core/controllers/reasons.py:47 core/controllers/reasons.py:61
-#: core/controllers/reasons.py:76 core/controllers/reasons.py:89
+#: core/controllers/parts.py:79 core/controllers/permissions.py:30
+#: core/controllers/permissions.py:43 core/controllers/reasons.py:34
+#: core/controllers/reasons.py:46 core/controllers/reasons.py:60
+#: core/controllers/reasons.py:74 core/controllers/reasons.py:87
 #: core/controllers/sites.py:33 core/controllers/sites.py:45
 #: core/controllers/sites.py:60 core/controllers/sites.py:79
 #: core/controllers/sites.py:92 core/controllers/sites.py:104
@@ -66,11 +70,13 @@ msgstr ""
 #: core/controllers/users.py:178 core/controllers/users.py:192
 #: core/controllers/users.py:209 core/controllers/users.py:239
 #: core/controllers/users.py:259 core/controllers/users.py:276
-#: core/controllers/users.py:289 core/controllers/warranties.py:36
-#: core/controllers/warranties.py:48 core/controllers/warranties.py:61
-#: core/controllers/warranties.py:74 core/controllers/warranties.py:87
-#: core/controllers/warranties.py:105 core/controllers/warranties.py:122
-#: core/controllers/warranties.py:141
+#: core/controllers/users.py:289 core/controllers/warranties.py:37
+#: core/controllers/warranties.py:49 core/controllers/warranties.py:62
+#: core/controllers/warranties.py:75 core/controllers/warranties.py:88
+#: core/controllers/warranties.py:105 core/controllers/warranties.py:121
+#: core/controllers/warranties.py:139 core/controllers/warranties.py:161
+#: core/controllers/warranties.py:178 core/controllers/warranties.py:192
+#: core/controllers/warranties.py:209 core/controllers/warranties.py:222
 msgid "abortException"
 msgstr ""
 
@@ -218,19 +224,19 @@ msgstr ""
 msgid "manualDeleted"
 msgstr ""
 
-#: core/controllers/permissions.py:48
+#: core/controllers/permissions.py:41
 msgid "permissionUpdated"
 msgstr ""
 
-#: core/controllers/reasons.py:59
+#: core/controllers/reasons.py:58
 msgid "reasonCreated"
 msgstr ""
 
-#: core/controllers/reasons.py:73
+#: core/controllers/reasons.py:72
 msgid "reasonUpdated"
 msgstr ""
 
-#: core/controllers/reasons.py:87
+#: core/controllers/reasons.py:85
 msgid "reasonDeleted"
 msgstr ""
 
@@ -294,15 +300,15 @@ msgstr ""
 msgid "photoUpdated"
 msgstr ""
 
-#: core/controllers/warranties.py:59
+#: core/controllers/warranties.py:60
 msgid "warrantyCreated"
 msgstr ""
 
-#: core/controllers/warranties.py:72
+#: core/controllers/warranties.py:73
 msgid "warrantyUpdated"
 msgstr ""
 
-#: core/controllers/warranties.py:85
+#: core/controllers/warranties.py:86
 msgid "warrantyDeleted"
 msgstr ""
 
@@ -310,8 +316,20 @@ msgstr ""
 msgid "warrantyApproved"
 msgstr ""
 
-#: core/controllers/warranties.py:136
+#: core/controllers/warranties.py:135
 msgid "warrantyRejected"
+msgstr ""
+
+#: core/controllers/warranties.py:176
+msgid "warrantyFilesAdded"
+msgstr ""
+
+#: core/controllers/warranties.py:207
+msgid "warrantyFileUpdated"
+msgstr ""
+
+#: core/controllers/warranties.py:220
+msgid "warrantyFileDeleted"
 msgstr ""
 
 #: core/schemas/brands.py:40 core/schemas/brands.py:43
@@ -361,15 +379,16 @@ msgstr ""
 msgid "contactEmailExistsError"
 msgstr ""
 
-#: core/schemas/equipments.py:53 core/schemas/equipments.py:56
+#: core/schemas/equipments.py:51 core/schemas/equipments.py:54
 msgid "modelRequired"
 msgstr ""
 
-#: core/schemas/equipments.py:69 core/schemas/equipments.py:72
+#: core/schemas/equipments.py:67 core/schemas/equipments.py:70
 msgid "referenceRequired"
 msgstr ""
 
-#: core/schemas/equipments.py:138
+#: core/schemas/equipments.py:116 core/schemas/warranties.py:95
+#: core/schemas/warranties.py:288
 #, python-format
 msgid "Unsupported file formats for: %(invalids)s"
 msgstr ""
@@ -447,6 +466,19 @@ msgstr ""
 msgid "invalidCurrentPassword"
 msgstr ""
 
+#: core/schemas/warranties.py:86 core/schemas/warranties.py:279
+#, python-format
+msgid "50MB max file size exceed for: %(invalids)s"
+msgstr ""
+
+#: core/schemas/warranties.py:107
+msgid "warrantyMissingParts"
+msgstr ""
+
+#: core/schemas/warranties.py:114
+msgid "warrantyInvalidParts"
+msgstr ""
+
 #: core/services/distributors.py:323
 msgid "contactNotFound"
 msgstr ""
@@ -484,16 +516,16 @@ msgstr ""
 msgid "resetPassword"
 msgstr ""
 
-#: core/services/warranties.py:303 core/services/warranties.py:358
+#: core/services/warranties.py:319 core/services/warranties.py:394
 msgid "warrantyNotFound"
 msgstr ""
 
-#: core/services/warranties.py:344
+#: core/services/warranties.py:380
 #, python-format
 msgid "SOE Latam - Aprobación de garantía #%(id)s"
 msgstr ""
 
-#: core/services/warranties.py:399
+#: core/services/warranties.py:432
 #, python-format
 msgid "SOE Latam - Rechazo de garantía #%(id)s"
 msgstr ""
@@ -552,7 +584,7 @@ msgstr ""
 #: templates/installation_approved.html:59
 #: templates/installation_rejected.html:74
 #: templates/installation_updated.html:58
-#: templates/register_installation.html:46 templates/warranty_approved.html:213
+#: templates/register_installation.html:46 templates/warranty_approved.html:219
 #: templates/warranty_rejected.html:227
 msgid "makeClick"
 msgstr ""
@@ -560,7 +592,7 @@ msgstr ""
 #: templates/installation_approved.html:61
 #: templates/installation_rejected.html:76
 #: templates/installation_updated.html:60
-#: templates/register_installation.html:48 templates/warranty_approved.html:218
+#: templates/register_installation.html:48 templates/warranty_approved.html:224
 #: templates/warranty_rejected.html:232
 msgid "here"
 msgstr ""
@@ -568,7 +600,7 @@ msgstr ""
 #: templates/installation_approved.html:63
 #: templates/installation_rejected.html:78
 #: templates/installation_updated.html:62
-#: templates/register_installation.html:50 templates/warranty_approved.html:220
+#: templates/register_installation.html:50 templates/warranty_approved.html:226
 #: templates/warranty_rejected.html:234
 msgid "toGoToApplication"
 msgstr ""
@@ -576,7 +608,7 @@ msgstr ""
 #: templates/installation_approved.html:66
 #: templates/installation_rejected.html:81
 #: templates/installation_updated.html:65
-#: templates/register_installation.html:53 templates/warranty_approved.html:223
+#: templates/register_installation.html:53 templates/warranty_approved.html:229
 #: templates/warranty_rejected.html:237
 msgid "bestRegards"
 msgstr ""
@@ -647,63 +679,67 @@ msgstr ""
 msgid "warrantyWithFollowingData"
 msgstr ""
 
-#: templates/warranty_approved.html:69 templates/warranty_rejected.html:70
+#: templates/warranty_approved.html:68
+msgid "warrantyFollowingWCO"
+msgstr ""
+
+#: templates/warranty_approved.html:75 templates/warranty_rejected.html:70
 msgid "warrantyContactInfo"
 msgstr ""
 
-#: templates/warranty_approved.html:80 templates/warranty_rejected.html:81
+#: templates/warranty_approved.html:86 templates/warranty_rejected.html:81
 msgid "warrantyContactName"
 msgstr ""
 
-#: templates/warranty_approved.html:84 templates/warranty_rejected.html:85
+#: templates/warranty_approved.html:90 templates/warranty_rejected.html:85
 msgid "warrantyContactEmail"
 msgstr ""
 
-#: templates/warranty_approved.html:88
+#: templates/warranty_approved.html:94
 msgid "warrantyContactPosition"
 msgstr ""
 
-#: templates/warranty_approved.html:95 templates/warranty_rejected.html:92
+#: templates/warranty_approved.html:101 templates/warranty_rejected.html:92
 msgid "warrantySiteInfo"
 msgstr ""
 
-#: templates/warranty_approved.html:106 templates/warranty_rejected.html:103
+#: templates/warranty_approved.html:112 templates/warranty_rejected.html:103
 msgid "warrantyAddress"
 msgstr ""
 
-#: templates/warranty_approved.html:110 templates/warranty_rejected.html:107
+#: templates/warranty_approved.html:116 templates/warranty_rejected.html:107
 msgid "warrantyCityCountry"
 msgstr ""
 
-#: templates/warranty_approved.html:119 templates/warranty_rejected.html:116
+#: templates/warranty_approved.html:125 templates/warranty_rejected.html:116
 msgid "warrantyEquipmentInfo"
 msgstr ""
 
-#: templates/warranty_approved.html:130 templates/warranty_rejected.html:127
+#: templates/warranty_approved.html:136 templates/warranty_rejected.html:127
 msgid "warrantyEquipmentModel"
 msgstr ""
 
-#: templates/warranty_approved.html:134 templates/warranty_rejected.html:131
+#: templates/warranty_approved.html:140 templates/warranty_rejected.html:131
 msgid "warrantyEquipmentReference"
 msgstr ""
 
-#: templates/warranty_approved.html:141 templates/warranty_rejected.html:138
+#: templates/warranty_approved.html:147 templates/warranty_rejected.html:138
 msgid "warrantyReasons"
 msgstr ""
 
-#: templates/warranty_approved.html:158 templates/warranty_rejected.html:155
+#: templates/warranty_approved.html:164 templates/warranty_rejected.html:155
 msgid "warrantyShiptTo"
 msgstr ""
 
-#: templates/warranty_approved.html:163 templates/warranty_rejected.html:160
+#: templates/warranty_approved.html:169 templates/warranty_rejected.html:160
 msgid "warrantyProblem"
 msgstr ""
 
-#: templates/warranty_approved.html:168 templates/warranty_rejected.html:165
+#: templates/warranty_approved.html:174 templates/warranty_rejected.html:165
 msgid "warrantySolution"
 msgstr ""
 
-#: templates/warranty_approved.html:174 templates/warranty_rejected.html:171
+#: templates/warranty_approved.html:180 templates/warranty_rejected.html:171
 msgid "warrantyPartsInfo"
 msgstr ""
 

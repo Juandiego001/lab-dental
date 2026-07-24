@@ -72,7 +72,7 @@
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.title" hide-details="auto" :label="$t('manuals.labelTitle')" counter="50"
-                maxlength="50" :rules="[titleRequired]" />
+                maxlength="50" :rules="[titleRequired]" autocomplete="off" />
             </v-col>
             <v-col cols="12">
               <v-textarea v-model="form.description" hide-details="auto" :label="$t('manuals.description')"
@@ -124,7 +124,7 @@
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.title" hide-details="auto" :label="$t('manuals.labelTitle')" counter="50"
-                maxlength="50" />
+                maxlength="50" autocomplete="off" />
             </v-col>
             <v-col cols="12">
               <v-textarea v-model="form.description" hide-details="auto" :label="$t('manuals.description')"
@@ -201,15 +201,15 @@
           <v-row dense>
             <v-col cols="6">
               <v-text-field v-model="searchForm.title" hide-details="auto" :label="$t('manuals.labelTitle')"
-                counter="100" maxlength="100" clearable />
+                counter="100" maxlength="100" clearable autocomplete="off" />
             </v-col>
             <v-col cols="6">
               <v-select v-model="searchForm.manualTypeId" item-title="name" item-value="id" :items="itemsTypes"
-                hide-details="auto" :label="$t('manuals.manualType')" clearable />
+                hide-details="auto" :label="$t('manuals.manualType')" clearable autocomplete="off" />
             </v-col>
             <v-col cols="6">
               <v-text-field v-model="searchForm.description" hide-details="auto" :label="$t('manuals.description')"
-                counter="100" maxlength="100" clearable />
+                counter="100" maxlength="100" clearable autocomplete="off" />
             </v-col>
             <v-col cols="6">
               <v-select v-model="searchForm.extension" item-title="title" item-value="value" hide-details="auto"

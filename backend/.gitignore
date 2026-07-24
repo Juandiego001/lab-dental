@@ -4,6 +4,8 @@ files
 files_data
 equipments_files
 installations_files
+warranties_files
+manuals_files
 users_files
 __pycache__
 /__pycache__

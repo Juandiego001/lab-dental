@@ -9,19 +9,19 @@
         <v-form>
           <v-row class="justify-center align-center">
             <v-col cols="6">
-              <v-text-field :label="$t('email')" hide-details="auto"></v-text-field>
+              <v-text-field :label="$t('email')" hide-details="auto" autocomplete="off" />
             </v-col>
 
             <v-col cols="6">
-              <v-text-field :label="$t('phone')" hide-details="auto"></v-text-field>
+              <v-text-field :label="$t('phone')" hide-details="auto" autocomplete="off" />
             </v-col>
 
             <v-col cols="12">
-              <v-text-field :label="$t('name')" hide-details="auto"></v-text-field>
+              <v-text-field :label="$t('name')" hide-details="auto" autocomplete="off" />
             </v-col>
 
             <v-col cols="12">
-              <v-textarea :label="$t('message')" hide-details="auto"></v-textarea>
+              <v-textarea :label="$t('message')" hide-details="auto" />
             </v-col>
 
             <v-col class="text-end" cols="12">

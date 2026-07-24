@@ -115,11 +115,11 @@
           <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="form.title" hide-details="auto" :label="$t('equipments.files.labelTitle')"
-                counter="50" maxlength="50" />
+                counter="50" maxlength="50" autocomplete="off" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.description" hide-details="auto" :label="$t('equipments.files.description')"
-                counter="100" maxlength="100" />
+                counter="100" maxlength="100" autocomplete="off" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.originalName" hide-details="auto" :label="$t('equipments.files.filename')"
@@ -188,19 +188,19 @@
           <v-row dense>
             <v-col cols="6">
               <v-text-field v-model="searchForm.originalName" hide-details="auto"
-                :label="$t('equipments.files.filename')" counter="50" maxlength="50" clearable />
+                :label="$t('equipments.files.filename')" counter="50" maxlength="50" clearable autocomplete="off" />
             </v-col>
             <v-col cols="6">
               <v-text-field v-model="searchForm.title" hide-details="auto" :label="$t('equipments.files.labelTitle')"
-                counter="100" maxlength="100" clearable />
+                counter="100" maxlength="100" clearable autocomplete="off" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="searchForm.description" hide-details="auto"
-                :label="$t('equipments.files.description')" counter="100" maxlength="100" clearable />
+                :label="$t('equipments.files.description')" counter="100" maxlength="100" clearable autocomplete="off" />
             </v-col>
             <v-col cols="12">
               <v-select v-model="searchForm.extension" item-title="title" item-value="value" hide-details="auto"
-                :label="$t('equipments.files.extension')" :items="extensions" clearable />
+                :label="$t('equipments.files.extension')" :items="extensions" clearable autocomplete="off" />
             </v-col>
             <v-col class="mt-3 text-end" cols="12">
               <v-btn class="bg-primary" size="small" type="submit" @mousedown.prevent :loading="loading">

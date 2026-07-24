@@ -509,9 +509,7 @@
     },
     "rules": {
       "partNumberRequired": "El número de parte es requerido",
-      "serialRequired": "El serial es requerido",
-      "descriptionRequired": "La descripción es requerida",
-      "invoiceParts": "Las partes de la factura son requeridas"
+      "descriptionRequired": "La descripción es requerida"
     }
   },
   "installations": {
@@ -608,24 +606,45 @@
         "message": "¿Está seguro que desea eliminar la pieza?"
       },
       "partNumber": "Número de pieza",
-      "serial": "Serial",
       "description": "Description",
-      "invoiceParts": "Piezas de factura",
       "quantity": "Cantidad",
-      "price": "Precio",
-      "total": "Total",
       "rules": {
         "partNumberRequired": "El número de pieza es requerido",
-        "serialRequired": "El serial es requerido",
         "descriptionRequired": "La descripción es requerida",
-        "invoicePartsRequired": "Las piezas de la factura son requeridas",
-        "quantityRequired": "La cantidad es requerida",
-        "priceRequired": "El precio es requerido"
+        "quantityRequired": "La cantidad es requerida"
       }
     },
-    "warrantyApprovals": "Aprobaciones de la garantía",
-    "dateReceived": "Fecha de recibido",
-    "technicalApproval": "Técnico Aprobador",
+    "files": {
+      "title": "Archivos de garantía",
+      "description": "Descripción",
+      "labelTitle": "Título",
+      "files": "Archivos",
+      "filename": "Archivo",
+      "size": "Tamaño",
+      "extension": "Extensión",
+      "videoNotSupported": "Tu navegador no soporta el elemento de video",
+      "create": {
+        "title": "Agregar Archivos"
+      },
+      "update": {
+        "title": "Actualizar Archivo"
+      },
+      "delete": {
+        "title": "Eliminar archivos",
+        "message": "¿Está seguro que desea eliminar el archivo?"
+      },
+      "search": {
+        "title": "Buscar Archivos"
+      },
+      "rules": {
+        "invalidFileType": "Solo se permiten archivos de video mp4 o imágenes",
+        "filesRequired": "Por lo menos un archivo es requerido",
+        "max50MBExceed": "Los archivos deben pesar como máximo 50 MB"
+      }
+    },
+    "receivedAt": "Recibido en",
+    "wcoCode": "Código de WCO",
+    "wcoYear": "Año de WCO",
     "create": {
       "title": "Crear garantía"
     },
@@ -655,7 +674,8 @@
       "reasonRequired": "El motivo de garantía es requerido",
       "shiptToRequired": "El lugar de envío es requerido",
       "problemRequired": "La descripción del problema es requerida",
-      "solutionRequired": "La descripción de la solución es requerida"
+      "solutionRequired": "La descripción de la solución es requerida",
+      "warrantyMissingParts": "Debe registrar al menos una parte de la garantía"
     },
     "statuses": {
       "label": "Estado",

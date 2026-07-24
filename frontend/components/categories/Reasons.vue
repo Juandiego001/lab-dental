@@ -66,11 +66,11 @@
           <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('reasons.name')"
-                :rules="[nameRequired]" />
+                :rules="[nameRequired]" autocomplete="off" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.slug" hide-details="auto" :label="$t('reasons.slug')"
-                :rules="[slugRequired]" />
+                :rules="[slugRequired]" autocomplete="off" />
             </v-col>
             <v-col cols="12">
               <v-textarea v-model="form.description" hide-details="auto" :label="$t('reasons.description')" />
@@ -101,11 +101,11 @@
           <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('reasons.name')"
-                :rules="[nameRequired]" />
+                :rules="[nameRequired]" autocomplete="off" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.slug" hide-details="auto" :label="$t('reasons.slug')"
-                :rules="[slugRequired]" />
+                :rules="[slugRequired]" autocomplete="off" />
             </v-col>
             <v-col cols="12">
               <v-textarea v-model="form.description" hide-details="auto" :label="$t('reasons.description')" />
@@ -164,7 +164,7 @@
           <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="search" :label="$t('reasons.search.fields')" hide-details="auto"
-                prepend-inner-icon="mdi-magnify" clearable />
+                prepend-inner-icon="mdi-magnify" clearable autocomplete="off" />
             </v-col>
             <v-col class="text-end" cols="12">
               <v-btn class="bg-primary" type="submit">{{ $t('search') }}</v-btn>

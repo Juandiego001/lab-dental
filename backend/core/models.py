@@ -1,7 +1,7 @@
 import enum
 from core.app import db
 from bcrypt import checkpw
-from sqlalchemy import Column, Enum, Index, Integer, Text, func, BigInteger, String, DateTime, ForeignKey, Boolean, text
+from sqlalchemy import UniqueConstraint, Column, Enum, Index, Integer, Text, func, BigInteger, String, DateTime, ForeignKey, Boolean, text
 from datetime import datetime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import expression
@@ -770,6 +770,35 @@ class Reason(db.Model):
         onupdate=func.now())
 
 
+class WarrantyFile(db.Model):
+    __tablename__ = 'warranties_files'
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    warranty_id: Mapped[int] = mapped_column(
+        ForeignKey('warranties.id'), nullable=False)
+    title: Mapped[str] = mapped_column(String(50), nullable=True)
+    description: Mapped[str] = mapped_column(String(100), nullable=True)
+    original_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    hash_name: Mapped[str] = mapped_column(String(100), nullable=True)
+    path: Mapped[str] = mapped_column(String, nullable=False)
+    mimetype: Mapped[str] = mapped_column(String(100), nullable=True)
+    extension: Mapped[str] = mapped_column(String(20), nullable=True)
+    size: Mapped[int] = mapped_column(
+        BigInteger, nullable=True, server_default='0')
+    status: Mapped[str] = mapped_column(String(20),
+                                        nullable=False,
+                                        server_default='ACTIVE')
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(),
+        nullable=False,
+        server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now())
+
+
 class Warranty(db.Model):
     __tablename__ = 'warranties'
 
@@ -817,3 +846,16 @@ class WarrantyReason(db.Model):
         ForeignKey('warranties.id'), nullable=False)
     reason_id: Mapped[int] = mapped_column(
         ForeignKey('reasons.id'), nullable=False)
+
+
+class WarrantyWCO(db.Model):
+    __tablename__ = 'warranties_wcos'
+    __table_args__ = (
+        UniqueConstraint('code', 'year', name='uq_warranty_wco_code_year'),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    warranty_id: Mapped[int] = mapped_column(
+        ForeignKey('warranties.id'), nullable=False)
+    code: Mapped[int] = mapped_column(Integer, nullable=False)
+    year: Mapped[int] = mapped_column(Integer, nullable=False)

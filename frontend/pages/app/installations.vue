@@ -30,10 +30,10 @@
             <template v-slot:item.option="{ item }">
               <v-btn v-if="$ability.can('update', 'installations')" class="my-2 bg-primary me-2" size="small"
                 icon="mdi-pencil" @click="async () => { await getInstallation(item.id); updateDialog = true }" />
-              <v-btn v-if="$ability.can('delete', 'installations')" class="my-2 bg-red me-2" size="small"
-                icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" />
-              <v-btn v-if="isAdmin" class="my-2 bg-secondary" size="small" icon="mdi-eye"
+              <v-btn v-if="isAdmin" class="my-2 me-2 bg-secondary" size="small" icon="mdi-eye"
                 @click="async () => { await getInstallation(item.id); approvalDialog = true }" />
+              <v-btn v-if="$ability.can('delete', 'installations')" class="my-2 bg-red" size="small"
+                icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" />
             </template>
           </v-data-table-server>
         </client-only>

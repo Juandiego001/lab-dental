@@ -1,20 +1,21 @@
-from datetime import datetime
+from datetime import datetime, date
 import io
-
+import uuid
+from pathlib import Path
 from weasyprint import HTML
-
+from werkzeug.datastructures import FileStorage
 from core.app import db, FRONTEND_APP_BASE_URL
-from core.models import Address, City, Contact, Country, Distributor, DistributorList, Equipment, List_, Reason, Site, User, UserList, Warranty, WarrantyReason
+from core.models import Address, City, Contact, Country, Distributor, DistributorList, Equipment, List_, Reason, Site, User, UserList, Warranty, WarrantyFile, WarrantyReason, WarrantyWCO
 from sqlalchemy import delete, and_, and_, func
 from werkzeug.exceptions import HTTPException
 from flask.templating import render_template
 from flask_babel import force_locale, gettext
-from core.utils import send_mail
+from core.utils import process_file, send_mail
 from core.schemas.warranties import WarrantyPDF
 from core.services.distributors import get_distributor_from_user
 
 
-def get_warranties(current_user: User, distributor_id: int, equipment_id: int, sale_date: datetime, invoice: str, status: str, page: int, per_page: int, sort_by: dict = None):
+def get_warranties(current_user: User, distributor_id: int, equipment_id: int, wco_code: int, wco_year: int, sale_date: datetime, invoice: str, status: str, page: int, per_page: int, sort_by: dict = None):
     '''Get warranties'''
 
     order_by = Warranty.id.desc()
@@ -36,6 +37,10 @@ def get_warranties(current_user: User, distributor_id: int, equipment_id: int, s
         query.append(Warranty.distributor_id == distributor_id)
     if invoice:
         query.append(Warranty.invoice.ilike(f'%{invoice}%'))
+    if wco_code:
+        query.append(WarrantyWCO.code == wco_code)
+    if wco_year:
+        query.append(WarrantyWCO.year == wco_year)
     if sale_date:
         query.append(Warranty.sale_date == sale_date)
     if status:
@@ -56,10 +61,13 @@ def get_warranties(current_user: User, distributor_id: int, equipment_id: int, s
             Warranty.problem,
             Warranty.solution,
             Warranty.status,
+            WarrantyWCO.code.label('wco_code'),
+            WarrantyWCO.year.label('wco_year'),
             Distributor.name.label('distributor_name'),
             func.concat(Equipment.model, ' - ', Equipment.reference).label('equipment_model_reference'))
         .join(Equipment, Equipment.id == Warranty.equipment_id)
         .join(Distributor, Distributor.id == Warranty.distributor_id)
+        .outerjoin(WarrantyWCO, WarrantyWCO.warranty_id == Warranty.id)
         .filter(*query)
         .order_by(order_by)
         .limit(per_page)
@@ -81,6 +89,9 @@ def get_warranty_by_id(warranty_id: int):
         Warranty.solution,
         Warranty.status,
         Warranty.parts,
+        Warranty.received_at,
+        WarrantyWCO.code.label('wco_code'),
+        WarrantyWCO.year.label('wco_year'),
 
         # Contact data
         func.jsonb_build_object(
@@ -110,8 +121,9 @@ def get_warranty_by_id(warranty_id: int):
         .join(Contact, Contact.id == Warranty.contact_id)\
         .join(Equipment, Equipment.id == Warranty.equipment_id)\
         .join(WarrantyReason, WarrantyReason.warranty_id == Warranty.id)\
+        .outerjoin(WarrantyWCO, WarrantyWCO.warranty_id == Warranty.id)\
         .filter(Warranty.id == warranty_id)\
-        .group_by(Distributor.id, Site.id, Contact.id, Equipment.id, Warranty.id)\
+        .group_by(Distributor.id, Site.id, Contact.id, Equipment.id, Warranty.id, WarrantyWCO.code, WarrantyWCO.year)\
         .first()
 
 
@@ -128,6 +140,9 @@ def get_warranty_by_id_for_pdf(warranty_id: int):
         Warranty.solution,
         Warranty.status,
         Warranty.parts,
+        Warranty.received_at,
+        WarrantyWCO.code.label('wco_code'),
+        WarrantyWCO.year.label('wco_year'),
 
         # Contact data
         func.jsonb_build_object(
@@ -159,6 +174,7 @@ def get_warranty_by_id_for_pdf(warranty_id: int):
         .join(Equipment, Equipment.id == Warranty.equipment_id)\
         .join(WarrantyReason, WarrantyReason.warranty_id == Warranty.id)\
         .join(Reason, Reason.id == WarrantyReason.reason_id)\
+        .outerjoin(WarrantyWCO, WarrantyWCO.warranty_id == Warranty.id)\
         .filter(Warranty.id == warranty_id)\
         .group_by(
             Distributor.name,
@@ -169,6 +185,9 @@ def get_warranty_by_id_for_pdf(warranty_id: int):
             Warranty.solution,
             Warranty.status,
             Warranty.parts,
+            Warranty.received_at,
+            WarrantyWCO.code,
+            WarrantyWCO.year,
             Contact.email,
             Contact.position,
             Contact.full_name,
@@ -215,9 +234,29 @@ def delete_warranty(warranty_id: int):
     db.session.commit()
 
 
+def create_warranty_file(warranty_id: int, warranty_file_data: FileStorage):
+    '''Creates an warranty file'''
+
+    mimetype, extension, original_name, size = process_file(warranty_file_data)
+    hash_name = str(uuid.uuid4())
+    file_path = f'./warranties_files/{hash_name}{extension}'
+    warranty_file = WarrantyFile(
+        warranty_id=warranty_id,
+        original_name=original_name,
+        hash_name=hash_name,
+        path=file_path,
+        mimetype=mimetype,
+        extension=extension,
+        size=size
+    )
+    db.session.add(warranty_file)
+    warranty_file_data.save(file_path)
+
+
 def create_warranty(warranty: dict):
     '''Create warranty'''
 
+    warranty_files: list[FileStorage] = warranty.pop('warranty_files')
     reasons_ids = warranty.pop('reasons_ids')
 
     new_warranty = Warranty(**warranty)
@@ -227,6 +266,9 @@ def create_warranty(warranty: dict):
     for reason_id in reasons_ids:
         db.session.add(WarrantyReason(
             warranty_id=new_warranty.id, reason_id=reason_id))
+
+    for warranty_file in warranty_files:
+        create_warranty_file(new_warranty.id, warranty_file)
 
     db.session.commit()
 
@@ -250,45 +292,18 @@ def group_reasons(reasons: list):
     return grouped_reasons
 
 
-def numeric_format_parts(parts: list[dict]) -> tuple[float, list]:
-    '''Numeric format parts'''
-
-    total_price = 0
-    formatted_parts = []
-    for part in parts:
-        total_price += int(part['quantity']) * float(part['price'])
-        formatted_part = part
-        if 'price' in formatted_part:
-            formatted_part['price'] = f"${part['price']:,.2f}"
-        else:
-            formatted_part['price'] = "$0.0"
-
-        if 'total' in formatted_part:
-            formatted_part['total'] = f"${part['total']:,.2f}"
-        else:
-            formatted_part['total'] = "$0.0"
-
-        formatted_parts.append(formatted_part)
-
-    total_price = f"${total_price:,.2f}"
-    return total_price, formatted_parts
-
-
 def get_warranty_pdf(warranty_id: int):
     '''Get warranty PDF'''
 
     the_warranty = get_warranty_by_id_for_pdf(warranty_id)
     the_warranty: WarrantyPDF = WarrantyPDF().dump(the_warranty)
-    total_price, formatted_parts = numeric_format_parts(the_warranty['parts'])
     grouped_reasons = group_reasons(the_warranty['reasons_names'])
 
     data = {
         **the_warranty,
-        "date": datetime.now().strftime("%m/%d/%Y"),
+        "date": datetime.now().strftime('%B %d, %Y'),
         "distributor": the_warranty['distributor'],
-        "grouped_reasons": grouped_reasons,
-        "total_price": total_price,
-        "parts": formatted_parts
+        "grouped_reasons": grouped_reasons
     }
 
     pdf_rendered = render_template('warranties.html', **data)
@@ -300,10 +315,37 @@ def get_warranty_pdf(warranty_id: int):
 def approve_warranty(warranty_id: int):
     '''Approve Warranty'''
 
-    if not check_warranty_exists(warranty_id):
+    current_warranty = check_warranty_exists(warranty_id)
+    if not current_warranty:
         raise HTTPException(gettext('warrantyNotFound'))
 
-    db.session.merge(Warranty(id=warranty_id, status='APPROVED'))
+    '''Validation to check if warranty already have WCO'''
+    existing_wco = db.session.query(WarrantyWCO)\
+        .filter(WarrantyWCO.warranty_id == warranty_id).first()
+
+    if not existing_wco:
+        last_warranty_wco = db.session.query(WarrantyWCO)\
+            .order_by(WarrantyWCO.id.desc())\
+            .first()
+
+        '''Validation for every new year'''
+        '''Every time a year passes, the entered warranty code must reset to 1 again.'''
+        current_year = date.today().year
+        new_warranty_wco = WarrantyWCO(
+            warranty_id=warranty_id,
+            year=current_year
+        )
+        if not last_warranty_wco or last_warranty_wco.year < current_year:
+            new_warranty_wco.code = 1
+        else:
+            new_warranty_wco.code = last_warranty_wco.code + 1
+
+        db.session.add(new_warranty_wco)
+
+    current_warranty.status = 'APPROVED'
+    if not current_warranty.received_at:
+        current_warranty.received_at = datetime.now()
+
     db.session.commit()
 
 
@@ -312,14 +354,11 @@ def notify_approval(warranty_id: int):
 
     warranty_data: dict = WarrantyPDF().dump(
         get_warranty_by_id_for_pdf(warranty_id))
-    total_price, formatted_parts = numeric_format_parts(warranty_data['parts'])
     warranty_data = {
         **warranty_data,
-        "date": datetime.now().strftime("%m/%d/%Y"),
+        "date": datetime.now().strftime('%B %d, %Y'),
         "distributor": warranty_data['distributor'],
         "reasons": warranty_data['reasons_names'],
-        "total_price": total_price,
-        "parts": formatted_parts,
         "app_url": f'{FRONTEND_APP_BASE_URL}/app/warranties'
     }
 
@@ -367,14 +406,11 @@ def notify_rejection(warranty_id: int, reject_comments: str):
 
     warranty_data: dict = WarrantyPDF().dump(
         get_warranty_by_id_for_pdf(warranty_id))
-    total_price, formatted_parts = numeric_format_parts(warranty_data['parts'])
     warranty_data = {
         **warranty_data,
         "date": datetime.now().strftime("%m/%d/%Y"),
         "distributor": warranty_data['distributor'],
         "reasons": warranty_data['reasons_names'],
-        "total_price": total_price,
-        "parts": formatted_parts,
         "app_url": f'{FRONTEND_APP_BASE_URL}/app/warranties',
         "reject_comments": reject_comments
     }
@@ -405,3 +441,76 @@ def notify_rejection(warranty_id: int, reject_comments: str):
                 plantilla='warranty_rejected.html',
                 params=warranty_data,
                 language=each_language)
+
+
+def search_warranty_files(warranty_id: int, title: str, description: str, original_name: str, extension: str, page: int, per_page: int):
+    '''Search warranties files'''
+
+    query = [WarrantyFile.status == 'ACTIVE',
+             WarrantyFile.warranty_id == warranty_id]
+    if title:
+        query.append(WarrantyFile.title.ilike(f'%{title}%'))
+    if description:
+        query.append(WarrantyFile.description.ilike(f'%{description}%'))
+    if original_name:
+        query.append(WarrantyFile.original_name.ilike(f'%{original_name}%'))
+    if extension:
+        query.append(WarrantyFile.extension.ilike(f'%{extension}%'))
+
+    total = db.session.query(WarrantyFile)\
+        .filter(*query)\
+        .count()
+    warranties_files = db.session.query(WarrantyFile)\
+        .filter(*query)\
+        .order_by(WarrantyFile.id.asc())\
+        .limit(per_page)\
+        .offset((page - 1) * per_page)\
+        .all()
+
+    return warranties_files, total
+
+
+def add_files(warranty_id: int, files: list[FileStorage]):
+    '''Add warranty files'''
+
+    for file in files:
+        create_warranty_file(
+            warranty_id=warranty_id,
+            warranty_file_data=file,
+        )
+    db.session.commit()
+
+
+def get_warranty_file(file_id: int):
+    '''Get warranty file'''
+
+    return db.session.query(WarrantyFile)\
+        .filter(WarrantyFile.id == file_id)\
+        .first()
+
+
+def update_warranty_file(file_id: int, data: dict):
+    '''Update warranty file'''
+
+    db.session.merge(WarrantyFile(id=file_id, **data))
+    db.session.commit()
+
+
+def remove_warranty_file(warranty_file_id: int):
+    '''Remove warranty file'''
+
+    warranty_file = db.session.query(WarrantyFile)\
+        .filter(
+        WarrantyFile.id == warranty_file_id,
+        WarrantyFile.status == 'ACTIVE'
+    )\
+        .first()
+    try:
+        Path(warranty_file.path).unlink(missing_ok=True)
+    except Exception as e:
+        print(
+            f"Ocurrió un error al intentar eliminar el archivo: {e}")
+
+    warranty_file.status = 'INACTIVE'
+    db.session.merge(warranty_file)
+    db.session.commit()

@@ -30,10 +30,10 @@
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
                 <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getDistributor(item.id)" />
-                <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                  @click="form.id = item.id; deleteDialog = true" />
                 <v-btn class="my-2 bg-secondary" size="small" icon="mdi-account-box"
                   @click="async () => { distributorId = item.id; await getContacts({}); dialog = true }" />
+                <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
+                  @click="form.id = item.id; deleteDialog = true" />
               </div>
             </template>
           </v-data-table-server>
@@ -57,12 +57,12 @@
           <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('distributors.name')"
-                :rules="[nameRequired]" counter="50" maxlength="50" />
+                :rules="[nameRequired]" counter="50" maxlength="50" autocomplete="off" />
             </v-col>
             <v-col>
               <v-autocomplete v-model="form.brandsIds" hide-details="auto" :label="$t('brands.title', 1)"
                 :items="brands" item-title="name" item-value="id" clearable multiple chips :rules="[brandsRequired]"
-                @update:search="(name) => {
+                autocomplete="off" @update:search="(name) => {
                   if (!createDialog) return;
                   getBrands({ brandsIds: form.brandsIds, name })
                 }" />
@@ -82,7 +82,7 @@
                   class="mb-2">
                   <v-text-field v-if="emailObj.status == 'ACTIVE'" v-model="emailObj.email" hide-details="auto"
                     :label="`${$t('distributors.emails.title')} ${index + 1}`" type="email" append-icon="mdi-delete"
-                    @click:append="removeEmailField(index)" counter="150" maxlength="150" />
+                    autocomplete="off" @click:append="removeEmailField(index)" counter="150" maxlength="150" />
                 </div>
               </v-slide-y-transition>
             </v-col>
@@ -101,7 +101,7 @@
                   class="mb-2">
                   <v-text-field v-if="phoneObj.status == 'ACTIVE'" v-model="phoneObj.phone" hide-details="auto"
                     :label="`${$t('distributors.phones.title')} ${index + 1}`" append-icon="mdi-delete"
-                    @click:append="removePhoneField(index)" counter="20" maxlength="20" />
+                    autocomplete="off" @click:append="removePhoneField(index)" counter="20" maxlength="20" />
                 </div>
               </v-slide-y-transition>
             </v-col>
@@ -138,7 +138,7 @@
           <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('distributors.name')"
-                :rules="[nameRequired]" counter="50" maxlength="50" />
+                :rules="[nameRequired]" counter="50" maxlength="50" autocomplete="off" />
             </v-col>
             <v-autocomplete v-model="form.brandsIds" hide-details="auto" :label="$t('brands.title', 1)" :items="brands"
               item-title="name" item-value="id" clearable multiple chips :rules="[brandsRequired]" @update:search="(name) => {
@@ -160,6 +160,7 @@
                   class="mb-2">
                   <v-text-field v-if="emailObj.status == 'ACTIVE'" v-model="emailObj.email" hide-details="auto"
                     :label="`${$t('distributors.emails.title')} ${index + 1}`" type="email" append-icon="mdi-delete"
+                    autocomplete="off"
                     @click:append="removeEmailField(index)" counter="150" maxlength="150" />
                 </div>
               </v-slide-y-transition>
@@ -179,6 +180,7 @@
                   class="mb-2">
                   <v-text-field v-if="phoneObj.status == 'ACTIVE'" v-model="phoneObj.phone" hide-details="auto"
                     :label="`${$t('distributors.phones.title')} ${index + 1}`" append-icon="mdi-delete"
+                    autocomplete="off"
                     @click:append="removePhoneField(index)" counter="20" maxlength="20" />
                 </div>
               </v-slide-y-transition>
@@ -238,7 +240,7 @@
           <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="searchForm.name" :label="$t('distributors.name')" hide-details="auto"
-                prepend-inner-icon="mdi-magnify" counter="50" maxlength="50" clearable />
+                prepend-inner-icon="mdi-magnify" counter="50" maxlength="50" clearable autocomplete="off" />
             </v-col>
             <v-col class="text-end" cols="12">
               <v-btn class="bg-primary" type="submit" @mousedown.prevent :loading="loading">{{ $t('search') }}</v-btn>

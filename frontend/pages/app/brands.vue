@@ -46,11 +46,11 @@
             <v-row dense>
               <v-col cols="12">
                 <v-text-field v-model="form.name" hide-details="auto" :label="$t('brands.name')" :rules="[nameRequired]"
-                  counter="50" maxlength="50" />
+                  counter="50" maxlength="50" autocomplete="off" />
               </v-col>
               <v-col cols="12">
                 <v-text-field v-model="form.slug" hide-details="auto" :label="$t('brands.slug')" :rules="[slugRequired]"
-                  counter="50" maxlength="50" @input="() => form.slug = $generateSlug(form.slug)" />
+                  counter="50" maxlength="50" autocomplete="off" @input="() => form.slug = $generateSlug(form.slug)" />
               </v-col>
               <v-col class="text-end">
                 <v-btn variant="outlined" @click="createDialog = false" @mousedown.prevent :disabled="loading">{{
@@ -80,11 +80,11 @@
             <v-row dense>
               <v-col cols="12">
                 <v-text-field v-model="form.name" hide-details="auto" :label="$t('brands.name')" :rules="[nameRequired]"
-                  counter="50" maxlength="50" />
+                  counter="50" maxlength="50" autocomplete="off" />
               </v-col>
               <v-col cols="12">
                 <v-text-field v-model="form.slug" hide-details="auto" :label="$t('brands.slug')" :rules="[slugRequired]"
-                  counter="50" maxlength="50" @input="() => form.slug = $generateSlug(form.slug)" />
+                  counter="50" maxlength="50" autocomplete="off" @input="() => form.slug = $generateSlug(form.slug)" />
               </v-col>
               <v-col class="text-end">
                 <v-btn variant="outlined" @click="updateDialog = false" @mousedown.prevent :disabled="loading">{{
@@ -136,11 +136,11 @@
             <v-row dense>
               <v-col cols="6">
                 <v-text-field v-model="searchForm.name" :label="$t('brands.name')" hide-details="auto" clearable
-                  counter="50" maxlength="50" />
+                  counter="50" maxlength="50" autocomplete="off" />
               </v-col>
               <v-col cols="6">
                 <v-text-field v-model="searchForm.slug" :label="$t('brands.slug')" hide-details="auto" clearable
-                  counter="50" maxlength="50" />
+                  counter="50" maxlength="50" autocomplete="off" />
               </v-col>
               <v-col class="text-end" cols="12">
                 <v-btn class="bg-primary" type="submit" @mousedown.prevent :loading="loading">{{ $t('search') }}</v-btn>

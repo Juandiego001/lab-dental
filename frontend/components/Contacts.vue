@@ -77,19 +77,19 @@
           <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="form.fullName" hide-details="auto" :label="$t('contacts.fullName')"
-                :rules="[nameRequired]" counter="50" maxlength="50" />
+                :rules="[nameRequired]" counter="50" maxlength="50" autocomplete="off" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.email" hide-details="auto" :label="$t('contacts.email')" counter="150"
-                maxlength="150" />
+                maxlength="150" autocomplete="off" />
             </v-col>
             <v-col cols="6">
               <v-text-field v-model="form.position" hide-details="auto" :label="$t('contacts.position')" counter="150"
-                maxlength="150" />
+                maxlength="150" autocomplete="off" />
             </v-col>
             <v-col cols="6">
               <v-text-field v-model="form.phone" hide-details="auto" :label="$t('contacts.phone')" counter="20"
-                maxlength="20" />
+                maxlength="20" autocomplete="off" />
             </v-col>
             <v-col class="mt-3 text-end" cols="12">
               <v-btn variant="outlined" size="small" @click="createDialog = false" @mousedown.prevent
@@ -122,19 +122,19 @@
           <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="form.fullName" hide-details="auto" :label="$t('contacts.fullName')"
-                :rules="[nameRequired]" counter="50" maxlength="50" />
+                :rules="[nameRequired]" counter="50" maxlength="50" autocomplete="off" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.email" hide-details="auto" :label="$t('contacts.email')" counter="150"
-                maxlength="150" />
+                maxlength="150" autocomplete="off" />
             </v-col>
             <v-col cols="6">
               <v-text-field v-model="form.position" hide-details="auto" :label="$t('contacts.position')" counter="150"
-                maxlength="150" />
+                maxlength="150" autocomplete="off" />
             </v-col>
             <v-col cols="6">
               <v-text-field v-model="form.phone" hide-details="auto" :label="$t('contacts.phone')" counter="20"
-                maxlength="20" />
+                maxlength="20" autocomplete="off" />
             </v-col>
             <v-col class="mt-3 text-end" cols="12">
               <v-btn variant="outlined" size="small" @click="createDialog = false" @mousedown.prevent
@@ -170,15 +170,15 @@
           <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="searchForm.fullName" :label="$t('contacts.fullName')" hide-details="auto"
-                counter="50" maxlength="50" clearable />
+                counter="50" maxlength="50" clearable autocomplete="off" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="searchForm.email" :label="$t('contacts.email')" hide-details="auto" counter="50"
-                maxlength="50" clearable />
+                maxlength="50" clearable autocomplete="off" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="searchForm.phone" :label="$t('contacts.phone')" hide-details="auto" counter="50"
-                maxlength="50" clearable />
+                maxlength="50" clearable autocomplete="off" />
             </v-col>
             <v-col class="mt-3 text-end" cols="12">
               <v-btn class="bg-primary" size="small" type="submit" @mousedown.prevent :loading="loading">

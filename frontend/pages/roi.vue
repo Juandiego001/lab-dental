@@ -16,7 +16,7 @@
           <v-spacer />
           <p class="text-subtitle-1 me-3 font-weight-medium">{{ $t('roi.exchangeRate') }}</p>
           <v-text-field v-model.number="exchangeRate" class="font-weight-medium" density="compact" type="number"
-            variant="outlined" hide-details="auto" max-width="180" @update:model-value="handleExchangeRate">
+            variant="outlined" hide-details="auto" max-width="180" @update:model-value="handleExchangeRate" autocomplete="off">
             <template v-slot:prepend-inner>
               <p>$</p>
             </template>
@@ -34,7 +34,7 @@
               <p class="font-weight-medium text-subtitle-1">{{ $t('roi.averageServicesDay') }}</p>
               <v-spacer />
               <v-text-field v-model.number="servicesDay" class="font-weight-medium" density="compact" variant="outlined"
-                hide-details="auto" max-width="80"></v-text-field>
+                hide-details="auto" max-width="80" autocomplete="off" />
             </v-col>
             <v-col cols="12" class="pt-0">
               <v-slider v-model="servicesDay" color="white" hide-details="auto" min="1" max="30" step="1"></v-slider>
@@ -44,7 +44,7 @@
               <p class="font-weight-medium text-subtitle-1">{{ $t('roi.serviceSaleRate') }}</p>
               <v-spacer />
               <v-text-field v-model.number="servicesSaleRate" class="font-weight-medium" density="compact"
-                variant="outlined" hide-details="auto" max-width="80"></v-text-field>
+                variant="outlined" hide-details="auto" max-width="80" autocomplete="off" />
             </v-col>
             <v-col cols="12" class="pt-0">
               <v-slider v-model="servicesSaleRate" color="white" hide-details="auto" min="1" :max="limits.saleRate"
@@ -55,7 +55,7 @@
               <p class="font-weight-medium text-subtitle-1">{{ $t('roi.employeesMonthSalary') }}</p>
               <v-spacer />
               <v-text-field v-model.number="employeesMonthSalary" class="font-weight-medium" density="compact"
-                variant="outlined" hide-details="auto" max-width="80"></v-text-field>
+                variant="outlined" hide-details="auto" max-width="80" autocomplete="off" />
             </v-col>
             <v-col cols="12" class="pt-0">
               <v-slider v-model="employeesMonthSalary" color="white" hide-details="auto" min="100" :max="limits.salary"
@@ -66,7 +66,7 @@
               <p class="font-weight-medium text-subtitle-1">{{ $t('roi.daysWorkedMonth') }}</p>
               <v-spacer />
               <v-text-field v-model.number="daysWorkedMonth" class="font-weight-medium" density="compact"
-                variant="outlined" hide-details="auto" max-width="80"></v-text-field>
+                variant="outlined" hide-details="auto" max-width="80" autocomplete="off" />
             </v-col>
             <v-col cols="12" class="pt-0">
               <v-slider v-model="daysWorkedMonth" color="white" hide-details="auto" min="1" max="30"
@@ -77,7 +77,7 @@
               <p class="font-weight-medium text-subtitle-1">{{ $t('roi.hoursWorkDay') }}</p>
               <v-spacer />
               <v-text-field v-model.number="hoursWorkedDay" class="font-weight-medium" density="compact"
-                variant="outlined" hide-details="auto" max-width="80"></v-text-field>
+                variant="outlined" hide-details="auto" max-width="80" autocomplete="off" />
             </v-col>
             <v-col cols="12" class="pt-0">
               <v-slider v-model="hoursWorkedDay" color="white" hide-details="auto" min="1" max="24" step="1"></v-slider>
@@ -87,7 +87,7 @@
               <p class="font-weight-medium text-subtitle-1">{{ $t('roi.rentPremisesMonth') }}</p>
               <v-spacer />
               <v-text-field v-model.number="rentPremisesMonth" class="font-weight-medium" density="compact"
-                variant="outlined" hide-details="auto" max-width="100"></v-text-field>
+                variant="outlined" hide-details="auto" max-width="100" autocomplete="off" />
             </v-col>
             <v-col cols="12" class="pt-0">
               <v-slider v-model="rentPremisesMonth" color="white" hide-details="auto" min="0" :max="limits.rent"
@@ -98,7 +98,7 @@
               <p class="font-weight-medium text-subtitle-1">{{ $t('roi.areaPremises') }}</p>
               <v-spacer />
               <v-text-field v-model.number="areaPremises" class="font-weight-medium" density="compact"
-                variant="outlined" hide-details="auto" max-width="80"></v-text-field>
+                variant="outlined" hide-details="auto" max-width="80" autocomplete="off" />
             </v-col>
             <v-col cols="12" class="pt-0">
               <v-slider v-model="areaPremises" color="white" hide-details="auto" min="10" max="2000"
@@ -109,7 +109,7 @@
               <p class="font-weight-medium text-subtitle-1">{{ $t('roi.workSiteArea') }}</p>
               <v-spacer />
               <v-text-field v-model.number="workArea" class="font-weight-medium" density="compact" variant="outlined"
-                hide-details="auto" max-width="80"></v-text-field>
+                hide-details="auto" max-width="80" autocomplete="off" />
             </v-col>
             <v-col cols="12" class="pt-0">
               <v-slider v-model="workArea" color="white" hide-details="auto" min="10" max="100" step="1"></v-slider>
@@ -119,7 +119,7 @@
               <p class="font-weight-medium text-subtitle-1">{{ $t('roi.equipmentLeaseMonth') }}</p>
               <v-spacer />
               <v-text-field v-model.number="equipmentLeaseMonth" class="font-weight-medium" density="compact"
-                variant="outlined" hide-details="auto" max-width="100"></v-text-field>
+                variant="outlined" hide-details="auto" max-width="100" autocomplete="off" />
             </v-col>
             <v-col cols="12" class="pt-0">
               <v-slider v-model="equipmentLeaseMonth" color="white" hide-details="auto" min="0" :max="limits.lease"
@@ -130,7 +130,7 @@
               <p class="font-weight-medium text-subtitle-1">{{ $t('roi.equipmentPrice') }}</p>
               <v-spacer />
               <v-text-field v-model.number="equipmentPrice" class="font-weight-medium" density="compact"
-                variant="outlined" hide-details="auto" max-width="100"></v-text-field>
+                variant="outlined" hide-details="auto" max-width="100" autocomplete="off" />
             </v-col>
             <v-col cols="12" class="pt-0">
               <v-slider v-model="equipmentPrice" color="white" hide-details="auto" min="5000" :max="limits.price"
