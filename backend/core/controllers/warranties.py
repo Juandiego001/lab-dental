@@ -108,16 +108,21 @@ def get_warranty_pdf(warranty_id: int):
 @bp.patch('/approve/<int:warranty_id>')
 @bp.output(Message)
 @jwt_required()
-def approve_installation(warranty_id):
-    '''Approve installation'''
+def approve_warranty(warranty_id: int):
+    '''Approve warranty'''
 
     try:
-        warranties.approve_warranty(warranty_id)
+        warranties.approve_warranty(
+            current_user=current_user,
+            warranty_id=warranty_id
+        )
+        print('PASA DESPUES DE ESTO')
         warranties.notify_approval(warranty_id)
         return {'message': gettext('warrantyApproved')}
     except HTTPException as ex:
         abort(400, ex.description)
     except Exception as ex:
+        print(ex)
         abort(500, gettext('abortException'))
 
 
@@ -125,8 +130,8 @@ def approve_installation(warranty_id):
 @bp.input(WarrantyRejectCommentsIn)
 @bp.output(Message)
 @jwt_required()
-def reject_installation(warranty_id: int, json_data: dict):
-    '''Reject installation'''
+def reject_warranty(warranty_id: int, json_data: dict):
+    '''Reject warranty'''
 
     try:
         warranties.reject_warranty(warranty_id)

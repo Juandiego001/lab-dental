@@ -62,6 +62,7 @@
                 @click="async () => { warrantyId = item.id; await getWarrantyFiles({}); tableDialog = true; }" />
               <v-btn class="my-2 bg-secondary me-2" size="small" icon="mdi-open-in-new"
                 :href="`/api/warranties/${item.id}/pdf`" target="_blank" />
+              <v-btn v-if="isAdmin" class="my-2 bg-secondary me-2" size="small" icon="mdi-file-document" />
               <v-btn v-if="$ability.can('delete', 'installations')" class="my-2 bg-red" size="small"
                 icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" />
             </template>

@@ -141,8 +141,11 @@ def get_warranty_by_id_for_pdf(warranty_id: int):
         Warranty.status,
         Warranty.parts,
         Warranty.received_at,
+        Warranty.approved_at,
+        Warranty.approved_at,
         WarrantyWCO.code.label('wco_code'),
         WarrantyWCO.year.label('wco_year'),
+        User.full_name.label('user'),
 
         # Contact data
         func.jsonb_build_object(
@@ -174,6 +177,7 @@ def get_warranty_by_id_for_pdf(warranty_id: int):
         .join(Equipment, Equipment.id == Warranty.equipment_id)\
         .join(WarrantyReason, WarrantyReason.warranty_id == Warranty.id)\
         .join(Reason, Reason.id == WarrantyReason.reason_id)\
+        .join(User, User.id == Warranty.user_approval_id)\
         .outerjoin(WarrantyWCO, WarrantyWCO.warranty_id == Warranty.id)\
         .filter(Warranty.id == warranty_id)\
         .group_by(
@@ -186,8 +190,10 @@ def get_warranty_by_id_for_pdf(warranty_id: int):
             Warranty.status,
             Warranty.parts,
             Warranty.received_at,
+            Warranty.approved_at,
             WarrantyWCO.code,
             WarrantyWCO.year,
+            User.full_name,
             Contact.email,
             Contact.position,
             Contact.full_name,
@@ -200,7 +206,7 @@ def get_warranty_by_id_for_pdf(warranty_id: int):
         .first()
 
 
-def check_warranty_exists(warranty_id: int):
+def check_warranty_exists(warranty_id: int) -> Warranty | None:
     '''Check if warranty exists'''
 
     return db.session.query(Warranty).filter(Warranty.id == warranty_id).first()
@@ -312,9 +318,10 @@ def get_warranty_pdf(warranty_id: int):
     return pdf_buffer
 
 
-def approve_warranty(warranty_id: int):
+def approve_warranty(current_user: User, warranty_id: int):
     '''Approve Warranty'''
 
+    current_date = datetime.now()
     current_warranty = check_warranty_exists(warranty_id)
     if not current_warranty:
         raise HTTPException(gettext('warrantyNotFound'))
@@ -344,8 +351,10 @@ def approve_warranty(warranty_id: int):
 
     current_warranty.status = 'APPROVED'
     if not current_warranty.received_at:
-        current_warranty.received_at = datetime.now()
+        current_warranty.received_at = current_date
 
+    current_warranty.user_approval_id = current_user.id
+    current_warranty.approved_at = current_date
     db.session.commit()
 
 
@@ -394,15 +403,18 @@ def notify_approval(warranty_id: int):
 def reject_warranty(warranty_id: int):
     '''Reject warranty'''
 
-    if not check_warranty_exists(warranty_id):
+    current_warranty = check_warranty_exists(warranty_id)
+    if not current_warranty:
         raise HTTPException(gettext('warrantyNotFound'))
 
-    db.session.merge(Warranty(id=warranty_id, status='REJECTED'))
+    current_warranty.status = 'REJECTED'
+    current_warranty.user_approval_id = None
+    current_warranty.approved_at = None
     db.session.commit()
 
 
 def notify_rejection(warranty_id: int, reject_comments: str):
-    '''Send notification to every distributor user about the installation rejected'''
+    '''Send notification to every distributor user about the warranty rejected'''
 
     warranty_data: dict = WarrantyPDF().dump(
         get_warranty_by_id_for_pdf(warranty_id))

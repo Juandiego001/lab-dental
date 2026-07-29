@@ -226,26 +226,17 @@
         </td>
       </tr>
       <tr style="text-align: left">
-        <th>Part Number</th>
-        <th>Description</th>
-        <th>Invoice Parts</th>
-        <th>Qty.</th>
-        <th>Price</th>
-        <th>Total</th>
+        <th colspan="2">Part Number</th>
+        <th colspan="2">Description</th>
+        <th colspan="2">Qty.</th>
       </tr>
       {% for part in parts %}
       <tr>
-        <td style="font-size: 12px;">{{ part.part_number }}</td>
-        <td style="font-size: 12px;">{{ part.description }}</td>
-        <td style="font-size: 12px;">{{ part.invoice_parts }}</td>
-        <td style="font-size: 12px;">{{ part.quantity }}</td>
-        <td style="font-size: 12px;">{{ part.price }}</td>
-        <td style="font-size: 12px;">{{ part.total }}</td>
+        <td colspan="2" style="font-size: 12px;">{{ part.part_number }}</td>
+        <td colspan="2" style="font-size: 12px;">{{ part.description }}</td>
+        <td colspan="2" style="font-size: 12px;">{{ part.quantity }}</td>
       </tr>
       {% endfor %}
-      <tr>
-        <td colspan="6" style="text-align: right;"><span style="font-weight: bold;">Total Price:</span> {{ total_price }}</td>
-      </tr>
     </table>
 
     <table class="formatted-table">
@@ -264,15 +255,13 @@
       </tr>
       <tr>
         <td>Date received</td>
-        <td>{{ received_at }}</td>
-        <td>By</td>
-        <td>{{ user }}</td>
+        <td colspan="3">{{ received_at }}</td>
       </tr>
       <tr>
         <td>Technical Approval</td>
-        <td></td>
+        <td>{{ approved_at }}</td>
         <td>By</td>
-        <td></td>
+        <td>{{ user }}</td>
       </tr>
       <tr>
         <td>Warranty Approval</td>

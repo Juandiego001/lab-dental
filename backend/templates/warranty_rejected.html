@@ -173,37 +173,23 @@
 
           <table class="parts-table">
             <tr style="text-align: left">
-              <th>Part Number</th>
-              <th>Description</th>
-              <th>Invoice Parts</th>
-              <th>Qty.</th>
-              <th>Price</th>
-              <th>Total</th>
+              <th colspan="2">Part Number</th>
+              <th colspan="2">Description</th>
+              <th colspan="2">Qty.</th>
             </tr>
             {% for part in parts %}
             <tr>
-              <td class="gray-bg" style="font-size: 12px">
+              <td colspan="2" class="gray-bg" style="font-size: 12px">
                 {{ part.part_number }}
               </td>
-              <td class="gray-bg" style="font-size: 12px">
+              <td colspan="2" class="gray-bg" style="font-size: 12px">
                 {{ part.description }}
               </td>
-              <td class="gray-bg" style="font-size: 12px">
-                {{ part.invoice_parts }}
-              </td>
-              <td class="gray-bg" style="font-size: 12px">
+              <td colspan="2" class="gray-bg" style="font-size: 12px">
                 {{ part.quantity }}
               </td>
-              <td class="gray-bg" style="font-size: 12px">{{ part.price }}</td>
-              <td class="gray-bg" style="font-size: 12px">{{ part.total }}</td>
             </tr>
             {% endfor %}
-            <tr>
-              <td colspan="6" style="text-align: right">
-                <span style="font-weight: bold">Total Price:</span> {{
-                total_price }}
-              </td>
-            </tr>
           </table>
 
           <p style="margin-bottom: 1rem">

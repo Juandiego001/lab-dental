@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 from flask_babel import gettext
 from core.utils import format_file_size, validate_files_size, validate_file_types
@@ -184,10 +185,7 @@ class WarrantySitePDF(BaseSchema):
 class PartPDF(BaseSchema):
     part_number = String()
     description = String()
-    invoice_parts = String()
     quantity = Integer()
-    price = Float()
-    total = Float()
 
 
 class WarrantyEquipmentPDF(BaseSchema):
@@ -195,11 +193,11 @@ class WarrantyEquipmentPDF(BaseSchema):
     reference = String()
 
 
-def set_received_at(v):
-    '''Set Received At for PDF'''
+def set_date_string(v: datetime):
+    '''Set Date String for PDF'''
 
-    if v.received_at:
-        return v.received_at.strftime('%B %d, %Y at %H:%M')
+    if v:
+        return v.strftime('%B %d, %Y at %H:%M')
     else:
         return ""
 
@@ -214,6 +212,7 @@ class WarrantyPDF(BaseSchema):
     parts = List(Nested(PartPDF))
     equipment_model_reference = String()
     distributor_name = String()
+    user = String()
     invoice = String()
     sale_date = Function(
         lambda v: v.sale_date.strftime('%B %d, %Y'))
@@ -221,7 +220,8 @@ class WarrantyPDF(BaseSchema):
     problem = String()
     solution = String()
     status = String()
-    received_at = Function(lambda v: set_received_at(v))
+    received_at = Function(lambda v: set_date_string(v.received_at))
+    approved_at = Function(lambda v: set_date_string(v.approved_at))
     wco = Function(lambda v: set_wco(v.wco_code, v.wco_year))
     created_at = DateTime()
     updated_at = DateTime()
