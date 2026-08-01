@@ -1,12 +1,11 @@
 from core.models import Brand
-from apiflask import Schema
 from apiflask.fields import DateTime, Integer, List, Nested, String
 from marshmallow import ValidationError, post_load, validate, validates_schema
 from core.schemas.utils import BaseSchema, SortBy
 from flask_babel import gettext
 
 
-class BrandSearch(Schema):
+class BrandSearch(BaseSchema):
     brands_ids = List(Integer(required=False, allow_none=True, load_default=None),
                             required=False, allow_none=True, data_key='brandsIds', load_default=None)
     name = String(required=False, allow_none=True,
@@ -80,6 +79,6 @@ class BrandOut(BaseSchema):
     updated_at = DateTime()
 
 
-class BrandsOut(Schema):
+class BrandsOut(BaseSchema):
     items = List(Nested(BrandOut))
     total = Integer()

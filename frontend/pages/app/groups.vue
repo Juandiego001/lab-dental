@@ -521,14 +521,14 @@ const updatePermissions = async (v, item, action) => {
   }
 }
 
-const modulesOnlyRead = ['brands', 'categories', 'equipments'];
+const modulesOnlyRead = ['brands', 'categories', 'equipments', 'aligners'];
 const modulesBan = ['distributors', 'lists'];
 
 const disablePermission = (permission, action) => {
   if (form.value.id == 1) return true;
 
   if (!isAdmin.value &&
-    ['equipments', 'brands', 'categories'].includes(permission.moduleName) &&
+    ['equipments', 'brands', 'categories', 'aligners'].includes(permission.moduleName) &&
     ['create', 'update', 'delete'].includes(action)) return true;
 
   if (form.value.distributorId !== 1 &&
