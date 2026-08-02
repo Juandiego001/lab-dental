@@ -5,7 +5,7 @@ from pathlib import Path
 from weasyprint import HTML
 from werkzeug.datastructures import FileStorage
 from core.app import db, FRONTEND_APP_BASE_URL
-from core.models import Address, City, Contact, Country, Distributor, DistributorList, Equipment, List_, Reason, Site, User, UserList, Warranty, WarrantyFile, WarrantyReason, WarrantyWCO
+from core.models import Address, City, Contact, Country, Distributor, DistributorList, Equipment, List_, Reason, Site, State, User, UserList, Warranty, WarrantyFile, WarrantyReason, WarrantyWCO
 from sqlalchemy import delete, and_, and_, func
 from werkzeug.exceptions import HTTPException
 from flask.templating import render_template
@@ -158,6 +158,7 @@ def get_warranty_by_id_for_pdf(warranty_id: int):
         func.jsonb_build_object(
             'address', Address.description,
             'city', City.name,
+            'state', State.name,
             'country', Country.name
         ).label('site'),
 
@@ -171,13 +172,14 @@ def get_warranty_by_id_for_pdf(warranty_id: int):
         .join(Distributor, Distributor.id == Warranty.distributor_id)\
         .join(Site, Site.id == Warranty.site_id)\
         .join(Address, Address.id == Site.address_id)\
-        .join(City, City.id == Address.city_id)\
+        .outerjoin(City, City.id == Address.city_id)\
+        .join(State, State.id == Address.state_id)\
         .join(Country, Country.id == Address.country_id)\
         .join(Contact, Contact.id == Warranty.contact_id)\
         .join(Equipment, Equipment.id == Warranty.equipment_id)\
         .join(WarrantyReason, WarrantyReason.warranty_id == Warranty.id)\
         .join(Reason, Reason.id == WarrantyReason.reason_id)\
-        .join(User, User.id == Warranty.user_approval_id)\
+        .outerjoin(User, User.id == Warranty.user_approval_id)\
         .outerjoin(WarrantyWCO, WarrantyWCO.warranty_id == Warranty.id)\
         .filter(Warranty.id == warranty_id)\
         .group_by(
@@ -199,6 +201,7 @@ def get_warranty_by_id_for_pdf(warranty_id: int):
             Contact.full_name,
             Address.description,
             City.name,
+            State.name,
             Country.name,
             Equipment.model,
             Equipment.reference,
@@ -398,6 +401,33 @@ def notify_approval(warranty_id: int):
                 plantilla='warranty_approved.html',
                 params=warranty_data,
                 language=each_language)
+
+    # Se envía el correo para Pipe para Snapon
+    grouped_reasons = group_reasons(warranty_data['reasons_names'])
+    data = {
+        **warranty_data,
+        "date": datetime.now().strftime('%B %d, %Y'),
+        "distributor": warranty_data['distributor'],
+        "grouped_reasons": grouped_reasons
+    }
+
+    pdf_rendered = render_template('warranties.html', **data)
+    pdf_bytes = HTML(string=pdf_rendered).write_pdf()
+
+    send_mail(
+        subject=f'Processing Warranty with WCO: {warranty_data['wco']}',
+        to=['Andres.Leon@snapon.com'],
+        plantilla='warranties_snapon_message.html',
+        params={'wco': warranty_data['wco']},
+        language='en',
+        with_soe_logo=False,
+        attachments=[
+            {
+                'filename': f"Warranty {warranty_data['wco']}.pdf",
+                'content': pdf_bytes
+            }
+        ]
+    )
 
 
 def reject_warranty(warranty_id: int):

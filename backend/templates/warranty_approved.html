@@ -64,9 +64,11 @@
             >
           </p>
 
-          <p style="margin-top: 20px;">
-            {{ _('warrantyFollowingWCO') }}: 
-            <span style="font-weight: bold; text-decoration: underline;">{{ wco }}</span>
+          <p style="margin-top: 20px">
+            {{ _('warrantyFollowingWCO') }}:
+            <span style="font-weight: bold; text-decoration: underline"
+              >{{ wco }}</span
+            >
           </p>
 
           <!-- Información del contacto -->
@@ -112,10 +114,14 @@
               <span style="font-weight: bold">{{ site.address }}.</span>
             </li>
             <li>
-              {{ _('warrantyCityCountry') }}:
-              <span style="font-weight: bold"
-                >{{ site.city + ', ' + site.country }}.</span
-              >
+              {% if site.city %}
+                {{ _('warrantyCityCountry') }}:
+              {% else %}
+                {{ _('warrantyStateCountry') }}:
+              {% endif %}
+              <span style="font-weight: bold">
+                {{ (site.city or site.state) + ', ' + site.country }}.
+              </span>
             </li>
           </ul>
 
@@ -175,7 +181,7 @@
           <p>{{ solution }}</p>
 
           <!-- Información de las partes -->
-          <p style="font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem;">
+          <p style="font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem">
             {{ _('warrantyPartsInfo') }}
           </p>
 

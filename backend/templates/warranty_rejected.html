@@ -104,10 +104,14 @@
               <span style="font-weight: bold">{{ site.address }}.</span>
             </li>
             <li>
-              {{ _('warrantyCityCountry') }}:
-              <span style="font-weight: bold"
-                >{{ site.city + ', ' + site.country }}.</span
-              >
+              {% if site.city %}
+                {{ _('warrantyCityCountry') }}:
+              {% else %}
+                {{ _('warrantyStateCountry') }}:
+              {% endif %}
+              <span style="font-weight: bold">
+                {{ (site.city or site.state) + ', ' + site.country }}.
+              </span>
             </li>
           </ul>
 

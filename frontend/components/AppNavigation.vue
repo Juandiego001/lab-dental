@@ -152,6 +152,11 @@ const menu = ref([
     path: '/app/lists',
     icon: 'mdi-office-building-cog-outline'
   },
+  {
+    subject: 'aligners',
+    path: '/app/aligners',
+    icon: 'mdi-car-wrench'
+  },
   // {
   //   subject: 'configuration',
   //   path: '/app/configuration',

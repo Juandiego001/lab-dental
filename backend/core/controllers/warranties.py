@@ -116,13 +116,11 @@ def approve_warranty(warranty_id: int):
             current_user=current_user,
             warranty_id=warranty_id
         )
-        print('PASA DESPUES DE ESTO')
         warranties.notify_approval(warranty_id)
         return {'message': gettext('warrantyApproved')}
     except HTTPException as ex:
         abort(400, ex.description)
     except Exception as ex:
-        print(ex)
         abort(500, gettext('abortException'))
 
 

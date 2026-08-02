@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-07-23 19:57-0500\n"
+"POT-Creation-Date: 2026-08-01 19:39-0500\n"
 "PO-Revision-Date: 2026-03-03 09:13-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -18,68 +18,83 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: core/utils.py:170
+#: core/utils.py:171
 msgid "Archivo desconocido/sin nombre"
 msgstr "Archivo desconocido/sin nombre"
 
-#: core/controllers/brands.py:31 core/controllers/brands.py:43
-#: core/controllers/brands.py:57 core/controllers/brands.py:70
-#: core/controllers/brands.py:83 core/controllers/categories.py:30
-#: core/controllers/categories.py:42 core/controllers/categories.py:56
-#: core/controllers/categories.py:69 core/controllers/categories.py:82
-#: core/controllers/clients.py:33 core/controllers/clients.py:45
-#: core/controllers/clients.py:58 core/controllers/clients.py:71
-#: core/controllers/clients.py:84 core/controllers/distributors.py:34
-#: core/controllers/distributors.py:46 core/controllers/distributors.py:60
-#: core/controllers/distributors.py:73 core/controllers/distributors.py:86
-#: core/controllers/distributors.py:99 core/controllers/distributors.py:121
-#: core/controllers/distributors.py:133 core/controllers/distributors.py:147
-#: core/controllers/distributors.py:166 core/controllers/distributors.py:179
-#: core/controllers/equipments.py:45 core/controllers/equipments.py:57
-#: core/controllers/equipments.py:70 core/controllers/equipments.py:87
-#: core/controllers/equipments.py:100 core/controllers/equipments.py:122
-#: core/controllers/equipments.py:139 core/controllers/equipments.py:153
-#: core/controllers/equipments.py:170 core/controllers/equipments.py:188
-#: core/controllers/equipments.py:201 core/controllers/files.py:29
-#: core/controllers/groups.py:29 core/controllers/groups.py:41
-#: core/controllers/groups.py:56 core/controllers/groups.py:70
-#: core/controllers/groups.py:83 core/controllers/installations.py:33
-#: core/controllers/installations.py:45 core/controllers/installations.py:62
-#: core/controllers/installations.py:78 core/controllers/installations.py:91
-#: core/controllers/installations.py:107 core/controllers/installations.py:125
-#: core/controllers/lists.py:29 core/controllers/lists.py:59
-#: core/controllers/lists.py:72 core/controllers/lists.py:86
-#: core/controllers/lists.py:102 core/controllers/lists.py:115
-#: core/controllers/lists.py:130 core/controllers/locations.py:26
-#: core/controllers/locations.py:45 core/controllers/locations.py:64
-#: core/controllers/manuals.py:41 core/controllers/manuals.py:55
-#: core/controllers/manuals.py:69 core/controllers/manuals.py:86
-#: core/controllers/manuals.py:99 core/controllers/manuals.py:118
-#: core/controllers/parts.py:26 core/controllers/parts.py:38
-#: core/controllers/parts.py:52 core/controllers/parts.py:66
-#: core/controllers/parts.py:79 core/controllers/permissions.py:30
-#: core/controllers/permissions.py:43 core/controllers/reasons.py:34
-#: core/controllers/reasons.py:46 core/controllers/reasons.py:60
-#: core/controllers/reasons.py:74 core/controllers/reasons.py:87
-#: core/controllers/sites.py:33 core/controllers/sites.py:45
-#: core/controllers/sites.py:60 core/controllers/sites.py:79
-#: core/controllers/sites.py:92 core/controllers/sites.py:104
-#: core/controllers/users.py:38 core/controllers/users.py:50
-#: core/controllers/users.py:71 core/controllers/users.py:85
-#: core/controllers/users.py:107 core/controllers/users.py:132
-#: core/controllers/users.py:145 core/controllers/users.py:165
-#: core/controllers/users.py:178 core/controllers/users.py:192
-#: core/controllers/users.py:209 core/controllers/users.py:239
-#: core/controllers/users.py:259 core/controllers/users.py:276
-#: core/controllers/users.py:289 core/controllers/warranties.py:37
-#: core/controllers/warranties.py:49 core/controllers/warranties.py:62
-#: core/controllers/warranties.py:75 core/controllers/warranties.py:88
-#: core/controllers/warranties.py:105 core/controllers/warranties.py:121
-#: core/controllers/warranties.py:139 core/controllers/warranties.py:161
-#: core/controllers/warranties.py:178 core/controllers/warranties.py:192
-#: core/controllers/warranties.py:209 core/controllers/warranties.py:222
+#: core/controllers/aligners.py:25 core/controllers/aligners.py:37
+#: core/controllers/aligners.py:52 core/controllers/aligners.py:67
+#: core/controllers/aligners.py:82 core/controllers/brands.py:31
+#: core/controllers/brands.py:43 core/controllers/brands.py:57
+#: core/controllers/brands.py:70 core/controllers/brands.py:83
+#: core/controllers/categories.py:30 core/controllers/categories.py:42
+#: core/controllers/categories.py:56 core/controllers/categories.py:69
+#: core/controllers/categories.py:82 core/controllers/clients.py:33
+#: core/controllers/clients.py:45 core/controllers/clients.py:58
+#: core/controllers/clients.py:71 core/controllers/clients.py:84
+#: core/controllers/distributors.py:34 core/controllers/distributors.py:46
+#: core/controllers/distributors.py:60 core/controllers/distributors.py:73
+#: core/controllers/distributors.py:86 core/controllers/distributors.py:99
+#: core/controllers/distributors.py:121 core/controllers/distributors.py:133
+#: core/controllers/distributors.py:147 core/controllers/distributors.py:166
+#: core/controllers/distributors.py:179 core/controllers/equipments.py:45
+#: core/controllers/equipments.py:57 core/controllers/equipments.py:70
+#: core/controllers/equipments.py:87 core/controllers/equipments.py:100
+#: core/controllers/equipments.py:122 core/controllers/equipments.py:139
+#: core/controllers/equipments.py:153 core/controllers/equipments.py:170
+#: core/controllers/equipments.py:188 core/controllers/equipments.py:201
+#: core/controllers/files.py:29 core/controllers/groups.py:29
+#: core/controllers/groups.py:41 core/controllers/groups.py:56
+#: core/controllers/groups.py:70 core/controllers/groups.py:83
+#: core/controllers/installations.py:33 core/controllers/installations.py:45
+#: core/controllers/installations.py:62 core/controllers/installations.py:78
+#: core/controllers/installations.py:91 core/controllers/installations.py:107
+#: core/controllers/installations.py:125 core/controllers/lists.py:29
+#: core/controllers/lists.py:59 core/controllers/lists.py:72
+#: core/controllers/lists.py:86 core/controllers/lists.py:102
+#: core/controllers/lists.py:115 core/controllers/lists.py:130
+#: core/controllers/locations.py:26 core/controllers/locations.py:45
+#: core/controllers/locations.py:64 core/controllers/manuals.py:41
+#: core/controllers/manuals.py:55 core/controllers/manuals.py:69
+#: core/controllers/manuals.py:86 core/controllers/manuals.py:99
+#: core/controllers/manuals.py:118 core/controllers/parts.py:26
+#: core/controllers/parts.py:38 core/controllers/parts.py:52
+#: core/controllers/parts.py:66 core/controllers/parts.py:79
+#: core/controllers/permissions.py:30 core/controllers/permissions.py:43
+#: core/controllers/reasons.py:34 core/controllers/reasons.py:46
+#: core/controllers/reasons.py:60 core/controllers/reasons.py:74
+#: core/controllers/reasons.py:87 core/controllers/sites.py:33
+#: core/controllers/sites.py:45 core/controllers/sites.py:60
+#: core/controllers/sites.py:79 core/controllers/sites.py:92
+#: core/controllers/sites.py:104 core/controllers/users.py:38
+#: core/controllers/users.py:50 core/controllers/users.py:71
+#: core/controllers/users.py:85 core/controllers/users.py:107
+#: core/controllers/users.py:132 core/controllers/users.py:145
+#: core/controllers/users.py:165 core/controllers/users.py:178
+#: core/controllers/users.py:192 core/controllers/users.py:209
+#: core/controllers/users.py:239 core/controllers/users.py:259
+#: core/controllers/users.py:276 core/controllers/users.py:289
+#: core/controllers/warranties.py:37 core/controllers/warranties.py:49
+#: core/controllers/warranties.py:62 core/controllers/warranties.py:75
+#: core/controllers/warranties.py:88 core/controllers/warranties.py:105
+#: core/controllers/warranties.py:125 core/controllers/warranties.py:144
+#: core/controllers/warranties.py:166 core/controllers/warranties.py:183
+#: core/controllers/warranties.py:197 core/controllers/warranties.py:214
+#: core/controllers/warranties.py:227
 msgid "abortException"
 msgstr "Ha ocurrido un error interno"
+
+#: core/controllers/aligners.py:50
+msgid "stageSuccess"
+msgstr "Comando de montaje enviado exitosamente"
+
+#: core/controllers/aligners.py:65
+msgid "unstageSuccess"
+msgstr "Comando de desmontaje enviado exitosamente"
+
+#: core/controllers/aligners.py:80
+msgid "cloudSuccess"
+msgstr "Comando de chequeo en la nube enviado exitosamente"
 
 #: core/controllers/brands.py:55
 msgid "brandCreated"
@@ -315,33 +330,33 @@ msgstr "Garantía actualizada exitosamente"
 msgid "warrantyDeleted"
 msgstr "Garantía eliminada exitosamente"
 
-#: core/controllers/warranties.py:117
+#: core/controllers/warranties.py:120
 msgid "warrantyApproved"
 msgstr "Garantía aprobada exitosamente"
 
-#: core/controllers/warranties.py:135
+#: core/controllers/warranties.py:139
 msgid "warrantyRejected"
 msgstr "Garantía rechazada exitosamente"
 
-#: core/controllers/warranties.py:176
+#: core/controllers/warranties.py:181
 msgid "warrantyFilesAdded"
 msgstr "Archivos agregados exitosamente"
 
-#: core/controllers/warranties.py:207
+#: core/controllers/warranties.py:212
 msgid "warrantyFileUpdated"
 msgstr "Archivo actualizado exitosamente"
 
-#: core/controllers/warranties.py:220
+#: core/controllers/warranties.py:225
 msgid "warrantyFileDeleted"
 msgstr "Archivo eliminado exitosamente"
 
-#: core/schemas/brands.py:40 core/schemas/brands.py:43
+#: core/schemas/brands.py:39 core/schemas/brands.py:42
 #: core/schemas/categories.py:40 core/schemas/categories.py:43
 #: core/schemas/lists.py:25 core/schemas/lists.py:28
 msgid "nameRequired"
 msgstr "El nombre es obligatorio"
 
-#: core/schemas/brands.py:56 core/schemas/brands.py:59
+#: core/schemas/brands.py:55 core/schemas/brands.py:58
 #: core/schemas/categories.py:56 core/schemas/categories.py:59
 msgid "slugRequired"
 msgstr "El slug es obligatorio"
@@ -390,8 +405,8 @@ msgstr "El modelo es obligatorio"
 msgid "referenceRequired"
 msgstr "La referencia es obligatoria"
 
-#: core/schemas/equipments.py:116 core/schemas/warranties.py:95
-#: core/schemas/warranties.py:288
+#: core/schemas/equipments.py:116 core/schemas/warranties.py:96
+#: core/schemas/warranties.py:289
 #, python-format
 msgid "Unsupported file formats for: %(invalids)s"
 msgstr "Formatos de archivo no permitidos para: %(invalids)s"
@@ -469,18 +484,22 @@ msgstr "Debe tener un máximo de 24 caracteres"
 msgid "invalidCurrentPassword"
 msgstr "La contraseña actual es inválida"
 
-#: core/schemas/warranties.py:86 core/schemas/warranties.py:279
+#: core/schemas/warranties.py:87 core/schemas/warranties.py:280
 #, python-format
 msgid "50MB max file size exceed for: %(invalids)s"
 msgstr "Tamaño máximo de 50 MB ha sido superado por: %(invalids)s"
 
-#: core/schemas/warranties.py:107
+#: core/schemas/warranties.py:108
 msgid "warrantyMissingParts"
 msgstr "Debe registrar al menos una parte de la garantía"
 
-#: core/schemas/warranties.py:114
+#: core/schemas/warranties.py:115
 msgid "warrantyInvalidParts"
 msgstr "Partes de la garantía inválidas"
+
+#: core/services/aligners.py:12
+msgid "alignerNotFound"
+msgstr "Alineadora no encontrada"
 
 #: core/services/distributors.py:323
 msgid "contactNotFound"
@@ -519,16 +538,16 @@ msgstr "SOE Latam - Rechazo de instalación #%(id)s"
 msgid "resetPassword"
 msgstr "Restablecer contraseña"
 
-#: core/services/warranties.py:319 core/services/warranties.py:394
+#: core/services/warranties.py:330 core/services/warranties.py:434
 msgid "warrantyNotFound"
 msgstr "Garantía no encontrada"
 
-#: core/services/warranties.py:380
+#: core/services/warranties.py:396
 #, python-format
 msgid "SOE Latam - Aprobación de garantía #%(id)s"
 msgstr "SOE Latam - Aprobación de garantía #%(id)s"
 
-#: core/services/warranties.py:432
+#: core/services/warranties.py:474
 #, python-format
 msgid "SOE Latam - Rechazo de garantía #%(id)s"
 msgstr "SOE Latam - Rechazo de garantía #%(id)s"
@@ -587,32 +606,32 @@ msgstr "Sede del cliente"
 #: templates/installation_approved.html:59
 #: templates/installation_rejected.html:74
 #: templates/installation_updated.html:58
-#: templates/register_installation.html:46 templates/warranty_approved.html:219
-#: templates/warranty_rejected.html:227
+#: templates/register_installation.html:46 templates/warranty_approved.html:210
+#: templates/warranty_rejected.html:217
 msgid "makeClick"
 msgstr "Haga click"
 
 #: templates/installation_approved.html:61
 #: templates/installation_rejected.html:76
 #: templates/installation_updated.html:60
-#: templates/register_installation.html:48 templates/warranty_approved.html:224
-#: templates/warranty_rejected.html:232
+#: templates/register_installation.html:48 templates/warranty_approved.html:215
+#: templates/warranty_rejected.html:222
 msgid "here"
 msgstr "aquí"
 
 #: templates/installation_approved.html:63
 #: templates/installation_rejected.html:78
 #: templates/installation_updated.html:62
-#: templates/register_installation.html:50 templates/warranty_approved.html:226
-#: templates/warranty_rejected.html:234
+#: templates/register_installation.html:50 templates/warranty_approved.html:217
+#: templates/warranty_rejected.html:224
 msgid "toGoToApplication"
 msgstr "para dirigirse a la aplicación"
 
 #: templates/installation_approved.html:66
 #: templates/installation_rejected.html:81
 #: templates/installation_updated.html:65
-#: templates/register_installation.html:53 templates/warranty_approved.html:229
-#: templates/warranty_rejected.html:237
+#: templates/register_installation.html:53 templates/warranty_approved.html:220
+#: templates/warranty_rejected.html:227
 msgid "bestRegards"
 msgstr "Saludos cordiales"
 
@@ -624,7 +643,7 @@ msgstr "Notificación de instalación rechazada"
 msgid "rejected"
 msgstr "RECHAZADA"
 
-#: templates/installation_rejected.html:58 templates/warranty_rejected.html:210
+#: templates/installation_rejected.html:58 templates/warranty_rejected.html:200
 msgid "rejectionReasonsAreFollowing"
 msgstr "Los motivos de rechazo son los siguientes"
 
@@ -693,63 +712,67 @@ msgstr "La garantía con los siguientes datos ha sido"
 msgid "warrantyFollowingWCO"
 msgstr "A continuación se tramitará con el siguiente WCO"
 
-#: templates/warranty_approved.html:75 templates/warranty_rejected.html:70
+#: templates/warranty_approved.html:76 templates/warranty_rejected.html:70
 msgid "warrantyContactInfo"
 msgstr "Información de contacto"
 
-#: templates/warranty_approved.html:86 templates/warranty_rejected.html:81
+#: templates/warranty_approved.html:87 templates/warranty_rejected.html:81
 msgid "warrantyContactName"
 msgstr "Nombre"
 
-#: templates/warranty_approved.html:90 templates/warranty_rejected.html:85
+#: templates/warranty_approved.html:91 templates/warranty_rejected.html:85
 msgid "warrantyContactEmail"
 msgstr "Correo"
 
-#: templates/warranty_approved.html:94
+#: templates/warranty_approved.html:95
 msgid "warrantyContactPosition"
 msgstr "Cargo"
 
-#: templates/warranty_approved.html:101 templates/warranty_rejected.html:92
+#: templates/warranty_approved.html:102 templates/warranty_rejected.html:92
 msgid "warrantySiteInfo"
 msgstr "Información de la sede"
 
-#: templates/warranty_approved.html:112 templates/warranty_rejected.html:103
+#: templates/warranty_approved.html:113 templates/warranty_rejected.html:103
 msgid "warrantyAddress"
 msgstr "Dirección"
 
-#: templates/warranty_approved.html:116 templates/warranty_rejected.html:107
+#: templates/warranty_approved.html:118 templates/warranty_rejected.html:108
 msgid "warrantyCityCountry"
 msgstr "Ciudad & País"
 
-#: templates/warranty_approved.html:125 templates/warranty_rejected.html:116
+#: templates/warranty_approved.html:120 templates/warranty_rejected.html:110
+msgid "warrantyStateCountry"
+msgstr "Estado & País"
+
+#: templates/warranty_approved.html:130 templates/warranty_rejected.html:120
 msgid "warrantyEquipmentInfo"
 msgstr "Información del equipo"
 
-#: templates/warranty_approved.html:136 templates/warranty_rejected.html:127
+#: templates/warranty_approved.html:141 templates/warranty_rejected.html:131
 msgid "warrantyEquipmentModel"
 msgstr "Modelo"
 
-#: templates/warranty_approved.html:140 templates/warranty_rejected.html:131
+#: templates/warranty_approved.html:145 templates/warranty_rejected.html:135
 msgid "warrantyEquipmentReference"
 msgstr "Referencia"
 
-#: templates/warranty_approved.html:147 templates/warranty_rejected.html:138
+#: templates/warranty_approved.html:152 templates/warranty_rejected.html:142
 msgid "warrantyReasons"
 msgstr "Motivos de garantía"
 
-#: templates/warranty_approved.html:164 templates/warranty_rejected.html:155
+#: templates/warranty_approved.html:169 templates/warranty_rejected.html:159
 msgid "warrantyShiptTo"
 msgstr "Enviar a"
 
-#: templates/warranty_approved.html:169 templates/warranty_rejected.html:160
+#: templates/warranty_approved.html:174 templates/warranty_rejected.html:164
 msgid "warrantyProblem"
 msgstr "Problema"
 
-#: templates/warranty_approved.html:174 templates/warranty_rejected.html:165
+#: templates/warranty_approved.html:179 templates/warranty_rejected.html:169
 msgid "warrantySolution"
 msgstr "Solución"
 
-#: templates/warranty_approved.html:180 templates/warranty_rejected.html:171
+#: templates/warranty_approved.html:185 templates/warranty_rejected.html:175
 msgid "warrantyPartsInfo"
 msgstr "Información de las partes"
 

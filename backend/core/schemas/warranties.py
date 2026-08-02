@@ -179,6 +179,7 @@ class WarrantyContactPDF(BaseSchema):
 class WarrantySitePDF(BaseSchema):
     address = String()
     city = String()
+    state = String()
     country = String()
 
 

@@ -171,8 +171,14 @@
         <td></td>
       </tr>
       <tr>
-        <td>City & Country</td>
-        <td>{{ site.city + ', ' + site.country }}</td>
+        <td>
+          {% if site.city %}
+            {{ _('warrantyCityCountry') }}:
+          {% else %}
+            {{ _('warrantyStateCountry') }}:
+          {% endif %}
+        </td>
+        <td>{{ (site.city or site.state) + ', ' + site.country }}</td>
         <td>Date of selling</td>
         <td>{{ sale_date }}</td>
       </tr>

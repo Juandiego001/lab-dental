@@ -279,7 +279,7 @@
             </v-col>
             <v-col cols="12">
               <v-file-input v-model="files" :prepend-icon="null" prepend-inner-icon="mdi-paperclip" hide-details="auto"
-                :label="$t('warranties.files.description')" multiple chips accept=".mp4, .jpg, .jpeg, .png, .webp, .svg"
+                :label="$t('warranties.files.title')" multiple chips accept=".mp4, .jpg, .jpeg, .png, .webp, .svg"
                 :rules="fileRules">
                 <template v-slot:selection="{ fileNames }">
                   <v-chip v-for="fileName in fileNames" :key="fileName" size="small" label>
