@@ -403,6 +403,8 @@ def notify_approval(warranty_id: int):
                 language=each_language)
 
     # Se envía el correo para Pipe para Snapon
+    warranty_files: list[WarrantyFile] = db.session.query(
+        WarrantyFile).filter(WarrantyFile.warranty_id == warranty_id).all()
     grouped_reasons = group_reasons(warranty_data['reasons_names'])
     data = {
         **warranty_data,
@@ -416,7 +418,8 @@ def notify_approval(warranty_id: int):
 
     send_mail(
         subject=f'Processing Warranty with WCO: {warranty_data['wco']}',
-        to=['Andres.Leon@snapon.com'],
+        # to=['Andres.Leon@snapon.com'],
+        to=['juandiego14012003@gmail.com'],
         plantilla='warranties_snapon_message.html',
         params={'wco': warranty_data['wco']},
         language='en',
@@ -425,7 +428,8 @@ def notify_approval(warranty_id: int):
             {
                 'filename': f"Warranty {warranty_data['wco']}.pdf",
                 'content': pdf_bytes
-            }
+            },
+            *[{'path':  warranty_file.path, 'filename': warranty_file.original_name} for warranty_file in warranty_files]
         ]
     )
 
