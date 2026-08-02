@@ -775,6 +775,7 @@
     "stage": "Montar",
     "unstage": "Desmontar",
     "check": "Chequear actualizaciones",
+    "commandError": "La alineadora se ha tardado en confirmar el cambio. Por favor, actualice para verificar el estado",
     "rules": {
       "serialNumberRequired": "El número serial es requerido"
     }

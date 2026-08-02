@@ -163,6 +163,7 @@
 </template>
 
 <script setup>
+const { t } = useI18n();
 const { notify } = useSnackbar()
 
 const { alignerData, viewAligner, sendStage, getAligner, sendUnstage, sendCloud } = useAligners();
@@ -193,11 +194,20 @@ const alignerDateFormat = (theDate) => {
   return fecha.toLocaleDateString("es-ES", opciones);
 };
 
-const stage = async (serialNumber) => {
+const stage = async () => {
   try {
     loading.value = true;
-    await sendStage();
-    await getAligner();
+    const message = await sendStage();
+    
+    let seconds = 0;
+    while (!showUnstage.value)  {
+      await getAligner();
+      await new Promise((res) => setTimeout(res, 1000));
+      seconds += 1;
+      if (seconds >= 5) throw new Error(t('aligners.commandError'));
+    }
+
+    notify(message, 'success');
   } catch (err) {
     notify(err, 'error')
   } finally {
@@ -208,8 +218,17 @@ const stage = async (serialNumber) => {
 const unstage = async () => {
   try {
     loading.value = true;
-    await sendUnstage();
-    await getAligner();
+    const message = await sendUnstage();
+
+    let seconds = 0;
+    while (!showStage.value)  {
+      await getAligner();
+      await new Promise((res) => setTimeout(res, 1000));
+      seconds += 1;
+      if (seconds >= 5) throw new Error(t('aligners.commandError'));
+    }
+
+    notify(message, 'success')
   } catch (err) {
     notify(err, 'error')
   } finally {
@@ -221,6 +240,7 @@ const checkCloud = async () => {
   try {
     loading.value = true;
     await sendCloud();
+    await new Promise((res) => setTimeout(res, 2000));
     await getAligner();
   } catch (err) {
     notify(err, 'error')

@@ -781,6 +781,7 @@
     "stage": "Stage",
     "unstage": "Unstage",
     "check": "Check Cloud",
+    "commandError": "The aligner has taken some time to confirm the change. Please refresh to check the status",
     "rules": {
       "serialNumberRequired": "The serial number is required"
     }

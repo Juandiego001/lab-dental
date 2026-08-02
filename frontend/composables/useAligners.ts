@@ -33,7 +33,7 @@ export const useAligners = () => {
         `/api/aligners/stage/${serialNumber.value}`,
         { method: 'POST' },
       )
-      notify(message, 'success')
+      return message
     } catch (err) {
       notify(err, 'error')
     }
@@ -45,7 +45,7 @@ export const useAligners = () => {
         `/api/aligners/unstage/${serialNumber.value}`,
         { method: 'POST' },
       )
-      notify(message, 'success')
+      return message
     } catch (err) {
       notify(err, 'error')
     }
