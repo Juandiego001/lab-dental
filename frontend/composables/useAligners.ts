@@ -3,6 +3,8 @@ export const useAligners = () => {
   const alignerData = useState('alignerData', () => ({}))
   const viewAligner = useState('viewAligner', () => false)
   const serialNumber = useState('serialNumber', () => '')
+  const semantic = useState('alignerSemantic', () => undefined)
+  const path = useState('alignerPath', () => undefined)
 
   const getAligner = async () => {
     try {
@@ -21,7 +23,8 @@ export const useAligners = () => {
       const data = await $api<any>('/api/aligners/utils/version', {
         method: 'GET',
       })
-      return data
+      semantic.value = data.semantic
+      path.value = data.path
     } catch (err) {
       notify(err, 'error')
     }
@@ -63,6 +66,17 @@ export const useAligners = () => {
     }
   }
 
+  const sendActivate = async () => {
+    try {
+      const { message } = await $api<any>(
+        `/api/aligners/activate/${serialNumber.value}`,
+        { method: 'POST' },
+      )
+    } catch (err) {
+      notify(err, 'error')
+    }
+  }
+
   return {
     getAligner,
     alignerData,
@@ -72,5 +86,8 @@ export const useAligners = () => {
     serialNumber,
     sendUnstage,
     sendCloud,
+    semantic,
+    path,
+    sendActivate,
   }
 }

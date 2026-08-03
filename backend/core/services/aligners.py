@@ -62,3 +62,15 @@ def send_cloud_command(serial_number: str):
         }
     )
     response.raise_for_status()
+
+
+def send_activate_command(serial_number: str):
+    '''Send activate command'''
+
+    response = requests.post(
+        'https://vehicle365.org/cmd/aligner_activate/v1',
+        json={
+            "serialNumber": serial_number
+        }
+    )
+    response.raise_for_status()

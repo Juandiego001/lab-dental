@@ -59,8 +59,8 @@
           </v-col>
 
           <v-col cols="6">
-            <v-text-field :label="$t('aligners.softwareReadyToDownload')" :model-value="'TRY_INSERT_DIFFERENT_UPDATE'"
-              readonly hide-details />
+            <v-text-field :label="$t('aligners.softwareReadyToDownload')"
+              :model-value="alignerData?.pendingSoftwareDownload" readonly hide-details />
           </v-col>
 
           <v-col class="mt-4" cols="12">
@@ -132,13 +132,13 @@
           </v-col>
 
           <v-col cols="6">
-            <v-text-field :label="$t('aligners.connected')" :model-value="alignerData?.connected ? 'Yes' : 'No'" readonly
-              hide-details />
+            <v-text-field :label="$t('aligners.connected')" :model-value="alignerData?.connected ? 'Yes' : 'No'"
+              readonly hide-details />
           </v-col>
 
           <v-col cols="6">
-            <v-text-field :label="$t('aligners.ddEnabled')" :model-value="alignerData?.boardFeatures?.isDDAligner ? 'Yes' : 'No'"
-              readonly hide-details />
+            <v-text-field :label="$t('aligners.ddEnabled')"
+              :model-value="alignerData?.boardFeatures?.isDDAligner ? 'Yes' : 'No'" readonly hide-details />
           </v-col>
         </v-row>
       </v-card-text>
@@ -148,13 +148,16 @@
         <v-btn variant="outlined" @click="viewAligner = false">
           {{ $t('cancel') }}
         </v-btn>
+        <v-btn v-if="isConnected" variant="outlined" class="bg-success" @click="activate" :disabled="loading">
+          {{ $t('aligners.activate') }}
+        </v-btn>
         <v-btn v-if="showStage" variant="outlined" class="bg-primary" @click="stage" :disabled="loading">
-          {{ $t('aligners.stage') }}
+          {{ `${$t('aligners.stage')} ${semantic}` }}
         </v-btn>
         <v-btn v-if="showUnstage" variant="outlined" class="bg-info" @click="unstage" :disabled="loading">
-          {{ $t('aligners.unstage') }}
+          {{ `${$t('aligners.unstage')} ${semantic}` }}
         </v-btn>
-        <v-btn variant="outlined" class="bg-secondary" @click="checkCloud" :disabled="loading">
+        <v-btn v-if="isConnected" variant="outlined" class="bg-secondary" @click="checkCloud" :disabled="loading">
           {{ $t('aligners.check') }}
         </v-btn>
       </v-card-actions>
@@ -166,7 +169,7 @@
 const { t } = useI18n();
 const { notify } = useSnackbar()
 
-const { alignerData, viewAligner, sendStage, getAligner, sendUnstage, sendCloud } = useAligners();
+const { alignerData, viewAligner, sendStage, getAligner, sendUnstage, sendCloud, semantic, sendActivate } = useAligners();
 
 const loading = ref(false);
 
@@ -175,6 +178,9 @@ const showStage = computed(() => {
 })
 const showUnstage = computed(() => {
   return alignerData.value?.pendingSoftwareDownload
+})
+const isConnected = computed(() => {
+  return alignerData.value?.connected
 })
 
 
@@ -198,9 +204,9 @@ const stage = async () => {
   try {
     loading.value = true;
     const message = await sendStage();
-    
+
     let seconds = 0;
-    while (!showUnstage.value)  {
+    while (!showUnstage.value) {
       await getAligner();
       await new Promise((res) => setTimeout(res, 1000));
       seconds += 1;
@@ -221,7 +227,7 @@ const unstage = async () => {
     const message = await sendUnstage();
 
     let seconds = 0;
-    while (!showStage.value)  {
+    while (!showStage.value) {
       await getAligner();
       await new Promise((res) => setTimeout(res, 1000));
       seconds += 1;
@@ -240,6 +246,19 @@ const checkCloud = async () => {
   try {
     loading.value = true;
     await sendCloud();
+    await new Promise((res) => setTimeout(res, 2000));
+    await getAligner();
+  } catch (err) {
+    notify(err, 'error')
+  } finally {
+    loading.value = false;
+  }
+}
+
+const activate = async () => {
+  try {
+    loading.value = true;
+    await sendActivate();
     await new Promise((res) => setTimeout(res, 2000));
     await getAligner();
   } catch (err) {

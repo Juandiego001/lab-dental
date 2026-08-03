@@ -80,3 +80,18 @@ def send_cloud_command(serial_number: str):
         return {'message': gettext('cloudSuccess')}
     except Exception as ex:
         abort(500, gettext('abortException'))
+
+
+@bp.post('/activate/<string:serial_number>')
+@bp.output(Message)
+@jwt_required()
+def send_activate_command(serial_number: str):
+    '''Send activate command'''
+
+    try:
+        aligners.send_activate_command(
+            serial_number=serial_number
+        )
+        return {'message': gettext('cloudSuccess')}
+    except Exception as ex:
+        abort(500, gettext('abortException'))

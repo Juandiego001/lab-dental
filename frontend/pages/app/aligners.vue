@@ -9,7 +9,8 @@
         class="d-flex align-center justify-center ga-4 mx-auto w-100" style="max-width: 800px;">
         <v-text-field v-model="serialNumber" class="w-100" hide-details="auto" style="max-width: 500px;"
           append-inner-icon="mdi-magnify" :placeholder="$t('aligners.serialNumber')" :rules="[serialNumberRequired]"
-          :readonly="loading" :disabled="loading" clearable @keydown.space.prevent autocomplete="off">
+          :readonly="loading" :disabled="loading" clearable @keydown.space.prevent autocomplete="off"
+          @update:model-value="serialNumber = $event?.toUpperCase() || ''">
           <template v-slot:append-inner>
             <v-btn v-if="!loading" icon="mdi-magnify" @click="getAligner" size="small" flat variant="text" />
             <v-progress-circular v-else :size="30" indeterminate class="v-progress-circular--disable-shrink" />
@@ -27,7 +28,7 @@ const { back } = useBack()
 const { t } = useI18n();
 const { $ability } = useNuxtApp();
 const { notify } = useSnackbar();
-const { serialNumber, getAligner: getAlignerData } = useAligners();
+const { serialNumber, getAligner: getAlignerData, getLastVersion } = useAligners();
 
 const loading = ref(false);
 const searchModel = ref(false);
@@ -52,6 +53,7 @@ const getAligner = async () => {
   try {
     if (!searchModel.value) return;
     loading.value = true;
+    await getLastVersion();
     await getAlignerData();
   } catch (err) {
     notify(err, 'error');
