@@ -418,8 +418,7 @@ def notify_approval(warranty_id: int):
 
     send_mail(
         subject=f'Processing Warranty with WCO: {warranty_data['wco']}',
-        # to=['Andres.Leon@snapon.com'],
-        to=['juandiego14012003@gmail.com'],
+        to=['Andres.Leon@snapon.com'],
         plantilla='warranties_snapon_message.html',
         params={'wco': warranty_data['wco']},
         language='en',

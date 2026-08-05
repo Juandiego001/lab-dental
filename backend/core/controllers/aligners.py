@@ -92,6 +92,6 @@ def send_activate_command(serial_number: str):
         aligners.send_activate_command(
             serial_number=serial_number
         )
-        return {'message': gettext('cloudSuccess')}
+        return {'message': gettext('activateSuccess')}
     except Exception as ex:
         abort(500, gettext('abortException'))

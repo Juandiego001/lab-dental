@@ -9,3 +9,6 @@ package-lock.json
 yarn.lock
 Dockerfile
 docker-compose.yml
+.vscode
+.editorconfig
+.prettierrc

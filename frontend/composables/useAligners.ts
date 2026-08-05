@@ -72,6 +72,7 @@ export const useAligners = () => {
         `/api/aligners/activate/${serialNumber.value}`,
         { method: 'POST' },
       )
+      notify(message, 'success')
     } catch (err) {
       notify(err, 'error')
     }
