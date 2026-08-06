@@ -173,9 +173,9 @@
       <tr>
         <td>
           {% if site.city %}
-            {{ _('warrantyCityCountry') }}:
+            City & Country:
           {% else %}
-            {{ _('warrantyStateCountry') }}:
+            State & Country:
           {% endif %}
         </td>
         <td>{{ (site.city or site.state) + ', ' + site.country }}</td>
