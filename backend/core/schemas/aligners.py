@@ -1,5 +1,5 @@
 from marshmallow import Schema
-from apiflask.fields import Boolean, DateTime, Float, Integer, List, Nested, String
+from apiflask.fields import Boolean, DateTime, String, String, List, Nested, String
 from core.schemas.utils import BaseSchema
 
 
@@ -9,20 +9,20 @@ class VersionSchema(Schema):
 
 
 class BoardFeaturesSchema(Schema):
-    numCameras = Integer()
-    numAccel = Integer()
+    numCameras = String()
+    numAccel = String()
     isDDAligner = Boolean()
 
 
 class SpecsSchema(Schema):
-    month = Integer()
-    year = Integer()
+    month = String()
+    year = String()
     name = String()
 
 
 class SpecsExpirationSchema(Schema):
-    month = Integer()
-    year = Integer()
+    month = String()
+    year = String()
 
 # --- Sub-esquemas de Geolocation ---
 
@@ -80,8 +80,8 @@ class GeolocationSchema(Schema):
     country_code = String()
     continent_name = String()
     continent_code = String()
-    latitude = Float()
-    longitude = Float()
+    latitude = String()
+    longitude = String()
     postal = String()
     calling_code = String()
     flag = String()
@@ -105,8 +105,8 @@ class SoftwareSpecsBoolSchema(Schema):
 
 class SoftwareSpecsProgressSchema(Schema):
     """Esquema reutilizable para progresos que pueden ser nulos"""
-    software = Float(allow_none=True)
-    specs = Float(allow_none=True)
+    software = String(allow_none=True)
+    specs = String(allow_none=True)
 
 
 class UpdateStateSchema(Schema):
@@ -147,8 +147,8 @@ class AlignerOut(Schema):
     updatedAt = String()
     createdAt = String()
 
-    openSupportTickets = Integer()
-    closedSupportTickets = Integer()
+    openSupportTickets = String()
+    closedSupportTickets = String()
     connected = Boolean()
     connectCount = String()
     port = String()
