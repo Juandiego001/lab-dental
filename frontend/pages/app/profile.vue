@@ -45,11 +45,12 @@
             </v-col>
             <v-col cols="6">
               <v-text-field v-model="profile.username" hide-details="auto" :label="$t('profile.username')" counter="50"
-                maxlength="50" :rules="[usernameRequired]" />
+                maxlength="50" :rules="[usernameRequired]"
+                @update:model-value="profile.username = $formatUsername($event)" :hint="$t('users.hints.username')" />
             </v-col>
             <v-col>
               <v-text-field v-model="profile.email" hide-details="auto" :label="$t('profile.email')" counter="50"
-                maxlength="50" :rules="[emailRequired]" />
+                maxlength="50" :rules="[emailRequired]" @update:model-value="form.email = $formatEmail($event)" />
             </v-col>
             <v-col>
               <v-select v-model="profile.language" item-title="title" item-value="value" hide-details="auto"
@@ -120,6 +121,7 @@ import { ref } from 'vue'
 const { notify } = useSnackbar();
 const { t, setLocale } = useI18n();
 const { setPhotoPath } = useProfile();
+const { $formatEmail, $formatUsername } = useNuxtApp();
 
 definePageMeta({
   layout: 'app',
@@ -254,17 +256,17 @@ const deletePhoto = async () => {
 
 // Rules
 const changePasswordRules = [
-  v => !!v || 'passwordRules.required',
-  v => /[A-Z]/.test(v) || 'passwordRules.requiredUpper',
-  v => /[a-z]/.test(v) || 'passwordRules.requiredLower',
-  v => /[^a-zA-Z\d]/.test(v) || 'passwordRules.requiredSpecial',
-  v => /\d/.test(v) || 'passwordRules.requiredNumber',
-  v => (v && v.length >= 10) || 'passwordRules.minLength10',
-  v => (v && v.length <= 24) || 'passwordRules.maxLength24',
-  v => (v === password.value.new) || 'passwordRules.dontMatch'
+  v => !!v || t('passwordRules.required'),
+  v => /[A-Z]/.test(v) || t('passwordRules.requiredUpper'),
+  v => /[a-z]/.test(v) || t('passwordRules.requiredLower'),
+  v => /[^a-zA-Z\d]/.test(v) || t('passwordRules.requiredSpecial'),
+  v => /\d/.test(v) || t('passwordRules.requiredNumber'),
+  v => (v && v.length >= 10) || t('passwordRules.minLength10'),
+  v => (v && v.length <= 24) || t('passwordRules.maxLength24'),
+  v => (v === password.value.new) || t('passwordRules.dontMatch')
 ]
-const fullNameRequired = (v) => !!v || 'users.rules.fullNameRequired';
-const usernameRequired = (v) => !!v || 'users.rules.usernameRequired';
-const emailRequired = (v) => !!v || 'users.rules.emailRequired';
+const fullNameRequired = (v) => !!v || t('users.rules.fullNameRequired');
+const usernameRequired = (v) => !!v || t('users.rules.usernameRequired');
+const emailRequired = (v) => !!v || t('users.rules.emailRequired');
 
 </script>

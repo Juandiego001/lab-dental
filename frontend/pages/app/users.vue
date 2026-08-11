@@ -63,12 +63,12 @@
             <v-col cols="12">
               <v-text-field v-model="username" hide-details="auto" :label="$t('users.username')"
                 :rules="[usernameRequired]" counter="20" maxlength="20"
-                @update:model-value="form.username = formatUsername($event)" :hint="$t('users.hints.username')" />
+                @update:model-value="form.username = $formatUsername($event)" :hint="$t('users.hints.username')" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.email" type="email" hide-details="auto" :label="$t('users.email')"
                 :rules="[emailRequired]" counter="150" maxlength="150"
-                @update:model-value="form.email = formatEmail($event)" />
+                @update:model-value="form.email = $formatEmail($event)" />
             </v-col>
             <v-col cols="12">
               <v-select v-model="form.language" item-title="title" item-value="value" hide-details="auto"
@@ -125,12 +125,12 @@
             <v-col cols="12">
               <v-text-field v-model="form.username" hide-details="auto" :label="$t('users.username')"
                 :rules="[usernameRequired]" counter="20" maxlength="20"
-                @update:model-value="form.username = formatUsername($event)" :hint="$t('users.hints.username')" />
+                @update:model-value="form.username = $formatUsername($event)" :hint="$t('users.hints.username')" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.email" type="email" hide-details="auto" :label="$t('users.email')"
                 :rules="[emailRequired]" counter="250" maxlength="250"
-                @update:model-value="form.email = formatEmail($event)" />
+                @update:model-value="form.email = $formatEmail($event)" />
             </v-col>
             <v-col cols="12">
               <v-select v-model="form.language" item-title="title" item-value="value" hide-details="auto"
@@ -239,7 +239,7 @@ import { useI18n } from 'vue-i18n'
 
 const { back } = useBack()
 const { notify } = useSnackbar();
-const { $ability } = useNuxtApp();
+const { $ability, $formatEmail, $formatUsername } = useNuxtApp();
 const { isAdmin } = useProfile();
 const { t } = useI18n();
 const { items: allDistributors, getDistributors } = useDistributors();
@@ -479,22 +479,6 @@ const deleteUser = async () => {
   } finally {
     loading.value = false;
   }
-}
-
-const formatUsername = (v) => {
-  if (!v) return '';
-
-  return v
-    .toLowerCase()
-    .replace(/[^a-z0-9._-]/g, '')
-}
-
-const formatEmail = (v) => {
-  if (!v) return '';
-
-  return v
-    .toLowerCase()
-    .replace(/[^a-z0-9@._-]/g, '')
 }
 
 // Rules
