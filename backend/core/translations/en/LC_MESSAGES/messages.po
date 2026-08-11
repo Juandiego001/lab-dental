@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-02 21:27-0500\n"
+"POT-Creation-Date: 2026-08-07 14:55-0500\n"
 "PO-Revision-Date: 2026-03-03 09:13-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -442,47 +442,55 @@ msgstr "Site address is required"
 msgid "clientIddistributorIdRequired"
 msgstr "Client ID or Distributor ID is required"
 
-#: core/schemas/users.py:90 core/schemas/users.py:93
+#: core/schemas/users.py:19
+msgid "invalidUsername"
+msgstr "The username cannot contain spaces or special characters"
+
+#: core/schemas/users.py:29
+msgid "invalidEmail"
+msgstr "The email cannot contain spaces or special characters"
+
+#: core/schemas/users.py:110 core/schemas/users.py:113
 msgid "fullNameRequired"
 msgstr "Full name is required"
 
-#: core/schemas/users.py:106 core/schemas/users.py:109
+#: core/schemas/users.py:126 core/schemas/users.py:129
 msgid "usernameRequired"
 msgstr "Username is required"
 
-#: core/schemas/users.py:122 core/schemas/users.py:125
+#: core/schemas/users.py:142 core/schemas/users.py:145
 msgid "emailRequired"
 msgstr "Email is required"
 
-#: core/schemas/users.py:170 core/schemas/users.py:222
+#: core/schemas/users.py:190 core/schemas/users.py:242
 msgid "usernameEmailExist"
 msgstr "Username or email already exists"
 
-#: core/schemas/users.py:308
+#: core/schemas/users.py:328
 msgid "mustHaveUppercase"
 msgstr "Must contain at least one uppercase letter"
 
-#: core/schemas/users.py:310
+#: core/schemas/users.py:330
 msgid "mustHaveLowerCase"
 msgstr "Must contain at least one lowercase letter"
 
-#: core/schemas/users.py:313
+#: core/schemas/users.py:333
 msgid "mustHaveSpecialCharacter"
 msgstr "Must contain at least one special character"
 
-#: core/schemas/users.py:315
+#: core/schemas/users.py:335
 msgid "mustHaveNumber"
 msgstr "Must contain at least one number"
 
-#: core/schemas/users.py:318
+#: core/schemas/users.py:338
 msgid "mustHaveMinimum10Characters"
 msgstr "Must be at least 10 characters long"
 
-#: core/schemas/users.py:321
+#: core/schemas/users.py:341
 msgid "mustHaveMaximum24Characters"
 msgstr "Must not exceed 24 characters"
 
-#: core/schemas/users.py:330
+#: core/schemas/users.py:350
 msgid "invalidCurrentPassword"
 msgstr "Invalid current password"
 
@@ -540,7 +548,7 @@ msgstr "SOE Latam - Installation rejection #%(id)s"
 msgid "resetPassword"
 msgstr "Reset Password"
 
-#: core/services/warranties.py:330 core/services/warranties.py:442
+#: core/services/warranties.py:330 core/services/warranties.py:441
 msgid "warrantyNotFound"
 msgstr "Warranty not found"
 
@@ -549,7 +557,7 @@ msgstr "Warranty not found"
 msgid "SOE Latam - Aprobación de garantía #%(id)s"
 msgstr "SOE Latam - Warranty Approval #%(id)s"
 
-#: core/services/warranties.py:482
+#: core/services/warranties.py:481
 #, python-format
 msgid "SOE Latam - Rechazo de garantía #%(id)s"
 msgstr "SOE Latam - Warranty rejection #%(id)s"
@@ -705,16 +713,6 @@ msgstr "Installation Registration Notification"
 msgid "newInstallationCheckDetails"
 msgstr "A new installation has been registered. Please check the details below"
 
-#: templates/warranties.html:176 templates/warranty_approved.html:118
-#: templates/warranty_rejected.html:108
-msgid "warrantyCityCountry"
-msgstr "City & Country"
-
-#: templates/warranties.html:178 templates/warranty_approved.html:120
-#: templates/warranty_rejected.html:110
-msgid "warrantyStateCountry"
-msgstr "State & Country"
-
 #: templates/warranty_approved.html:51 templates/warranty_rejected.html:51
 msgid "warrantyWithFollowingData"
 msgstr "A warranty with the following data has been"
@@ -746,6 +744,14 @@ msgstr "Site info"
 #: templates/warranty_approved.html:113 templates/warranty_rejected.html:103
 msgid "warrantyAddress"
 msgstr "Address"
+
+#: templates/warranty_approved.html:118 templates/warranty_rejected.html:108
+msgid "warrantyCityCountry"
+msgstr "City & Country"
+
+#: templates/warranty_approved.html:120 templates/warranty_rejected.html:110
+msgid "warrantyStateCountry"
+msgstr "State & Country"
 
 #: templates/warranty_approved.html:130 templates/warranty_rejected.html:120
 msgid "warrantyEquipmentInfo"

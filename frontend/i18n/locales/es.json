@@ -359,6 +359,9 @@
       "usernameRequired": "El nombre de usuario es requerido",
       "emailRequired": "El email es requerido",
       "passwordRequired": "La contraseña es requerida"
+    },
+    "hints": {
+      "username": "Solo minúsculas y '.-_' son aceptados"
     }
   },
   "modules": {

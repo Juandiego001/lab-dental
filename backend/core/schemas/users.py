@@ -11,6 +11,24 @@ from apiflask.fields import Boolean, DateTime, File, Integer, List, Nested, Stri
 from marshmallow import EXCLUDE, ValidationError, post_load, pre_load, validates_schema, validate
 from flask_babel import gettext
 
+class UsernameField(String):
+    def _deserialize(self, value, attr, data, **kwargs):
+        value = super()._deserialize(value, attr, data, **kwargs)
+        
+        if not re.match(r"^[a-zA-Z0-9._-]+$", value):
+            raise ValidationError(gettext('invalidUsername'))
+            
+        return value
+    
+class EmailField(String):
+    def _deserialize(self, value, attr, data, **kwargs):
+        value = super()._deserialize(value, attr, data, **kwargs)
+        
+        if not re.match(r"^[a-zA-Z0-9@._-]+$", value):
+            raise ValidationError(gettext('invalidEmail'))
+            
+        return value
+
 
 class UserSearch(Schema):
     users_ids = List(Integer(), required=False, allow_none=True,
@@ -56,7 +74,7 @@ class UserSearch(Schema):
 
 
 class UserInLogIn(BaseSchema):
-    email = String()
+    email = EmailField()
     password = String()
 
 
@@ -66,13 +84,13 @@ class UserIn(BaseSchema):
         data_key='distributorId', required=False, allow_none=True)
     full_name = String(required=True, allow_none=False,
                        data_key='fullName', validate=validate.Length(max=50))
-    username = String(required=True, allow_none=False,
+    username = UsernameField(required=True, allow_none=False,
                       validate=validate.Length(max=20))
-    email = String(required=True, allow_none=False,
+    email = EmailField(required=True, allow_none=False,
                    validate=validate.Length(max=250))
     language = String(required=False,  validate=validate.Length(
         max=10), load_default='en')
-    role = String()
+    role = String(validate=validate.OneOf(choices=['ADMIN', 'DISTRIBUTOR']))
     password = String()
     status = String(load_default='ACTIVE')
 

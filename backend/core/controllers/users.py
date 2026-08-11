@@ -8,6 +8,7 @@ from core.schemas.utils import Message
 from flask_jwt_extended import create_access_token, set_access_cookies, jwt_required, get_jwt_identity, current_user, unset_jwt_cookies
 from core.schemas.users import EmailIn, PasswordIn, TokenIn, UserInLogIn, UserInUpdate, UserInCreate, UserOut, UserSearch, UsersExistingIn, UsersOut, ProfileIn, ProfileOut, TokenPasswordIn, PhotoIn
 from flask_babel import gettext, force_locale
+from datetime import timedelta
 
 
 bp = APIBlueprint('users', __name__)
@@ -59,7 +60,7 @@ def login_users(user):
         user = users.login(user['email'], user['password'])
         user_data = ProfileOut().dump(user)
         access_token = create_access_token(
-            identity=str(user.id), additional_claims=user_data)
+            identity=str(user.id), additional_claims=user_data, expires_delta=timedelta(days=1))
         with force_locale(user_data['language']):
             response = jsonify(access_token=access_token,
                                message=f'{gettext('welcome')} {user_data['fullName']}')
@@ -72,8 +73,9 @@ def login_users(user):
 
 
 @bp.post('/')
-@bp.input(UserInCreate)
 @jwt_required()
+@bp.input(UserInCreate)
+@bp.output(Message)
 def create_users(json_data):
     '''Create users'''
 
@@ -108,9 +110,9 @@ def get_profile():
 
 
 @bp.patch('/profile')
+@jwt_required()
 @bp.input(ProfileIn, arg_name='user_data')
 @bp.output(Message)
-@jwt_required()
 def update_profile(user_data: dict):
     '''
     Actualización del perfil de usuario
@@ -133,9 +135,9 @@ def update_profile(user_data: dict):
 
 
 @bp.put('/<int:user_id>')
+@jwt_required()
 @bp.input(UserInUpdate)
 @bp.output(Message)
-@jwt_required()
 def update_users(user_id, json_data):
     '''Update user'''
     try:
@@ -146,9 +148,9 @@ def update_users(user_id, json_data):
 
 
 @bp.post('/admins')
+@jwt_required()
 @bp.input(UsersExistingIn)
 @bp.output(UsersOut)
-@jwt_required()
 def get_admin_users(json_data):
     '''Get admin users'''
 
@@ -166,8 +168,8 @@ def get_admin_users(json_data):
 
 
 @bp.delete('/<int:user_id>')
-@bp.output(Message)
 @jwt_required()
+@bp.output(Message)
 def delete_users(user_id):
     '''Delete users'''
 

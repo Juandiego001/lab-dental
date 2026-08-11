@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-02 21:27-0500\n"
+"POT-Creation-Date: 2026-08-07 14:55-0500\n"
 "PO-Revision-Date: 2026-03-03 09:13-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -444,47 +444,55 @@ msgstr "La dirección de la sede es obligatoria"
 msgid "clientIddistributorIdRequired"
 msgstr "El ID del cliente o del distribuidor es obligatorio"
 
-#: core/schemas/users.py:90 core/schemas/users.py:93
+#: core/schemas/users.py:19
+msgid "invalidUsername"
+msgstr "El nombre de usuario no puede contener espacios ni caracteres especiales"
+
+#: core/schemas/users.py:29
+msgid "invalidEmail"
+msgstr "El correo no puede contener espacios ni caracteres especiales"
+
+#: core/schemas/users.py:110 core/schemas/users.py:113
 msgid "fullNameRequired"
 msgstr "El nombre completo es obligatorio"
 
-#: core/schemas/users.py:106 core/schemas/users.py:109
+#: core/schemas/users.py:126 core/schemas/users.py:129
 msgid "usernameRequired"
 msgstr "El nombre de usuario es obligatorio"
 
-#: core/schemas/users.py:122 core/schemas/users.py:125
+#: core/schemas/users.py:142 core/schemas/users.py:145
 msgid "emailRequired"
 msgstr "El correo electrónico es obligatorio"
 
-#: core/schemas/users.py:170 core/schemas/users.py:222
+#: core/schemas/users.py:190 core/schemas/users.py:242
 msgid "usernameEmailExist"
 msgstr "El nombre de usuario o correo ya existe"
 
-#: core/schemas/users.py:308
+#: core/schemas/users.py:328
 msgid "mustHaveUppercase"
 msgstr "Debe contener al menos una mayúscula"
 
-#: core/schemas/users.py:310
+#: core/schemas/users.py:330
 msgid "mustHaveLowerCase"
 msgstr "Debe contener al menos una minúscula"
 
-#: core/schemas/users.py:313
+#: core/schemas/users.py:333
 msgid "mustHaveSpecialCharacter"
 msgstr "Debe contener al menos un carácter especial"
 
-#: core/schemas/users.py:315
+#: core/schemas/users.py:335
 msgid "mustHaveNumber"
 msgstr "Debe contener al menos un número"
 
-#: core/schemas/users.py:318
+#: core/schemas/users.py:338
 msgid "mustHaveMinimum10Characters"
 msgstr "Debe tener un mínimo de 10 caracteres"
 
-#: core/schemas/users.py:321
+#: core/schemas/users.py:341
 msgid "mustHaveMaximum24Characters"
 msgstr "Debe tener un máximo de 24 caracteres"
 
-#: core/schemas/users.py:330
+#: core/schemas/users.py:350
 msgid "invalidCurrentPassword"
 msgstr "La contraseña actual es inválida"
 
@@ -542,7 +550,7 @@ msgstr "SOE Latam - Rechazo de instalación #%(id)s"
 msgid "resetPassword"
 msgstr "Restablecer contraseña"
 
-#: core/services/warranties.py:330 core/services/warranties.py:442
+#: core/services/warranties.py:330 core/services/warranties.py:441
 msgid "warrantyNotFound"
 msgstr "Garantía no encontrada"
 
@@ -551,7 +559,7 @@ msgstr "Garantía no encontrada"
 msgid "SOE Latam - Aprobación de garantía #%(id)s"
 msgstr "SOE Latam - Aprobación de garantía #%(id)s"
 
-#: core/services/warranties.py:482
+#: core/services/warranties.py:481
 #, python-format
 msgid "SOE Latam - Rechazo de garantía #%(id)s"
 msgstr "SOE Latam - Rechazo de garantía #%(id)s"
@@ -708,16 +716,6 @@ msgstr ""
 "Se ha registrado una nueva instalación en el sistema. Los detalles son "
 "los siguientes"
 
-#: templates/warranties.html:176 templates/warranty_approved.html:118
-#: templates/warranty_rejected.html:108
-msgid "warrantyCityCountry"
-msgstr "Ciudad & País"
-
-#: templates/warranties.html:178 templates/warranty_approved.html:120
-#: templates/warranty_rejected.html:110
-msgid "warrantyStateCountry"
-msgstr "Estado & País"
-
 #: templates/warranty_approved.html:51 templates/warranty_rejected.html:51
 msgid "warrantyWithFollowingData"
 msgstr "La garantía con los siguientes datos ha sido"
@@ -749,6 +747,14 @@ msgstr "Información de la sede"
 #: templates/warranty_approved.html:113 templates/warranty_rejected.html:103
 msgid "warrantyAddress"
 msgstr "Dirección"
+
+#: templates/warranty_approved.html:118 templates/warranty_rejected.html:108
+msgid "warrantyCityCountry"
+msgstr "Ciudad & País"
+
+#: templates/warranty_approved.html:120 templates/warranty_rejected.html:110
+msgid "warrantyStateCountry"
+msgstr "Estado & País"
 
 #: templates/warranty_approved.html:130 templates/warranty_rejected.html:120
 msgid "warrantyEquipmentInfo"

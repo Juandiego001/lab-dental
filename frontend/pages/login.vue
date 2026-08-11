@@ -8,13 +8,13 @@
         <v-row>
           <v-col cols="12">
             <v-text-field class="text-white" v-model="email" :label="$t('login.emailUsername')" hide-details="auto"
-              type="email" variant="outlined">
-            </v-text-field>
+              type="email" variant="outlined" @update:model-value="email = $event?.toLowerCase() || ''">
+            </v-text-field >
           </v-col>
 
           <v-col cols="12 pb-0">
             <v-text-field class="text-white" v-model="password" :label="$t('login.password')" hide-details="auto"
-              variant="outlined" :type="isVisible ? 'text' : 'password'" autocomplete="off">
+              variant="outlined" :type="isVisible ? 'text' : 'password'" autocomplete="off" >
               <template #append-inner>
                 <v-btn :icon="isVisible ? 'mdi-eye-off' : 'mdi-eye'" variant="text" size="small"
                   @click="isVisible = !isVisible" />

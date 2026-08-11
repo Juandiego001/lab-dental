@@ -61,12 +61,14 @@
                 :rules="[fullNameRequired]" counter="50" maxlength="50" />
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.username" hide-details="auto" :label="$t('users.username')"
-                :rules="[usernameRequired]" counter="20" maxlength="20" />
+              <v-text-field v-model="username" hide-details="auto" :label="$t('users.username')"
+                :rules="[usernameRequired]" counter="20" maxlength="20"
+                @update:model-value="form.username = formatUsername($event)" :hint="$t('users.hints.username')" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.email" type="email" hide-details="auto" :label="$t('users.email')"
-                :rules="[emailRequired]" counter="150" maxlength="150" />
+                :rules="[emailRequired]" counter="150" maxlength="150"
+                @update:model-value="form.email = formatEmail($event)" />
             </v-col>
             <v-col cols="12">
               <v-select v-model="form.language" item-title="title" item-value="value" hide-details="auto"
@@ -79,8 +81,9 @@
                 @click:append-inner="showPassword = !showPassword" />
             </v-col>
             <v-col class="text-end">
-              <v-btn variant="outlined" @click="createDialog = false" @mousedown.prevent :disabled="loading">{{
-                $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="createDialog = false" @mousedown.prevent :disabled="loading">
+                {{ $t('cancel') }}
+              </v-btn>
               <span class="mx-1" />
               <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('confirm') }}</v-btn>
             </v-col>
@@ -121,11 +124,13 @@
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.username" hide-details="auto" :label="$t('users.username')"
-                :rules="[usernameRequired]" counter="20" maxlength="20" />
+                :rules="[usernameRequired]" counter="20" maxlength="20"
+                @update:model-value="form.username = formatUsername($event)" :hint="$t('users.hints.username')" />
             </v-col>
             <v-col cols="12">
               <v-text-field v-model="form.email" type="email" hide-details="auto" :label="$t('users.email')"
-                :rules="[emailRequired]" counter="250" maxlength="250" />
+                :rules="[emailRequired]" counter="250" maxlength="250"
+                @update:model-value="form.email = formatEmail($event)" />
             </v-col>
             <v-col cols="12">
               <v-select v-model="form.language" item-title="title" item-value="value" hide-details="auto"
@@ -295,6 +300,22 @@ const distributors = computed(() => {
   return allDistributors.value.filter((distributor) => distributor.id !== 1);
 })
 
+const username = computed({
+  get() {
+    return form.value.username
+  },
+  set(v) {
+    if (!v) {
+      form.value.username = ''
+      return
+    }
+
+    form.value.username = v
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '')
+  }
+})
+
 const headers = computed(() => {
   const defaultHeaders = [
     { title: t('users.fullName'), key: 'fullName' },
@@ -462,6 +483,22 @@ const deleteUser = async () => {
   } finally {
     loading.value = false;
   }
+}
+
+const formatUsername = (v) => {
+  if (!v) return '';
+
+  return v
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]/g, '')
+}
+
+const formatEmail = (v) => {
+  if (!v) return '';
+
+  return v
+    .toLowerCase()
+    .replace(/[^a-z0-9@._-]/g, '')
 }
 
 // Rules
