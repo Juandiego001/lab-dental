@@ -24,8 +24,8 @@ def upgrade():
 
     users = db.session.query(User).filter(User.status == 'ACTIVE')
     for user in users:
-        user.username = user.username.lower()
-        user.email = user.email.lower()
+        user.username = user.username.lower().replace(" ", "")
+        user.email = user.email.lower().replace(" ", "")
 
     db.session.commit()
 

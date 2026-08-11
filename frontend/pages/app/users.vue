@@ -438,7 +438,7 @@ const createUser = async () => {
       body: form.value
     })
     notify(message, 'success');
-    await getUsers({ isMain: true })
+    await searchUsers()
     createDialog.value = false
   } catch (err) {
     notify(err, 'error');
@@ -456,9 +456,7 @@ const updateUser = async () => {
       body: form.value
     })
     notify(message, 'success');
-    await getUsers({
-      isMain: true,
-    })
+    await searchUsers()
     updateDialog.value = false
   } catch (err) {
     notify(err, 'error');
@@ -474,9 +472,7 @@ const deleteUser = async () => {
       method: 'DELETE'
     })
     notify(message, 'success');
-    await getUsers({
-      isMain: true,
-    })
+    await searchUsers()
     deleteDialog.value = false
   } catch (err) {
     notify(err, 'error');

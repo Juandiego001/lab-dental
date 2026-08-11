@@ -3,8 +3,8 @@ import type { ItemsTotal } from '~/shared/types/utils'
 
 export const useUsers = () => {
   const { notify } = useSnackbar()
-  const items: any = ref([])
-  const total: any = ref(15)
+  const items: any = useState('usersItems', () => ([]))
+  const total = useState('usersTotal', () => 15)
 
   const getUsers = async ({
     usersIds,
