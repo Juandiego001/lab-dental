@@ -786,6 +786,8 @@
     "check": "Check Cloud",
     "activate": "Activate",
     "commandError": "The aligner has taken some time to confirm the change. Please refresh to check the status",
+    "connectedLabel": "The aligner is connected",
+    "disconnectedLabel": "The aligner is disconnected",
     "rules": {
       "serialNumberRequired": "The serial number is required"
     }

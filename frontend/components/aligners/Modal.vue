@@ -6,12 +6,28 @@
           <v-icon icon="mdi-car-wrench" class="me-2" />
           <span>{{ alignerData?.serialNumber }}</span>
           <v-spacer />
-          <v-btn class="bg-primary" size="small" icon="mdi-close" @click="viewAligner = false" />
+
+          <div class="d-flex align-center ga-2">
+            <v-btn class="bg-primary" size="small" icon="mdi-reload" @click="reloadAligner" :loading="loading" />
+            <v-btn class="bg-primary" size="small" icon="mdi-close" @click="viewAligner = false" />
+          </div>
         </v-row>
       </v-card-title>
 
       <v-card-text>
         <v-row dense>
+          <v-col class="text-success" cols="12">
+            <div v-if="alignerData?.connected"
+              class="d-inline-flex align-center py-1 px-1 bg-success text-white ga-1 rounded">
+              <v-icon size="small">mdi-check</v-icon>
+              <span class="text-caption">{{ $t('aligners.connectedLabel') }}</span>
+            </div>
+            <div v-else class="d-inline-flex align-center py-1 px-1 bg-error text-white ga-1 rounded">
+              <v-icon size="small">mdi-close-thick</v-icon>
+              <span class="text-caption">{{ $t('aligners.disconnectedLabel') }}</span>
+            </div>
+          </v-col>
+
           <v-col cols="12">
             <p class="text-primary">{{ $t('aligners.systemTitle') }}</p>
           </v-col>
@@ -133,7 +149,7 @@
 
           <v-col cols="6">
             <v-text-field :label="$t('aligners.connected')" :model-value="alignerData?.connected ? 'Yes' : 'No'"
-              readonly hide-details />
+              readonly hide-details :class="alignerData?.connected ? 'bg-success' : 'bg-error'" />
           </v-col>
 
           <v-col cols="6">
@@ -169,12 +185,12 @@
 const { t } = useI18n();
 const { notify } = useSnackbar()
 
-const { alignerData, viewAligner, sendStage, getAligner, sendUnstage, sendCloud, semantic, sendActivate } = useAligners();
+const { alignerData, viewAligner, sendStage, getAligner, sendUnstage, sendCloud, semantic, sendActivate, getLastVersion } = useAligners();
 
 const loading = ref(false);
 
 const showStage = computed(() => {
-  return !alignerData.value?.updateState && !alignerData.value?.pendingSoftwareDownload
+  return alignerData.value?.updateState && alignerData.value?.updateState.state === 'READY_TO_INSTALL' && !alignerData.value?.pendingSoftwareDownload
 })
 const showUnstage = computed(() => {
   return alignerData.value?.pendingSoftwareDownload
@@ -267,5 +283,18 @@ const activate = async () => {
     loading.value = false;
   }
 }
+
+const reloadAligner = async () => {
+  try {
+    loading.value = true;
+    await getLastVersion();
+    await getAligner();
+  } catch (err) {
+    notify(err, 'error');
+  } finally {
+    loading.value = false;
+  }
+}
+
 
 </script>
