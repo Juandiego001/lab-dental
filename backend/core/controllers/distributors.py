@@ -1,13 +1,13 @@
 from flask_babel import gettext
-from http.client import HTTPException
+from werkzeug.exceptions import HTTPException
 from core.services import distributors
 from apiflask import APIBlueprint, abort
 from flask_jwt_extended import jwt_required, current_user
 from core.schemas.clients import ClientsOut
 from core.schemas.utils import Message, Pagination
 from core.schemas.distributors import (
-    ContactInCreate, ContactOut, DistributorIn, DistributorOut, DistributorSearch, DistributorsOut, ContactSearch, ContactsOut,
-    ContactIn
+    AlignersOut, ContactInCreate, ContactOut, DistributorInCreate, DistributorInUpdate, DistributorOut, DistributorSearch, DistributorsOut, ContactSearch, ContactsOut,
+    ContactIn, AlignerSearch, AlignerInCreate, AlignerFileIn, AlignersValidationsOut, AlignersMultipleIn
 )
 
 
@@ -26,6 +26,7 @@ def search_distributors(json_data):
             current_user=current_user,
             distributors_ids=json_data['distributors_ids'],
             name=json_data['name'],
+            bp=json_data['bp'],
             page=json_data['page'],
             per_page=json_data['per_page'],
             sort_by=json_data['sort_by'])
@@ -61,7 +62,7 @@ def get_clients_by_distributor(distributor_id, query_data):
 
 
 @bp.post('/')
-@bp.input(DistributorIn, arg_name='distributor')
+@bp.input(DistributorInCreate, arg_name='distributor')
 @jwt_required()
 def create_distributors(distributor: dict):
     '''Create distributors'''
@@ -74,7 +75,7 @@ def create_distributors(distributor: dict):
 
 
 @bp.put('/<int:distributor_id>')
-@bp.input(DistributorIn)
+@bp.input(DistributorInUpdate)
 @bp.output(Message)
 @jwt_required()
 def update_distributors(distributor_id, json_data):
@@ -177,3 +178,122 @@ def delete_contact(contact_id: int):
         return {'message': gettext('contactDeleted')}
     except Exception as ex:
         abort(500, gettext('abortException'))
+
+
+@bp.post('/aligners/search')
+@bp.input(AlignerSearch)
+@bp.output(AlignersOut)
+@jwt_required()
+def search_distributor_aligners(json_data: dict):
+    '''Search distributor aligners'''
+
+    try:
+        results, total = distributors.search_distributor_aligners(
+            distributor_id=json_data['distributor_id'],
+            aligners_ids=json_data['aligners_ids'],
+            serial=json_data['serial'],
+            software=json_data['software'],
+            page=json_data['page'],
+            per_page=json_data['per_page'],
+            sort_by=json_data['sort_by'])
+        return {'items': results, 'total': total}
+    except Exception as ex:
+        abort(500, gettext('abortException'))
+
+
+@bp.post('/aligners')
+@bp.input(AlignerInCreate)
+@bp.output(Message)
+@jwt_required()
+def associate_aligner_to_distributor(json_data: dict):
+    '''Associate aligner to distributor'''
+
+    try:
+        distributors.associate_aligner_to_distributor(
+            serial=json_data['serial'],
+            distributor_id=json_data['distributor_id'],
+        )
+        return {'message': gettext('alignerAssociatedSuccessfully')}
+    except Exception as ex:
+        abort(500, gettext('abortException'))
+
+
+@bp.post('/aligners/refresh/<int:distributor_id>')
+@bp.output(Message)
+@jwt_required()
+def refresh_distributor_aligners(distributor_id: int):
+    '''Refresh distributor aligners'''
+
+    try:
+        distributors.refresh_distributor_aligners(
+            distributor_id=distributor_id,
+        )
+        return {'message': gettext('distributorAlignersUpdatedSuccessfully')}
+    except Exception as ex:
+        abort(500, gettext('abortException'))
+
+
+@bp.put('/aligners/file/<int:distributor_id>')
+@bp.input(AlignerFileIn, location='form_and_files')
+@bp.output(AlignersValidationsOut)
+@jwt_required()
+def validate_aligners_file(distributor_id: int, form_and_files_data: dict):
+    '''Validate aligners file'''
+
+    try:
+        validations = distributors.validate_aligners_file(
+            distributor_id=distributor_id,
+            file=form_and_files_data['file']
+        )
+        return {'validations': validations}
+    except Exception as ex:
+        abort(500, gettext('abortException'))
+
+
+@bp.post('/aligners/file/<int:distributor_id>')
+@bp.input(AlignersMultipleIn)
+@bp.output(Message)
+@jwt_required()
+def upload_multiple_aligners(distributor_id: int, json_data: dict):
+    '''Validate aligners file'''
+
+    try:
+        distributors.upload_multiple_aligners(
+            distributor_id=distributor_id,
+            serials=json_data['serials']
+        )
+        return {'message': gettext('alignersPairedSuccessfully')}
+    except HTTPException as ex:
+        abort(400, ex.description)
+    except Exception as ex:
+        abort(500, gettext('abortException'))
+
+
+@bp.delete('/aligners/<int:aligner_id>')
+@bp.output(Message)
+@jwt_required()
+def unlink_distributor_aligner(aligner_id: int):
+    '''Unlink distributor aligner'''
+
+    try:
+        distributors.unlink_distributor_aligner(aligner_id=aligner_id)
+        return {'message': gettext('alignerUnlinkedSuccessfully')}
+    except Exception as ex:
+        abort(500, gettext('abortException'))
+
+
+# @bp.post('/aligners/file')
+# @bp.input(AlignerInCreate)
+# @bp.output(Message)
+# @jwt_required()
+# def associate_aligners_to_distributor_by_file(json_data: dict):
+#     '''Associate aligners to distributor by plain text file'''
+
+#     try:
+#         distributors.associate_aligner_to_distributor_by_plain(
+#             serial=json_data['serial'],
+#             distributor_id=json_data['distributor_id'],
+#         )
+#         return {'message': gettext('alignerAssociatedSuccessfully')}
+#     except Exception as ex:
+#         abort(500, gettext('abortException'))

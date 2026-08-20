@@ -522,7 +522,7 @@ const updatePermissions = async (v, item, action) => {
 }
 
 const modulesOnlyRead = ['brands', 'categories', 'equipments', 'aligners'];
-const modulesBan = ['distributors', 'lists'];
+const modulesBan = ['distributors', 'lists', 'reasons'];
 
 const disablePermission = (permission, action) => {
   if (form.value.id == 1) return true;

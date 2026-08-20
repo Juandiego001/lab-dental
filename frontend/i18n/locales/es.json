@@ -223,6 +223,7 @@
   "distributors": {
     "title": "Distribuidor | Distribuidores",
     "name": "Nombre",
+    "bp": "Identificador BP",
     "notes": "Notas",
     "emails": {
       "title": "Correo | Correos electrónicos"
@@ -245,7 +246,36 @@
     },
     "rules": {
       "nameRequired": "El nombre es requerido",
+      "bpRequired": "El identificador BP es requerido",
       "brandsRequired": "Al menos una marca es requerida"
+    },
+    "aligners": {
+      "title": "Alineadora | Alineadoras",
+      "serial": "Serial",
+      "software": "Versión de Software",
+      "specs": "Specs",
+      "createdAt": "Creado en",
+      "message": "Mensaje",
+      "validate": "Validar", 
+      "create": {
+        "title": "Asociar alineadora"
+      },
+      "file": {
+        "title": "Asociar múltiples alineadoras a través de un archivo",
+        "label": "Archivo de texto plano"
+      },
+      "search": {
+        "title": "Buscar alineadora"
+      },
+      "delete": {
+        "title": "Desasociar alineadora",
+        "message": "¿Está seguro que desea desasociar la alineadora?"
+      },
+      "rules": {
+        "serialRequired": "El serial es requerido",
+        "fileRequired": "El archivo de texto plano es requerido",
+        "fileSize0": "El archivo de texto plano no contiene información"
+      }
     }
   },
   "contacts": {

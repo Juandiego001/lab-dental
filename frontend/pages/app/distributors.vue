@@ -1,6 +1,7 @@
 <template>
   <v-container fluid class="fill-height align-start">
-    <Contacts />
+    <DistributorsContacts />
+    <DistributorsAligners />
     <v-card width="100%" flat>
       <v-card-title class="d-flex justify-space-between">
         <p>{{ $t('distributors.title', 2) }}</p>
@@ -32,6 +33,13 @@
                 <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getDistributor(item.id)" />
                 <v-btn class="my-2 bg-secondary" size="small" icon="mdi-account-box"
                   @click="async () => { distributorId = item.id; await getContacts({}); dialog = true }" />
+
+                <v-btn class="my-2 bg-secondary" size="small" icon="mdi-car-wrench"
+                  @click="async () => { distributorIdAligners = item.id; await getAligners({}); dialogAligners = true }"
+                  :loading="distributorIdAligners == item.id && loadingAligners"
+                />
+
+
                 <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
                   @click="form.id = item.id; deleteDialog = true" />
               </div>
@@ -58,6 +66,10 @@
             <v-col cols="12">
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('distributors.name')"
                 :rules="[nameRequired]" counter="50" maxlength="50" autocomplete="off" />
+            </v-col>
+            <v-col cols="12">
+              <v-text-field v-model="form.bp" hide-details="auto" :label="$t('distributors.bp')" :rules="[bpRequired]"
+                counter="50" maxlength="50" autocomplete="off" />
             </v-col>
             <v-col>
               <v-autocomplete v-model="form.brandsIds" hide-details="auto" :label="$t('brands.title', 1)"
@@ -140,6 +152,10 @@
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('distributors.name')"
                 :rules="[nameRequired]" counter="50" maxlength="50" autocomplete="off" />
             </v-col>
+            <v-col cols="12">
+              <v-text-field v-model="form.bp" hide-details="auto" :label="$t('distributors.bp')" :rules="[bpRequired]"
+                counter="50" maxlength="50" autocomplete="off" />
+            </v-col>
             <v-autocomplete v-model="form.brandsIds" hide-details="auto" :label="$t('brands.title', 1)" :items="brands"
               item-title="name" item-value="id" clearable multiple chips :rules="[brandsRequired]" @update:search="(name) => {
                 if (!updateDialog) return;
@@ -160,8 +176,7 @@
                   class="mb-2">
                   <v-text-field v-if="emailObj.status == 'ACTIVE'" v-model="emailObj.email" hide-details="auto"
                     :label="`${$t('distributors.emails.title')} ${index + 1}`" type="email" append-icon="mdi-delete"
-                    autocomplete="off"
-                    @click:append="removeEmailField(index)" counter="150" maxlength="150" />
+                    autocomplete="off" @click:append="removeEmailField(index)" counter="150" maxlength="150" />
                 </div>
               </v-slide-y-transition>
             </v-col>
@@ -180,8 +195,7 @@
                   class="mb-2">
                   <v-text-field v-if="phoneObj.status == 'ACTIVE'" v-model="phoneObj.phone" hide-details="auto"
                     :label="`${$t('distributors.phones.title')} ${index + 1}`" append-icon="mdi-delete"
-                    autocomplete="off"
-                    @click:append="removePhoneField(index)" counter="20" maxlength="20" />
+                    autocomplete="off" @click:append="removePhoneField(index)" counter="20" maxlength="20" />
                 </div>
               </v-slide-y-transition>
             </v-col>
@@ -223,7 +237,7 @@
   </v-dialog>
 
   <!-- Search Dialog -->
-  <v-dialog v-model="searchDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
+  <v-dialog v-model="searchDialog" max-width="600" persistent :fullscreen="$vuetify.display.smAndDown">
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
@@ -238,9 +252,13 @@
           searchDialog = false;
         }">
           <v-row dense>
-            <v-col cols="12">
-              <v-text-field v-model="searchForm.name" :label="$t('distributors.name')" hide-details="auto"
-                prepend-inner-icon="mdi-magnify" counter="50" maxlength="50" clearable autocomplete="off" />
+            <v-col cols="6">
+              <v-text-field v-model="searchForm.name" :label="$t('distributors.name')" hide-details="auto" counter="50"
+                maxlength="50" clearable autocomplete="off" />
+            </v-col>
+            <v-col cols="6">
+              <v-text-field v-model="searchForm.bp" :label="$t('distributors.bp')" hide-details="auto" counter="50"
+                maxlength="50" clearable autocomplete="off" />
             </v-col>
             <v-col class="text-end" cols="12">
               <v-btn class="bg-primary" type="submit" @mousedown.prevent :loading="loading">{{ $t('search') }}</v-btn>
@@ -263,6 +281,7 @@ const { t } = useI18n();
 const { items, total, getDistributors } = useDistributors();
 const { distributorId, dialog, getContacts } = useContacts();
 const { items: brands, getBrands } = useBrands();
+const { distributorId: distributorIdAligners, dialog: dialogAligners, getAligners, loading: loadingAligners } = useDistributorsAligners();
 
 definePageMeta({
   layout: 'app',
@@ -295,7 +314,8 @@ const form = ref({
   brandsIds: []
 })
 const searchForm = ref({
-  name: ''
+  name: '',
+  bp: '',
 })
 
 const itemsPerPageOptions = computed(() => [
@@ -368,6 +388,7 @@ const searchDistributors = async (defPage, defPerPage) => {
     loading.value = true;
     await getDistributors({
       name: searchForm.value.name,
+      bp: searchForm.value.bp,
       page: defPage || page.value,
       perPage: defPerPage || perPage.value,
       sortBy: sortBy.value?.length ? sortBy.value[0] : null
@@ -487,6 +508,7 @@ const removePhoneField = (index) => {
 
 // Rules
 const nameRequired = (v) => !!v || t('distributors.rules.nameRequired');
+const bpRequired = (v) => !!v || t('distributors.rules.bpRequired');
 const brandsRequired = (v) => (v && v.length > 0) || t('distributors.rules.brandsRequired');
 
 </script>

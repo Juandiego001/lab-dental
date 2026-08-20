@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-07 14:55-0500\n"
+"POT-Creation-Date: 2026-08-19 17:41-0500\n"
 "PO-Revision-Date: 2026-03-03 09:13-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: core/utils.py:176
+#: core/utils.py:191
 msgid "Archivo desconocido/sin nombre"
 msgstr "Unknown/Untitled File"
 
@@ -32,12 +32,15 @@ msgstr "Unknown/Untitled File"
 #: core/controllers/categories.py:69 core/controllers/categories.py:82
 #: core/controllers/clients.py:33 core/controllers/clients.py:45
 #: core/controllers/clients.py:58 core/controllers/clients.py:71
-#: core/controllers/clients.py:84 core/controllers/distributors.py:34
-#: core/controllers/distributors.py:46 core/controllers/distributors.py:60
-#: core/controllers/distributors.py:73 core/controllers/distributors.py:86
-#: core/controllers/distributors.py:99 core/controllers/distributors.py:121
-#: core/controllers/distributors.py:133 core/controllers/distributors.py:147
-#: core/controllers/distributors.py:166 core/controllers/distributors.py:179
+#: core/controllers/clients.py:84 core/controllers/distributors.py:35
+#: core/controllers/distributors.py:47 core/controllers/distributors.py:61
+#: core/controllers/distributors.py:74 core/controllers/distributors.py:87
+#: core/controllers/distributors.py:100 core/controllers/distributors.py:122
+#: core/controllers/distributors.py:134 core/controllers/distributors.py:148
+#: core/controllers/distributors.py:167 core/controllers/distributors.py:180
+#: core/controllers/distributors.py:202 core/controllers/distributors.py:220
+#: core/controllers/distributors.py:236 core/controllers/distributors.py:254
+#: core/controllers/distributors.py:274 core/controllers/distributors.py:287
 #: core/controllers/equipments.py:45 core/controllers/equipments.py:57
 #: core/controllers/equipments.py:70 core/controllers/equipments.py:87
 #: core/controllers/equipments.py:100 core/controllers/equipments.py:122
@@ -67,14 +70,14 @@ msgstr "Unknown/Untitled File"
 #: core/controllers/sites.py:33 core/controllers/sites.py:45
 #: core/controllers/sites.py:60 core/controllers/sites.py:79
 #: core/controllers/sites.py:92 core/controllers/sites.py:104
-#: core/controllers/users.py:38 core/controllers/users.py:50
-#: core/controllers/users.py:71 core/controllers/users.py:85
-#: core/controllers/users.py:107 core/controllers/users.py:132
-#: core/controllers/users.py:145 core/controllers/users.py:165
-#: core/controllers/users.py:178 core/controllers/users.py:192
-#: core/controllers/users.py:209 core/controllers/users.py:239
-#: core/controllers/users.py:259 core/controllers/users.py:276
-#: core/controllers/users.py:289 core/controllers/warranties.py:37
+#: core/controllers/users.py:39 core/controllers/users.py:51
+#: core/controllers/users.py:72 core/controllers/users.py:87
+#: core/controllers/users.py:109 core/controllers/users.py:134
+#: core/controllers/users.py:147 core/controllers/users.py:167
+#: core/controllers/users.py:180 core/controllers/users.py:194
+#: core/controllers/users.py:211 core/controllers/users.py:241
+#: core/controllers/users.py:261 core/controllers/users.py:278
+#: core/controllers/users.py:291 core/controllers/warranties.py:37
 #: core/controllers/warranties.py:49 core/controllers/warranties.py:62
 #: core/controllers/warranties.py:75 core/controllers/warranties.py:88
 #: core/controllers/warranties.py:105 core/controllers/warranties.py:124
@@ -136,29 +139,45 @@ msgstr "Client updated successfully"
 msgid "clientDeleted"
 msgstr "Client deleted successfully"
 
-#: core/controllers/distributors.py:71
+#: core/controllers/distributors.py:72
 msgid "distributorCreated"
 msgstr "Distributor created successfully"
 
-#: core/controllers/distributors.py:84
+#: core/controllers/distributors.py:85
 msgid "distributorUpdated"
 msgstr "Distributor updated successfully"
 
-#: core/controllers/distributors.py:97
+#: core/controllers/distributors.py:98
 msgid "distributorDeleted"
 msgstr "Distributor deleted successfully"
 
-#: core/controllers/distributors.py:145
+#: core/controllers/distributors.py:146
 msgid "contactCreated"
 msgstr "Contact created successfully"
 
-#: core/controllers/distributors.py:162
+#: core/controllers/distributors.py:163
 msgid "contactUpdated"
 msgstr "Contact updated successfully"
 
-#: core/controllers/distributors.py:177
+#: core/controllers/distributors.py:178
 msgid "contactDeleted"
 msgstr "Contact deleted successfully"
+
+#: core/controllers/distributors.py:217
+msgid "alignerAssociatedSuccessfully"
+msgstr "The aligner has been successfully paired"
+
+#: core/controllers/distributors.py:233
+msgid "distributorAlignersUpdatedSuccessfully"
+msgstr "The aligners has been successfully updated"
+
+#: core/controllers/distributors.py:269
+msgid "alignersPairedSuccessfully"
+msgstr "The aligners have been successfully paired"
+
+#: core/controllers/distributors.py:285
+msgid "alignerUnlinkedSuccessfully"
+msgstr "The aligner have been unlinked successfully"
 
 #: core/controllers/equipments.py:68
 msgid "equipmentCreated"
@@ -272,51 +291,51 @@ msgstr "Site updated successfully"
 msgid "siteDeleted"
 msgstr "Site deleted successfully"
 
-#: core/controllers/users.py:65
+#: core/controllers/users.py:66
 msgid "welcome"
 msgstr "Welcome"
 
-#: core/controllers/users.py:69
+#: core/controllers/users.py:70
 msgid "wrongUsernamePassword"
 msgstr "Username or password incorrect"
 
-#: core/controllers/users.py:83
+#: core/controllers/users.py:85
 msgid "userCreated"
 msgstr "User created successfully"
 
-#: core/controllers/users.py:128
+#: core/controllers/users.py:130
 msgid "profileUpdated"
 msgstr "Profile update successfully"
 
-#: core/controllers/users.py:143
+#: core/controllers/users.py:145
 msgid "userUpdated"
 msgstr "User updated successfully"
 
-#: core/controllers/users.py:176
+#: core/controllers/users.py:178
 msgid "userDeleted"
 msgstr "User deleted successfully"
 
-#: core/controllers/users.py:188
+#: core/controllers/users.py:190
 msgid "tokenValid"
 msgstr "Token valid"
 
-#: core/controllers/users.py:190
+#: core/controllers/users.py:192
 msgid "tokenInvalid"
 msgstr "Token invalid"
 
-#: core/controllers/users.py:207 core/controllers/users.py:237
+#: core/controllers/users.py:209 core/controllers/users.py:239
 msgid "passwordUpdated"
 msgstr "Password updated successfully"
 
-#: core/controllers/users.py:223
+#: core/controllers/users.py:225
 msgid "recoveryLinkSent"
 msgstr "A recovery link has been sent. Please check your email"
 
-#: core/controllers/users.py:250
+#: core/controllers/users.py:252
 msgid "sessionEnded"
 msgstr "Session ended"
 
-#: core/controllers/users.py:274 core/controllers/users.py:287
+#: core/controllers/users.py:276 core/controllers/users.py:289
 msgid "photoUpdated"
 msgstr "Photo updated"
 
@@ -367,37 +386,78 @@ msgstr "Slug required"
 msgid "clientNameRequired"
 msgstr "Client's name required"
 
-#: core/schemas/distributors.py:82 core/schemas/distributors.py:86
+#: core/schemas/distributors.py:87 core/schemas/distributors.py:91
 msgid "distributorNameRequired"
 msgstr "Distributor name required"
 
-#: core/schemas/distributors.py:94 core/schemas/distributors.py:98
+#: core/schemas/distributors.py:105 core/schemas/distributors.py:109
+msgid "distributorBpRequired"
+msgstr "Distributor BP Number required"
+
+#: core/schemas/distributors.py:117 core/schemas/distributors.py:121
 msgid "brandRequired"
 msgstr "At least one brand is required"
 
-#: core/schemas/distributors.py:106
+#: core/schemas/distributors.py:129
 msgid "brandDoesntExist"
 msgstr "Brand doesnt exist"
 
-#: core/schemas/distributors.py:122
+#: core/schemas/distributors.py:145
 msgid "distributorEmailLengthExceededError"
 msgstr "Distributor email max length exceeded"
 
-#: core/schemas/distributors.py:136
+#: core/schemas/distributors.py:159
 msgid "distributorEmailExistsError"
 msgstr "Distributor email already exists"
 
-#: core/schemas/distributors.py:152
+#: core/schemas/distributors.py:175
 msgid "distributorPhoneLengthExceededError"
 msgstr "Distributor phone max length exceeded"
 
-#: core/schemas/distributors.py:162
+#: core/schemas/distributors.py:185
 msgid "distributorPhoneExistsError"
 msgstr "Distributor phone already exists"
 
-#: core/schemas/distributors.py:279 core/services/distributors.py:326
+#: core/schemas/distributors.py:205 core/schemas/distributors.py:265
+msgid "distributorNameExistsError"
+msgstr "There is already a distributor with that name"
+
+#: core/schemas/distributors.py:222 core/schemas/distributors.py:288
+msgid "distributorBPExistsError"
+msgstr "There is already a distributor with that BP Number"
+
+#: core/schemas/distributors.py:237
+msgid "distributorDoesntExist"
+msgstr "The distributor does not exist"
+
+#: core/schemas/distributors.py:406 core/services/distributors.py:332
 msgid "contactEmailExistsError"
 msgstr "Contact email already exists"
+
+#: core/schemas/distributors.py:447 core/services/aligners.py:12
+#: core/services/distributors.py:499
+msgid "alignerNotFound"
+msgstr "Aligner not found"
+
+#: core/schemas/distributors.py:461 core/services/distributors.py:488
+msgid "alignerAlreadyAssociated"
+msgstr "The aligner has already been associated"
+
+#: core/schemas/distributors.py:481
+#, python-format
+msgid "Invalid empty files: %(invalids)s"
+msgstr "Invalid empty files: %(invalids)s"
+
+#: core/schemas/distributors.py:489
+#, python-format
+msgid "10MB max file size exceed for: %(invalids)s"
+msgstr "10MB max file size exceed for: %(invalids)s"
+
+#: core/schemas/distributors.py:498 core/schemas/equipments.py:116
+#: core/schemas/warranties.py:96 core/schemas/warranties.py:289
+#, python-format
+msgid "Unsupported file formats for: %(invalids)s"
+msgstr "Unsupported file formats for: %(invalids)s"
 
 #: core/schemas/equipments.py:51 core/schemas/equipments.py:54
 msgid "modelRequired"
@@ -406,12 +466,6 @@ msgstr "Model required"
 #: core/schemas/equipments.py:67 core/schemas/equipments.py:70
 msgid "referenceRequired"
 msgstr "Reference required"
-
-#: core/schemas/equipments.py:116 core/schemas/warranties.py:96
-#: core/schemas/warranties.py:289
-#, python-format
-msgid "Unsupported file formats for: %(invalids)s"
-msgstr "Unsupported file formats for: %(invalids)s"
 
 #: core/schemas/groups.py:38 core/schemas/groups.py:41
 msgid "groupNameRequired"
@@ -446,51 +500,51 @@ msgstr "Client ID or Distributor ID is required"
 msgid "invalidUsername"
 msgstr "The username cannot contain spaces or special characters"
 
-#: core/schemas/users.py:29
+#: core/schemas/users.py:28
 msgid "invalidEmail"
 msgstr "The email cannot contain spaces or special characters"
 
-#: core/schemas/users.py:110 core/schemas/users.py:113
+#: core/schemas/users.py:108 core/schemas/users.py:111
 msgid "fullNameRequired"
 msgstr "Full name is required"
 
-#: core/schemas/users.py:126 core/schemas/users.py:129
+#: core/schemas/users.py:124 core/schemas/users.py:127
 msgid "usernameRequired"
 msgstr "Username is required"
 
-#: core/schemas/users.py:142 core/schemas/users.py:145
+#: core/schemas/users.py:140 core/schemas/users.py:143
 msgid "emailRequired"
 msgstr "Email is required"
 
-#: core/schemas/users.py:190 core/schemas/users.py:242
+#: core/schemas/users.py:188 core/schemas/users.py:240
 msgid "usernameEmailExist"
 msgstr "Username or email already exists"
 
-#: core/schemas/users.py:328
+#: core/schemas/users.py:326
 msgid "mustHaveUppercase"
 msgstr "Must contain at least one uppercase letter"
 
-#: core/schemas/users.py:330
+#: core/schemas/users.py:328
 msgid "mustHaveLowerCase"
 msgstr "Must contain at least one lowercase letter"
 
-#: core/schemas/users.py:333
+#: core/schemas/users.py:331
 msgid "mustHaveSpecialCharacter"
 msgstr "Must contain at least one special character"
 
-#: core/schemas/users.py:335
+#: core/schemas/users.py:333
 msgid "mustHaveNumber"
 msgstr "Must contain at least one number"
 
-#: core/schemas/users.py:338
+#: core/schemas/users.py:336
 msgid "mustHaveMinimum10Characters"
 msgstr "Must be at least 10 characters long"
 
-#: core/schemas/users.py:341
+#: core/schemas/users.py:339
 msgid "mustHaveMaximum24Characters"
 msgstr "Must not exceed 24 characters"
 
-#: core/schemas/users.py:350
+#: core/schemas/users.py:348
 msgid "invalidCurrentPassword"
 msgstr "Invalid current password"
 
@@ -507,13 +561,21 @@ msgstr "You must register at least one part of the warranty"
 msgid "warrantyInvalidParts"
 msgstr "Warranty Invalid Parts"
 
-#: core/services/aligners.py:12
-msgid "alignerNotFound"
-msgstr "Aligner not found"
-
-#: core/services/distributors.py:323
+#: core/services/distributors.py:329
 msgid "contactNotFound"
 msgstr "Contact not found"
+
+#: core/services/distributors.py:505
+msgid "alignerCanBePaired"
+msgstr "The aligner can be paired"
+
+#: core/services/distributors.py:524
+msgid "someAlignersAreAlreadyAssociated"
+msgstr "Some aligners are already associated"
+
+#: core/services/distributors.py:530
+msgid "someAlignersDoesNotExist"
+msgstr "Some aligners does not exist"
 
 #: core/services/installations.py:208
 #, python-format

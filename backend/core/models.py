@@ -86,6 +86,7 @@ class Distributor(db.Model):
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    bp: Mapped[str] = mapped_column(String(100), nullable=True, unique=True)
     notes: Mapped[str] = mapped_column(String(), nullable=True)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
@@ -109,6 +110,8 @@ class Distributor(db.Model):
         'DistributorPhone', back_populates='distributor')
     contacts = relationship(
         'Contact', back_populates='distributor')
+    distributors_aligners = relationship(
+        'DistributorAligner', back_populates='distributor')
 
 
 class DistributorBrand(db.Model):
@@ -190,6 +193,52 @@ class DistributorPhone(db.Model):
         'Distributor', back_populates='distributors_phones')
 
 
+class DistributorAligner(db.Model):
+    __tablename__ = 'distributors_aligners'
+    __table_args__ = (
+        Index(
+            'unique_serial_status',  # Index name
+            'serial', 'status',  # Columns which are part of the index
+            unique=True,
+            postgresql_where=Column('status') == 'ACTIVE'),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    distributor_id: Mapped[int] = mapped_column(
+        ForeignKey('distributors.id'), nullable=False)
+    serial: Mapped[str] = mapped_column(
+        String(100), nullable=False, unique=True)
+    specs: Mapped[str] = mapped_column(
+        String(100), nullable=True)
+    software: Mapped[str] = mapped_column(
+        String(100), nullable=True, comment='Software Version')
+    v_created_at: Mapped[datetime] = mapped_column(
+        DateTime(),
+        nullable=True,
+        comment='Created at date from Vehicles plaform/Real created at'
+    )
+    v_created_at: Mapped[datetime] = mapped_column(
+        DateTime(),
+        nullable=True
+    )
+    status: Mapped[str] = mapped_column(String(20),
+                                        nullable=False,
+                                        server_default='ACTIVE')
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(),
+        nullable=False,
+        server_default=func.now(),
+        comment='Created at registered in the SOE DB. Different from v_created_at.')
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now())
+
+    distributor = relationship(
+        'Distributor', back_populates='distributors_aligners')
+
+
 class Contact(db.Model):
     __tablename__ = 'contacts'
     __table_args__ = (
@@ -227,6 +276,15 @@ class Contact(db.Model):
 
 class Client(db.Model):
     __tablename__ = 'clients'
+    __table_args__ = (
+        Index(
+            'uq_active_distributor_client_name',
+            'distributor_id',
+            'name',
+            unique=True,
+            postgresql_where=text("status = 'ACTIVE'")
+        ),
+    )
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     distributor_id: Mapped[int] = mapped_column(

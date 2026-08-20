@@ -167,6 +167,21 @@ def validate_files_size(files_list: list[FileStorage], max_size_mb: int = 50):
     return invalids
 
 
+def is_valid_text_file(header_bytes: bytes) -> bool:
+    """
+    Verifica si los bytes leídos corresponden a un archivo de texto válido.
+    Los archivos de texto normales (UTF-8/ASCII) no contienen bytes nulos.
+    """
+    if b'\x00' in header_bytes:
+        return False
+
+    try:
+        header_bytes.decode('utf-8')
+        return True
+    except UnicodeDecodeError:
+        return False
+
+
 def validate_file_types(allowed_extensions: set[str], allowed_mimetypes: set[str], files_list: list[FileStorage]) -> list:
     '''Validate files types'''
 
@@ -176,14 +191,35 @@ def validate_file_types(allowed_extensions: set[str], allowed_mimetypes: set[str
             invalids.append(gettext("Archivo desconocido/sin nombre"))
             continue
 
-        extension_valida = is_allowed_extension(
+        valid_extension = is_allowed_extension(
             file.filename, allowed_extensions)
-        mimetype_valido = file.mimetype in allowed_mimetypes
+        valid_mime = file.mimetype in allowed_mimetypes
         header_bytes = file.read(2048)
         file.seek(0)
         real_file_type = filetype.guess(header_bytes)
 
-        if real_file_type is None or not extension_valida or not mimetype_valido or real_file_type.mime not in allowed_mimetypes:
-            invalids.append(file.filename)
+        if real_file_type is not None:
+            if not valid_extension or not valid_mime or real_file_type.mime not in allowed_mimetypes:
+                invalids.append(file.filename)
+        else:
+            is_text_mimetype = file.mimetype == 'text/plain'
+            if valid_extension and valid_mime and is_text_mimetype:
+                if not is_valid_text_file(header_bytes):
+                    invalids.append(file.filename)
+            else:
+                invalids.append(file.filename)
 
+    return invalids
+
+
+def validate_empty_files(files_list: list[FileStorage]) -> list:
+    '''Validate empty files'''
+
+    invalids = []
+    for file in files_list:
+        file.seek(0, os.SEEK_END)
+        file_size = file.tell()
+        file.seek(0)
+        if file_size == 0:
+            invalids.append(file.filename)
     return invalids

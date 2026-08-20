@@ -223,6 +223,7 @@
   "distributors": {
     "title": "Distributor | Distributors",
     "name": "Name",
+    "bp": "BP Number",
     "notes": "Notes",
     "emails": {
       "title": "Email | Distributor Emails"
@@ -245,7 +246,36 @@
     },
     "rules": {
       "nameRequired": "The name is required",
+      "bpRequired": "The BP Number is required",
       "brandsRequired": "At least one brand is required"
+    },
+    "aligners": {
+      "title": "Aligner | Aligners",
+      "serial": "Serial",
+      "software": "Software version",
+      "specs": "Specs",
+      "createdAt": "Created at",
+      "message": "Message",
+      "validate": "Validate",
+      "create": {
+        "title": "Link aligner"
+      },
+      "file": {
+        "title": "Link multiple aligners through a file",
+        "label": "Plain text file"
+      },
+      "search": {
+        "title": "Search aligner"
+      },
+      "delete": {
+        "title": "Unlink Aligner",
+        "message": "Are you sure you want to unlink the aligner?"
+      },
+      "rules": {
+        "serialRequired": "The serial is required",
+        "fileRequired": "The plain text file is required",
+        "fileSize0": "The plain text file does not have data"
+      }
     }
   },
   "contacts": {

@@ -2,9 +2,11 @@ from core.app import db
 from sqlalchemy import and_
 from flask_babel import gettext
 from core.schemas.utils import BaseSchema, SortBy
-from marshmallow import validates_schema, ValidationError, validate
-from apiflask.fields import DateTime, Function, String, List, Integer, Nested
-from core.models import Brand, Contact, Distributor, DistributorEmail, DistributorPhone
+from marshmallow import pre_load, validates_schema, ValidationError, validate
+from apiflask.fields import DateTime, Function, String, List, Integer, Nested, File
+from core.models import Brand, Contact, Distributor, DistributorAligner, DistributorEmail, DistributorPhone
+from core.services.distributors import aligner_exist
+from core.utils import validate_empty_files, validate_file_types, validate_files_size
 
 
 class DistributorSearch(BaseSchema):
@@ -12,6 +14,8 @@ class DistributorSearch(BaseSchema):
                             required=False, allow_none=True, data_key='distributorsIds', load_default=None)
     name = String(required=False, allow_none=True,
                   validate=validate.Length(max=50), load_default='')
+    bp = String(required=False, allow_none=True,
+                validate=validate.Length(max=50), load_default='')
     page = Integer(load_default=1)
     per_page = Integer(data_key='perPage', load_default=15)
     sort_by = Nested(SortBy, data_key='sortBy', load_default=None)
@@ -54,9 +58,10 @@ class DistributorPhoneSchema(BaseSchema):
 
 
 class DistributorIn(BaseSchema):
-    id = Integer()
     name = String(required=True, allow_none=False,
                   validate=validate.Length(max=50))
+    bp = String(required=True, allow_none=False,
+                validate=validate.Length(max=50))
     brands_ids = List(Integer, data_key='brandsIds', required=False,
                       allow_none=True, load_default=[])
     emails = List(Nested(DistributorEmailSchema), required=False,
@@ -84,6 +89,24 @@ class DistributorIn(BaseSchema):
         if not data['name']:
             raise ValidationError(
                 {'message':  gettext('distributorNameRequired')})
+
+    @validates_schema
+    def bp_exists(self, data, **kwargs):
+        '''
+        Validate the BP Number exists and have a value
+
+        :param self: Description
+        :param data: Description
+        :param kwargs: Description
+        '''
+
+        if not 'bp' in data:
+            raise ValidationError(
+                {'message':  gettext('distributorBpRequired')})
+
+        if not data['bp']:
+            raise ValidationError(
+                {'message':  gettext('distributorBpRequired')})
 
     @validates_schema
     def brands_exists(self, data, **kwargs):
@@ -162,6 +185,109 @@ class DistributorIn(BaseSchema):
                 {'message':  gettext('distributorPhoneExistsError')})
 
 
+class DistributorInCreate(DistributorIn):
+
+    @validates_schema
+    def name_already_exists(self, data, **kwargs):
+        '''
+        Validate the name exists in other distributor
+
+        :param self: Description
+        :param data: Description
+        :param kwargs: Description
+        '''
+
+        distributor_exists = db.session.query(Distributor)\
+            .filter(Distributor.name == data['name'])\
+            .first()
+        if distributor_exists:
+            raise ValidationError(
+                {'message':  gettext('distributorNameExistsError')})
+
+    @validates_schema
+    def bp_already_exists(self, data, **kwargs):
+        '''
+        Validate the BP Number exists in other distributor
+
+        :param self: Description
+        :param data: Description
+        :param kwargs: Description
+        '''
+
+        distributor_exists = db.session.query(Distributor)\
+            .filter(Distributor.bp == data['bp'])\
+            .first()
+        if distributor_exists:
+            raise ValidationError(
+                {'message':  gettext('distributorBPExistsError')})
+
+
+class DistributorInUpdate(DistributorIn):
+    id = Integer(required=True, allow_none=False)
+
+    @pre_load
+    def set_distributor_object(self, data, **kwargs):
+        '''Get distributor object'''
+
+        distributor = db.session.query(Distributor).filter(
+            Distributor.id == data['id']).first()
+
+        if not distributor:
+            raise ValidationError(
+                {'message': gettext('distributorDoesntExist')}
+            )
+
+        self.distributor_obj = distributor
+        return data
+
+    @validates_schema
+    def name_already_exists(self, data, **kwargs):
+        '''
+        Validate the name exists in other distributor
+
+        :param self: Description
+        :param data: Description
+        :param kwargs: Description
+        '''
+
+        the_distributor: Distributor = self.distributor_obj
+
+        # If the name did not change, keep going - do not need to do a validation
+        if the_distributor.name == data['name']:
+            return data
+
+        distributor_exists = db.session.query(Distributor)\
+            .filter(Distributor.name == data['name'])\
+            .first()
+
+        if distributor_exists:
+            raise ValidationError(
+                {'message':  gettext('distributorNameExistsError')})
+
+    @validates_schema
+    def bp_already_exists(self, data, **kwargs):
+        '''
+        Validate the BP Number exists in other distributor
+
+        :param self: Description
+        :param data: Description
+        :param kwargs: Description
+        '''
+
+        the_distributor: Distributor = self.distributor_obj
+
+        # If the BP Number did not change, keep going - do not need to do a validation
+        if the_distributor.bp == data['bp']:
+            return data
+
+        distributor_exists = db.session.query(Distributor)\
+            .filter(Distributor.bp == data['bp'])\
+            .first()
+        if distributor_exists:
+            raise ValidationError(
+                {'message':  gettext('distributorBPExistsError')})
+
+
 def get_brands_ids(d: Distributor):
     '''Process distributors_brands list object and return only the ids'''
 
@@ -183,6 +309,7 @@ def get_brands(d: Distributor):
 class DistributorOut(BaseSchema):
     id = Integer()
     name = String()
+    bp = String()
     notes = String()
     brands_ids = Function(lambda d: get_brands_ids(d), data_key='brandsIds')
     brands = Function(lambda d: get_brands(d))
@@ -277,3 +404,110 @@ class ContactInCreate(ContactIn):
         if email_exists:
             raise ValidationError(
                 {'message':  gettext('contactEmailExistsError')})
+
+
+class AlignerSearch(BaseSchema):
+    distributor_id = Integer(
+        required=True, allow_none=False, data_key='distributorId')
+    aligners_ids = List(
+        Integer(), required=False,
+        allow_none=True, load_default=None, data_key='alignersIds')
+    serial = String(required=False, allow_none=True,
+                    validate=validate.Length(max=50), load_default='')
+    software = String(required=False, allow_none=True,
+                      validate=validate.Length(max=20), load_default='')
+    page = Integer(load_default=1)
+    per_page = Integer(data_key='perPage', load_default=15)
+    sort_by = Nested(SortBy, data_key='sortBy', load_default=None)
+
+
+class AlignerOut(BaseSchema):
+    id = Integer()
+    serial = String()
+    specs = String()
+    software = String(data_key='software')
+    v_created_at = String(data_key='vCreatedAt')
+
+
+class AlignersOut(BaseSchema):
+    items = List(Nested(AlignerOut))
+    total = Integer()
+
+
+class AlignerInCreate(BaseSchema):
+    distributor_id = Integer(
+        required=True, allow_none=False, data_key='distributorId')
+    serial = String(required=True, allow_none=False)
+
+    @validates_schema
+    def serial_exist(self, data, **kwargs):
+        '''Validate if serial exist'''
+
+        if not aligner_exist(data['serial']):
+            raise ValidationError({'message': gettext('alignerNotFound')})
+
+    @validates_schema
+    def serial_already_exist(self, data, **kwargs):
+        '''Validate if serial already exists in the distributor'''
+
+        if db.session.query(DistributorAligner)\
+            .filter(
+                and_(
+                    DistributorAligner.distributor_id == data['distributor_id'],
+                    DistributorAligner.serial == data['serial']
+                ))\
+                .first():
+            raise ValidationError(
+                {'message': gettext('alignerAlreadyAssociated')})
+
+
+class AlignerFileIn(BaseSchema):
+    file = File(required=True)
+
+    @validates_schema
+    def valid_file(self, data, **kwargs):
+        '''Validate Plain Text File'''
+
+        allowed_mimetypes = {'text/plain'}
+        allowed_extensions = {'txt'}
+
+        the_file = data['file']
+
+        '''Empty files validation'''
+        invalids = validate_empty_files(files_list=[the_file])
+        if invalids:
+            invalids = ", ".join(invalids)
+            raise ValidationError({
+                "message": gettext(u"Invalid empty files: %(invalids)s", invalids=invalids)
+            })
+
+        '''File size validation'''
+        invalids = validate_files_size(files_list=[the_file], max_size_mb=10)
+        if invalids:
+            invalids = ", ".join(invalids)
+            raise ValidationError({
+                "message": gettext(u"10MB max file size exceed for: %(invalids)s", invalids=invalids)
+            })
+
+        '''File type validation'''
+        invalids = validate_file_types(
+            allowed_extensions, allowed_mimetypes, [the_file])
+        if invalids:
+            invalids = ", ".join(invalids)
+            raise ValidationError({
+                "message": gettext(u"Unsupported file formats for: %(invalids)s", invalids=invalids)
+            })
+
+
+class AlignerValidation(BaseSchema):
+    serial = String()
+    message_type = String(data_key='messageType')
+    message = String()
+
+
+class AlignersValidationsOut(BaseSchema):
+    validations = List(Nested(AlignerValidation))
+
+
+class AlignersMultipleIn(BaseSchema):
+    serials = List(Nested(AlignerValidation))

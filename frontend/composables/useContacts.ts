@@ -6,7 +6,7 @@ export const useContacts = () => {
   const items: any = useState('contactsItems', () => new Array(0))
   const total: any = useState('totalContacts', () => 0)
   const distributorId = useState('distributorId', () => null)
-  const dialog = useState('dialog', () => false)
+  const dialog = useState('contactsDialog', () => false)
 
   const getContacts = async ({
     theDistributorId = undefined,

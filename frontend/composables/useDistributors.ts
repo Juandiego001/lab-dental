@@ -9,6 +9,7 @@ export const useDistributors = () => {
   const getDistributors = async ({
     distributorsIds,
     name = '',
+    bp = '',
     page = 1,
     perPage = 15,
     sortBy = undefined,
@@ -18,6 +19,7 @@ export const useDistributors = () => {
         body: {
           distributorsIds,
           name,
+          bp,
           page,
           perPage,
           sortBy: sortBy,

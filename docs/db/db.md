@@ -25,6 +25,7 @@
   - [DISTRIBUTORS BRANDS](#distributors-brands)
   - [DISTRIBUTORS EMAILS](#distributors-emails)
   - [DISTRIBUTORS PHONES](#distributors-phones)
+  - [DISTRIBUTORS ALIGNERS](#distributors-aligners)
   - [CONTACTS](#contacts)
   - [DISTRIBUTORS LISTS](#distributors-lists)
   - [LISTS](#lists)
@@ -75,6 +76,7 @@ erDiagram
     DISTRIBUTORS ||--o{ CONTACTS : has
     DISTRIBUTORS ||--o{ DISTRIBUTORS_EMAILS : has
     DISTRIBUTORS ||--o{ DISTRIBUTORS_PHONES : has
+    DISTRIBUTORS ||--o{ DISTRIBUTORS_ALIGNERS : has
     DISTRIBUTORS ||--o{ CLIENTS : has
     DISTRIBUTORS ||--o{ SITES : has
     CLIENTS ||--o{ SITES : has
@@ -244,6 +246,7 @@ erDiagram
     DISTRIBUTORS {
         int id PK, UK "AUTO_INCREMENT, NN"
         string name UK "NN"
+        string bp UK "N"
         text notes "N"
         string status "NN"
         date created_at "NN"
@@ -293,6 +296,23 @@ erDiagram
         int id PK, UK "AUTO_INCREMENT, NN"
         int distributor_id FK
         string phone UK "NN"
+        string status "NN"
+        date created_at "NN"
+        date updated_at "NN"
+    }
+```
+
+<div class="page" />
+
+### DISTRIBUTORS ALIGNERS
+
+```mermaid
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '12px', 'entityPadding': '5' }}}%%
+erDiagram
+    DISTRIBUTORS_ALIGNERS {
+        int id PK, UK "AUTO_INCREMENT, NN"
+        int distributor_id FK
+        string serial UK "NN"
         string status "NN"
         date created_at "NN"
         date updated_at "NN"

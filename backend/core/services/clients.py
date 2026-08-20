@@ -71,12 +71,23 @@ def get_client_by_id(client_id: int):
         .first()
 
 
+def get_client_by_name_and_distributor(distributor_id: int, name: str) -> Client | None:
+    '''Get client by name and distributor to verify if existing'''
+
+    return db.session.query(Client).filter(and_(Client.distributor_id == distributor_id, Client.name == name, Client.status == 'ACTIVE')).first()
+
+
 def create_client(current_user: User, client_model: Client):
     '''Create a client'''
 
     if not (client_model.distributor_id):
         distributor: Distributor = get_distributor_from_user(current_user)
         client_model.distributor_id = distributor.id
+
+    '''Validates client with existing name'''
+    if get_client_by_name_and_distributor(client_model.distributor_id, client_model.name):
+        pass
+
 
     db.session.add(client_model)
     db.session.commit()

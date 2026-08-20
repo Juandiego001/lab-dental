@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="viewAligner" max-width="900" scrollable>
+  <v-dialog v-model="viewAligner" max-width="900" scrollable persistent>
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row no-gutters align="center">
