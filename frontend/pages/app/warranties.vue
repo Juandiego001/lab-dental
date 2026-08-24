@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="fill-height align-start">
-    <v-card class="d-flex flex-column" width="100%" height="100%" flat>
+    <v-card class="d-flex flex-column" width="100%" height="100%" flat style="overflow: inherit;">
       <v-card-title class="d-flex justify-space-between">
         <p>{{ $t('warranties.title', 2) }}</p>
         <div>
