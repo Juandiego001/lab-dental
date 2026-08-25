@@ -168,10 +168,10 @@
           {{ $t('aligners.activate') }}
         </v-btn>
         <v-btn v-if="showStage" variant="outlined" class="bg-primary" @click="stage" :disabled="loading">
-          {{ `${$t('aligners.stage')} ${semantic}` }}
+          {{ `${$t('aligners.stage')} ${lastVersion}` }}
         </v-btn>
         <v-btn v-if="showUnstage" variant="outlined" class="bg-info" @click="unstage" :disabled="loading">
-          {{ `${$t('aligners.unstage')} ${semantic}` }}
+          {{ `${$t('aligners.unstage')} ${lastVersion}` }}
         </v-btn>
         <v-btn v-if="isConnected" variant="outlined" class="bg-secondary" @click="checkCloud" :disabled="loading">
           {{ $t('aligners.check') }}
@@ -185,12 +185,12 @@
 const { t } = useI18n();
 const { notify } = useSnackbar()
 
-const { alignerData, viewAligner, sendStage, getAligner, sendUnstage, sendCloud, semantic, sendActivate, getLastVersion } = useAligners();
+const { alignerData, viewAligner, sendStage, getAligner, sendUnstage, sendCloud, semantic: lastVersion, sendActivate, getLastVersion } = useAligners();
 
 const loading = ref(false);
 
 const showStage = computed(() => {
-  return alignerData.value?.updateState && alignerData.value?.updateState.state === 'READY_TO_INSTALL' && !alignerData.value?.pendingSoftwareDownload
+  return !alignerData.value?.pendingSoftwareDownload && alignerData.value?.version.semantic < lastVersion.value
 })
 const showUnstage = computed(() => {
   return alignerData.value?.pendingSoftwareDownload
