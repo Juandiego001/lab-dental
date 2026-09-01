@@ -350,10 +350,35 @@ def delete_contact_by_id(contact_id: int):
     db.session.commit()
 
 
+def get_aliners_info_with_connection(serials: list[tuple[str, str]]) -> list[dict]:
+    '''Get aligners info from vehicles with connection'''
+
+    data = []
+    for (id, serial) in serials:
+        response = requests.get(
+            'https://vehicle365.org/read/aligner/v1/',
+            params={
+                'serialNumber': serial,
+                'username': 'andresleon',
+            }
+        )
+        if response.status_code != 200:
+            continue
+
+        info = response.json()
+        if not 'specs' in info:
+            continue
+        data.append({
+            **info,
+            'id': id,
+        })
+    return data
+
+
 def get_aliners_info(serials: list[str] | set[str]) -> list[dict]:
     '''Get aligners info from vehicles'''
 
-    total_pages = math.floor(len(serials)/10) + 1
+    total_pages = math.ceil(len(serials)/10)
     data = []
     for page in range(total_pages):
         since = 10*page
@@ -378,6 +403,8 @@ def refresh_distributor_aligners(distributor_id: int):
 
     data = get_aliners_info(serials=[aligner.serial for aligner in aligners])
     for aligner_data in data:
+        if not 'specs' in aligner_data:
+            continue
         specs = aligner_data['specs']
         for aligner in aligners:
             if aligner.serial == aligner_data['serialNumber']:
@@ -388,7 +415,7 @@ def refresh_distributor_aligners(distributor_id: int):
     db.session.commit()
 
 
-def search_distributor_aligners(distributor_id: int, aligners_ids: list[int], serial: str, software: str, page: int, per_page: int, sort_by: dict = None):
+def search_distributor_aligners(distributor_id: int, aligners_ids: list[int], serial: str, software: str, page: int, per_page: int, sort_by: dict = None, the_filter: str = None,):
     '''Search distributor aligners'''
 
     order_by = DistributorAligner.id.desc()
@@ -471,13 +498,10 @@ def validate_aligners_file(distributor_id: int, file: FileStorage):
         .splitlines()
 
     serials = set([line.strip().upper() for line in file_content])
-    existing_serials = db.session.scalars(db.session.query(DistributorAligner.serial)
-                                          .filter(
-        and_(
-            DistributorAligner.distributor_id == distributor_id,
-            DistributorAligner.serial.in_(serials)
-        )
-    ))
+    existing_serials = db.session.scalars(
+        db.session.query(DistributorAligner.serial)
+        .filter(DistributorAligner.serial.in_(serials)
+                ))
 
     for serial in existing_serials:
         validations.append({
@@ -487,14 +511,22 @@ def validate_aligners_file(distributor_id: int, file: FileStorage):
         })
         serials.remove(serial)
 
-    data = [aligner['serialNumber']
-            for aligner in get_aliners_info(serials=serials)]
-    for serial in serials:
-        if serial not in data:
+    data = get_aliners_info(serials=serials)
+    the_serials = [aligner['serialNumber'] for aligner in data]
+    the_specs = [aligner['specs']
+                 if 'specs' in aligner else None for aligner in data]
+    for i, serial in enumerate(serials):
+        if serial not in the_serials:
             validations.append({
                 'serial': serial,
                 'message_type': 'error',
                 'message': gettext('alignerNotFound')
+            })
+        elif not the_specs[i]:
+            validations.append({
+                'serial': serial,
+                'message_type': 'error',
+                'message': gettext('alignerSpecsNotFound')
             })
         else:
             validations.append({
@@ -547,3 +579,15 @@ def unlink_distributor_aligner(aligner_id: int):
     db.session.execute(delete(DistributorAligner).where(
         DistributorAligner.id == aligner_id))
     db.session.commit()
+
+
+def get_all_aligners(distributor_id: int):
+    '''Get all aligners of a distributor'''
+
+    aligners = db.session.query(DistributorAligner.id, DistributorAligner.serial)\
+        .filter(DistributorAligner.distributor_id == distributor_id)\
+        .all()
+
+    results = get_aliners_info_with_connection(
+        serials=[(aligner.id, aligner.serial) for aligner in aligners])
+    return {'items': results}

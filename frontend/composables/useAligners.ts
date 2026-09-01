@@ -3,8 +3,8 @@ export const useAligners = () => {
   const alignerData = useState('alignerData', () => ({}))
   const viewAligner = useState('viewAligner', () => false)
   const serialNumber = useState('serialNumber', () => '')
-  const semantic = useState('alignerSemantic', () => undefined)
-  const path = useState('alignerPath', () => undefined)
+  const semantic = useState('alignerSemantic', () => '')
+  const path = useState('alignerPath', () => '')
 
   const getAligner = async () => {
     try {
@@ -20,9 +20,12 @@ export const useAligners = () => {
 
   const getLastVersion = async () => {
     try {
-      const data = await $api<any>('/api/aligners/utils/version', {
-        method: 'GET',
-      })
+      const data = await $api<{ semantic: string; path: string }>(
+        '/api/aligners/utils/version',
+        {
+          method: 'GET',
+        },
+      )
       semantic.value = data.semantic
       path.value = data.path
     } catch (err) {
@@ -78,6 +81,17 @@ export const useAligners = () => {
     }
   }
 
+  const getLabelSoftware = async (machineVersion: string) => {
+    if (!semantic.value) await getLastVersion()
+    if (machineVersion == semantic.value) {
+      return 'equal'
+    } else if (machineVersion < semantic.value) {
+      return 'lower'
+    } else {
+      return 'greater'
+    }
+  }
+
   return {
     getAligner,
     alignerData,
@@ -90,5 +104,6 @@ export const useAligners = () => {
     semantic,
     path,
     sendActivate,
+    getLabelSoftware,
   }
 }

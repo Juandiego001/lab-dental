@@ -9,7 +9,7 @@ export const useSnackbar = () => {
     snackbar.value = {
       message,
       visible: true,
-      color: type === 'success' ? 'green-darken-4' : 'red-darken-4',
+      color: type === 'success' ? 'green-darken-4' : type === 'error' ? 'red-darken-4' : 'lime-darken-4',
     }
   }
 

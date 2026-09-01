@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-19 17:41-0500\n"
+"POT-Creation-Date: 2026-08-31 12:07-0500\n"
 "PO-Revision-Date: 2026-03-03 09:13-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -38,52 +38,53 @@ msgstr "Unknown/Untitled File"
 #: core/controllers/distributors.py:100 core/controllers/distributors.py:122
 #: core/controllers/distributors.py:134 core/controllers/distributors.py:148
 #: core/controllers/distributors.py:167 core/controllers/distributors.py:180
-#: core/controllers/distributors.py:202 core/controllers/distributors.py:220
-#: core/controllers/distributors.py:236 core/controllers/distributors.py:254
-#: core/controllers/distributors.py:274 core/controllers/distributors.py:287
-#: core/controllers/equipments.py:45 core/controllers/equipments.py:57
-#: core/controllers/equipments.py:70 core/controllers/equipments.py:87
-#: core/controllers/equipments.py:100 core/controllers/equipments.py:122
-#: core/controllers/equipments.py:139 core/controllers/equipments.py:153
-#: core/controllers/equipments.py:170 core/controllers/equipments.py:188
-#: core/controllers/equipments.py:201 core/controllers/files.py:29
-#: core/controllers/groups.py:29 core/controllers/groups.py:41
-#: core/controllers/groups.py:56 core/controllers/groups.py:70
-#: core/controllers/groups.py:83 core/controllers/installations.py:33
-#: core/controllers/installations.py:45 core/controllers/installations.py:62
-#: core/controllers/installations.py:78 core/controllers/installations.py:91
-#: core/controllers/installations.py:107 core/controllers/installations.py:125
-#: core/controllers/lists.py:29 core/controllers/lists.py:59
-#: core/controllers/lists.py:72 core/controllers/lists.py:86
-#: core/controllers/lists.py:102 core/controllers/lists.py:115
-#: core/controllers/lists.py:130 core/controllers/locations.py:26
-#: core/controllers/locations.py:45 core/controllers/locations.py:64
-#: core/controllers/manuals.py:41 core/controllers/manuals.py:55
-#: core/controllers/manuals.py:69 core/controllers/manuals.py:86
-#: core/controllers/manuals.py:99 core/controllers/manuals.py:118
-#: core/controllers/parts.py:26 core/controllers/parts.py:38
-#: core/controllers/parts.py:52 core/controllers/parts.py:66
-#: core/controllers/parts.py:79 core/controllers/permissions.py:30
-#: core/controllers/permissions.py:43 core/controllers/reasons.py:34
-#: core/controllers/reasons.py:46 core/controllers/reasons.py:60
-#: core/controllers/reasons.py:74 core/controllers/reasons.py:87
-#: core/controllers/sites.py:33 core/controllers/sites.py:45
-#: core/controllers/sites.py:60 core/controllers/sites.py:79
-#: core/controllers/sites.py:92 core/controllers/sites.py:104
-#: core/controllers/users.py:39 core/controllers/users.py:51
-#: core/controllers/users.py:72 core/controllers/users.py:87
-#: core/controllers/users.py:109 core/controllers/users.py:134
-#: core/controllers/users.py:147 core/controllers/users.py:167
-#: core/controllers/users.py:180 core/controllers/users.py:194
-#: core/controllers/users.py:211 core/controllers/users.py:241
-#: core/controllers/users.py:261 core/controllers/users.py:278
-#: core/controllers/users.py:291 core/controllers/warranties.py:37
-#: core/controllers/warranties.py:49 core/controllers/warranties.py:62
-#: core/controllers/warranties.py:75 core/controllers/warranties.py:88
-#: core/controllers/warranties.py:105 core/controllers/warranties.py:124
-#: core/controllers/warranties.py:142 core/controllers/warranties.py:164
-#: core/controllers/warranties.py:181 core/controllers/warranties.py:195
-#: core/controllers/warranties.py:212 core/controllers/warranties.py:225
+#: core/controllers/distributors.py:201 core/controllers/distributors.py:214
+#: core/controllers/distributors.py:231 core/controllers/distributors.py:246
+#: core/controllers/distributors.py:263 core/controllers/distributors.py:283
+#: core/controllers/distributors.py:296 core/controllers/equipments.py:45
+#: core/controllers/equipments.py:57 core/controllers/equipments.py:70
+#: core/controllers/equipments.py:87 core/controllers/equipments.py:100
+#: core/controllers/equipments.py:122 core/controllers/equipments.py:139
+#: core/controllers/equipments.py:153 core/controllers/equipments.py:170
+#: core/controllers/equipments.py:188 core/controllers/equipments.py:201
+#: core/controllers/files.py:29 core/controllers/groups.py:29
+#: core/controllers/groups.py:41 core/controllers/groups.py:56
+#: core/controllers/groups.py:70 core/controllers/groups.py:83
+#: core/controllers/installations.py:33 core/controllers/installations.py:45
+#: core/controllers/installations.py:62 core/controllers/installations.py:78
+#: core/controllers/installations.py:91 core/controllers/installations.py:107
+#: core/controllers/installations.py:125 core/controllers/lists.py:29
+#: core/controllers/lists.py:59 core/controllers/lists.py:72
+#: core/controllers/lists.py:86 core/controllers/lists.py:102
+#: core/controllers/lists.py:115 core/controllers/lists.py:130
+#: core/controllers/locations.py:26 core/controllers/locations.py:45
+#: core/controllers/locations.py:64 core/controllers/manuals.py:41
+#: core/controllers/manuals.py:55 core/controllers/manuals.py:69
+#: core/controllers/manuals.py:86 core/controllers/manuals.py:99
+#: core/controllers/manuals.py:118 core/controllers/parts.py:26
+#: core/controllers/parts.py:38 core/controllers/parts.py:52
+#: core/controllers/parts.py:66 core/controllers/parts.py:79
+#: core/controllers/permissions.py:30 core/controllers/permissions.py:43
+#: core/controllers/reasons.py:34 core/controllers/reasons.py:46
+#: core/controllers/reasons.py:60 core/controllers/reasons.py:74
+#: core/controllers/reasons.py:87 core/controllers/sites.py:33
+#: core/controllers/sites.py:45 core/controllers/sites.py:60
+#: core/controllers/sites.py:79 core/controllers/sites.py:92
+#: core/controllers/sites.py:104 core/controllers/users.py:39
+#: core/controllers/users.py:51 core/controllers/users.py:72
+#: core/controllers/users.py:87 core/controllers/users.py:109
+#: core/controllers/users.py:134 core/controllers/users.py:147
+#: core/controllers/users.py:167 core/controllers/users.py:180
+#: core/controllers/users.py:194 core/controllers/users.py:211
+#: core/controllers/users.py:241 core/controllers/users.py:261
+#: core/controllers/users.py:278 core/controllers/users.py:291
+#: core/controllers/warranties.py:37 core/controllers/warranties.py:49
+#: core/controllers/warranties.py:62 core/controllers/warranties.py:75
+#: core/controllers/warranties.py:88 core/controllers/warranties.py:105
+#: core/controllers/warranties.py:124 core/controllers/warranties.py:142
+#: core/controllers/warranties.py:164 core/controllers/warranties.py:181
+#: core/controllers/warranties.py:195 core/controllers/warranties.py:212
+#: core/controllers/warranties.py:225
 msgid "abortException"
 msgstr "There was an internal error"
 
@@ -163,19 +164,19 @@ msgstr "Contact updated successfully"
 msgid "contactDeleted"
 msgstr "Contact deleted successfully"
 
-#: core/controllers/distributors.py:217
+#: core/controllers/distributors.py:229
 msgid "alignerAssociatedSuccessfully"
 msgstr "The aligner has been successfully paired"
 
-#: core/controllers/distributors.py:233
+#: core/controllers/distributors.py:244
 msgid "distributorAlignersUpdatedSuccessfully"
 msgstr "The aligners has been successfully updated"
 
-#: core/controllers/distributors.py:269
+#: core/controllers/distributors.py:278
 msgid "alignersPairedSuccessfully"
 msgstr "The aligners have been successfully paired"
 
-#: core/controllers/distributors.py:285
+#: core/controllers/distributors.py:294
 msgid "alignerUnlinkedSuccessfully"
 msgstr "The aligner have been unlinked successfully"
 
@@ -434,26 +435,26 @@ msgstr "The distributor does not exist"
 msgid "contactEmailExistsError"
 msgstr "Contact email already exists"
 
-#: core/schemas/distributors.py:447 core/services/aligners.py:12
-#: core/services/distributors.py:499
+#: core/schemas/distributors.py:461 core/services/aligners.py:12
+#: core/services/distributors.py:525
 msgid "alignerNotFound"
 msgstr "Aligner not found"
 
-#: core/schemas/distributors.py:461 core/services/distributors.py:488
+#: core/schemas/distributors.py:475 core/services/distributors.py:513
 msgid "alignerAlreadyAssociated"
 msgstr "The aligner has already been associated"
 
-#: core/schemas/distributors.py:481
+#: core/schemas/distributors.py:495
 #, python-format
 msgid "Invalid empty files: %(invalids)s"
 msgstr "Invalid empty files: %(invalids)s"
 
-#: core/schemas/distributors.py:489
+#: core/schemas/distributors.py:503
 #, python-format
 msgid "10MB max file size exceed for: %(invalids)s"
 msgstr "10MB max file size exceed for: %(invalids)s"
 
-#: core/schemas/distributors.py:498 core/schemas/equipments.py:116
+#: core/schemas/distributors.py:512 core/schemas/equipments.py:116
 #: core/schemas/warranties.py:96 core/schemas/warranties.py:289
 #, python-format
 msgid "Unsupported file formats for: %(invalids)s"
@@ -565,15 +566,19 @@ msgstr "Warranty Invalid Parts"
 msgid "contactNotFound"
 msgstr "Contact not found"
 
-#: core/services/distributors.py:505
+#: core/services/distributors.py:531
+msgid "alignerSpecsNotFound"
+msgstr "Aligner specs not found"
+
+#: core/services/distributors.py:537
 msgid "alignerCanBePaired"
 msgstr "The aligner can be paired"
 
-#: core/services/distributors.py:524
+#: core/services/distributors.py:556
 msgid "someAlignersAreAlreadyAssociated"
 msgstr "Some aligners are already associated"
 
-#: core/services/distributors.py:530
+#: core/services/distributors.py:562
 msgid "someAlignersDoesNotExist"
 msgstr "Some aligners does not exist"
 

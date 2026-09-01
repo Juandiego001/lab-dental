@@ -7,7 +7,7 @@ from core.schemas.clients import ClientsOut
 from core.schemas.utils import Message, Pagination
 from core.schemas.distributors import (
     AlignersOut, ContactInCreate, ContactOut, DistributorInCreate, DistributorInUpdate, DistributorOut, DistributorSearch, DistributorsOut, ContactSearch, ContactsOut,
-    ContactIn, AlignerSearch, AlignerInCreate, AlignerFileIn, AlignersValidationsOut, AlignersMultipleIn
+    ContactIn, AlignerSearch, AlignerInCreate, AlignerFileIn, AlignersValidationsOut, AlignersMultipleIn, AlignersAllOut
 )
 
 
@@ -197,6 +197,18 @@ def search_distributor_aligners(json_data: dict):
             per_page=json_data['per_page'],
             sort_by=json_data['sort_by'])
         return {'items': results, 'total': total}
+    except Exception as ex:
+        abort(500, gettext('abortException'))
+
+
+@bp.get('/aligners/<int:distributor_id>')
+@bp.output(AlignersAllOut)
+@jwt_required()
+def get_all_aligners(distributor_id: int):
+    '''Get all aligners of a distributor with raw vehicles data with connection'''
+
+    try:
+        return distributors.get_all_aligners(distributor_id=distributor_id)
     except Exception as ex:
         abort(500, gettext('abortException'))
 

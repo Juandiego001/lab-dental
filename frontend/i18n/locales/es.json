@@ -256,7 +256,7 @@
       "specs": "Specs",
       "createdAt": "Creado en",
       "message": "Mensaje",
-      "validate": "Validar", 
+      "validate": "Validar",
       "create": {
         "title": "Asociar alineadora"
       },
@@ -812,6 +812,35 @@
     "commandError": "La alineadora se ha tardado en confirmar el cambio. Por favor, actualice para verificar el estado",
     "connectedLabel": "La alineadora está conectada",
     "disconnectedLabel": "La alineadora está desconectada",
+    "dashboard": {
+      "generalSummary": "Resumen general",
+      "lastUpdate": "Última actualización",
+      "noDataAvailable": "No se encontró información",
+      "connection": "Conexión",
+      "connected": "Conectadas",
+      "disconnected": "Desconectadas",
+      "softwareVersion": "Versión de Software",
+      "equal": "Versiones Iguales",
+      "lower": "Versiones Anteriores",
+      "greater": "Versiones Siguientes",
+      "specs": "Especificaciones",
+      "standing": "Vigentes",
+      "expired": "Expiradas",
+      "detailTitle": "Detalle de máquinas",
+      "visualizationFormat": "Formato de visualización",
+      "filter": "Filtrar",
+      "copiarSerial": "Copiar serial",
+      "location": "Ubicación",
+      "createdAt": "Creado en",
+      "expiration": "Expiración",
+      "all": "Todas",
+      "lowerThan": "Version menor a",
+      "greaterThan": "Version mayor a",
+      "equalTo": "Version igual a",
+      "table": "Tabla",
+      "cards": "Tarjetas",
+      "requestPermissionsMessage": "Solicite permisos para ver los detalles de las alineadoras"
+    },
     "rules": {
       "serialNumberRequired": "El número serial es requerido"
     }
@@ -833,5 +862,6 @@
   "search": "Buscar",
   "cancel": "Cancelar",
   "missingRequiredFields": "Campos requeridos faltantes",
-  "logout": "Cerrar sesión"
+  "logout": "Cerrar sesión",
+  "update": "Actualizar"
 }

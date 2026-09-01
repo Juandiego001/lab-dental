@@ -818,6 +818,35 @@
     "commandError": "The aligner has taken some time to confirm the change. Please refresh to check the status",
     "connectedLabel": "The aligner is connected",
     "disconnectedLabel": "The aligner is disconnected",
+    "dashboard": {
+      "generalSummary": "General summary",
+      "lastUpdate": "Last update",
+      "noDataAvailable": "No data available",
+      "connection": "Connection",
+      "connected": "Connected",
+      "disconnected": "Disconnected",
+      "softwareVersion": "Software Version",
+      "equal": "Equal Versions",
+      "lower": "Lower Versions",
+      "greater": "Greater Versions",
+      "specs": "Specs",
+      "standing": "Standing",
+      "expired": "Expired",
+      "detailTitle": "Aligners detail",
+      "visualizationFormat": "Visualization format",
+      "filter": "Filter",
+      "copySerial": "Copy serial",
+      "location": "Location",
+      "createdAt": "Created at",
+      "expiration": "Expiration",
+      "all": "All",
+      "lowerThan": "Version lower than",
+      "greaterThan": "Version greater than",
+      "equalTo": "Version equal to",
+      "table": "Table",
+      "cards": "Cards",
+      "requestPermissionsMessage": "You need to request permissions to see aligners detail"
+    },
     "rules": {
       "serialNumberRequired": "The serial number is required"
     }
@@ -840,5 +869,6 @@
   "search": "Search",
   "cancel": "Cancel",
   "missingRequiredFields": "Missing required fields",
-  "logout": "Logout"
+  "logout": "Logout",
+  "update": "Update"
 }

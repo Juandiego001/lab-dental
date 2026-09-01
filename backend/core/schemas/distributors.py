@@ -3,7 +3,7 @@ from sqlalchemy import and_
 from flask_babel import gettext
 from core.schemas.utils import BaseSchema, SortBy
 from marshmallow import pre_load, validates_schema, ValidationError, validate
-from apiflask.fields import DateTime, Function, String, List, Integer, Nested, File
+from apiflask.fields import Boolean, DateTime, Dict, Function, String, List, Integer, Nested, File
 from core.models import Brand, Contact, Distributor, DistributorAligner, DistributorEmail, DistributorPhone
 from core.services.distributors import aligner_exist
 from core.utils import validate_empty_files, validate_file_types, validate_files_size
@@ -432,6 +432,20 @@ class AlignerOut(BaseSchema):
 class AlignersOut(BaseSchema):
     items = List(Nested(AlignerOut))
     total = Integer()
+
+
+class AlignerAllOut(BaseSchema):
+    id = Integer()
+    version = Dict()
+    serialNumber = String(data_key='serial')
+    specs = Dict()
+    specsExpiration = Dict()
+    connected = Boolean()
+    createdAt = String()
+
+
+class AlignersAllOut(BaseSchema):
+    items = List(Nested(AlignerAllOut))
 
 
 class AlignerInCreate(BaseSchema):
