@@ -42,8 +42,11 @@
           </v-col>
 
           <v-col v-if="isAdmin" cols="12" md="3" sm="12" :class="!$vuetify.display.mdAndUp ? 'py-3' : ''">
-            <v-select v-model="distributorId" :items="distributors" item-title="name" item-value="id"
-              :label="$t('distributors.title')" density="compact" max-width="340" hide-details :disabled="loading" />
+            <v-autocomplete v-model="distributorId" :label="$t('distributors.title')" :items="distributors"
+              item-title="name" item-value="id" hide-details="auto" clearable max-width="340" density="compact"
+              :disabled="loading" @update:search="(name) => {
+                getDistributors({ distributorsIds: [distributorId], name })
+              }" />
           </v-col>
 
           <v-col cols="12" md="6" sm="12" class="d-flex align-center ga-2"

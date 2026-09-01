@@ -465,11 +465,7 @@ class AlignerInCreate(BaseSchema):
         '''Validate if serial already exists in the distributor'''
 
         if db.session.query(DistributorAligner)\
-            .filter(
-                and_(
-                    DistributorAligner.distributor_id == data['distributor_id'],
-                    DistributorAligner.serial == data['serial']
-                ))\
+            .filter(DistributorAligner.serial == data['serial'])\
                 .first():
             raise ValidationError(
                 {'message': gettext('alignerAlreadyAssociated')})
