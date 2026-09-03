@@ -818,6 +818,7 @@
     "commandError": "The aligner has taken some time to confirm the change. Please refresh to check the status",
     "connectedLabel": "The aligner is connected",
     "disconnectedLabel": "The aligner is disconnected",
+    "copiedSerialMessage": "Serial number copied to the clipboard",
     "dashboard": {
       "generalSummary": "General summary",
       "lastUpdate": "Last update",

@@ -109,7 +109,7 @@
                 </template>
                 <template v-slot:item.option="{ item, index, }">
                   <div class="d-flex align-center justify-center ga-2">
-                    <v-btn class="my-1 bg-red" size="x-small" icon="mdi-trash-can" @click="test(index)" />
+                    <v-btn class="my-1 bg-red" size="x-small" icon="mdi-trash-can" @click="removeSerial(index)" />
                   </div>
                 </template>
               </v-data-table>
@@ -429,9 +429,7 @@ const getAligner = async () => {
 }
 
 
-const test = (index) => {
-  console.log({ 'validationPerPage': validationPerPage.value })
-  console.log({ 'validationPage': validationPage.value })
+const removeSerial = (index) => {
   validationItems.value.splice((index + (validationPerPage.value * (validationPage.value - 1))), 1)
 }
 

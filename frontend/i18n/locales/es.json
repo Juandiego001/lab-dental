@@ -812,6 +812,7 @@
     "commandError": "La alineadora se ha tardado en confirmar el cambio. Por favor, actualice para verificar el estado",
     "connectedLabel": "La alineadora está conectada",
     "disconnectedLabel": "La alineadora está desconectada",
+    "copiedSerialMessage": "Serial copiado en el portapapeles",
     "dashboard": {
       "generalSummary": "Resumen general",
       "lastUpdate": "Última actualización",

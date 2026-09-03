@@ -9,12 +9,14 @@
       <!-- Dashboard -->
       <v-tabs-window-item value="dashboard">
         <div class="d-flex align-center ga-4 justify-center flex-wrap">
-          <NuxtLink v-for="route in routes" style="min-width: 180px; max-width: 250px;"
-            class="d-inline-flex align-center justify-space-between w-100 pa-2 text-white rounded-lg text-decoration-none"
-            :style="{ background: route.background, cursor: 'pointer' }" :to="route.path">
-            <span class="text-h6">{{ $t(`${route.subject}.title`, 2) }}</span>
-            <v-icon :icon="route.icon" />
-          </NuxtLink>
+          <client-only>
+            <NuxtLink v-for="route in routes" style="min-width: 180px; max-width: 250px;"
+              class="d-inline-flex align-center justify-space-between w-100 pa-2 text-white rounded-lg text-decoration-none"
+              :style="{ background: route.background, cursor: 'pointer' }" :to="route.path">
+              <span class="text-h6">{{ $t(`${route.subject}.title`, 2) }}</span>
+              <v-icon :icon="route.icon" />
+            </NuxtLink>
+          </client-only>
         </div>
       </v-tabs-window-item>
 
@@ -148,8 +150,8 @@
           <template v-slot:item.option="{ item }">
             <div class="d-flex align-center justify-center ga-2">
               <v-btn v-if="$ability.can('read', 'aligners')" class="my-1 bg-secondary" size="x-small" icon="mdi-eye"
-                @click="async () => { loadingView = true; serialNumber = item.serial; await getAligner(); loadingView = false }"
-                :loading="serialNumber == item.serial && loadingView" />
+                @click="async () => { loadingView = true; serialNumber = item.serialNumber; await getAligner(); loadingView = false }"
+                :loading="serialNumber == item.serialNumber && loadingView" />
               <v-btn v-if="isAdmin" class="my-1 bg-red" size="x-small" icon="mdi-trash-can"
                 @click="alignerId = item.id; deleteDialog = true" />
             </div>
@@ -167,15 +169,15 @@
           </v-col>
           <v-col v-else v-for="aligner in items" cols="12" sm="6" md="4" xl="3" class="pa-4">
             <v-card class="d-flex flex-column h-100 border text-left" elevation="0" hover rounded="xl" max-width="350"
-              @click="getAlignerDetail(aligner)" :loading="serialNumber == aligner.serial && loadingView">
+              @click="getAlignerDetail(aligner)" :loading="serialNumber == aligner.serialNumber && loadingView">
               <v-card-title class="d-flex align-center justify-space-between pb-0 pt-4">
                 <div class="d-flex align-center ga-2">
                   <span class="text-subtitle-1 font-weight-bold text-grey-darken-4">
-                    {{ aligner.serial }}
+                    {{ aligner.serialNumber }}
                   </span>
 
                   <v-btn icon="mdi-content-copy" size="x-small" variant="text" color="grey-darken-1"
-                    :title="$t('aligners.dashboard.copySerial')" />
+                    :title="$t('aligners.dashboard.copySerial')" @click.stop="copyToClipboard(aligner.serialNumber)" />
                 </div>
 
                 <!-- Badge de estado -->
@@ -238,7 +240,7 @@
                     <div class="text-caption text-grey-darken-1 text-uppercase font-weight-bold mb-1">
                       Specs
                     </div>
-                    <v-chip size="small" :class="`bg-${aligner.standing ? 'success' : 'error'}`" class="specs-chips">
+                    <v-chip size="small" :class="`bg-${aligner.standing ? 'primary' : 'error'}`" class="specs-chips">
                       {{ aligner?.specsLabel }}
                     </v-chip>
                   </v-col>
@@ -680,6 +682,10 @@ const getAllAligners = async () => {
     getStats();
 
   } catch (err) {
+    if (err.name === 'AbortError' || err.message === 'The user aborted a request.') {
+      return; // Salimos silenciosamente
+    }
+
     notify(err, 'error');
   } finally {
     loading.value = false;
@@ -721,10 +727,17 @@ const getAlignerDetail = async (aligner) => {
     return;
   }
   loadingView.value = true;
-  serialNumber.value = aligner.serial;
+  serialNumber.value = aligner.serialNumber;
   await getAligner();
   loadingView.value = false;
 }
+
+const copyToClipboard = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text);
+    notify(t('aligners.copiedSerialMessage', 'success'))
+  } catch (err) { }
+};
 </script>
 
 <style>
