@@ -1,3 +1,4 @@
+from flask import stream_with_context
 from flask_babel import gettext
 from werkzeug.exceptions import HTTPException
 from core.services import distributors
@@ -7,7 +8,7 @@ from core.schemas.clients import ClientsOut
 from core.schemas.utils import Message, Pagination
 from core.schemas.distributors import (
     AlignersOut, ContactInCreate, ContactOut, DistributorInCreate, DistributorInUpdate, DistributorOut, DistributorSearch, DistributorsOut, ContactSearch, ContactsOut,
-    ContactIn, AlignerSearch, AlignerInCreate, AlignerFileIn, AlignersValidationsOut, AlignersMultipleIn, AlignersAllOut
+    ContactIn, AlignerSearch, AlignerInCreate, AlignerFileIn, AlignersValidationsOut, AlignersMultipleIn
 )
 
 
@@ -202,13 +203,11 @@ def search_distributor_aligners(json_data: dict):
 
 
 @bp.get('/aligners/<int:distributor_id>')
-@bp.output(AlignersAllOut)
 @jwt_required()
 def get_all_aligners(distributor_id: int):
-    '''Get all aligners of a distributor with raw vehicles data with connection'''
-
+    '''Stream all aligners of a distributor with raw vehicles data'''
     try:
-        return distributors.get_all_aligners(distributor_id=distributor_id)
+        return stream_with_context(distributors.stream_all_aligners(distributor_id))
     except Exception as ex:
         abort(500, gettext('abortException'))
 

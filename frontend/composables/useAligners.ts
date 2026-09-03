@@ -5,6 +5,7 @@ export const useAligners = () => {
   const serialNumber = useState('serialNumber', () => '')
   const semantic = useState('alignerSemantic', () => '')
   const path = useState('alignerPath', () => '')
+  const abortController = useState('alignersAbortController', () => null);
 
   const getAligner = async () => {
     try {
@@ -105,5 +106,6 @@ export const useAligners = () => {
     path,
     sendActivate,
     getLabelSoftware,
+    abortController
   }
 }

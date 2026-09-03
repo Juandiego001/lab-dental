@@ -1,5 +1,6 @@
 import re
 import math
+from flask import json
 import requests
 import unicodedata
 from core.app import db
@@ -387,6 +388,7 @@ def get_aliners_info(serials: list[str] | set[str]) -> list[dict]:
             f'https://vehicle365.org/read/aligners/v1/?page=1&filterSerialNumber={filter_serials}'
         )
         if response.status_code != 200:
+
             continue
 
         data += response.json()['docs']
@@ -513,16 +515,17 @@ def validate_aligners_file(distributor_id: int, file: FileStorage):
 
     data = get_aliners_info(serials=serials)
     the_serials = [aligner['serialNumber'] for aligner in data]
-    the_specs = [aligner['specs']
-                 if 'specs' in aligner else None for aligner in data]
-    for i, serial in enumerate(serials):
+    the_specs = {aligner["serialNumber"]: aligner.get(
+        "specs", None) for aligner in data}
+
+    for serial in serials:
         if serial not in the_serials:
             validations.append({
                 'serial': serial,
                 'message_type': 'error',
                 'message': gettext('alignerNotFound')
             })
-        elif not the_specs[i]:
+        elif not the_specs[serial]:
             validations.append({
                 'serial': serial,
                 'message_type': 'error',
@@ -591,3 +594,32 @@ def get_all_aligners(distributor_id: int):
     results = get_aliners_info_with_connection(
         serials=[(aligner.id, aligner.serial) for aligner in aligners])
     return {'items': results}
+
+
+def stream_all_aligners(distributor_id: int):
+    '''Yield aligners of a distributor one by one as Server-Sent Events'''
+
+    aligners = db.session.query(DistributorAligner.id, DistributorAligner.serial)\
+        .filter(DistributorAligner.distributor_id == distributor_id)\
+        .all()
+
+    for (id, serial) in aligners:
+        response = requests.get(
+            'https://vehicle365.org/read/aligner/v1/',
+            params={
+                'serialNumber': serial,
+                'username': 'andresleon',
+            }
+        )
+
+        if response.status_code == 200:
+            info = response.json()
+            if not 'specs' in info:
+                info['specs'] = None
+
+            data_item = {
+                **info,
+                'id': id,
+            }
+            # Formato SSE estándar: "data: {json}\n\n"
+            yield f"data: {json.dumps(data_item)}\n\n"

@@ -96,7 +96,7 @@
             </v-col>
             <v-col cols="12">
               <v-data-table :items="validationItems" :headers="validationHeaders" :loading="validationLoading"
-                density="compact">
+                density="compact" v-model:page="validationPage" v-model:items-per-page="validationPerPage">
                 <template v-slot:item.serial="{ item }">
                   <v-chip class="text-caption my-2">
                     {{ item.serial }}
@@ -107,10 +107,9 @@
                     {{ item.message }}
                   </v-chip>
                 </template>
-                <template v-slot:item.option="{ item, index }">
+                <template v-slot:item.option="{ item, index, }">
                   <div class="d-flex align-center justify-center ga-2">
-                    <v-btn class="my-1 bg-red" size="x-small" icon="mdi-trash-can"
-                      @click="validationItems.splice(index, 1)" />
+                    <v-btn class="my-1 bg-red" size="x-small" icon="mdi-trash-can" @click="test(index)" />
                   </div>
                 </template>
               </v-data-table>
@@ -220,6 +219,9 @@ const validationLoading = ref(false);
 const page = ref(1)
 const perPage = ref(15)
 const sortBy = ref(null)
+
+const validationPage = ref(1);
+const validationPerPage = ref(10);
 
 const deleteDialog = ref(false)
 
@@ -426,6 +428,12 @@ const getAligner = async () => {
   }
 }
 
+
+const test = (index) => {
+  console.log({ 'validationPerPage': validationPerPage.value })
+  console.log({ 'validationPage': validationPage.value })
+  validationItems.value.splice((index + (validationPerPage.value * (validationPage.value - 1))), 1)
+}
 
 const serialRequired = (v) => !!v || t('distributors.aligners.rules.serialRequired');
 const fileRequired = [

@@ -129,9 +129,9 @@
               {{ $dateFormat(new Date(item.createdAt)) }}
             </v-chip>
           </template>
-          <template v-slot:item.serial="{ item }">
+          <template v-slot:item.serialNumber="{ item }">
             <v-chip class="text-caption" :class="`bg-${item.connected ? 'primary' : 'error'}`">
-              {{ item.serial }}
+              {{ item.serialNumber }}
             </v-chip>
           </template>
           <template v-slot:item.software="{ item }">
@@ -288,7 +288,7 @@
 
 <script setup>
 const { $ability } = useNuxtApp();
-const { getLastVersion, semantic, getLabelSoftware, serialNumber, getAligner } = useAligners();
+const { getLastVersion, semantic, getLabelSoftware, serialNumber, getAligner, abortController } = useAligners();
 const { items: distributors, getDistributors } = useDistributors();
 const { isAdmin, profile } = useProfile();
 const { t } = useI18n();
@@ -454,7 +454,7 @@ onBeforeMount(async () => {
 
 const headers = computed(() => {
   const defaultHeaders = [
-    { title: t('distributors.aligners.serial'), key: 'serial', sortable: false },
+    { title: t('distributors.aligners.serial'), key: 'serialNumber', sortable: false },
     { title: t('distributors.aligners.software'), align: 'center', key: 'software' },
     { title: t('distributors.aligners.specs'), align: 'center', key: 'specs', sortable: false },
     { title: t('distributors.aligners.createdAt'), align: 'center', key: 'createdAt' }
@@ -618,31 +618,67 @@ const getSoftwareStats = async () => {
 const getAllAligners = async () => {
   try {
     loading.value = true;
-    let theAligners = [];
-    const data = await $api(`/api/distributors/aligners/${distributorId.value}`, {
-      method: 'GET'
-    })
+    allAligners.value = [];
+    items.value = [];
+    abortController.value = new AbortController();
 
-    for (let aligner of data.items) {
-      theAligners.push({
-        ...aligner,
-        specsLabel: `${aligner.specs.name} ${aligner.specs.month}/${aligner.specs.year}`,
-        software: aligner.version.semantic,
-        softwareLabel: await getLabelSoftware(aligner.version.semantic),
-        standing:
-          new Date(aligner.specs.year, aligner.specs.month) <
-          new Date(
-            aligner.specsExpiration.year,
-            aligner.specsExpiration.month,
-          ),
-      });
+    const response = await $api(`/api/distributors/aligners/${distributorId.value}`, {
+      method: 'GET',
+      responseType: 'stream',
+      signal: abortController.value.signal
+    });
+
+    // Obtenemos el lector del stream
+    const reader = response.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const events = buffer.split('\n\n');
+      buffer = events.pop();
+
+      for (const event of events) {
+        if (event.trim().startsWith('data:')) {
+          const dataStr = event.replace(/^data:/, '').trim();
+
+          if (dataStr) {
+            const aligner = JSON.parse(dataStr);
+            let standing = false;
+            let specsLabel = null;
+            if (aligner.specs) {
+              specsLabel = `${aligner?.specs?.name} ${aligner?.specs?.month}/${aligner?.specs?.year}`
+              standing = new Date(aligner?.specs?.year, aligner?.specs?.month) <
+                new Date(
+                  aligner?.specsExpiration?.year,
+                  aligner?.specsExpiration?.month
+                )
+            }
+
+            // Formateamos los datos justo cuando llegan
+            const formattedAligner = {
+              ...aligner,
+              specsLabel,
+              software: aligner.version.semantic,
+              softwareLabel: await getLabelSoftware(aligner.version.semantic),
+              standing
+            };
+
+            // Agregamos al array reactivo, la UI se actualizará uno por uno
+            allAligners.value.push(formattedAligner);
+            items.value.push(formattedAligner); // O igualarlo a allAligners.value si no hay filtros activos
+          }
+        }
+      }
     }
 
+    // Estas acciones suceden cuando el stream ha terminado completamente
     updatedAt.value = new Date().toTimeString().split(' ')[0];
-    allAligners.value = theAligners;
-    items.value = theAligners;
     resetStats();
     getStats();
+
   } catch (err) {
     notify(err, 'error');
   } finally {

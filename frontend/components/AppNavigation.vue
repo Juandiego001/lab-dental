@@ -13,7 +13,7 @@
     <v-list-item link to="/app" title="Home" append-icon="mdi-home" />
 
     <template v-for="route in routes">
-      <v-list-item v-if="!['forums', 'strapi'].includes(route.subject)" link :to="route.path"
+      <v-list-item v-if="!['forums', 'strapi'].includes(route.subject)" link @click="goTo(route.path)"
         :title="$t(`${route.subject}.title`, 2)" :append-icon="route.icon" />
       <v-list-item v-if="['forums', 'strapi'].includes(route.subject)" link :href="route.path"
         :title="$t(`${route.subject}.title`, 2)" :append-icon="route.icon" />
@@ -52,7 +52,7 @@
 
       <v-list density="compact" nav>
         <v-list-item density="compact" variant="flat" append-icon="mdi-account" :title="$t('profile.title')"
-          :to="'/app/profile'" />
+          @click="goTo('/app/profile')" />
         <v-list-item :title="$t('logout')" append-icon="mdi-logout" class="text-error" @click="logout" />
       </v-list>
     </v-menu>
@@ -68,6 +68,7 @@ const { $ability } = useNuxtApp();
 const routes = ref([])
 const drawer = ref(true);
 const { profile } = useProfile();
+const { abortController } = useAligners();
 
 const menu = ref([
   {
@@ -183,11 +184,22 @@ onMounted(() => {
 
 const logout = async () => {
   try {
+
+    if (abortController.value) {
+      abortController.value.abort();
+    }
     const { message } = await $api('/api/users/logout', { method: 'GET' });
     await navigateTo('/');
     notify(message, 'success');
   } catch (err) {
     notify(err, 'error');
   }
+}
+
+const goTo = async (path) => {
+  if (path !== '/app' && abortController.value) {
+    abortController.value.abort();
+  }
+  await navigateTo(path);
 }
 </script>
