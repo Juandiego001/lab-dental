@@ -11,8 +11,18 @@
       <v-card-text>
         <v-row class="ma-0 mb-2">
           <v-spacer />
-          <v-btn v-if="isAdmin" class="me-2" icon="mdi-plus" size="x-small" @click="createDialog = !createDialog" />
-          <v-btn icon="mdi-magnify" size="x-small" @click="searchDialog = !searchDialog" />
+          <v-tooltip :text="$t('reasons.tooltip.add')" :disabled="loading" location="bottom">
+            <template v-slot:activator="{ props }">
+              <v-btn v-bind="props" v-if="isAdmin" class="me-2" icon="mdi-plus" size="x-small"
+                @click="createDialog = !createDialog" />
+            </template>
+          </v-tooltip>
+
+          <v-tooltip :text="$t('reasons.tooltip.search')" :disabled="loading" location="bottom">
+            <template v-slot:activator="{ props }">
+              <v-btn v-bind="props" icon="mdi-magnify" size="x-small" @click="searchDialog = !searchDialog" />
+            </template>
+          </v-tooltip>
         </v-row>
         <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
@@ -40,9 +50,19 @@
           <template v-slot:item.option="{ item }">
             <div class="d-flex align-center justify-center ga-2 my-2">
               <template v-if="isAdmin">
-                <v-btn class="bg-primary" size="x-small" icon="mdi-pencil" @click="getReason(item.id)" />
-                <v-btn class="bg-red" size="x-small" icon="mdi-trash-can"
-                  @click="form.id = item.id; deleteDialog = true" />
+                <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" class="bg-primary" size="x-small" icon="mdi-pencil"
+                      @click="getReason(item.id)" />
+                  </template>
+                </v-tooltip>
+
+                <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" class="bg-red" size="x-small" icon="mdi-trash-can"
+                      @click="form.id = item.id; deleteDialog = true" />
+                  </template>
+                </v-tooltip>
               </template>
             </div>
           </template>
@@ -65,12 +85,12 @@
         <v-form ref="createForm" v-model="createModel" @submit.prevent="createReason">
           <v-row dense>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('reasons.name')"
-                :rules="[nameRequired]" autocomplete="off" />
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('reasons.name')" :rules="[nameRequired]"
+                autocomplete="off" />
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('reasons.slug')"
-                :rules="[slugRequired]" autocomplete="off" />
+              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('reasons.slug')" :rules="[slugRequired]"
+                autocomplete="off" />
             </v-col>
             <v-col cols="12">
               <v-textarea v-model="form.description" hide-details="auto" :label="$t('reasons.description')" />
@@ -100,12 +120,12 @@
         <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateReason">
           <v-row dense>
             <v-col cols="12">
-              <v-text-field v-model="form.name" hide-details="auto" :label="$t('reasons.name')"
-                :rules="[nameRequired]" autocomplete="off" />
+              <v-text-field v-model="form.name" hide-details="auto" :label="$t('reasons.name')" :rules="[nameRequired]"
+                autocomplete="off" />
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('reasons.slug')"
-                :rules="[slugRequired]" autocomplete="off" />
+              <v-text-field v-model="form.slug" hide-details="auto" :label="$t('reasons.slug')" :rules="[slugRequired]"
+                autocomplete="off" />
             </v-col>
             <v-col cols="12">
               <v-textarea v-model="form.description" hide-details="auto" :label="$t('reasons.description')" />

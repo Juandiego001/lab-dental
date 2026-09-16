@@ -406,34 +406,6 @@ class ContactInCreate(ContactIn):
                 {'message':  gettext('contactEmailExistsError')})
 
 
-class AlignerSearch(BaseSchema):
-    distributor_id = Integer(
-        required=True, allow_none=False, data_key='distributorId')
-    aligners_ids = List(
-        Integer(), required=False,
-        allow_none=True, load_default=None, data_key='alignersIds')
-    serial = String(required=False, allow_none=True,
-                    validate=validate.Length(max=50), load_default='')
-    software = String(required=False, allow_none=True,
-                      validate=validate.Length(max=20), load_default='')
-    page = Integer(load_default=1)
-    per_page = Integer(data_key='perPage', load_default=15)
-    sort_by = Nested(SortBy, data_key='sortBy', load_default=None)
-
-
-class AlignerOut(BaseSchema):
-    id = Integer()
-    serial = String()
-    specs = String()
-    software = String(data_key='software')
-    v_created_at = String(data_key='vCreatedAt')
-
-
-class AlignersOut(BaseSchema):
-    items = List(Nested(AlignerOut))
-    total = Integer()
-
-
 class AlignerAllOut(BaseSchema):
     id = Integer()
     version = Dict()
@@ -521,3 +493,7 @@ class AlignersValidationsOut(BaseSchema):
 
 class AlignersMultipleIn(BaseSchema):
     serials = List(Nested(AlignerValidation))
+
+
+class AlignerAliasIn(BaseSchema):
+    alias = String(required=True, allow_none=False, validate=validate.Length(max=30))

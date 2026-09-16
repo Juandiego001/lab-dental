@@ -11,8 +11,18 @@
       <v-card-text>
         <v-row class="ma-0 mb-2">
           <v-spacer />
-          <v-btn v-if="isAdmin" class="me-2" icon="mdi-plus" size="x-small" @click="createDialog = !createDialog" />
-          <v-btn icon="mdi-magnify" size="x-small" @click="searchDialog = !searchDialog" />
+          <v-tooltip :text="$t('warranties.tooltip.addFile')" :disabled="loading" location="bottom">
+            <template v-slot:activator="{ props }">
+              <v-btn v-bind="props" v-if="isAdmin" class="me-2" icon="mdi-plus" size="x-small"
+                @click="createDialog = !createDialog" />
+            </template>
+          </v-tooltip>
+
+          <v-tooltip :text="$t('warranties.tooltip.searchFile')" :disabled="loading" location="bottom">
+            <template v-slot:activator="{ props }">
+              <v-btn v-bind="props" icon="mdi-magnify" size="x-small" @click="searchDialog = !searchDialog" />
+            </template>
+          </v-tooltip>
         </v-row>
         <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
@@ -40,17 +50,41 @@
 
           <template v-slot:item.option="{ item }">
             <div class="d-flex align-center justify-center ga-2">
-              <v-btn class="my-1 bg-secondary" size="x-small" icon="mdi-open-in-new"
-                :href="`/api/files?path=${item.path}`" target="_blank" />
+              <v-tooltip :text="$t('tooltip.create')" :disabled="loading" location="bottom">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" class="my-1 bg-secondary" size="x-small" icon="mdi-open-in-new"
+                    :href="`/api/files?path=${item.path}`" target="_blank" />
+                </template>
+              </v-tooltip>
               <template v-if="isAdmin">
-                <v-btn class="my-1 bg-primary" size="x-small" icon="mdi-pencil" @click="getWarrantyFile(item.id)" />
-                <v-btn class="my-1 bg-red" size="x-small" icon="mdi-trash-can"
-                  @click="form.id = item.id; deleteDialog = true" />
+                <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" class="my-1 bg-primary" size="x-small" icon="mdi-pencil"
+                      @click="getWarrantyFile(item.id)" />
+                  </template>
+                </v-tooltip>
+
+                <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" class="my-1 bg-red" size="x-small" icon="mdi-trash-can"
+                      @click="form.id = item.id; deleteDialog = true" />
+                  </template>
+                </v-tooltip>
+
                 <div class="d-flex ga-1 my-1 flex-column">
-                  <v-btn v-if="item.sortOrder > 1" class="bg-secondary" size="x-small" icon="mdi-arrow-up-bold"
-                    @click="updateWarrantyFileOrder(item.id, item.sortOrder - 1)" />
-                  <v-btn v-if="item.sortOrder < total" class="bg-secondary" size="x-small" icon="mdi-arrow-down-bold"
-                    @click="updateWarrantyFileOrder(item.id, item.sortOrder + 1)" />
+                  <v-tooltip :text="$t('tooltip.increaseOrder')" :disabled="loading" location="bottom">
+                    <template v-slot:activator="{ props }">
+                      <v-btn v-bind="props" v-if="item.sortOrder > 1" class="bg-secondary" size="x-small"
+                        icon="mdi-arrow-up-bold" @click="updateWarrantyFileOrder(item.id, item.sortOrder - 1)" />
+                    </template>
+                  </v-tooltip>
+
+                  <v-tooltip :text="$t('tooltip.decreaseOrder')" :disabled="loading" location="bottom">
+                    <template v-slot:activator="{ props }">
+                      <v-btn v-bind="props" v-if="item.sortOrder < total" class="bg-secondary" size="x-small"
+                        icon="mdi-arrow-down-bold" @click="updateWarrantyFileOrder(item.id, item.sortOrder + 1)" />
+                    </template>
+                  </v-tooltip>
                 </div>
               </template>
             </div>

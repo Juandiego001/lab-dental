@@ -218,19 +218,19 @@ class UserInUpdate(UserIn):
     def check_email_or_username_exists(self, data, **kwargs):
         '''Check if there is already a user with the username or the email given'''
 
-        current_user: User = db.session.query(
+        the_current_user: User = db.session.query(
             User).filter(User.id == data['id']).first()
 
         user_exists = None
-        if current_user.email != data['email'] and current_user.email != data['username']:
+        if the_current_user.email != data['email'] and the_current_user.username != data['username']:
             user_exists = db.session.query(User)\
                 .filter(and_(or_(User.email == data['email'], User.username == data['username']), User.status == 'ACTIVE'))\
                 .first()
-        elif current_user.email != data['email']:
+        elif the_current_user.email != data['email']:
             user_exists = db.session.query(User)\
                 .filter(and_(User.email == data['email'], User.status == 'ACTIVE'))\
                 .first()
-        elif current_user.username != data['username']:
+        elif the_current_user.username != data['username']:
             user_exists = db.session.query(User)\
                 .filter(and_(User.username == data['username'], User.status == 'ACTIVE'))\
                 .first()

@@ -14,7 +14,7 @@
 
           <v-col cols="12 pb-0">
             <v-text-field class="text-white" v-model="password" :label="$t('login.password')" hide-details="auto"
-              variant="outlined" :type="isVisible ? 'text' : 'password'" autocomplete="off" >
+              variant="outlined" :type="isVisible ? 'text' : 'password'" autocomplete>
               <template #append-inner>
                 <v-btn :icon="isVisible ? 'mdi-eye-off' : 'mdi-eye'" variant="text" size="small"
                   @click="isVisible = !isVisible" />
@@ -28,7 +28,7 @@
           </v-col>
 
           <v-col cols="12">
-            <v-btn class="text-white" block variant="outlined" type="submit">{{ $t('login.title') }}</v-btn>
+            <v-btn class="text-white" block variant="outlined" type="submit" :loading="loading">{{ $t('login.title') }}</v-btn>
           </v-col>
         </v-row>
       </v-form>
@@ -47,6 +47,7 @@ useHead({
   title: `SOE Latam | ${t('login.title')}`
 })
 
+const loading = ref(false);
 const { notify } = useSnackbar();
 const { $ability } = useNuxtApp();
 const email = ref('')
@@ -55,6 +56,7 @@ const isVisible = ref(false)
 
 const logIn = async () => {
   try {
+    loading.value = true;
     const response = await $api('/api/users/login', {
       method: 'POST',
       body: {
@@ -68,6 +70,8 @@ const logIn = async () => {
     await navigateTo('/app');
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 </script>

@@ -18,6 +18,16 @@
             </NuxtLink>
           </client-only>
         </div>
+
+        <!-- <v-card class="me-8" href="http://localhost:1337" width="200" height="200">
+          <v-img src="/public/bg_about.png" />
+          <v-card-title>Strapi</v-card-title>
+        </v-card>
+
+        <v-card class="me-8" href="http://192.168.0.104:4200" width="200" height="200">
+          <v-img src="/public/bg_about.png" />
+          <v-card-title>Forum</v-card-title>
+        </v-card> -->
       </v-tabs-window-item>
 
       <!-- Alineadoras -->
@@ -26,8 +36,11 @@
         style="max-width: 1300px; margin: 0 auto; width: 100%;">
         <!-- Resumen general -->
         <v-row no-gutters class="flex-shrink-1 flex-grow-0">
-          <v-col cols="12" class="mb-2">
+          <v-col cols="12">
             <h3>{{ $t('aligners.dashboard.generalSummary') }}</h3>
+          </v-col>
+
+          <v-col cols="6" class="d-flex align-center">
             <p class="text-caption">{{ $t('aligners.dashboard.lastUpdate') }}:
               <client-only>
                 <span class="font-weight-bold">
@@ -37,13 +50,25 @@
             </p>
           </v-col>
 
+          <v-col cols="12" md="6" sm="6" xs="12" class="d-flex align-center ga-2 mb-2"
+            :class="!$vuetify.display.smAndUp ? 'justify-start' : 'justify-end'">
+            <v-btn class="bg-primary" prepend-icon="mdi-reload" :loading="loading" @click="getAllAligners"
+              size="small">{{ $t('update') }}</v-btn>
+          </v-col>
+
           <v-col cols="12" :md="isAdmin ? 3 : 6" sm="12" :class="$vuetify.display.mdAndUp ? 'pe-2' : ''">
             <v-text-field id="serial-input" type="text" v-model="semantic" @input="(e) => semantic = e.target.value"
               maxlength="19" :label="$t('aligners.softwareVersion')" hide-details density="compact" max-width="340"
               @update:model-value="handleInput" @blur="handleBlur" :disabled="loading" />
           </v-col>
 
-          <v-col v-if="isAdmin" cols="12" md="3" sm="12" :class="!$vuetify.display.mdAndUp ? 'py-3' : ''">
+          <v-col cols="12" :md="isAdmin ? 3 : 6" sm="12" :class="$vuetify.display.mdAndUp ? 'pe-2' : 'py-2'">
+            <v-text-field id="specs-input" type="text" v-model="specsInput" @input="(e) => specsInput = e.target.value"
+              maxlength="19" :label="$t('aligners.specsVersion')" hide-details density="compact" max-width="340"
+              @update:model-value="handleSpecsInput" @blur="handleSpecsBlur" :disabled="loading" />
+          </v-col>
+
+          <v-col v-if="isAdmin" cols="12" md="3" sm="12">
             <v-autocomplete v-model="distributorId" :label="$t('distributors.title')" :items="distributors"
               item-title="name" item-value="id" hide-details="auto" clearable max-width="340" density="compact"
               :disabled="loading" @update:search="(name) => {
@@ -51,11 +76,6 @@
               }" />
           </v-col>
 
-          <v-col cols="12" md="6" sm="12" class="d-flex align-center ga-2"
-            :class="!$vuetify.display.mdAndUp ? 'justify-start' : 'justify-end'">
-            <v-btn class="bg-primary" prepend-icon="mdi-reload" :loading="loading" @click="getAllAligners"
-              size="small">{{ $t('update') }}</v-btn>
-          </v-col>
         </v-row>
 
         <!-- Gráficos -->
@@ -126,20 +146,32 @@
         <!-- Table -->
         <v-data-table v-if="visualization === 'table'" :items="items" :headers="headers" :loading="loading"
           density="compact" class="flex-shrink-1 flex-grow-0">
-          <template v-slot:item.createdAt="{ item }">
-            <v-chip class="text-caption my-2">
-              {{ $dateFormat(new Date(item.createdAt)) }}
-            </v-chip>
-          </template>
           <template v-slot:item.serialNumber="{ item }">
             <v-chip class="text-caption" :class="`bg-${item.connected ? 'primary' : 'error'}`">
               {{ item.serialNumber }}
             </v-chip>
           </template>
+
+          <template v-slot:item.alias="{ item }">
+            <div v-if="item.alias" class="d-flex align-center justify-center">
+              <span class="w-100 d-inline-block bg-grey-darken-1 py-1 px-2 rounded-pill text-caption text-center"
+                style="max-width: 150px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; background-color: rgb(228, 228, 228) !important; color: black !important;"
+                :title="item.alias">
+                {{ item.alias }}
+              </span>
+            </div>
+            <span v-else>-</span>
+          </template>
+
           <template v-slot:item.software="{ item }">
             <v-chip class="text-caption"
               :class="`bg-${item.softwareLabel === 'equal' ? 'primary' : item.softwareLabel === 'lower' ? 'error' : 'success'}`">
               {{ item.software }}
+            </v-chip>
+          </template>
+          <template v-slot:item.createdAt="{ item }">
+            <v-chip class="text-caption my-2">
+              {{ $dateFormat(new Date(item.createdAt)) }}
             </v-chip>
           </template>
           <template v-slot:item.specs="{ item }">
@@ -149,11 +181,29 @@
           </template>
           <template v-slot:item.option="{ item }">
             <div class="d-flex align-center justify-center ga-2">
-              <v-btn v-if="$ability.can('read', 'aligners')" class="my-1 bg-secondary" size="x-small" icon="mdi-eye"
-                @click="async () => { loadingView = true; serialNumber = item.serialNumber; await getAligner(); loadingView = false }"
-                :loading="serialNumber == item.serialNumber && loadingView" />
-              <v-btn v-if="isAdmin" class="my-1 bg-red" size="x-small" icon="mdi-trash-can"
-                @click="alignerId = item.id; deleteDialog = true" />
+              <v-tooltip :text="$t('aligners.tooltip.setAlias')" :disabled="loading" location="bottom">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" v-if="$ability.can('read', 'aligners')" class="my-1 bg-secondary" size="x-small"
+                    icon="mdi-pencil" @click="alignerId = item.id; aliasDialog = true" :disabled="loading" />
+                </template>
+              </v-tooltip>
+
+              <v-tooltip :text="$t('aligners.tooltip.viewAligner')"
+                :disabled="loading || (serialNumber == item.serialNumber && loadingView)" location="bottom">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" v-if="$ability.can('read', 'aligners')" class="my-1 bg-secondary" size="x-small"
+                    icon="mdi-eye"
+                    @click="async () => { loadingView = true; serialNumber = item.serialNumber; await getAligner(); loadingView = false }"
+                    :loading="serialNumber == item.serialNumber && loadingView" :disabled="loading" />
+                </template>
+              </v-tooltip>
+
+              <v-tooltip :text="$t('aligners.tooltip.unlink')" location="bottom" :disabled="loading">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" v-if="isAdmin" class="my-1 bg-red" size="x-small" icon="mdi-trash-can"
+                    @click="alignerId = item.id; deleteDialog = true" :disabled="loading" />
+                </template>
+              </v-tooltip>
             </div>
           </template>
         </v-data-table>
@@ -253,7 +303,6 @@
       </v-tabs-window-item>
     </v-tabs-window>
 
-
     <v-dialog v-model="deleteDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
       <v-card tile>
         <v-card-title class="bg-primary">
@@ -274,18 +323,37 @@
       </v-card>
     </v-dialog>
 
-    <!-- <v-card class="me-8" href="http://localhost:1337" width="200" height="200">
-        <v-img src="/public/bg_about.png" />
-        <v-card-title>Strapi</v-card-title>
+    <!-- Set Alias for Aligner Dialog -->
+    <v-dialog v-model="aliasDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
+      <v-card tile>
+        <v-card-title class="bg-primary">
+          <v-row class="text-body-1" no-gutters align="center">
+            {{ $t('aligners.alias.title') }}
+            <v-spacer />
+            <v-btn class="bg-primary" size="x-small" icon="mdi-close" @click="aliasDialog = false" />
+          </v-row>
+        </v-card-title>
+        <v-card-text class="text-center">
+          <v-row no-gutters>
+            <v-col cols="12" class="mb-4">
+              <v-text-field v-model="alias" :label="$t('aligners.alias.label')" hide-details="auto" counter="30"
+                maxlength="30" />
+            </v-col>
+            <v-col cols="12" class="d-flex justify-end align-center ga-2">
+              <v-btn @click="aliasDialog = false" size="small" variant="outlined" :disabled="loading">
+                {{ $t('cancel') }}
+              </v-btn>
+              <v-btn @click="setAlignerAlias" class="bg-primary" size="small" :loading="loading">
+                {{ $t('confirm') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-text>
       </v-card>
+    </v-dialog>
 
-      <v-card class="me-8" href="http://192.168.0.104:4200" width="200" height="200">
-        <v-img src="/public/bg_about.png" />
-        <v-card-title>Forum</v-card-title>
-      </v-card> -->
+    <AlignersModal />
   </v-container>
-
-  <AlignersModal />
 </template>
 
 <script setup>
@@ -306,6 +374,8 @@ useHead({
 })
 
 
+const alias = ref('');
+const specsInput = ref('2026.R2');
 const connection = ref({
   yes: 0,
   no: 0,
@@ -319,6 +389,7 @@ const standing = ref({
   yes: 0,
   no: 0,
 })
+const aliasDialog = ref(false);
 const deleteDialog = ref(false);
 const loadingView = ref(false);
 const loading = ref(false);
@@ -442,21 +513,13 @@ const alignerId = ref('');
 onBeforeMount(async () => {
   try {
     routes.value = menu.value.filter(item => $ability.can('read', item.subject));
-    updatedAt.value = new Date().toTimeString().split(' ')[0];
-
-    await getLastVersion();
-    if (isAdmin.value) {
-      await getDistributors({});
-      distributorId.value = distributors.value[0].id;
-    } else {
-      distributorId.value = profile.value.distributor_id;
-    }
   } catch (err) { }
 })
 
 const headers = computed(() => {
   const defaultHeaders = [
     { title: t('distributors.aligners.serial'), key: 'serialNumber', sortable: false },
+    { title: t('aligners.alias.label'), align: 'center', key: 'alias', sortable: false },
     { title: t('distributors.aligners.software'), align: 'center', key: 'software' },
     { title: t('distributors.aligners.specs'), align: 'center', key: 'specs', sortable: false },
     { title: t('distributors.aligners.createdAt'), align: 'center', key: 'createdAt' }
@@ -517,9 +580,31 @@ const filterOptions = computed(() => [
   }
 ])
 
+watch(tab, async (v) => {
+  if (v != 'aligners') return;
+  if (updatedAt.value != '--:--:--') return;
+
+  updatedAt.value = new Date().toTimeString().split(' ')[0];
+  await getLastVersion();
+  if (isAdmin.value) {
+    await getDistributors({});
+    distributorId.value = distributors.value[0].id;
+  } else {
+    distributorId.value = profile.value.distributor_id;
+  }
+})
+
 watch(semantic, async (v) => {
   if (!v) return;
   await getSoftwareStats();
+})
+
+const releaseRegex = /^(19|20)\d{2}\.R[1-9]\d*$/
+
+watch(specsInput, async (v) => {
+  if (!v) return;
+  if (!releaseRegex.test(v)) return;
+  await getSpecsStats();
 })
 
 watch(distributorId, async (v) => {
@@ -544,6 +629,13 @@ watch(theFilter, (v) => {
     items.value = [...allAligners.value.filter((e) => e.software === semantic.value)]
   } else if (v === 'greater') {
     items.value = [...allAligners.value.filter((e) => e.software > semantic.value)]
+  }
+})
+
+watch(aliasDialog, (v) => {
+  if (!v) {
+    alias.value = '';
+    return;
   }
 })
 
@@ -588,6 +680,36 @@ const getStats = () => {
   }
 };
 
+
+function parseSpec(spec) {
+  const match = spec.trim().match(/^(\d+)\.R(\d+)$/i)
+  if (!match) return null
+
+  return {
+    year: parseInt(match[1], 10),
+    release: parseInt(match[2], 10)
+  }
+}
+
+function compareSpecs(val) {
+  const specs = parseSpec(specsInput.value)
+  const parsed = parseSpec(val)
+  if (!specs || !parsed) return false;
+
+  // 1. Comparar años
+  if (specs.year !== parsed.year) {
+    return specs.year < parsed.year
+  }
+
+  // 2. Si el año es igual, comparar releases
+  if (specs.release !== parsed.release) {
+    return specs.release < parsed.release
+  }
+
+  return true
+}
+
+
 const getSoftwareStats = async () => {
   let theAligners = [];
 
@@ -610,6 +732,32 @@ const getSoftwareStats = async () => {
       software.value.lower += 1;
     } else {
       software.value.greater += 1;
+    }
+  }
+
+  allAligners.value = theAligners;
+  items.value = theAligners;
+}
+
+const getSpecsStats = async () => {
+  let theAligners = [];
+
+  standing.value = {
+    yes: 0,
+    no: 0,
+  }
+
+  for (let aligner of allAligners.value) {
+    let theStanding = compareSpecs(aligner.specs.name);
+    theAligners.push({
+      ...aligner,
+      standing: theStanding,
+    })
+
+    if (theStanding) {
+      standing.value.yes += 1;
+    } else {
+      standing.value.no += 1;
     }
   }
 
@@ -652,11 +800,7 @@ const getAllAligners = async () => {
             let specsLabel = null;
             if (aligner.specs) {
               specsLabel = `${aligner?.specs?.name} ${aligner?.specs?.month}/${aligner?.specs?.year}`
-              standing = new Date(aligner?.specs?.year, aligner?.specs?.month) <
-                new Date(
-                  aligner?.specsExpiration?.year,
-                  aligner?.specsExpiration?.month
-                )
+              standing = compareSpecs(aligner.specs.name)
             }
 
             // Formateamos los datos justo cuando llegan
@@ -682,7 +826,7 @@ const getAllAligners = async () => {
     getStats();
 
   } catch (err) {
-    if (err.name === 'AbortError' || err.message === 'The user aborted a request.') {
+    if (err.name === 'AbortError' || err.cause?.name === 'AbortError') {
       return; // Salimos silenciosamente
     }
 
@@ -703,6 +847,21 @@ const handleInput = (value) => {
 const handleBlur = () => {
   if (!semantic.value) return
   semantic.value = semantic.value.replace(/^\.+|\.+$/g, '')
+}
+
+const handleSpecsInput = (value) => {
+  if (!value) return
+  specsInput.value = value
+    .toUpperCase()
+    .replace(/[^0-9.R]/g, '')
+}
+
+
+const handleSpecsBlur = () => {
+  if (!specsInput.value) return
+  specsInput.value = specsInput.value
+    .toUpperCase()
+    .replace(/[^0-9.R]/g, '')
 }
 
 const deleteAligner = async () => {
@@ -738,6 +897,25 @@ const copyToClipboard = async (text) => {
     notify(t('aligners.copiedSerialMessage', 'success'))
   } catch (err) { }
 };
+
+const setAlignerAlias = async () => {
+  try {
+    loading.value = true;
+    const { message } = await $api(`/api/distributors/aligners/alias/${alignerId.value}`, {
+      method: 'POST',
+      body: {
+        alias: alias.value
+      }
+    })
+    notify(message, 'success');
+    await getAllAligners();
+    aliasDialog.value = false;
+  } catch (err) {
+    notify(err, 'error');
+  } finally {
+    loading.value = false;
+  }
+}
 </script>
 
 <style>

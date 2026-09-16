@@ -208,19 +208,8 @@ class DistributorAligner(db.Model):
         ForeignKey('distributors.id'), nullable=False)
     serial: Mapped[str] = mapped_column(
         String(100), nullable=False, unique=True)
-    specs: Mapped[str] = mapped_column(
-        String(100), nullable=True)
-    software: Mapped[str] = mapped_column(
-        String(100), nullable=True, comment='Software Version')
-    v_created_at: Mapped[datetime] = mapped_column(
-        DateTime(),
-        nullable=True,
-        comment='Created at date from Vehicles plaform/Real created at'
-    )
-    v_created_at: Mapped[datetime] = mapped_column(
-        DateTime(),
-        nullable=True
-    )
+    alias: Mapped[str] = mapped_column(
+        String(100), nullable=True, comment='Aligner Alias')
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
                                         server_default='ACTIVE')
@@ -876,6 +865,7 @@ class Warranty(db.Model):
 
     sale_date: Mapped[datetime] = mapped_column(DateTime(), nullable=False)
     invoice: Mapped[str] = mapped_column(String(40), nullable=False)
+    serial: Mapped[str] = mapped_column(String(100), nullable=True)
     shipt_to: Mapped[str] = mapped_column(String(400), nullable=False)
     problem: Mapped[str] = mapped_column(String(400), nullable=False)
     solution: Mapped[str] = mapped_column(String(400), nullable=False)

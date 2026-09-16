@@ -5,10 +5,19 @@
         <p>{{ $t('warranties.title', 2) }}</p>
         <div>
           <client-only>
-            <v-btn v-if="$ability.can('create', 'warranties')" class="me-2" icon="mdi-plus" size="small" variant="text"
-              @click="createDialog = !createDialog" />
-            <v-btn v-if="$ability.can('read', 'warranties')" class="me-2" icon="mdi-magnify" size="small" variant="text"
-              @click="searchDialog = !searchDialog" />
+            <v-tooltip :text="$t('tooltip.create')" location="bottom">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" v-if="$ability.can('create', 'warranties')" class="me-2" icon="mdi-plus"
+                  size="small" variant="text" @click="createDialog = !createDialog" />
+              </template>
+            </v-tooltip>
+
+            <v-tooltip :text="$t('tooltip.search')" location="bottom">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" v-if="$ability.can('read', 'warranties')" class="me-2" icon="mdi-magnify"
+                  size="small" variant="text" @click="searchDialog = !searchDialog" />
+              </template>
+            </v-tooltip>
           </client-only>
         </div>
       </v-card-title>
@@ -53,18 +62,48 @@
             <template v-slot:item.saleDate="{ item }">{{ date.format(item.saleDate, 'fullDate') }}</template>
 
             <template v-slot:item.option="{ item }">
-              <v-btn v-if="$ability.can('update', 'installations') && item.status !== 'APPROVED'"
-                class="my-2 bg-primary me-2" size="small" icon="mdi-pencil"
-                @click="async () => { await getWarranty(item.id); updateDialog = true }" />
-              <v-btn v-if="isAdmin" class="my-2 me-2 bg-secondary" size="small" icon="mdi-eye"
-                @click="async () => { await getWarranty(item.id); approvalDialog = true }" />
-              <v-btn class="my-2 bg-secondary me-2" size="small" icon="mdi-image-area"
-                @click="async () => { warrantyId = item.id; await getWarrantyFiles({}); tableDialog = true; }" />
-              <v-btn class="my-2 bg-secondary me-2" size="small" icon="mdi-open-in-new"
-                :href="`/api/warranties/${item.id}/pdf`" target="_blank" />
-              <v-btn v-if="isAdmin" class="my-2 bg-secondary me-2" size="small" icon="mdi-file-document" />
-              <v-btn v-if="$ability.can('delete', 'installations')" class="my-2 bg-red" size="small"
-                icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" />
+              <v-tooltip :text="$t('warranties.tooltip.viewUpdate')" location="bottom">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" v-if="$ability.can('update', 'installations') && item.status !== 'APPROVED'"
+                    class="my-2 bg-primary me-2" size="small" icon="mdi-pencil"
+                    @click="async () => { await getWarranty(item.id); updateDialog = true }" />
+                </template>
+              </v-tooltip>
+
+              <v-tooltip :text="$t('warranties.tooltip.approveReject')" location="bottom">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" v-if="isAdmin" class="my-2 me-2 bg-secondary" size="small" icon="mdi-eye"
+                    @click="async () => { await getWarranty(item.id); approvalDialog = true }" />
+                </template>
+              </v-tooltip>
+
+              <v-tooltip :text="$t('warranties.tooltip.files')" location="bottom">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" class="my-2 bg-secondary me-2" size="small" icon="mdi-image-area"
+                    @click="async () => { warrantyId = item.id; await getWarrantyFiles({}); tableDialog = true; }" />
+                </template>
+              </v-tooltip>
+
+              <v-tooltip :text="$t('warranties.tooltip.viewPdf')" location="bottom">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" class="my-2 bg-secondary me-2" size="small" icon="mdi-open-in-new"
+                    :href="`/api/warranties/${item.id}/pdf`" target="_blank" />
+                </template>
+              </v-tooltip>
+
+              <v-tooltip :text="$t('warranties.tooltip.logs')" location="bottom">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" v-if="isAdmin" class="my-2 bg-secondary me-2" size="small"
+                    icon="mdi-file-document" />
+                </template>
+              </v-tooltip>
+
+              <v-tooltip :text="$t('warranties.tooltip.delete')" location="bottom">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" v-if="$ability.can('delete', 'installations')" class="my-2 bg-red" size="small"
+                    icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" />
+                </template>
+              </v-tooltip>
             </template>
           </v-data-table-server>
         </client-only>
@@ -191,6 +230,10 @@
             <v-col cols="12" class="text-body-2 text-primary mt-2">
               {{ $t('warranties.info') }}
             </v-col>
+            <v-col cols="12">
+              <v-text-field v-model="form.serial" :label="$t('warranties.serial')" hide-details="auto"
+                :rules="[serialRequired]" counter="50" maxlength="50" />
+            </v-col>
             <v-col cols="6">
               <v-menu v-model="showPicker" :close-on-content-click="false" transition="scale-transition" offset-y
                 full-width max-width="290px" min-width="290px">
@@ -244,7 +287,14 @@
                   {{ $t('warranties.parts.title', 2) }}
                 </span>
                 <v-spacer />
-                <v-btn color="primary" variant="text" size=" x-small" icon="mdi-plus" @click="partsDialog = true" />
+
+                <v-tooltip :text="$t('warranties.tooltip.addPart')" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" color="primary" variant="text" size=" x-small" icon="mdi-plus"
+                      @click="partsDialog = true" />
+                  </template>
+                </v-tooltip>
+
               </div>
 
               <v-data-table-server :items="parts" :headers="headersParts" :page="pageParts"
@@ -264,10 +314,19 @@
 
                 <template v-slot:item.option="{ item }">
                   <div class="d-flex align-center justify-center ga-2 my-2">
-                    <v-btn class="bg-primary" size="x-small" icon="mdi-pencil"
-                      @click="partData = item; partsDialog = true" />
-                    <v-btn class="bg-red" size="x-small" icon="mdi-trash-can"
-                      @click="partData = item; deletePartDialog = true" />
+                    <v-tooltip :text="$t('warranties.tooltip.viewUpdate')" location="bottom">
+                      <template v-slot:activator="{ props }">
+                        <v-btn v-bind="props" class="bg-primary" size="x-small" icon="mdi-pencil"
+                          @click="partData = item; partsDialog = true" />
+                      </template>
+                    </v-tooltip>
+
+                    <v-tooltip :text="$t('warranties.tooltip.delete')" location="bottom">
+                      <template v-slot:activator="{ props }">
+                        <v-btn v-bind="props" class="bg-red" size="x-small" icon="mdi-trash-can"
+                          @click="partData = item; deletePartDialog = true" />
+                      </template>
+                    </v-tooltip>
                   </div>
                 </template>
               </v-data-table-server>
@@ -409,6 +468,10 @@
             <v-col cols="12" class="text-body-2 text-primary mt-2">
               {{ $t('warranties.info') }}
             </v-col>
+            <v-col cols="12">
+              <v-text-field v-model="form.serial" :label="$t('warranties.serial')" hide-details="auto"
+                :rules="[serialRequired]" counter="50" maxlength="50" />
+            </v-col>
             <v-col cols="6">
               <v-menu v-model="showPicker" :close-on-content-click="false" transition="scale-transition" offset-y
                 full-width max-width="290px" min-width="290px">
@@ -462,7 +525,13 @@
                   {{ $t('warranties.parts.title', 2) }}
                 </span>
                 <v-spacer />
-                <v-btn color="primary" variant="text" size=" x-small" icon="mdi-plus" @click="partsDialog = true" />
+
+                <v-tooltip :text="$t('warranties.tooltip.addPart')" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" color="primary" variant="text" size=" x-small" icon="mdi-plus"
+                      @click="partsDialog = true" />
+                  </template>
+                </v-tooltip>
               </div>
 
               <v-data-table-server :items="parts" :headers="headersParts" :page="pageParts"
@@ -482,10 +551,20 @@
 
                 <template v-slot:item.option="{ item }">
                   <div class="d-flex align-center justify-center ga-2 my-2">
-                    <v-btn class="bg-primary" size="x-small" icon="mdi-pencil"
-                      @click="partData = item; partsDialog = true" />
-                    <v-btn class="bg-red" size="x-small" icon="mdi-trash-can"
-                      @click="partData = item; deletePartDialog = true" />
+                    <v-tooltip :text="$t('warranties.tooltip.viewUpdate')" location="bottom">
+                      <template v-slot:activator="{ props }">
+                        <v-btn v-bind="props" class="bg-primary" size="x-small" icon="mdi-pencil"
+                          @click="partData = item; partsDialog = true" />
+                      </template>
+                    </v-tooltip>
+
+                    <v-tooltip :text="$t('warranties.tooltip.delete')" location="bottom">
+                      <template v-slot:activator="{ props }">
+                        <v-btn v-bind="props" class="bg-red" size="x-small" icon="mdi-trash-can"
+                          @click="partData = item; deletePartDialog = true" />
+                      </template>
+                    </v-tooltip>
+
                   </div>
                 </template>
               </v-data-table-server>
@@ -568,6 +647,10 @@
               <p class="text-body-2 text-primary pb-2">{{ $t('warranties.title', 2) }}</p>
             </v-col>
 
+            <v-col cols="12">
+              <v-text-field v-model="searchForm.serial" :label="$t('warranties.serial')" hide-details="auto"
+                counter="50" maxlength="50" clearable />
+            </v-col>
             <v-col cols="6">
               <v-text-field v-model="searchForm.wcoCode" :label="$t('warranties.wcoCode')" hide-details="auto"
                 counter="20" maxlength="20" clearable type="number" />
@@ -930,6 +1013,7 @@ const searchForm = ref({
   distributorId: null,
   wco: null,
   saleDate: null,
+  serial: null,
   invoice: null,
   status: null,
 })
@@ -1152,6 +1236,7 @@ const getWarranties = async () => {
         wcoYear: searchForm.value.wcoYear,
         saleDate: searchForm.value.saleDate,
         invoice: searchForm.value.invoice,
+        serial: searchForm.value.serial,
         status: searchForm.value.status,
         page: page.value,
         perPage: perPage.value,
@@ -1403,4 +1488,5 @@ const reasonRequired = (v) => !!v || t('warranties.rules.reasonRequired');
 const shiptToRequired = (v) => !!v || t('warranties.rules.shiptToRequired');
 const problemRequired = (v) => !!v || t('warranties.rules.problemRequired');
 const solutionRequired = (v) => !!v || t('warranties.rules.solutionRequired');
+const serialRequired = (v) => !!v || t('warranties.rules.serialRequired');
 </script>

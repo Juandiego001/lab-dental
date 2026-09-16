@@ -5,10 +5,19 @@
         <p>{{ $t('installations.title', 2) }}</p>
         <div>
           <client-only>
-            <v-btn v-if="$ability.can('create', 'installations')" class="me-2" icon="mdi-plus" size="small"
-              variant="text" @click="createDialog = !createDialog" />
-            <v-btn v-if="$ability.can('read', 'installations')" class="me-2" icon="mdi-magnify" size="small"
-              variant="text" @click="searchDialog = !searchDialog" />
+            <v-tooltip :text="$t('tooltip.create')" :disabled="loading" location="bottom">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" v-if="$ability.can('create', 'installations')" class="me-2" icon="mdi-plus"
+                  size="small" variant="text" @click="createDialog = !createDialog" />
+              </template>
+            </v-tooltip>
+
+            <v-tooltip :text="$t('tooltip.search')" :disabled="loading" location="bottom">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" v-if="$ability.can('read', 'installations')" class="me-2" icon="mdi-magnify"
+                  size="small" variant="text" @click="searchDialog = !searchDialog" />
+              </template>
+            </v-tooltip>
           </client-only>
         </div>
       </v-card-title>
@@ -28,12 +37,27 @@
             </template>
             <template v-slot:item.installedDate="{ item }">{{ date.format(item.installedDate, 'fullDate') }}</template>
             <template v-slot:item.option="{ item }">
-              <v-btn v-if="$ability.can('update', 'installations')" class="my-2 bg-primary me-2" size="small"
-                icon="mdi-pencil" @click="async () => { await getInstallation(item.id); updateDialog = true }" />
-              <v-btn v-if="isAdmin" class="my-2 me-2 bg-secondary" size="small" icon="mdi-eye"
-                @click="async () => { await getInstallation(item.id); approvalDialog = true }" />
-              <v-btn v-if="$ability.can('delete', 'installations')" class="my-2 bg-red" size="small"
-                icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" />
+              <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" v-if="$ability.can('update', 'installations')" class="my-2 bg-primary me-2"
+                    size="small" icon="mdi-pencil"
+                    @click="async () => { await getInstallation(item.id); updateDialog = true }" />
+                </template>
+              </v-tooltip>
+
+              <v-tooltip :text="$t('tooltip.approveReject')" :disabled="loading" location="bottom">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" v-if="isAdmin" class="my-2 me-2 bg-secondary" size="small" icon="mdi-eye"
+                    @click="async () => { await getInstallation(item.id); approvalDialog = true }" />
+                </template>
+              </v-tooltip>
+
+              <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" v-if="$ability.can('delete', 'installations')" class="my-2 bg-red" size="small"
+                    icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" />
+                </template>
+              </v-tooltip>
             </template>
           </v-data-table-server>
         </client-only>

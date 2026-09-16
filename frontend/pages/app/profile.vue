@@ -72,11 +72,12 @@
       <v-card-text>
         <v-form ref="passwordForm" v-model="updatePasswordModel" @submit.prevent="updatePassword">
           <v-row dense>
+            <v-text-field v-model="profile.username" type="text" autocomplete="username" hidden class="d-none" />
             <v-col cols="12">
               <v-text-field v-model="password.current" :label="$t('profile.changePassword.current')" hide-details="auto"
                 :type="showCurrentPassword ? 'text' : 'password'" prepend-inner-icon="mdi-lock-outline"
                 :append-inner-icon="showCurrentPassword ? 'mdi-eye-off' : 'mdi-eye'"
-                @click:append-inner="showCurrentPassword = !showCurrentPassword" :rules="[changePasswordRules[0]]">
+                @click:append-inner="showCurrentPassword = !showCurrentPassword" :rules="[changePasswordRules[0]]" autocomplete="current-password">
                 <template v-slot:message="{ message }">
                   {{ $t(message) }}
                 </template>
@@ -86,7 +87,7 @@
               <v-text-field v-model="password.new" :label="$t('profile.changePassword.new')" hide-details="auto"
                 :type="showNewPassword ? 'text' : 'password'" prepend-inner-icon="mdi-lock-plus-outline"
                 :append-inner-icon="showNewPassword ? 'mdi-eye-off' : 'mdi-eye'"
-                @click:append-inner="showNewPassword = !showNewPassword" :rules="changePasswordRules">
+                @click:append-inner="showNewPassword = !showNewPassword" :rules="changePasswordRules" autocomplete="new-password">
                 <template v-slot:message="{ message }">
                   {{ $t(message) }}
                 </template>
@@ -97,7 +98,7 @@
               <v-text-field v-model="password.confirm" :label="$t('profile.changePassword.confirm')" hide-details="auto"
                 :type="showConfirmPassword ? 'text' : 'password'" prepend-inner-icon="mdi-lock-check-outline"
                 :append-inner-icon="showConfirmPassword ? 'mdi-eye-off' : 'mdi-eye'"
-                @click:append-inner="showConfirmPassword = !showConfirmPassword" :rules="changePasswordRules">
+                @click:append-inner="showConfirmPassword = !showConfirmPassword" :rules="changePasswordRules" autocomplete="new-password">
                 <template v-slot:message="{ message }">
                   {{ $t(message) }}
                 </template></v-text-field>
@@ -256,14 +257,14 @@ const deletePhoto = async () => {
 
 // Rules
 const changePasswordRules = [
-  v => !!v || t('passwordRules.required'),
-  v => /[A-Z]/.test(v) || t('passwordRules.requiredUpper'),
-  v => /[a-z]/.test(v) || t('passwordRules.requiredLower'),
-  v => /[^a-zA-Z\d]/.test(v) || t('passwordRules.requiredSpecial'),
-  v => /\d/.test(v) || t('passwordRules.requiredNumber'),
-  v => (v && v.length >= 10) || t('passwordRules.minLength10'),
-  v => (v && v.length <= 24) || t('passwordRules.maxLength24'),
-  v => (v === password.value.new) || t('passwordRules.dontMatch')
+  v => !!v || 'passwordRules.required',
+  v => /[A-Z]/.test(v) || 'passwordRules.requiredUpper',
+  v => /[a-z]/.test(v) || 'passwordRules.requiredLower',
+  v => /[^a-zA-Z\d]/.test(v) || 'passwordRules.requiredSpecial',
+  v => /\d/.test(v) || 'passwordRules.requiredNumber',
+  v => (v && v.length >= 10) || 'passwordRules.minLength10',
+  v => (v && v.length <= 24) || 'passwordRules.maxLength24',
+  v => (v === password.value.new) || 'passwordRules.dontMatch'
 ]
 const fullNameRequired = (v) => !!v || t('users.rules.fullNameRequired');
 const usernameRequired = (v) => !!v || t('users.rules.usernameRequired');

@@ -26,6 +26,7 @@ class WarrantySearch(BaseSchema):
     sale_date = DateTime(
         required=False, allow_none=True, data_key='saleDate', load_default=None)
     invoice = String(required=False, allow_none=True, load_default=None)
+    serial = String(required=False, allow_none=True, load_default=None)
     status = String(required=False, allow_none=True, load_default=None)
     page = Integer(load_default=1)
     per_page = Integer(data_key='perPage', load_default=15)
@@ -53,6 +54,8 @@ class WarrantyIn(BaseSchema):
     sale_date = String(required=True, allow_none=False, data_key='saleDate')
     invoice = String(required=True, allow_none=False,
                      validate=validate.Length(max=40))
+    serial = String(required=True, allow_none=False,
+                     validate=validate.Length(max=100))
     shipt_to = String(required=True, allow_none=False,
                       validate=validate.Length(max=400), data_key='shiptTo')
     problem = String(required=True, allow_none=False,
@@ -161,6 +164,7 @@ class WarrantyOut(BaseSchema):
         data_key='equipmentModelReference')
     distributor_name = String(data_key='distributorName')
     invoice = String()
+    serial = String()
     sale_date = String(data_key='saleDate')
     shipt_to = String(data_key='shiptTo')
     problem = String()
@@ -215,6 +219,7 @@ class WarrantyPDF(BaseSchema):
     distributor_name = String()
     user = String()
     invoice = String()
+    serial = String()
     sale_date = Function(
         lambda v: v.sale_date.strftime('%B %d, %Y'))
     shipt_to = String()

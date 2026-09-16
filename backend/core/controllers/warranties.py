@@ -27,6 +27,7 @@ def get_warranties(json_data):
             wco_year=json_data['wco_year'],
             sale_date=json_data['sale_date'],
             invoice=json_data['invoice'],
+            serial=json_data['serial'],
             status=json_data['status'],
             page=json_data['page'],
             per_page=json_data['per_page'],

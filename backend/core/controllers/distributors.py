@@ -7,8 +7,8 @@ from flask_jwt_extended import jwt_required, current_user
 from core.schemas.clients import ClientsOut
 from core.schemas.utils import Message, Pagination
 from core.schemas.distributors import (
-    AlignersOut, ContactInCreate, ContactOut, DistributorInCreate, DistributorInUpdate, DistributorOut, DistributorSearch, DistributorsOut, ContactSearch, ContactsOut,
-    ContactIn, AlignerSearch, AlignerInCreate, AlignerFileIn, AlignersValidationsOut, AlignersMultipleIn
+    ContactInCreate, ContactOut, DistributorInCreate, DistributorInUpdate, DistributorOut, DistributorSearch, DistributorsOut, ContactSearch, ContactsOut,
+    ContactIn, AlignerInCreate, AlignerFileIn, AlignersValidationsOut, AlignersMultipleIn, AlignerAliasIn
 )
 
 
@@ -181,27 +181,6 @@ def delete_contact(contact_id: int):
         abort(500, gettext('abortException'))
 
 
-@bp.post('/aligners/search')
-@bp.input(AlignerSearch)
-@bp.output(AlignersOut)
-@jwt_required()
-def search_distributor_aligners(json_data: dict):
-    '''Search distributor aligners'''
-
-    try:
-        results, total = distributors.search_distributor_aligners(
-            distributor_id=json_data['distributor_id'],
-            aligners_ids=json_data['aligners_ids'],
-            serial=json_data['serial'],
-            software=json_data['software'],
-            page=json_data['page'],
-            per_page=json_data['per_page'],
-            sort_by=json_data['sort_by'])
-        return {'items': results, 'total': total}
-    except Exception as ex:
-        abort(500, gettext('abortException'))
-
-
 @bp.get('/aligners/<int:distributor_id>')
 @jwt_required()
 def get_all_aligners(distributor_id: int):
@@ -225,21 +204,6 @@ def associate_aligner_to_distributor(json_data: dict):
             distributor_id=json_data['distributor_id'],
         )
         return {'message': gettext('alignerAssociatedSuccessfully')}
-    except Exception as ex:
-        abort(500, gettext('abortException'))
-
-
-@bp.post('/aligners/refresh/<int:distributor_id>')
-@bp.output(Message)
-@jwt_required()
-def refresh_distributor_aligners(distributor_id: int):
-    '''Refresh distributor aligners'''
-
-    try:
-        distributors.refresh_distributor_aligners(
-            distributor_id=distributor_id,
-        )
-        return {'message': gettext('distributorAlignersUpdatedSuccessfully')}
     except Exception as ex:
         abort(500, gettext('abortException'))
 
@@ -308,3 +272,24 @@ def unlink_distributor_aligner(aligner_id: int):
 #         return {'message': gettext('alignerAssociatedSuccessfully')}
 #     except Exception as ex:
 #         abort(500, gettext('abortException'))
+
+
+@bp.post('/aligners/alias/<int:aligner_id>')
+@bp.input(AlignerAliasIn)
+@bp.output(Message)
+@jwt_required()
+def set_aligner_alias(aligner_id: int, json_data: dict):
+    '''Set alias for aligner'''
+
+    try:
+        distributors.set_aligner_alias(
+            current_user=current_user,
+            aligner_id=aligner_id,
+            alias=json_data['alias']
+        )
+        return {'message': gettext('alignerAliasSetSuccessfully')}
+    except HTTPException as ex:
+        abort(400, ex.description)
+    except Exception as ex:
+        print(ex)
+        abort(500, gettext('abortException'))

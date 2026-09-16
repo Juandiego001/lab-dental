@@ -11,8 +11,17 @@
       <v-card-text class="pb-2">
         <v-row class="ma-0 mb-2">
           <v-spacer />
-          <v-btn class="me-2" icon="mdi-plus" size="x-small" @click="createDialog = !createDialog" />
-          <v-btn icon="mdi-magnify" size="x-small" @click="searchDialog = !searchDialog" />
+          <v-tooltip :text="$t('contacts.tooltip.add')" location="bottom">
+            <template v-slot:activator="{ props }">
+              <v-btn v-bind="props" class="me-2" icon="mdi-plus" size="x-small" @click="createDialog = !createDialog" />
+            </template>
+          </v-tooltip>
+
+          <v-tooltip :text="$t('contacts.tooltip.search')" location="bottom">
+            <template v-slot:activator="{ props }">
+              <v-btn v-bind="props" icon="mdi-magnify" size="x-small" @click="searchDialog = !searchDialog" />
+            </template>
+          </v-tooltip>
         </v-row>
         <client-only>
           <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
@@ -21,9 +30,19 @@
             density="compact">
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
-                <v-btn class="my-1 bg-primary" size="x-small" icon="mdi-pencil" @click="getContact(item.id)" />
-                <v-btn class="my-1 bg-red" size="x-small" icon="mdi-trash-can"
-                  @click="form.id = item.id; deleteDialog = true" />
+                <v-tooltip :text="$t('tooltip.viewUpdate')" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" class="my-1 bg-primary" size="x-small" icon="mdi-pencil"
+                      @click="getContact(item.id)" />
+                  </template>
+                </v-tooltip>
+
+                <v-tooltip :text="$t('tooltip.delete')" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" class="my-1 bg-red" size="x-small" icon="mdi-trash-can"
+                      @click="form.id = item.id; deleteDialog = true" />
+                  </template>
+                </v-tooltip>
               </div>
             </template>
 

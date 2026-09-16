@@ -5,10 +5,19 @@
         <p>{{ $t('groups.title', 2) }}</p>
         <div>
           <client-only>
-            <v-btn v-if="$ability.can('create', 'groups')" class="me-2" icon="mdi-plus" size="small" variant="text"
-              @click="createDialog = !createDialog" />
-            <v-btn v-if="$ability.can('read', 'groups')" class="me-2" icon="mdi-magnify" size="small" variant="text"
-              @click="searchDialog = !searchDialog" />
+            <v-tooltip :text="$t('tooltip.create')" :disabled="loading" location="bottom">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" v-if="$ability.can('create', 'groups')" class="me-2" icon="mdi-plus" size="small"
+                  variant="text" @click="createDialog = !createDialog" />
+              </template>
+            </v-tooltip>
+
+            <v-tooltip :text="$t('tooltip.search')" :disabled="loading" location="bottom">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" v-if="$ability.can('read', 'groups')" class="me-2" icon="mdi-magnify" size="small"
+                  variant="text" @click="searchDialog = !searchDialog" />
+              </template>
+            </v-tooltip>
           </client-only>
         </div>
       </v-card-title>
@@ -19,11 +28,26 @@
             @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
-                <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getGroup(item.id)" />
-                <v-btn class="my-2 mx-2 bg-secondary" size="small" icon="mdi-shield-edit"
-                  @click="form = item; getPermissions()" />
-                <v-btn v-if="item.id !== 1" class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                  @click="form.id = item.id; deleteDialog = true" />
+                <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" class="my-2 bg-primary" size="small" icon="mdi-pencil"
+                      @click="getGroup(item.id)" />
+                  </template>
+                </v-tooltip>
+
+                <v-tooltip :text="$t('groups.permissions.title')" :disabled="loading" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" class="my-2 mx-2 bg-secondary" size="small" icon="mdi-shield-edit"
+                      @click="form = item; getPermissions()" />
+                  </template>
+                </v-tooltip>
+
+                <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" v-if="item.id !== 1" class="my-2 bg-red" size="small" icon="mdi-trash-can"
+                      @click="form.id = item.id; deleteDialog = true" />
+                  </template>
+                </v-tooltip>
               </div>
             </template>
           </v-data-table-server>

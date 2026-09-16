@@ -8,7 +8,13 @@
           <v-spacer />
 
           <div class="d-flex align-center ga-2">
-            <v-btn class="bg-primary" size="small" icon="mdi-reload" @click="reloadAligner" :loading="loading" />
+            <v-tooltip :text="$t('aligners.tooltip.refresh')" location="bottom">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" class="bg-primary" size="small" icon="mdi-reload" @click="reloadAligner"
+                  :loading="loading" />
+              </template>
+            </v-tooltip>
+
             <v-btn class="bg-primary" size="small" icon="mdi-close" @click="viewAligner = false" />
           </div>
         </v-row>

@@ -5,41 +5,76 @@
         <v-row no-gutters align="center">
           {{ $t('distributors.aligners.title', 2) }}
           <v-spacer />
-          <v-btn class="bg-primary" size="x-small" icon="mdi-close" @click="dialog = false" />
+          <v-btn class="bg-primary" size="x-small" icon="mdi-close" @click="closeDialog" />
         </v-row>
       </v-card-title>
       <v-card-text class="pb-2">
         <v-row class="ma-0 mb-2">
           <v-spacer />
-          <v-btn class="me-2" icon="mdi-reload" size="x-small" @click="refreshAligners" :disabled="loading" />
-          <v-btn class="me-2" icon="mdi-plus" size="x-small" @click="createDialog = !createDialog"
-            :disabled="loading" />
-          <v-btn class="me-2" icon="mdi-file-document-plus" size="x-small" @click="fileDialog = !fileDialog"
-            :disabled="loading" />
-          <v-btn icon="mdi-magnify" size="x-small" @click="searchDialog = !searchDialog" :disabled="loading" />
-        </v-row>
-        <client-only>
-          <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
-            :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading"
-            density="compact">
-            <template v-slot:item.vCreatedAt="{ item }">
-              <v-chip class="text-caption my-2">
-                {{ $dateFormat(new Date(item.vCreatedAt)) }}
-              </v-chip>
+          <v-tooltip :text="$t('tooltip.refresh')" :disabled="loading" location="bottom">
+            <template v-slot:activator="{ props }">
+              <v-btn v-bind="props" class="me-2" icon="mdi-reload" size="x-small" @click="getAllAligners"
+                :disabled="loading" />
             </template>
-            <template v-slot:item.option="{ item }">
-              <div class="d-flex align-center justify-center ga-2">
-                <v-btn class="my-1 bg-secondary" size="x-small" icon="mdi-eye"
-                  @click="async () => { serialNumber = item.serial; await getAligner() }"
-                  :loading="serialNumber == item.serial && loading" />
-                <v-btn class="my-1 bg-red" size="x-small" icon="mdi-trash-can"
-                  @click="form.id = item.id; deleteDialog = true" />
-              </div>
-            </template>
+          </v-tooltip>
 
-          </v-data-table-server>
-        </client-only>
+          <v-tooltip :text="$t('aligners.tooltip.add')" :disabled="loading" location="bottom">
+            <template v-slot:activator="{ props }">
+              <v-btn v-bind="props" class="me-2" icon="mdi-plus" size="x-small" @click="createDialog = !createDialog"
+                :disabled="loading" />
+            </template>
+          </v-tooltip>
+
+          <v-tooltip :text="$t('aligners.tooltip.addMultiple')" :disabled="loading" location="bottom">
+            <template v-slot:activator="{ props }">
+              <v-btn v-bind="props" class="me-2" icon="mdi-file-document-plus" size="x-small"
+                @click="fileDialog = !fileDialog" :disabled="loading" />
+            </template>
+          </v-tooltip>
+        </v-row>
+        <v-data-table :items="items" :headers="headers" :loading="loading" density="compact">
+          <template v-slot:item.alias="{ item }">
+            <div v-if="item.alias" class="d-flex align-center justify-center">
+              <span class="w-100 d-inline-block bg-grey-darken-1 py-1 px-2 rounded-pill text-caption text-center"
+                style="max-width: 150px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; background-color: rgb(228, 228, 228) !important; color: black !important;"
+                :title="item.alias">
+                {{ item.alias }}
+              </span>
+            </div>
+            <span v-else>-</span>
+          </template>
+          <template v-slot:item.createdAt="{ item }">
+            <v-chip class="text-caption my-2">
+              {{ $dateFormat(new Date(item.createdAt)) }}
+            </v-chip>
+          </template>
+          <template v-slot:item.option="{ item }">
+            <div class="d-flex align-center justify-center ga-2">
+              <v-tooltip :text="$t('aligners.tooltip.setAlias')" :disabled="loading" location="bottom">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" class="my-1 bg-secondary" size="x-small" icon="mdi-pencil"
+                    @click="alignerId = item.id; aliasDialog = true" :disabled="loading" />
+                </template>
+              </v-tooltip>
+
+              <v-tooltip :text="$t('aligners.tooltip.viewAligner')" :disabled="loading" location="bottom">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" class="my-1 bg-secondary" size="x-small" icon="mdi-eye"
+                    @click="async () => { serialNumber = item.serialNumber; await getAligner() }" :disabled="loading"
+                    :loading="serialNumber == item.serialNumber && loading" />
+                </template>
+              </v-tooltip>
+
+              <v-tooltip :text="$t('aligners.tooltip.unlink')" :disabled="loading" location="bottom">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" class="my-1 bg-red" size="x-small" icon="mdi-trash-can" :disabled="loading"
+                    @click="form.id = item.id; deleteDialog = true" />
+                </template>
+              </v-tooltip>
+            </div>
+          </template>
+
+        </v-data-table>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -109,7 +144,11 @@
                 </template>
                 <template v-slot:item.option="{ item, index, }">
                   <div class="d-flex align-center justify-center ga-2">
-                    <v-btn class="my-1 bg-red" size="x-small" icon="mdi-trash-can" @click="removeSerial(index)" />
+                    <v-tooltip :text="$t('tooltip.remove')" location="bottom">
+                      <template v-slot:activator="{ props }">
+                        <v-btn v-bind="props" class="my-1 bg-red" size="x-small" icon="mdi-trash-can" @click="removeSerial(index)" />
+                      </template>
+                    </v-tooltip>
                   </div>
                 </template>
               </v-data-table>
@@ -125,41 +164,6 @@
               <v-btn v-if="validationItems.length" class="bg-primary" size="small" @mousedown.prevent
                 :disabled="validationLoading || canConfirm" @click="uploadMultipleAligners">
                 {{ $t('confirm') }}
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-form>
-      </v-card-text>
-    </v-card>
-  </v-dialog>
-
-  <!-- Search Dialog -->
-  <v-dialog v-model="searchDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
-    <v-card tile>
-      <v-card-title class="bg-primary">
-        <v-row class="text-body-1" no-gutters align="center">
-          {{ $t('distributors.aligners.search.title') }}
-          <v-spacer />
-          <v-btn class="bg-primary" size="x-small" icon="mdi-close" @click="searchDialog = false" />
-        </v-row>
-      </v-card-title>
-      <v-card-text>
-        <v-form @submit.prevent="async () => {
-          await searchAligners(1, 15);
-          searchDialog = false;
-        }">
-          <v-row dense>
-            <v-col cols="12">
-              <v-text-field v-model="searchForm.serial" :label="$t('distributors.aligners.serial')" hide-details="auto"
-                counter="50" maxlength="50" clearable autocomplete="off" />
-            </v-col>
-            <v-col cols="12">
-              <v-text-field v-model="searchForm.software" :label="$t('distributors.aligners.software')"
-                hide-details="auto" counter="50" maxlength="50" clearable autocomplete="off" />
-            </v-col>
-            <v-col class="mt-3 text-end" cols="12">
-              <v-btn class="bg-primary" size="small" type="submit" @mousedown.prevent :loading="loading">
-                {{ $t('search') }}
               </v-btn>
             </v-col>
           </v-row>
@@ -189,6 +193,35 @@
     </v-card>
   </v-dialog>
 
+  <!-- Set Alias for Aligner Dialog -->
+  <v-dialog v-model="aliasDialog" max-width="500" persistent :fullscreen="$vuetify.display.smAndDown">
+    <v-card tile>
+      <v-card-title class="bg-primary">
+        <v-row class="text-body-1" no-gutters align="center">
+          {{ $t('aligners.alias.title') }}
+          <v-spacer />
+          <v-btn class="bg-primary" size="x-small" icon="mdi-close" @click="aliasDialog = false" />
+        </v-row>
+      </v-card-title>
+      <v-card-text class="text-center">
+        <v-row no-gutters>
+          <v-col cols="12" class="mb-4">
+            <v-text-field v-model="alias" :label="$t('aligners.alias.label')" hide-details="auto" counter="30"
+              maxlength="30" />
+          </v-col>
+          <v-col cols="12" class="d-flex justify-end align-center ga-2">
+            <v-btn @click="aliasDialog = false" size="small" variant="outlined" :disabled="loading">
+              {{ $t('cancel') }}
+            </v-btn>
+            <v-btn @click="setAlignerAlias" class="bg-primary" size="small" :loading="loading">
+              {{ $t('confirm') }}
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+
   <AlignersModal />
 </template>
 
@@ -200,31 +233,24 @@ const { notify } = useSnackbar();
 const { t } = useI18n();
 
 const { serialNumber, getAligner: getAlignerData, getLastVersion, viewAligner } = useAligners();
-const {
-  items,
-  total,
-  getAligners,
-  dialog,
-  distributorId
-} = useDistributorsAligners();
+const { dialog, distributorId } = useDistributorsAligners();
 
 const loading = ref(false)
-const searchDialog = ref(false)
 const createDialog = ref(false)
 const fileDialog = ref(false)
+const deleteDialog = ref(false)
+const aliasDialog = ref(false);
 
 const validationItems = ref([]);
 const validationLoading = ref(false);
 
-const page = ref(1)
-const perPage = ref(15)
-const sortBy = ref(null)
-
 const validationPage = ref(1);
 const validationPerPage = ref(10);
 
-const deleteDialog = ref(false)
-
+const alignerId = ref('');
+const alias = ref('');
+const abortController = ref(null);
+const items = ref([]);
 const createModel = ref(false)
 const fileModel = ref(false)
 const createForm = ref()
@@ -233,31 +259,13 @@ const file = ref(null);
 const form = ref({
   serial: ''
 })
-const searchForm = ref({
-  serial: '',
-  software: '',
-})
-
-const resetForm = () => {
-  form.value = {
-    serial: '',
-  }
-  file.value = null;
-  validationItems.value = [];
-}
-
-const itemsPerPageOptions = computed(() => [
-  { value: 15, title: '15' },
-  { value: 25, title: '25' },
-  { value: 50, title: '50' },
-  { value: 100, title: '100' }
-])
 
 const headers = computed(() => [
-  { title: t('distributors.aligners.serial'), key: 'serial' },
+  { title: t('distributors.aligners.serial'), key: 'serialNumber' },
+  { title: t('aligners.alias.label'), align: 'center', key: 'alias', sortable: false },
   { title: t('distributors.aligners.software'), align: 'center', key: 'software' },
   { title: t('distributors.aligners.specs'), align: 'center', key: 'specs', sortable: false },
-  { title: t('distributors.aligners.createdAt'), align: 'center', key: 'vCreatedAt' },
+  { title: t('distributors.aligners.createdAt'), align: 'center', key: 'createdAt' },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
@@ -291,39 +299,21 @@ watch(deleteDialog, (val) => {
   if (!val) resetForm();
 })
 
-watch(page, async () => {
-  await searchAligners();
-})
-
-watch(perPage, async () => {
-  await searchAligners();
-})
-
-watch(sortBy, async (v) => {
-  if (v && v.length) {
-    await searchAligners();
-  }
-})
-
 watch(viewAligner, (v) => {
   if (!v) serialNumber.value = false;
 })
 
-const searchAligners = async (defPage, defPerPage) => {
-  try {
-    loading.value = true;
-    await getAligners({
-      serial: searchForm.value.serial,
-      software: searchForm.value.software,
-      page: defPage || page.value,
-      perPage: defPerPage || perPage.value,
-      sortBy: sortBy.value?.length ? sortBy.value[0] : null
-    });
-  } catch (err) {
-    notify(err, 'error');
-  } finally {
-    loading.value = false;
+watch(dialog, async (v) => {
+  if (!v) return;
+  await getAllAligners();
+})
+
+const resetForm = () => {
+  form.value = {
+    serial: '',
   }
+  file.value = null;
+  validationItems.value = [];
 }
 
 const createAligner = async () => {
@@ -338,7 +328,7 @@ const createAligner = async () => {
       }
     })
     notify(message, 'success');
-    await getAligners({});
+    await getAllAligners();
     createDialog.value = false;
   } catch (err) {
     notify(err, 'error');
@@ -373,7 +363,7 @@ const deleteAligner = async () => {
       method: 'DELETE'
     })
     notify(message, 'success');
-    await getAligners({});
+    await getAllAligners();
     deleteDialog.value = false;
   } catch (err) {
     notify(err, 'error');
@@ -381,20 +371,6 @@ const deleteAligner = async () => {
     loading.value = false;
   }
 }
-
-const refreshAligners = async () => {
-  try {
-    loading.value = true;
-    const { message } = await $api(`/api/distributors/aligners/refresh/${distributorId.value}`, { method: 'POST', })
-    notify(message, 'success');
-    await getAligners({});
-  } catch (err) {
-    notify(err, 'error');
-  } finally {
-    loading.value = false;
-  }
-}
-
 
 const uploadMultipleAligners = async () => {
   try {
@@ -406,7 +382,7 @@ const uploadMultipleAligners = async () => {
       }
     })
     notify(message, 'success');
-    await getAligners({});
+    await getAllAligners();
     fileDialog.value = false;
   } catch (err) {
     notify(err, 'error');
@@ -414,7 +390,6 @@ const uploadMultipleAligners = async () => {
     validationLoading.value = false;
   }
 }
-
 
 const getAligner = async () => {
   try {
@@ -428,9 +403,85 @@ const getAligner = async () => {
   }
 }
 
-
 const removeSerial = (index) => {
   validationItems.value.splice((index + (validationPerPage.value * (validationPage.value - 1))), 1)
+}
+
+const getAllAligners = async () => {
+  try {
+    loading.value = true;
+    items.value = [];
+    abortController.value = new AbortController();
+
+    const response = await $api(`/api/distributors/aligners/${distributorId.value}`, {
+      method: 'GET',
+      responseType: 'stream',
+      signal: abortController.value.signal
+    });
+
+    const reader = response.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const events = buffer.split('\n\n');
+      buffer = events.pop();
+
+      for (const event of events) {
+        if (event.trim().startsWith('data:')) {
+          const dataStr = event.replace(/^data:/, '').trim();
+          if (dataStr) {
+            const aligner = JSON.parse(dataStr);
+            let specs = null;
+            if (aligner.specs) {
+              specs = `${aligner?.specs?.name} ${aligner?.specs?.month}/${aligner?.specs?.year}`
+            }
+            const formattedAligner = {
+              ...aligner,
+              specs,
+              software: aligner.version.semantic,
+            };
+            items.value.push(formattedAligner);
+          };
+        }
+      }
+    }
+
+  } catch (err) {
+    if (err.name === 'AbortError' || err.cause?.name === 'AbortError') {
+      return;
+    }
+    notify(err, 'error');
+  } finally {
+    loading.value = false;
+  }
+}
+
+const setAlignerAlias = async () => {
+  try {
+    loading.value = true;
+    const { message } = await $api(`/api/distributors/aligners/alias/${alignerId.value}`, {
+      method: 'POST',
+      body: {
+        alias: alias.value
+      }
+    })
+    notify(message, 'success');
+    aliasDialog.value = false;
+    await getAllAligners();
+  } catch (err) {
+    notify(err, 'error');
+  } finally {
+    loading.value = false;
+  }
+}
+
+const closeDialog = () => {
+  dialog.value = false;
+  if (abortController.value) abortController.value.abort();
 }
 
 const serialRequired = (v) => !!v || t('distributors.aligners.rules.serialRequired');

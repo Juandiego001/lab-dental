@@ -396,71 +396,6 @@ def get_aliners_info(serials: list[str] | set[str]) -> list[dict]:
     return data
 
 
-def refresh_distributor_aligners(distributor_id: int):
-    '''Refresh data of distributor aligners'''
-
-    aligners = db.session.query(DistributorAligner)\
-        .filter(DistributorAligner.distributor_id == distributor_id)\
-        .all()
-
-    data = get_aliners_info(serials=[aligner.serial for aligner in aligners])
-    for aligner_data in data:
-        if not 'specs' in aligner_data:
-            continue
-        specs = aligner_data['specs']
-        for aligner in aligners:
-            if aligner.serial == aligner_data['serialNumber']:
-                aligner.specs = f'{specs['name']} {specs['month']}/{specs['year']}'
-                aligner.software = aligner_data['version']['semantic']
-                aligner.v_created_at = aligner_data['createdAt']
-
-    db.session.commit()
-
-
-def search_distributor_aligners(distributor_id: int, aligners_ids: list[int], serial: str, software: str, page: int, per_page: int, sort_by: dict = None, the_filter: str = None,):
-    '''Search distributor aligners'''
-
-    order_by = DistributorAligner.id.desc()
-    if sort_by:
-        sort_key = sort_by.get('key', '')
-        sort_order = sort_by.get('order', '')
-        if sort_key == 'serial':
-            order_by = DistributorAligner.serial
-        elif sort_key == 'vCreatedAt':
-            order_by = DistributorAligner.v_created_at
-        elif sort_key == 'software':
-            order_by = DistributorAligner.software
-        order_by = order_by.asc() if sort_order == 'asc' else order_by.desc()
-
-    query = [DistributorAligner.status == 'ACTIVE',
-             DistributorAligner.distributor_id == distributor_id]
-    with_aligners_ids = None
-    if serial:
-        query.append(DistributorAligner.serial.ilike(f'%{serial}%'))
-    if software:
-        query.append(DistributorAligner.software.ilike(f'%{software}%'))
-    if aligners_ids:
-        query.append(DistributorAligner.id.not_in(aligners_ids))
-        with_aligners_ids = db.session.query(DistributorAligner)\
-            .filter(DistributorAligner.id.in_(aligners_ids))\
-            .all()
-
-    total = db.session.query(DistributorAligner)\
-        .filter(*query).count()
-    total += len(with_aligners_ids) if with_aligners_ids else 0
-
-    aligners = db.session.query(DistributorAligner)\
-        .filter(*query)\
-        .order_by(order_by)\
-        .limit(per_page)\
-        .offset((page - 1) * per_page)\
-        .all()
-
-    if not with_aligners_ids:
-        return aligners, total
-    return with_aligners_ids + aligners, total
-
-
 def aligner_exist(serial: str) -> bool | dict:
     '''Verify if aligner exist by given serial'''
 
@@ -544,7 +479,7 @@ def validate_aligners_file(distributor_id: int, file: FileStorage):
 def upload_multiple_aligners(distributor_id: int, serials: list[dict]):
     '''Upload multiple aligners after the text validation'''
 
-    serials = [serial['serial'] for serial in serials]  # Get only serials
+    serials = [serial['serial'] for serial in serials]
     existing_serials = db.session.query(DistributorAligner.serial)\
         .filter(
         and_(
@@ -563,14 +498,10 @@ def upload_multiple_aligners(distributor_id: int, serials: list[dict]):
             raise HTTPException(gettext('someAlignersDoesNotExist'))
 
     for aligner_data in data:
-        specs = aligner_data['specs']
         db.session.add(
             DistributorAligner(
                 distributor_id=distributor_id,
-                serial=aligner_data['serialNumber'],
-                specs=f'{specs['name']} {specs['month']}/{specs['year']}',
-                software=aligner_data['version']['semantic'],
-                v_created_at=aligner_data['createdAt'],
+                serial=aligner_data['serialNumber']
             ))
 
     db.session.commit()
@@ -599,11 +530,12 @@ def get_all_aligners(distributor_id: int):
 def stream_all_aligners(distributor_id: int):
     '''Yield aligners of a distributor one by one as Server-Sent Events'''
 
-    aligners = db.session.query(DistributorAligner.id, DistributorAligner.serial)\
+    aligners = db.session.query(DistributorAligner.id, DistributorAligner.alias, DistributorAligner.serial)\
         .filter(DistributorAligner.distributor_id == distributor_id)\
+        .order_by(DistributorAligner.id.desc())\
         .all()
 
-    for (id, serial) in aligners:
+    for (id, alias, serial) in aligners:
         response = requests.get(
             'https://vehicle365.org/read/aligner/v1/',
             params={
@@ -620,6 +552,25 @@ def stream_all_aligners(distributor_id: int):
             data_item = {
                 **info,
                 'id': id,
+                'alias': alias
             }
             # Formato SSE estándar: "data: {json}\n\n"
             yield f"data: {json.dumps(data_item)}\n\n"
+
+
+def set_aligner_alias(current_user: User, aligner_id: int, alias: str):
+    '''Set aligner alias'''
+
+    filters_ = [DistributorAligner.id == aligner_id]
+    distributor_id = get_distributor_from_user(user=current_user).id
+    if distributor_id != 1:
+        filters_.append(DistributorAligner.distributor_id == distributor_id)
+
+    the_aligner = db.session.query(DistributorAligner)\
+        .filter(and_(*filters_)).first()
+
+    if not the_aligner:
+        raise HTTPException(gettext('alignerNotFound'))
+
+    the_aligner.alias = alias
+    db.session.commit()

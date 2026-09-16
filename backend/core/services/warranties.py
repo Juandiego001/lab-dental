@@ -15,7 +15,7 @@ from core.schemas.warranties import WarrantyPDF
 from core.services.distributors import get_distributor_from_user
 
 
-def get_warranties(current_user: User, distributor_id: int, equipment_id: int, wco_code: int, wco_year: int, sale_date: datetime, invoice: str, status: str, page: int, per_page: int, sort_by: dict = None):
+def get_warranties(current_user: User, distributor_id: int, equipment_id: int, wco_code: int, wco_year: int, sale_date: datetime, invoice: str, serial: str, status: str, page: int, per_page: int, sort_by: dict = None):
     '''Get warranties'''
 
     order_by = Warranty.id.desc()
@@ -37,6 +37,8 @@ def get_warranties(current_user: User, distributor_id: int, equipment_id: int, w
         query.append(Warranty.distributor_id == distributor_id)
     if invoice:
         query.append(Warranty.invoice.ilike(f'%{invoice}%'))
+    if serial:
+        query.append(Warranty.serial.ilike(f'%{serial}%'))
     if wco_code:
         query.append(WarrantyWCO.code == wco_code)
     if wco_year:
@@ -83,6 +85,7 @@ def get_warranty_by_id(warranty_id: int):
         func.array_agg(WarrantyReason.reason_id).label('reasons_ids'),
         Warranty.id,
         Warranty.invoice,
+        Warranty.serial,
         Warranty.sale_date,
         Warranty.shipt_to,
         Warranty.problem,
@@ -134,6 +137,7 @@ def get_warranty_by_id_for_pdf(warranty_id: int):
         Distributor.name.label('distributor'),
         func.array_agg(Reason.name).label('reasons_names'),
         Warranty.invoice,
+        Warranty.serial,
         Warranty.sale_date,
         Warranty.shipt_to,
         Warranty.problem,
@@ -185,6 +189,7 @@ def get_warranty_by_id_for_pdf(warranty_id: int):
         .group_by(
             Distributor.name,
             Warranty.invoice,
+            Warranty.serial,
             Warranty.sale_date,
             Warranty.shipt_to,
             Warranty.problem,

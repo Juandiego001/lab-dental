@@ -5,10 +5,19 @@
         <p>{{ $t('categories.title', 2) }}</p>
         <div>
           <client-only>
-            <v-btn v-if="$ability.can('create', 'categories')" class="me-2" icon="mdi-plus" size="small" variant="text"
-              @click="createDialog = !createDialog" />
-            <v-btn v-if="$ability.can('read', 'categories')" class="me-2" icon="mdi-magnify" size="small" variant="text"
-              @click="searchDialog = !searchDialog" />
+            <v-tooltip :text="$t('tooltip.create')" :disabled="loading" location="bottom">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" v-if="$ability.can('create', 'categories')" class="me-2" icon="mdi-plus"
+                  size="small" variant="text" @click="createDialog = !createDialog" />
+              </template>
+            </v-tooltip>
+
+            <v-tooltip :text="$t('tooltip.search')" :disabled="loading" location="bottom">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" v-if="$ability.can('read', 'categories')" class="me-2" icon="mdi-magnify"
+                  size="small" variant="text" @click="searchDialog = !searchDialog" />
+              </template>
+            </v-tooltip>
           </client-only>
         </div>
       </v-card-title>
@@ -19,12 +28,26 @@
             @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
-                <v-btn v-if="$ability.can('update', 'categories')" class="my-2 bg-primary" size="small"
-                  icon="mdi-pencil" @click="getCategory(item.id)" />
-                <v-btn v-if="isAdmin" class="bg-secondary" size="small" icon="mdi-file-cancel"
-                  @click="async () => { categoryId = item.id; await getReasons({ categoryId: item.id }); reasonsDialog = true }" />
-                <v-btn v-if="$ability.can('delete', 'categories')" class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                  @click="form.id = item.id; deleteDialog = true" />
+                <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" v-if="$ability.can('update', 'categories')" class="my-2 bg-primary"
+                      size="small" icon="mdi-pencil" @click="getCategory(item.id)" />
+                  </template>
+                </v-tooltip>
+
+                <v-tooltip :text="$t('reasons.title', 2)" :disabled="loading" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" v-if="isAdmin" class="bg-secondary" size="small" icon="mdi-file-cancel"
+                      @click="async () => { categoryId = item.id; await getReasons({ categoryId: item.id }); reasonsDialog = true }" />
+                  </template>
+                </v-tooltip>
+
+                <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" v-if="$ability.can('delete', 'categories')" class="my-2 bg-red" size="small"
+                      icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" />
+                  </template>
+                </v-tooltip>
               </div>
             </template>
           </v-data-table-server>

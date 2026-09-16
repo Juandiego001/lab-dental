@@ -11,8 +11,18 @@
       <v-card-text>
         <v-row class="ma-0 mb-2">
           <v-spacer />
-          <v-btn v-if="isAdmin" class="me-2" icon="mdi-plus" size="x-small" @click="createDialog = !createDialog" />
-          <v-btn icon="mdi-magnify" size="x-small" @click="searchDialog = !searchDialog" />
+          <v-tooltip :text="$t('manuals.tooltip.add')" :disabled="loading" location="bottom">
+            <template v-slot:activator="{ props }">
+              <v-btn v-bind="props" v-if="isAdmin" class="me-2" icon="mdi-plus" size="x-small"
+                @click="createDialog = !createDialog" />
+            </template>
+          </v-tooltip>
+
+          <v-tooltip :text="$t('manuals.tooltip.search')" :disabled="loading" location="bottom">
+            <template v-slot:activator="{ props }">
+              <v-btn v-bind="props" icon="mdi-magnify" size="x-small" @click="searchDialog = !searchDialog" />
+            </template>
+          </v-tooltip>
         </v-row>
         <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
@@ -39,12 +49,27 @@
 
           <template v-slot:item.option="{ item }">
             <div class="d-flex align-center justify-center ga-2 my-2">
-              <v-btn class="bg-secondary" size="x-small" icon="mdi-open-in-new"
-                :href="`/api/files?path=${item.manualFile.path}`" target="_blank" />
+              <v-tooltip :text="$t('manuals.tooltip.view')" :disabled="loading" location="bottom">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" class="bg-secondary" size="x-small" icon="mdi-open-in-new"
+                    :href="`/api/files?path=${item.manualFile.path}`" target="_blank" />
+                </template>
+              </v-tooltip>
+
               <template v-if="isAdmin">
-                <v-btn class="bg-primary" size="x-small" icon="mdi-pencil" @click="getManual(item.id)" />
-                <v-btn class="bg-red" size="x-small" icon="mdi-trash-can"
-                  @click="form.id = item.id; deleteDialog = true" />
+                <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" class="bg-primary" size="x-small" icon="mdi-pencil"
+                      @click="getManual(item.id)" />
+                  </template>
+                </v-tooltip>
+
+                <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" class="bg-red" size="x-small" icon="mdi-trash-can"
+                      @click="form.id = item.id; deleteDialog = true" />
+                  </template>
+                </v-tooltip>
               </template>
             </div>
           </template>

@@ -276,6 +276,10 @@
         "fileRequired": "El archivo de texto plano es requerido",
         "fileSize0": "El archivo de texto plano no contiene información"
       }
+    },
+    "tooltip": {
+      "addEmail": "Agregar correo",
+      "addPhone": "Agregar teléfono"
     }
   },
   "contacts": {
@@ -299,6 +303,10 @@
     },
     "rules": {
       "fullNameRequired": "El nombre es requerido"
+    },
+    "tooltip": {
+      "add": "Agregar contacto",
+      "search": "Buscar contacto"
     }
   },
   "sites": {
@@ -519,6 +527,13 @@
       "categoryRequired": "La categoría es requerida",
       "modelRequired": "El modelo es requerido",
       "referenceRequired": "La referencia es requerida"
+    },
+    "tooltip": {
+      "addFile": "Agregar archivo",
+      "searchFile": "Buscar archivo",
+      "viewFile": "Ver archivo",
+      "increaseOrder": "Incrementar orden",
+      "decreaseOrder": "Disminuir orden"
     }
   },
   "parts": {
@@ -614,6 +629,10 @@
     "rules": {
       "nameRequired": "El nombre es requerido",
       "slugRequired": "El slug es requerido"
+    },
+    "tooltip": {
+      "add": "Agregar motivos",
+      "search": "Buscar motivos"
     }
   },
   "warranties": {
@@ -630,6 +649,7 @@
     "shiptTo": "Enviar a",
     "problem": "Descripción del problema",
     "solution": "Descripción de la solución",
+    "serial": "Serial",
     "parts": {
       "title": "Piezas usadas en reparación (partes requeridas)",
       "create": "Crear pieza",
@@ -708,13 +728,26 @@
       "shiptToRequired": "El lugar de envío es requerido",
       "problemRequired": "La descripción del problema es requerida",
       "solutionRequired": "La descripción de la solución es requerida",
-      "warrantyMissingParts": "Debe registrar al menos una parte de la garantía"
+      "warrantyMissingParts": "Debe registrar al menos una parte de la garantía",
+      "serialRequired": "El serial es requerido"
     },
     "statuses": {
       "label": "Estado",
       "active": "Activo",
       "approved": "Aprobado",
       "rejected": "Rechazado"
+    },
+    "tooltip": {
+      "viewUpdate": "Ver/Editar",
+      "approveReject": "Aprobar/Rechazar",
+      "files": "Archivos",
+      "viewPdf": "Ver PDF",
+      "logs": "Logs",
+      "delete": "Eliminar",
+      "addPart": "Agregar parte",
+      "addFile": "Agregar archivo",
+      "searchFile": "Buscar archivo",
+      "viewFile": "Ver archivo"
     }
   },
   "manuals": {
@@ -746,6 +779,11 @@
       "fileRequired": "El archivo es requerido",
       "invalidFileType": "Solo se permiten archivos PDF, word o imágenes",
       "typeRequired": "El tipo es requerido"
+    },
+    "tooltip": {
+      "add": "Agregar manual",
+      "search": "Buscar manual",
+      "view": "Ver manual"
     }
   },
   "lists": {
@@ -813,6 +851,19 @@
     "connectedLabel": "La alineadora está conectada",
     "disconnectedLabel": "La alineadora está desconectada",
     "copiedSerialMessage": "Serial copiado en el portapapeles",
+    "units": "unidades",
+    "alias": {
+      "label": "Alias",
+      "title": "Asociar alias a una alineadora"
+    },
+    "tooltip": {
+      "setAlias": "Establecer alias",
+      "viewAligner": "Ver alineadora",
+      "unlink": "Desasociar alineadora",
+      "refresh": "Refrescar",
+      "add": "Agregar alineadora",
+      "addMultiple": "Agregar múltiples alineadoras"
+    },
     "dashboard": {
       "generalSummary": "Resumen general",
       "lastUpdate": "Última actualización",
@@ -864,5 +915,15 @@
   "cancel": "Cancelar",
   "missingRequiredFields": "Campos requeridos faltantes",
   "logout": "Cerrar sesión",
-  "update": "Actualizar"
+  "update": "Actualizar",
+  "tooltip": {
+    "create": "Crear",
+    "search": "Buscar",
+    "viewUpdate": "Ver/Editar",
+    "delete": "Eliminar",
+    "remove": "Remover",
+    "refresh": "Refrescar",
+    "increaseOrder": "Incrementar orden",
+    "decreaseOrder": "Disminuir orden"
+  }
 }

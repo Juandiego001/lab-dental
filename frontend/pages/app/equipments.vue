@@ -5,10 +5,19 @@
         <p>{{ $t('equipments.title', 2) }}</p>
         <div>
           <client-only>
-            <v-btn v-if="$ability.can('create', 'equipments')" class="me-2" icon="mdi-plus" size="small" variant="text"
-              @click="createDialog = !createDialog" />
-            <v-btn v-if="$ability.can('read', 'equipments')" class="me-2" icon="mdi-magnify" size="small" variant="text"
-              @click="searchDialog = !searchDialog" />
+            <v-tooltip :text="$t('tooltip.create')" :disabled="loading" location="bottom">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" v-if="$ability.can('create', 'equipments')" class="me-2" icon="mdi-plus"
+                  size="small" variant="text" @click="createDialog = !createDialog" />
+              </template>
+            </v-tooltip>
+
+            <v-tooltip :text="$t('tooltip.search')" :disabled="loading" location="bottom">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" v-if="$ability.can('read', 'equipments')" class="me-2" icon="mdi-magnify"
+                  size="small" variant="text" @click="searchDialog = !searchDialog" />
+              </template>
+            </v-tooltip>
           </client-only>
         </div>
       </v-card-title>
@@ -38,14 +47,33 @@
             </template>
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
-                <v-btn v-if="isAdmin" class="my-2 bg-primary" size="small" icon="mdi-pencil"
-                  @click="getEquipment(item.id)" />
-                <v-btn class="my-2 bg-secondary" size="small" icon="mdi-image-area"
-                  @click="async () => { filesEquipmentId = item.id; await getEquipmentFiles({}); tableDialog = true; }" />
-                <v-btn class="my-2 bg-secondary" size="small" icon="mdi-file-multiple"
-                  @click="async () => { manualsEquipmentId = item.id; await getManuals({ equipmentId: item.id }); manualsDialog = true; }" />
-                <v-btn v-if="isAdmin" class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                  @click="form.id = item.id; deleteDialog = true" />
+                <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" v-if="isAdmin" class="my-2 bg-primary" size="small" icon="mdi-pencil"
+                      @click="getEquipment(item.id)" />
+                  </template>
+                </v-tooltip>
+
+                <v-tooltip :text="$t('equipments.files.title')" :disabled="loading" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" class="my-2 bg-secondary" size="small" icon="mdi-image-area"
+                      @click="async () => { filesEquipmentId = item.id; await getEquipmentFiles({}); tableDialog = true; }" />
+                  </template>
+                </v-tooltip>
+
+                <v-tooltip :text="$t('manuals.title', 2)" :disabled="loading" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" class="my-2 bg-secondary" size="small" icon="mdi-file-multiple"
+                      @click="async () => { manualsEquipmentId = item.id; await getManuals({ equipmentId: item.id }); manualsDialog = true; }" />
+                  </template>
+                </v-tooltip>
+
+                <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" v-if="isAdmin" class="my-2 bg-red" size="small" icon="mdi-trash-can"
+                      @click="form.id = item.id; deleteDialog = true" />
+                  </template>
+                </v-tooltip>
               </div>
             </template>
           </v-data-table-server>

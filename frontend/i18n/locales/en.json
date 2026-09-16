@@ -276,6 +276,10 @@
         "fileRequired": "The plain text file is required",
         "fileSize0": "The plain text file does not have data"
       }
+    },
+    "tooltip": {
+      "addEmail": "Add email",
+      "addPhone": "Add phone"
     }
   },
   "contacts": {
@@ -299,6 +303,10 @@
     },
     "rules": {
       "fullNameRequired": "Name required"
+    },
+    "tooltip": {
+      "add": "Add contact",
+      "search": "Search contact"
     }
   },
   "sites": {
@@ -521,6 +529,13 @@
       "categoryRequired": "The category is required",
       "referenceRequired": "The reference is required",
       "modelRequired": "The model is required"
+    },
+    "tooltip": {
+      "addFile": "Add file",
+      "searchFile": "Search file",
+      "viewFile": "View file",
+      "increaseOrder": "Increase order",
+      "decreaseOrder": "Decrease order"
     }
   },
   "parts": {
@@ -618,6 +633,10 @@
     "rules": {
       "nameRequired": "The name is required",
       "slugRequired": "The slug is required"
+    },
+    "tooltip": {
+      "add": "Add reasons",
+      "search": "Search reasons"
     }
   },
   "warranties": {
@@ -634,6 +653,7 @@
     "shiptTo": "Shipt To",
     "problem": "Problem description",
     "solution": "Solution description",
+    "serial": "Serial",
     "parts": {
       "title": "Parts used in reparation (parts required)",
       "create": "Create part",
@@ -714,13 +734,26 @@
       "shiptToRequired": "The delivery address is required",
       "problemRequired": "The problem description is required",
       "solutionRequired": "The solution description is required",
-      "warrantyMissingParts": "You must register at least one part of the warranty"
+      "warrantyMissingParts": "You must register at least one part of the warranty",
+      "serialRequired": "The serial is required"
     },
     "statuses": {
       "label": "Status",
       "active": "Active",
       "approved": "Approved",
       "rejected": "Rejected"
+    },
+    "tooltip": {
+      "viewUpdate": "View/Update",
+      "approveReject": "Approve/Reject",
+      "files": "Files",
+      "viewPdf": "View PDF",
+      "logs": "Logs",
+      "delete": "Delete",
+      "addPart": "Add part",
+      "addFile": "Add file",
+      "searchFile": "Search file",
+      "viewFile": "View file"
     }
   },
   "manuals": {
@@ -752,6 +785,11 @@
       "fileRequired": "The file is required",
       "invalidFileType": "Only PDF, docx or images are allowed",
       "typeRequired": "The manual type is required"
+    },
+    "tooltip": {
+      "add": "Add manual",
+      "search": "Search manual",
+      "view": "View manual"
     }
   },
   "lists": {
@@ -819,6 +857,19 @@
     "connectedLabel": "The aligner is connected",
     "disconnectedLabel": "The aligner is disconnected",
     "copiedSerialMessage": "Serial number copied to the clipboard",
+    "units": "units",
+    "alias": {
+      "label": "Alias",
+      "title": "Set alias for aligner"
+    },
+    "tooltip": {
+      "setAlias": "Set alias",
+      "viewAligner": "View aligner",
+      "unlink": "Unlink aligner",
+      "refresh": "Refresh",
+      "add": "Add aligner",
+      "addMultiple": "Add multiple aligners"
+    },
     "dashboard": {
       "generalSummary": "General summary",
       "lastUpdate": "Last update",
@@ -871,5 +922,16 @@
   "cancel": "Cancel",
   "missingRequiredFields": "Missing required fields",
   "logout": "Logout",
-  "update": "Update"
+  "update": "Update",
+  "tooltip": {
+    "create": "Create",
+    "search": "Search",
+    "viewUpdate": "View/Update",
+    "delete": "Delete",
+    "remove": "Remove",
+    "refresh": "Refresh",
+    "approveReject": "Approve/Reject",
+    "increaseOrder": "Increase order",
+    "decreaseOrder": "Decrease order"
+  }
 }

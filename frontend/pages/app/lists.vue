@@ -5,10 +5,19 @@
         <p>{{ $t('lists.title', 2) }}</p>
         <div>
           <client-only>
-            <v-btn v-if="$ability.can('create', 'lists')" class="me-2" icon="mdi-plus" size="small" variant="text"
-              @click="createDialog = !createDialog" />
-            <v-btn v-if="$ability.can('read', 'lists')" class="me-2" icon="mdi-magnify" size="small" variant="text"
-              @click="searchDialog = !searchDialog" />
+            <v-tooltip :text="$t('tooltip.create')" :disabled="loading" location="bottom">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" v-if="$ability.can('create', 'lists')" class="me-2" icon="mdi-plus" size="small"
+                  variant="text" @click="createDialog = !createDialog" />
+              </template>
+            </v-tooltip>
+
+            <v-tooltip :text="$t('tooltip.search')" :disabled="loading" location="bottom">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" v-if="$ability.can('read', 'lists')" class="me-2" icon="mdi-magnify" size="small"
+                  variant="text" @click="searchDialog = !searchDialog" />
+              </template>
+            </v-tooltip>
           </client-only>
         </div>
       </v-card-title>
@@ -22,9 +31,19 @@
             </template>
             <template v-slot:item.option="{ item }">
               <div class="d-flex justify-center align-center ga-2">
-                <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getList(item.id)" />
-                <v-btn v-if="!item.isMain" class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                  @click="form.id = item.id; deleteDialog = true" />
+                <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" class="my-2 bg-primary" size="small" icon="mdi-pencil"
+                      @click="getList(item.id)" />
+                  </template>
+                </v-tooltip>
+
+                <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" v-if="!item.isMain" class="my-2 bg-red" size="small" icon="mdi-trash-can"
+                      @click="form.id = item.id; deleteDialog = true" />
+                  </template>
+                </v-tooltip>
               </div>
             </template>
           </v-data-table-server>

@@ -5,10 +5,19 @@
         <p>{{ $t('sites.title', 2) }}</p>
         <div>
           <client-only>
-            <v-btn v-if="$ability.can('create', 'sites')" class="me-2" icon="mdi-plus" size="small" variant="text"
-              @click="createDialog = !createDialog" />
-            <v-btn v-if="$ability.can('read', 'sites')" class="me-2" icon="mdi-magnify" size="small" variant="text"
-              @click="searchDialog = !searchDialog" />
+            <v-tooltip :text="$t('tooltip.create')" :disabled="loading" location="bottom">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" v-if="$ability.can('create', 'sites')" class="me-2" icon="mdi-plus" size="small"
+                  variant="text" @click="createDialog = !createDialog" />
+              </template>
+            </v-tooltip>
+
+            <v-tooltip :text="$t('tooltip.search')" :disabled="loading" location="bottom">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" v-if="$ability.can('read', 'sites')" class="me-2" icon="mdi-magnify" size="small"
+                  variant="text" @click="searchDialog = !searchDialog" />
+              </template>
+            </v-tooltip>
           </client-only>
         </div>
       </v-card-title>
@@ -25,10 +34,19 @@
             </template>
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
-                <v-btn v-if="$ability.can('update', 'sites')" class="my-2 bg-primary" size="small" icon="mdi-pencil"
-                  @click="getSite(item.id)" />
-                <v-btn v-if="$ability.can('delete', 'sites')" class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                  @click="form.id = item.id; deleteDialog = true" />
+                <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" v-if="$ability.can('update', 'sites')" class="my-2 bg-primary" size="small"
+                      icon="mdi-pencil" @click="getSite(item.id)" />
+                  </template>
+                </v-tooltip>
+
+                <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" v-if="$ability.can('delete', 'sites')" class="my-2 bg-red" size="small"
+                      icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" />
+                  </template>
+                </v-tooltip>
               </div>
             </template>
           </v-data-table-server>
@@ -133,7 +151,7 @@
           <v-row dense>
             <v-col cols="12">
               <p class="text-body-2 font-bold text-primary text-decoration-underline">
-                {{ form.companyType === 'distributors' ? $t('sites.distributorsSite') : $t('sites.clientsSite') }}
+                {{ form.companyType === 'distributors' ? $t('sites.distributorSite') : $t('sites.clientsSite') }}
               </p>
             </v-col>
             <template v-if="isAdmin && form.companyType === 'distributors'">

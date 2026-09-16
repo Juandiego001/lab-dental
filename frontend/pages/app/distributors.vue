@@ -7,10 +7,19 @@
         <p>{{ $t('distributors.title', 2) }}</p>
         <div>
           <client-only>
-            <v-btn v-if="$ability.can('create', 'distributors')" class="me-2" icon="mdi-plus" size="small"
-              variant="text" @click="createDialog = !createDialog" />
-            <v-btn v-if="$ability.can('read', 'distributors')" class="me-2" icon="mdi-magnify" size="small"
-              variant="text" @click="searchDialog = !searchDialog" />
+            <v-tooltip :text="$t('tooltip.create')" location="bottom">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" v-if="$ability.can('create', 'distributors')" class="me-2" icon="mdi-plus"
+                  size="small" variant="text" @click="createDialog = !createDialog" />
+              </template>
+            </v-tooltip>
+
+            <v-tooltip :text="$t('tooltip.search')" location="bottom">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" v-if="$ability.can('read', 'distributors')" class="me-2" icon="mdi-magnify"
+                  size="small" variant="text" @click="searchDialog = !searchDialog" />
+              </template>
+            </v-tooltip>
           </client-only>
         </div>
       </v-card-title>
@@ -30,18 +39,34 @@
 
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
-                <v-btn class="my-2 bg-primary" size="small" icon="mdi-pencil" @click="getDistributor(item.id)" />
-                <v-btn class="my-2 bg-secondary" size="small" icon="mdi-account-box"
-                  @click="async () => { distributorId = item.id; await getContacts({}); dialog = true }" />
+                <v-tooltip :text="$t('tooltip.viewUpdate')" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" class="my-2 bg-primary" size="small" icon="mdi-pencil"
+                      @click="getDistributor(item.id)" />
+                  </template>
+                </v-tooltip>
 
-                <v-btn class="my-2 bg-secondary" size="small" icon="mdi-car-wrench"
-                  @click="async () => { distributorIdAligners = item.id; await getAligners({}); dialogAligners = true }"
-                  :loading="distributorIdAligners == item.id && loadingAligners"
-                />
+                <v-tooltip :text="$t('contacts.title')" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" class="my-2 bg-secondary" size="small" icon="mdi-account-box"
+                      @click="async () => { distributorId = item.id; await getContacts({}); dialog = true }" />
+                  </template>
+                </v-tooltip>
 
+                <v-tooltip :text="$t('aligners.title', 2)" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" class="my-2 bg-secondary" size="small" icon="mdi-car-wrench"
+                      @click="async () => { distributorIdAligners = item.id; dialogAligners = true }"
+                      :loading="distributorIdAligners == item.id && loadingAligners" />
+                  </template>
+                </v-tooltip>
 
-                <v-btn class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                  @click="form.id = item.id; deleteDialog = true" />
+                <v-tooltip :text="$t('tooltip.delete')" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" class="my-2 bg-red" size="small" icon="mdi-trash-can"
+                      @click="form.id = item.id; deleteDialog = true" />
+                  </template>
+                </v-tooltip>
               </div>
             </template>
           </v-data-table-server>
@@ -85,8 +110,13 @@
               <div class="d-flex align-center">
                 <span class="text-subtitle-2 text-primary">{{ $t('distributors.emails.title', 2) }}</span>
                 <v-spacer />
-                <v-btn color="primary" variant="text" size="x-small" icon="mdi-plus" @mousedown.prevent
-                  @click="addEmailField" />
+
+                <v-tooltip :text="$t('distributors.tooltip.addEmail')" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" color="primary" variant="text" size="x-small" icon="mdi-plus"
+                      @mousedown.prevent @click="addEmailField" />
+                  </template>
+                </v-tooltip>
               </div>
 
               <v-slide-y-transition group>
@@ -104,8 +134,12 @@
               <div class="d-flex align-center">
                 <span class="text-subtitle-2 text-primary">{{ $t('distributors.phones.title', 2) }}</span>
                 <v-spacer />
-                <v-btn color="primary" variant="text" size="x-small" icon="mdi-plus" @mousedown.prevent
-                  @click="addPhoneField" />
+                <v-tooltip :text="$t('distributors.tooltip.addPhone')" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" color="primary" variant="text" size="x-small" icon="mdi-plus"
+                      @mousedown.prevent @click="addPhoneField" />
+                  </template>
+                </v-tooltip>
               </div>
 
               <v-slide-y-transition group>
@@ -167,8 +201,13 @@
               <div class="d-flex align-center">
                 <span class="text-subtitle-2 text-primary">{{ $t('distributors.emails.title', 2) }}</span>
                 <v-spacer />
-                <v-btn color="primary" variant="text" size="x-small" icon="mdi-plus" @mousedown.prevent
-                  @click="addEmailField" />
+
+                <v-tooltip :text="$t('distributors.tooltip.addEmail')" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" color="primary" variant="text" size="x-small" icon="mdi-plus"
+                      @mousedown.prevent @click="addEmailField" />
+                  </template>
+                </v-tooltip>
               </div>
 
               <v-slide-y-transition group>
@@ -186,8 +225,13 @@
               <div class="d-flex align-center">
                 <span class="text-subtitle-2 text-primary">{{ $t('distributors.phones.title', 2) }}</span>
                 <v-spacer />
-                <v-btn color="primary" variant="text" size="x-small" icon="mdi-plus" @mousedown.prevent
-                  @click="addPhoneField" />
+
+                <v-tooltip :text="$t('distributors.tooltip.addPhone')" location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" color="primary" variant="text" size="x-small" icon="mdi-plus"
+                      @mousedown.prevent @click="addPhoneField" />
+                  </template>
+                </v-tooltip>
               </div>
 
               <v-slide-y-transition group>
@@ -281,7 +325,7 @@ const { t } = useI18n();
 const { items, total, getDistributors } = useDistributors();
 const { distributorId, dialog, getContacts } = useContacts();
 const { items: brands, getBrands } = useBrands();
-const { distributorId: distributorIdAligners, dialog: dialogAligners, getAligners, loading: loadingAligners } = useDistributorsAligners();
+const { distributorId: distributorIdAligners, dialog: dialogAligners, loading: loadingAligners } = useDistributorsAligners();
 
 definePageMeta({
   layout: 'app',
