@@ -783,6 +783,10 @@
             <v-col cols="12" class="text-body-2 text-primary mt-2">
               {{ $t('warranties.info') }}
             </v-col>
+            <v-col cols="12">
+              <v-text-field v-model="form.serial" :label="$t('warranties.serial')" hide-details="auto" counter="50"
+                maxlength="50" readonly />
+            </v-col>
             <v-col cols="6">
               <v-text-field v-model="form.saleDate" :label="$t('warranties.saleDate')" readonly hide-details="auto" />
             </v-col>
