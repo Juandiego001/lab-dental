@@ -4,8 +4,8 @@ import uuid
 from pathlib import Path
 from weasyprint import HTML
 from werkzeug.datastructures import FileStorage
-from core.app import db, FRONTEND_APP_BASE_URL
-from core.models import Address, City, Contact, Country, Distributor, DistributorList, Equipment, List_, Reason, Site, State, User, UserList, Warranty, WarrantyFile, WarrantyReason, WarrantyWCO
+from core.app import db, FRONTEND_APP_BASE_URL, MASTER_SNAPON_EMAIL
+from core.models import Address, City, Contact, Country, Distributor, DistributorList, Equipment, List_, Module, Notification, NotificationModule, Reason, Site, State, User, UserList, UserNotification, Warranty, WarrantyFile, WarrantyReason, WarrantyWCO
 from sqlalchemy import delete, and_, and_, func
 from werkzeug.exceptions import HTTPException
 from flask.templating import render_template
@@ -77,7 +77,7 @@ def get_warranties(current_user: User, distributor_id: int, equipment_id: int, w
     ).unique()), total
 
 
-def get_warranty_by_id(warranty_id: int):
+def get_warranty_by_id(warranty_id: int) -> Warranty:
     '''Get warranty by warranty id'''
 
     return db.session.query(
@@ -92,7 +92,7 @@ def get_warranty_by_id(warranty_id: int):
         Warranty.solution,
         Warranty.status,
         Warranty.parts,
-        Warranty.received_at,
+        Warranty.created_at,
         WarrantyWCO.code.label('wco_code'),
         WarrantyWCO.year.label('wco_year'),
 
@@ -130,10 +130,11 @@ def get_warranty_by_id(warranty_id: int):
         .first()
 
 
-def get_warranty_by_id_for_pdf(warranty_id: int):
+def get_warranty_by_id_for_pdf(warranty_id: int) -> Warranty:
     '''Get warranty by warranty id for PDF generation'''
 
     return db.session.query(
+        Distributor.id.label('distributor_id'),
         Distributor.name.label('distributor'),
         func.array_agg(Reason.name).label('reasons_names'),
         Warranty.invoice,
@@ -144,8 +145,7 @@ def get_warranty_by_id_for_pdf(warranty_id: int):
         Warranty.solution,
         Warranty.status,
         Warranty.parts,
-        Warranty.received_at,
-        Warranty.approved_at,
+        Warranty.created_at,
         Warranty.approved_at,
         WarrantyWCO.code.label('wco_code'),
         WarrantyWCO.year.label('wco_year'),
@@ -187,6 +187,7 @@ def get_warranty_by_id_for_pdf(warranty_id: int):
         .outerjoin(WarrantyWCO, WarrantyWCO.warranty_id == Warranty.id)\
         .filter(Warranty.id == warranty_id)\
         .group_by(
+            Distributor.id,
             Distributor.name,
             Warranty.invoice,
             Warranty.serial,
@@ -196,7 +197,7 @@ def get_warranty_by_id_for_pdf(warranty_id: int):
             Warranty.solution,
             Warranty.status,
             Warranty.parts,
-            Warranty.received_at,
+            Warranty.created_at,
             Warranty.approved_at,
             WarrantyWCO.code,
             WarrantyWCO.year,
@@ -241,11 +242,137 @@ def update_warranty(warranty_id: int, json_data: dict):
     db.session.commit()
 
 
+def notify_update(warranty_id: int):
+    '''Notify users the warranty have been updated'''
+
+    warranty: Warranty = get_warranty_by_id_for_pdf(warranty_id)
+    warranty_data = WarrantyPDF().dump(warranty)
+    warranty_data = {
+        **warranty_data,
+        "date": datetime.now().strftime('%B %d, %Y'),
+        "distributor": warranty_data['distributor'],
+        "reasons": warranty_data['reasons_names'],
+        "app_url": f'{FRONTEND_APP_BASE_URL}/app/warranties'
+    }
+
+    admins = db.session.query(User)\
+        .join(UserList)\
+        .join(List_)\
+        .join(DistributorList)\
+        .filter(and_(DistributorList.distributor_id == warranty.distributor_id, User.status == 'ACTIVE', User.role == 'ADMIN'))\
+        .distinct(User.email)\
+        .order_by(User.email)\
+        .all()
+
+    allowed_users = db.session.query(User)\
+        .join(UserNotification, UserNotification.user_id == User.id)\
+        .join(Notification, Notification.id == UserNotification.notification_id)\
+        .join(NotificationModule, NotificationModule.notification_id == Notification.id)\
+        .join(Module, Module.id == NotificationModule.module_id)\
+        .join(UserList, UserList.user_id == User.id)\
+        .join(List_, UserList.list_id == List_.id)\
+        .join(DistributorList, DistributorList.list_id == List_.id)\
+        .filter(
+        and_(
+            DistributorList.distributor_id == warranty.distributor_id,
+            User.status == 'ACTIVE',
+            User.role != 'ADMIN',
+            Module.name == 'warranties',
+            NotificationModule.update
+        )
+    )\
+        .distinct(User.email)\
+        .order_by(User.email)\
+        .all()
+
+    all_users = admins + allowed_users
+    users_emails_by_language = {'es': [], 'en': []}
+    for each_user in all_users:
+        users_emails_by_language[each_user.language].append(
+            each_user.email)
+
+    for each_language in users_emails_by_language.keys():
+        users_filtered = users_emails_by_language[each_language]
+        if len(users_filtered) > 0:
+            with force_locale(each_language):
+                mail_subject = gettext(u'SOE Latam - Actualización de garantía #%(id)s',
+                                       id=warranty_id)
+            send_mail(
+                subject=mail_subject,
+                to=users_filtered,
+                plantilla='warranty_updated.html',
+                params=warranty_data,
+                language=each_language)
+
+
 def delete_warranty(warranty_id: int):
     '''Delete warranty'''
 
     db.session.merge(Warranty(id=warranty_id, status='INACTIVE'))
     db.session.commit()
+
+
+def notify_delete(warranty_id: int):
+    '''Notify users the warranty have been updated'''
+
+    warranty: Warranty = get_warranty_by_id_for_pdf(warranty_id)
+    warranty_data = WarrantyPDF().dump(warranty)
+    warranty_data = {
+        **warranty_data,
+        "date": datetime.now().strftime('%B %d, %Y'),
+        "distributor": warranty_data['distributor'],
+        "reasons": warranty_data['reasons_names'],
+        "app_url": f'{FRONTEND_APP_BASE_URL}/app/warranties'
+    }
+
+    admins = db.session.query(User)\
+        .join(UserList)\
+        .join(List_)\
+        .join(DistributorList)\
+        .filter(and_(DistributorList.distributor_id == warranty.distributor_id, User.status == 'ACTIVE', User.role == 'ADMIN'))\
+        .distinct(User.email)\
+        .order_by(User.email)\
+        .all()
+
+    allowed_users = db.session.query(User)\
+        .join(UserNotification, UserNotification.user_id == User.id)\
+        .join(Notification, Notification.id == UserNotification.notification_id)\
+        .join(NotificationModule, NotificationModule.notification_id == Notification.id)\
+        .join(Module, Module.id == NotificationModule.module_id)\
+        .join(UserList, UserList.user_id == User.id)\
+        .join(List_, UserList.list_id == List_.id)\
+        .join(DistributorList, DistributorList.list_id == List_.id)\
+        .filter(
+        and_(
+            DistributorList.distributor_id == warranty.distributor_id,
+            User.status == 'ACTIVE',
+            User.role != 'ADMIN',
+            Module.name == 'warranties',
+            NotificationModule.delete
+        )
+    )\
+        .distinct(User.email)\
+        .order_by(User.email)\
+        .all()
+
+    all_users = admins + allowed_users
+    users_emails_by_language = {'es': [], 'en': []}
+    for each_user in all_users:
+        users_emails_by_language[each_user.language].append(
+            each_user.email)
+
+    for each_language in users_emails_by_language.keys():
+        users_filtered = users_emails_by_language[each_language]
+        if len(users_filtered) > 0:
+            with force_locale(each_language):
+                mail_subject = gettext(u'SOE Latam - Eliminación de garantía #%(id)s',
+                                       id=warranty_id)
+            send_mail(
+                subject=mail_subject,
+                to=users_filtered,
+                plantilla='warranty_deleted.html',
+                params=warranty_data,
+                language=each_language)
 
 
 def create_warranty_file(warranty_id: int, warranty_file_data: FileStorage):
@@ -258,7 +385,6 @@ def create_warranty_file(warranty_id: int, warranty_file_data: FileStorage):
         warranty_id=warranty_id,
         original_name=original_name,
         hash_name=hash_name,
-        path=file_path,
         mimetype=mimetype,
         extension=extension,
         size=size
@@ -285,6 +411,65 @@ def create_warranty(warranty: dict):
         create_warranty_file(new_warranty.id, warranty_file)
 
     db.session.commit()
+    return new_warranty
+
+
+def notify_creation(warranty: Warranty = None):
+    '''Send notification to every admin that manages the distributor that a warranty has been created'''
+
+    warranty_data: dict = WarrantyPDF().dump(
+        get_warranty_by_id_for_pdf(warranty.id))
+
+    warranty_data['app_url'] = f'{FRONTEND_APP_BASE_URL}/app/warranties'
+
+    admins = db.session.query(User)\
+        .join(UserList)\
+        .join(List_)\
+        .join(DistributorList)\
+        .filter(and_(DistributorList.distributor_id == warranty.distributor_id, User.status == 'ACTIVE', User.role == 'ADMIN'))\
+        .distinct(User.email)\
+        .order_by(User.email)\
+        .all()
+
+    allowed_users = db.session.query(User)\
+        .join(UserNotification, UserNotification.user_id == User.id)\
+        .join(Notification, Notification.id == UserNotification.notification_id)\
+        .join(NotificationModule, NotificationModule.notification_id == Notification.id)\
+        .join(Module, Module.id == NotificationModule.module_id)\
+        .join(UserList, UserList.user_id == User.id)\
+        .join(List_, UserList.list_id == List_.id)\
+        .join(DistributorList, DistributorList.list_id == List_.id)\
+        .filter(
+        and_(
+            DistributorList.distributor_id == warranty.distributor_id,
+            User.status == 'ACTIVE',
+            User.role != 'ADMIN',
+            Module.name == 'warranties',
+            NotificationModule.create
+        )
+    )\
+        .distinct(User.email)\
+        .order_by(User.email)\
+        .all()
+
+    all_users = admins + allowed_users
+    users_emails_language = {'es': [], 'en': []}
+    for each_user in all_users:
+        users_emails_language[each_user.language].append(
+            each_user.email)
+
+    for each_language in users_emails_language.keys():
+        users_filtered = users_emails_language[each_language]
+        if len(users_filtered) > 0:
+            with force_locale(each_language):
+                mail_subject = gettext(u'SOE Latam - Creación de garantía #%(id)s',
+                                       id=warranty.id)
+            send_mail(
+                subject=mail_subject,
+                to=users_filtered,
+                plantilla='warranty_created.html',
+                params=warranty_data,
+                language=each_language)
 
 
 def group_reasons(reasons: list):
@@ -358,9 +543,6 @@ def approve_warranty(current_user: User, warranty_id: int):
         db.session.add(new_warranty_wco)
 
     current_warranty.status = 'APPROVED'
-    if not current_warranty.received_at:
-        current_warranty.received_at = current_date
-
     current_warranty.user_approval_id = current_user.id
     current_warranty.approved_at = current_date
     db.session.commit()
@@ -369,8 +551,8 @@ def approve_warranty(current_user: User, warranty_id: int):
 def notify_approval(warranty_id: int):
     '''Send notification to every distributor user about the warranty approved'''
 
-    warranty_data: dict = WarrantyPDF().dump(
-        get_warranty_by_id_for_pdf(warranty_id))
+    warranty: Warranty = get_warranty_by_id_for_pdf(warranty_id)
+    warranty_data: dict = WarrantyPDF().dump(warranty)
     warranty_data = {
         **warranty_data,
         "date": datetime.now().strftime('%B %d, %Y'),
@@ -379,18 +561,39 @@ def notify_approval(warranty_id: int):
         "app_url": f'{FRONTEND_APP_BASE_URL}/app/warranties'
     }
 
-    users_ = db.session.query(User)\
+    admins = db.session.query(User)\
         .join(UserList)\
         .join(List_)\
         .join(DistributorList)\
-        .join(Warranty, Warranty.distributor_id == DistributorList.distributor_id)\
-        .filter(and_(Warranty.id == warranty_id, User.status == 'ACTIVE', User.role != 'ADMIN'))\
+        .filter(and_(DistributorList.distributor_id == warranty.distributor_id, User.status == 'ACTIVE', User.role == 'ADMIN'))\
         .distinct(User.email)\
         .order_by(User.email)\
         .all()
 
+    allowed_users = db.session.query(User)\
+        .join(UserNotification, UserNotification.user_id == User.id)\
+        .join(Notification, Notification.id == UserNotification.notification_id)\
+        .join(NotificationModule, NotificationModule.notification_id == Notification.id)\
+        .join(Module, Module.id == NotificationModule.module_id)\
+        .join(UserList, UserList.user_id == User.id)\
+        .join(List_, UserList.list_id == List_.id)\
+        .join(DistributorList, DistributorList.list_id == List_.id)\
+        .filter(
+        and_(
+            DistributorList.distributor_id == warranty.distributor_id,
+            User.status == 'ACTIVE',
+            User.role != 'ADMIN',
+            Module.name == 'warranties',
+            NotificationModule.update
+        )
+    )\
+        .distinct(User.email)\
+        .order_by(User.email)\
+        .all()
+
+    all_users = admins + allowed_users
     users_emails_by_language = {'es': [], 'en': []}
-    for each_user in users_:
+    for each_user in all_users:
         users_emails_by_language[each_user.language].append(
             each_user.email)
 
@@ -407,7 +610,7 @@ def notify_approval(warranty_id: int):
                 params=warranty_data,
                 language=each_language)
 
-    # Se envía el correo para Pipe para Snapon
+    # Se envía el correo para Pipe o MASTER_SNAPON_EMAIL para Snapon
     warranty_files: list[WarrantyFile] = db.session.query(
         WarrantyFile).filter(WarrantyFile.warranty_id == warranty_id).all()
     grouped_reasons = group_reasons(warranty_data['reasons_names'])
@@ -423,7 +626,7 @@ def notify_approval(warranty_id: int):
 
     send_mail(
         subject=f'Processing Warranty with WCO: {warranty_data['wco']}',
-        to=['Andres.Leon@snapon.com'],
+        to=[MASTER_SNAPON_EMAIL],
         plantilla='warranties_snapon_message.html',
         params={'wco': warranty_data['wco']},
         language='en',
@@ -433,7 +636,13 @@ def notify_approval(warranty_id: int):
                 'filename': f"Warranty {warranty_data['wco']}.pdf",
                 'content': pdf_bytes
             },
-            *[{'path':  warranty_file.path, 'filename': warranty_file.original_name} for warranty_file in warranty_files]
+            *[
+                {
+                    'path':  f'{warranty_file.hash_name}{warranty_file.extension}',
+                    'filename': warranty_file.original_name
+                }
+                for warranty_file in warranty_files
+            ]
         ]
     )
 
@@ -454,8 +663,8 @@ def reject_warranty(warranty_id: int):
 def notify_rejection(warranty_id: int, reject_comments: str):
     '''Send notification to every distributor user about the warranty rejected'''
 
-    warranty_data: dict = WarrantyPDF().dump(
-        get_warranty_by_id_for_pdf(warranty_id))
+    warranty: Warranty = get_warranty_by_id_for_pdf(warranty_id)
+    warranty_data: dict = WarrantyPDF().dump(warranty)
     warranty_data = {
         **warranty_data,
         "date": datetime.now().strftime("%m/%d/%Y"),
@@ -465,17 +674,39 @@ def notify_rejection(warranty_id: int, reject_comments: str):
         "reject_comments": reject_comments
     }
 
-    users_ = db.session.query(User)\
+    admins = db.session.query(User)\
         .join(UserList)\
         .join(List_)\
         .join(DistributorList)\
-        .join(Warranty, Warranty.distributor_id == DistributorList.distributor_id)\
-        .filter(and_(Warranty.id == warranty_id, User.status == 'ACTIVE', User.role != 'ADMIN'))\
+        .filter(and_(DistributorList.distributor_id == warranty.distributor_id, User.status == 'ACTIVE', User.role == 'ADMIN'))\
         .distinct(User.email)\
         .order_by(User.email)\
         .all()
+
+    allowed_users = db.session.query(User)\
+        .join(UserNotification, UserNotification.user_id == User.id)\
+        .join(Notification, Notification.id == UserNotification.notification_id)\
+        .join(NotificationModule, NotificationModule.notification_id == Notification.id)\
+        .join(Module, Module.id == NotificationModule.module_id)\
+        .join(UserList, UserList.user_id == User.id)\
+        .join(List_, UserList.list_id == List_.id)\
+        .join(DistributorList, DistributorList.list_id == List_.id)\
+        .filter(
+        and_(
+            DistributorList.distributor_id == warranty.distributor_id,
+            User.status == 'ACTIVE',
+            User.role != 'ADMIN',
+            Module.name == 'warranties',
+            NotificationModule.update
+        )
+    )\
+        .distinct(User.email)\
+        .order_by(User.email)\
+        .all()
+
+    all_users = admins + allowed_users
     users_emails_by_language = {'es': [], 'en': []}
-    for each_user in users_:
+    for each_user in all_users:
         users_emails_by_language[each_user.language].append(
             each_user.email)
 
@@ -556,7 +787,9 @@ def remove_warranty_file(warranty_file_id: int):
     )\
         .first()
     try:
-        Path(warranty_file.path).unlink(missing_ok=True)
+        Path(
+            f'./warranties_files/{warranty_file.hash_name}{warranty_file.extension}')\
+            .unlink(missing_ok=True)
     except Exception as e:
         print(
             f"Ocurrió un error al intentar eliminar el archivo: {e}")

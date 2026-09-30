@@ -26,6 +26,10 @@
           <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
             :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
             @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
+            <template v-slot:item.phone="{ item }">
+              <span v-if="item.phone">{{ item.phone }}</span>
+              <span v-else>-</span>
+            </template>
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
                 <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">

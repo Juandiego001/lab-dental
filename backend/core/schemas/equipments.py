@@ -123,8 +123,8 @@ class EquipmentFileOut(BaseSchema):
     description = String()
     original_name = String(data_key='originalName')
     size = Function(lambda data: format_file_size(data.size))
+    hash_name = String(data_key='hashName')
     extension = String()
-    path = String()
     sort_order = Integer(data_key='sortOrder')
 
 

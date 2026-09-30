@@ -8,7 +8,7 @@ from core.app import db, FRONTEND_APP_BASE_URL
 from core.utils import process_file, send_mail
 from werkzeug.datastructures import FileStorage
 from sqlalchemy.dialects.postgresql import JSONB
-from core.models import Installation, InstallationFile
+from core.models import Installation, InstallationFile, Module, Notification, NotificationModule, UserNotification
 from core.services.distributors import get_distributor_from_user
 from core.schemas.installations import InstallationCreatedNotification, InstallationApprovedNotification
 from core.models import Client, Distributor, DistributorList, Equipment, Installation, List_, Site, User, UserList
@@ -82,14 +82,19 @@ def get_installation_by_id(installation_id: int):
         client_site.name.label('site_client_name'),
         distributor_site.name.label('site_distributor_name'),
         func.array_agg(
-            func.cast('{"originalName":"' + InstallationFile.original_name + '","path":"' +
-                      InstallationFile.path + '"}', JSON))
+            func.cast(
+                '{"original_name":"' + InstallationFile.original_name +
+                '","hash_name":"' + InstallationFile.hash_name +
+                '","extension":"' + InstallationFile.extension +
+                '"}', JSON))
         .filter(InstallationFile.file_type == 'EVIDENCES')
         .label('installation_evidences_files'),
         func.cast(func.json_agg(
-            func.cast('{"originalName":"' + InstallationFile.original_name + '","path":"' +
-                      InstallationFile.path + '"}', JSON))
-                  .filter(InstallationFile.file_type == 'SERIAL'), JSONB)[0]
+            func.cast(
+                '{"original_name":"' + InstallationFile.original_name +
+                '","hash_name":"' + InstallationFile.hash_name +
+                '","extension":"' + InstallationFile.extension +
+                '"}', JSON)).filter(InstallationFile.file_type == 'SERIAL'), JSONB)[0]
         .label('installation_serial_file')
     )\
         .select_from(Installation)\
@@ -138,7 +143,6 @@ def create_installation_file(installation_id: int, installation_file_data: FileS
         installation_id=installation_id,
         original_name=original_name,
         hash_name=hash_name,
-        path=file_path,
         mimetype=mimetype,
         extension=extension,
         size=size,
@@ -174,20 +178,26 @@ def create_installation(current_user: User, data: dict):
 
 
 def notify_creation(installation: Installation = None):
-    '''Send notification to every admin that manages the distributor that creates an installation'''
+    '''Send notification to every admin and user that manages the distributor that creates an installation'''
 
     installation_data = InstallationCreatedNotification().dump(
         get_installation_by_id(installation.id))
+
+    serial_file = installation_data['serial_file']
     installation_files_attachments = [
         {
-            'path': installation_data['serial_file']['path'],
-            'filename': installation_data['serial_file']['originalName']
+            'path': f'./installations_files/{serial_file['hash_name'] + serial_file['extension']}',
+            'filename': serial_file['original_name']
         },
-        *[{'path': evidence['path'], 'filename': evidence['originalName']} for evidence in installation_data['evidences_files']]
+        *[
+            {
+                'path': f'./installations_files/{evidence['hash_name'] + evidence['extension']}',
+                'filename': evidence['original_name']
+            } for evidence in installation_data['evidences_files']]
     ]
     installation_data['app_url'] = f'{FRONTEND_APP_BASE_URL}/app/installations'
 
-    users_ = db.session.query(User)\
+    admins = db.session.query(User)\
         .join(UserList)\
         .join(List_)\
         .join(DistributorList)\
@@ -196,13 +206,35 @@ def notify_creation(installation: Installation = None):
         .order_by(User.email)\
         .all()
 
-    users_emails_by_language = {'es': [], 'en': []}
-    for each_user in users_:
-        users_emails_by_language[each_user.language].append(
+    allowed_users = db.session.query(User)\
+        .join(UserNotification, UserNotification.user_id == User.id)\
+        .join(Notification, Notification.id == UserNotification.notification_id)\
+        .join(NotificationModule, NotificationModule.notification_id == Notification.id)\
+        .join(Module, Module.id == NotificationModule.module_id)\
+        .join(UserList, UserList.user_id == User.id)\
+        .join(List_, UserList.list_id == List_.id)\
+        .join(DistributorList, DistributorList.list_id == List_.id)\
+        .filter(
+            and_(
+                DistributorList.distributor_id == installation.distributor_id,
+                User.status == 'ACTIVE',
+                User.role != 'ADMIN',
+                Module.name == 'installations',
+                NotificationModule.create
+            )
+    )\
+        .distinct(User.email)\
+        .order_by(User.email)\
+        .all()
+
+    all_users = admins + allowed_users
+    by_languages = {'es': [], 'en': []}
+    for each_user in all_users:
+        by_languages[each_user.language].append(
             each_user.email)
 
-    for each_language in users_emails_by_language.keys():
-        users_filtered = users_emails_by_language[each_language]
+    for each_language in by_languages.keys():
+        users_filtered = by_languages[each_language]
         if len(users_filtered) > 0:
             with force_locale(each_language):
                 mail_subject = gettext(u'SOE Latam - Registro de certificado de instalación #%(id)s',
@@ -210,7 +242,7 @@ def notify_creation(installation: Installation = None):
             send_mail(
                 subject=mail_subject,
                 to=users_filtered,
-                plantilla='register_installation.html',
+                plantilla='installation_created.html',
                 params=installation_data,
                 attachments=installation_files_attachments,
                 language=each_language)
@@ -245,7 +277,8 @@ def update_installation(installation_id: int, data: dict):
     if serial_picture:
         serial_picture_data = db.session.query(InstallationFile).filter(
             InstallationFile.installation_id == installation_id, InstallationFile.file_type == 'SERIAL').first()
-        serial_picture.save(serial_picture_data.path)
+        serial_picture.save(
+            f'./installations_files/{serial_picture_data.hash_name}{serial_picture_data.extension}')
 
     if installation_pictures:
         db.session.query(InstallationFile).filter(InstallationFile.installation_id ==
@@ -259,13 +292,13 @@ def update_installation(installation_id: int, data: dict):
 
 
 def notify_update(installation_id: int):
-    '''Notify admins the installation have been updated'''
+    '''Notify users the installation have been updated'''
 
     installation_data = InstallationApprovedNotification().dump(
         get_installation_by_id(installation_id))
     installation_data['app_url'] = f'{FRONTEND_APP_BASE_URL}/app/installations'
 
-    users_ = db.session.query(User)\
+    admins = db.session.query(User)\
         .join(UserList)\
         .join(List_)\
         .join(DistributorList)\
@@ -274,8 +307,30 @@ def notify_update(installation_id: int):
         .order_by(User.email)\
         .all()
 
+    allowed_users = db.session.query(User)\
+        .join(UserNotification, UserNotification.user_id == User.id)\
+        .join(Notification, Notification.id == UserNotification.notification_id)\
+        .join(NotificationModule, NotificationModule.notification_id == Notification.id)\
+        .join(Module, Module.id == NotificationModule.module_id)\
+        .join(UserList, UserList.user_id == User.id)\
+        .join(List_, UserList.list_id == List_.id)\
+        .join(DistributorList, DistributorList.list_id == List_.id)\
+        .filter(
+        and_(
+            DistributorList.distributor_id == installation_data['distributor_id'],
+            User.status == 'ACTIVE',
+            User.role != 'ADMIN',
+            Module.name == 'installations',
+            NotificationModule.update
+        )
+    )\
+        .distinct(User.email)\
+        .order_by(User.email)\
+        .all()
+
+    all_users = admins + allowed_users
     users_emails_by_language = {'es': [], 'en': []}
-    for each_user in users_:
+    for each_user in all_users:
         users_emails_by_language[each_user.language].append(
             each_user.email)
 
@@ -300,6 +355,63 @@ def delete_installation(installation_id: int):
     db.session.commit()
 
 
+def notify_delete(installation_id: int):
+    '''Notify users the installation have been deleted'''
+
+    installation_data = InstallationApprovedNotification().dump(
+        get_installation_by_id(installation_id))
+    installation_data['app_url'] = f'{FRONTEND_APP_BASE_URL}/app/installations'
+
+    admins = db.session.query(User)\
+        .join(UserList)\
+        .join(List_)\
+        .join(DistributorList)\
+        .filter(and_(DistributorList.distributor_id == installation_data['distributor_id'], User.status == 'ACTIVE', User.role == 'ADMIN'))\
+        .distinct(User.email)\
+        .order_by(User.email)\
+        .all()
+
+    allowed_users = db.session.query(User)\
+        .join(UserNotification, UserNotification.user_id == User.id)\
+        .join(Notification, Notification.id == UserNotification.notification_id)\
+        .join(NotificationModule, NotificationModule.notification_id == Notification.id)\
+        .join(Module, Module.id == NotificationModule.module_id)\
+        .join(UserList, UserList.user_id == User.id)\
+        .join(List_, UserList.list_id == List_.id)\
+        .join(DistributorList, DistributorList.list_id == List_.id)\
+        .filter(
+        and_(
+            DistributorList.distributor_id == installation_data['distributor_id'],
+            User.status == 'ACTIVE',
+            User.role != 'ADMIN',
+            Module.name == 'installations',
+            NotificationModule.delete
+        )
+    )\
+        .distinct(User.email)\
+        .order_by(User.email)\
+        .all()
+
+    all_users = admins + allowed_users
+    users_emails_by_language = {'es': [], 'en': []}
+    for each_user in all_users:
+        users_emails_by_language[each_user.language].append(
+            each_user.email)
+
+    for each_language in users_emails_by_language.keys():
+        users_filtered = users_emails_by_language[each_language]
+        if len(users_filtered) > 0:
+            with force_locale(each_language):
+                mail_subject = gettext(u'SOE Latam - Certificado de instalación eliminado #%(id)s',
+                                       id=installation_id)
+            send_mail(
+                subject=mail_subject,
+                to=users_filtered,
+                plantilla='installation_deleted.html',
+                params=installation_data,
+                language=each_language)
+
+
 def approve_installation(installation_id: int):
     '''Approve installation'''
 
@@ -317,7 +429,7 @@ def notify_approval(installation_id: int):
         get_installation_by_id(installation_id))
     installation_data['app_url'] = f'{FRONTEND_APP_BASE_URL}/app/installations'
 
-    users_ = db.session.query(User)\
+    admins = db.session.query(User)\
         .join(UserList)\
         .join(List_)\
         .join(DistributorList)\
@@ -326,8 +438,30 @@ def notify_approval(installation_id: int):
         .order_by(User.email)\
         .all()
 
+    allowed_users = db.session.query(User)\
+        .join(UserNotification, UserNotification.user_id == User.id)\
+        .join(Notification, Notification.id == UserNotification.notification_id)\
+        .join(NotificationModule, NotificationModule.notification_id == Notification.id)\
+        .join(Module, Module.id == NotificationModule.module_id)\
+        .join(UserList, UserList.user_id == User.id)\
+        .join(List_, UserList.list_id == List_.id)\
+        .join(DistributorList, DistributorList.list_id == List_.id)\
+        .filter(
+        and_(
+            DistributorList.distributor_id == installation_data['distributor_id'],
+            User.status == 'ACTIVE',
+            User.role != 'ADMIN',
+            Module.name == 'installations',
+            NotificationModule.update
+        )
+    )\
+        .distinct(User.email)\
+        .order_by(User.email)\
+        .all()
+
+    all_users = admins + allowed_users
     users_emails_by_language = {'es': [], 'en': []}
-    for each_user in users_:
+    for each_user in all_users:
         users_emails_by_language[each_user.language].append(
             each_user.email)
 
@@ -363,7 +497,7 @@ def notify_rejection(installation_id: int, reject_comments: str):
     installation_data['reject_comments'] = reject_comments
     installation_data['app_url'] = f'{FRONTEND_APP_BASE_URL}/app/installations'
 
-    users_ = db.session.query(User)\
+    admins = db.session.query(User)\
         .join(UserList)\
         .join(List_)\
         .join(DistributorList)\
@@ -371,8 +505,31 @@ def notify_rejection(installation_id: int, reject_comments: str):
         .distinct(User.email)\
         .order_by(User.email)\
         .all()
+
+    allowed_users = db.session.query(User)\
+        .join(UserNotification, UserNotification.user_id == User.id)\
+        .join(Notification, Notification.id == UserNotification.notification_id)\
+        .join(NotificationModule, NotificationModule.notification_id == Notification.id)\
+        .join(Module, Module.id == NotificationModule.module_id)\
+        .join(UserList, UserList.user_id == User.id)\
+        .join(List_, UserList.list_id == List_.id)\
+        .join(DistributorList, DistributorList.list_id == List_.id)\
+        .filter(
+        and_(
+            DistributorList.distributor_id == installation_data['distributor_id'],
+            User.status == 'ACTIVE',
+            User.role != 'ADMIN',
+            Module.name == 'installations',
+            NotificationModule.update
+        )
+    )\
+        .distinct(User.email)\
+        .order_by(User.email)\
+        .all()
+
+    all_users = admins + allowed_users
     users_emails_by_language = {'es': [], 'en': []}
-    for each_user in users_:
+    for each_user in all_users:
         users_emails_by_language[each_user.language].append(
             each_user.email)
 

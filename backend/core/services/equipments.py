@@ -73,7 +73,7 @@ def search_equipments(current_user: User, equipment_id: int, brand_id: int, cate
     if with_picture:
         timestamp = int(datetime.now().timestamp())
         select_cols.append(
-            EquipmentFile.path.concat(
+            EquipmentFile.hash_name.concat(
                 f'&v={timestamp}'
             ).label('main_picture')
         )
@@ -147,7 +147,6 @@ def create_equipment_file(equipment_id: int, equipment_file: FileStorage, sort_o
         equipment_id=equipment_id,
         original_name=original_name,
         hash_name=hash_name,
-        path=file_path,
         mimetype=mimetype,
         extension=extension,
         size=size,
@@ -174,8 +173,10 @@ def remove_equipment_file(equipment_file_id: int):
         EquipmentFile.status == 'ACTIVE'
     )\
         .first()
+
     try:
-        Path(equipment_file.path).unlink(missing_ok=True)
+        Path(f'./equipments_files/{equipment_file.hash_name}{equipment_file.extension}')\
+            .unlink(missing_ok=True)
     except Exception as e:
         print(
             f"Ocurrió un error al intentar eliminar el archivo: {e}")

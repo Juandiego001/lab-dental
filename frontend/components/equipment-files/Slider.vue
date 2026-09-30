@@ -12,7 +12,7 @@
         <v-carousel>
           <v-carousel-item v-for="file of items">
             <v-img v-if="file.extension !== '.mp4'" width="100%" height="100%" contain
-              :src="`/api/files?path=${file.path}`">
+              :src="`/api/files/equipments/${file.hashName}`">
               <template v-slot:placeholder>
                 <v-row class="fill-height ma-0" align="center" justify="center">
                   <v-progress-circular indeterminate color="white" size="40" />
@@ -20,7 +20,7 @@
               </template>
             </v-img>
             <video controls preload="metadata" style="width: 100%; height: calc(100% - 50px); object-fit: contain;">
-              <source :src="`/api/files?path=${file.path}`" type="video/mp4" />
+              <source :src="`/api/files/equipments/${file.hashName}`" type="video/mp4" />
               {{ $t('equipments.files.videoNotSupported') }}
             </video>
           </v-carousel-item>

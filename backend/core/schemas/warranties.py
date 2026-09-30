@@ -21,8 +21,10 @@ class WarrantySearch(BaseSchema):
         required=False, allow_none=True, data_key='distributorId', load_default=None)
     equipment_id = Integer(
         required=False, allow_none=True, data_key='equipmentId', load_default=None)
-    wco_code = Integer(required=False, allow_none=True, load_default=None, data_key='wcoCode')
-    wco_year = Integer(required=False, allow_none=True, load_default=None, data_key='wcoYear')
+    wco_code = Integer(required=False, allow_none=True,
+                       load_default=None, data_key='wcoCode')
+    wco_year = Integer(required=False, allow_none=True,
+                       load_default=None, data_key='wcoYear')
     sale_date = DateTime(
         required=False, allow_none=True, data_key='saleDate', load_default=None)
     invoice = String(required=False, allow_none=True, load_default=None)
@@ -55,7 +57,7 @@ class WarrantyIn(BaseSchema):
     invoice = String(required=True, allow_none=False,
                      validate=validate.Length(max=40))
     serial = String(required=True, allow_none=False,
-                     validate=validate.Length(max=100))
+                    validate=validate.Length(max=100))
     shipt_to = String(required=True, allow_none=False,
                       validate=validate.Length(max=400), data_key='shiptTo')
     problem = String(required=True, allow_none=False,
@@ -158,7 +160,6 @@ class WarrantyOut(BaseSchema):
     user_approval_id = Integer(data_key='userApprovalId')
     reasons_ids = List(Integer(), data_key='reasonsIds')
     parts = List(Nested(PartSchema))
-    received_at = DateTime(data_key='receivedAt')
     wco = Function(lambda v: set_wco(v.wco_code, v.wco_year))
     equipment_model_reference = String(
         data_key='equipmentModelReference')
@@ -170,7 +171,7 @@ class WarrantyOut(BaseSchema):
     problem = String()
     solution = String()
     status = String()
-    created_at = DateTime()
+    created_at = DateTime(data_key='createdAt')
     updated_at = DateTime()
 
 
@@ -207,7 +208,6 @@ def set_date_string(v: datetime):
         return ""
 
 
-
 class WarrantyPDF(BaseSchema):
     distributor = String()
     contact = Nested(WarrantyContactPDF)
@@ -226,10 +226,9 @@ class WarrantyPDF(BaseSchema):
     problem = String()
     solution = String()
     status = String()
-    received_at = Function(lambda v: set_date_string(v.received_at))
     approved_at = Function(lambda v: set_date_string(v.approved_at))
     wco = Function(lambda v: set_wco(v.wco_code, v.wco_year))
-    created_at = DateTime()
+    created_at = Function(lambda v: set_date_string(v.created_at))
     updated_at = DateTime()
 
 
@@ -301,8 +300,8 @@ class WarrantyFileOut(BaseSchema):
     description = String()
     original_name = String(data_key='originalName')
     size = Function(lambda data: format_file_size(data.size))
+    hash_name = String(data_key='hashName')
     extension = String()
-    path = String()
     sort_order = Integer(data_key='sortOrder')
 
 

@@ -52,6 +52,9 @@
   - [WARRANTIES REASONS](#warranties-reasons)
   - [WARRANTIES WCOS](#warranties-wcos)
   - [WARRANTIES FILES](#warranties-files)
+  - [NOTIFICATIONS](#notifications)
+  - [USERS NOTIFICATIONS](#users-notifications)
+  - [NOTIFICATIONS MODULES](#notifications-modules)
 
 <div class="page"/>
 
@@ -86,6 +89,8 @@ erDiagram
     CLIENTS ||--o{ INSTALLATIONS : has
     DISTRIBUTORS ||--o{ DISTRIBUTORS_BRANDS : has
     BRANDS ||--o{ DISTRIBUTORS_BRANDS : has
+    DISTRIBUTORS ||--o{ GROUPS : has
+    DISTRIBUTORS ||--o{ NOTIFICATIONS : has
 ```
 
 <div class="page"/>
@@ -100,6 +105,10 @@ erDiagram
     GROUPS ||--o{ USERS_GROUPS : has
     GROUPS ||--o{ PERMISSIONS : has
     MODULES ||--o{ PERMISSIONS : has
+    USERS ||--o{ USERS_NOTIFICATIONS : has
+    NOTIFICATIONS ||--o{ USERS_NOTIFICATIONS : has
+    NOTIFICATIONS ||--o{ NOTIFICATIONS_MODULES : has
+    MODULES ||--o{ NOTIFICATIONS_MODULES : has
 ```
 
 <div class="page"/>
@@ -412,8 +421,10 @@ erDiagram
         string full_name "NN"
         string username UK "NN"
         string email UK "NN"
-        string role "NN"
         string password "NN"
+        string role "NN"
+        string language "NN"
+        string photo "N"
         string status "NN"
         date created_at "NN"
         date updated_at "NN"
@@ -619,7 +630,6 @@ erDiagram
         string ship_to "NN"
         string problem "NN"
         string solution "NN"
-        date received_at "N"
         string status "NN"
         date created_at "NN"
         date updated_at "NN"
@@ -637,7 +647,10 @@ erDiagram
         int id PK, UK "AUTO_INCREMENT, NN"
         int installation_id FK "NN"
         string original_name "NN"
-        string path "NN"
+        string hash_name "NN"
+        string extension "NN"
+        string mimetype "NN"
+        string size "NN"
         string file_type "NN, [FORMAT, SERIAL, EVIDENCES]"
         string status "NN"
         date created_at "NN"
@@ -676,7 +689,6 @@ erDiagram
         int equipment_id FK "NN"
         string original_name "NN"
         string hash_name "NN"
-        string path "NN"
         string extension "NN"
         string mimetype "NN"
         string size "NN"
@@ -783,7 +795,62 @@ erDiagram
         int id PK, UK "AUTO_INCREMENT, NN"
         int warranty_id FK "NN"
         string original_name "NN"
-        string path "NN"
+        string hash_name "NN"
+        string extension "NN"
+        string mimetype "NN"
+        string size "NN"
+        string status "NN"
+        date created_at "NN"
+        date updated_at "NN"
+    }
+```
+
+<div class="page" />
+
+### NOTIFICATIONS
+
+```mermaid
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '12px', 'entityPadding': '5' }}}%%
+erDiagram
+    NOTIFICATIONS {
+        int id PK, UK "AUTO_INCREMENT, NN"
+        int distributor_id FK "NN"
+        string name UK "NN"
+        string status "NN"
+        date created_at "NN"
+        date updated_at "NN"
+    }
+```
+
+
+<div class="page" />
+
+### USERS NOTIFICATIONS
+
+```mermaid
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '12px', 'entityPadding': '5' }}}%%
+erDiagram
+    USERS_NOTIFICATIONS {
+        int id PK, UK "AUTO_INCREMENT, NN"
+        int user_id FK "NN"
+        int notification_id FK "NN"
+    }
+```
+
+<div class="page" />
+
+### NOTIFICATIONS MODULES
+
+```mermaid
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '12px', 'entityPadding': '5' }}}%%
+erDiagram
+    NOTIFICATIONS_MODULES {
+        int id PK, UK "AUTO_INCREMENT, NN"
+        int notification_id FK "NN"
+        int module_id FK "NN"
+        boolean create "NN"
+        boolean delete "NN"
+        boolean update "NN"
         string status "NN"
         date created_at "NN"
         date updated_at "NN"

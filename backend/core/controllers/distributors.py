@@ -291,5 +291,4 @@ def set_aligner_alias(aligner_id: int, json_data: dict):
     except HTTPException as ex:
         abort(400, ex.description)
     except Exception as ex:
-        print(ex)
         abort(500, gettext('abortException'))

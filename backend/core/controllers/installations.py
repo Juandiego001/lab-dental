@@ -86,6 +86,7 @@ def delete_installations(installation_id):
 
     try:
         installations.delete_installation(installation_id)
+        installations.notify_delete(installation_id)
         return {'message': gettext('installationDeleted')}
     except Exception as ex:
         abort(500, gettext('abortException'))

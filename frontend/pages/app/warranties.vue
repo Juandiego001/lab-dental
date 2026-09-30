@@ -570,10 +570,10 @@
               </v-data-table-server>
             </v-col>
 
-            <!-- Recieved At -->
-            <v-col v-if="form.receivedAt" cols="12" class="text-body-2 mt-2">
+            <!-- Created At -->
+            <v-col v-if="form.createdAt" cols="12" class="text-body-2 mt-2">
               <p class="text-primary">{{ $t('warranties.receivedAt') }}:
-                <span class="font-weight-bold">{{ date.format(form.receivedAt, 'fullDateTime') }}</span>
+                <span class="font-weight-bold">{{ date.format(form.createdAt, 'fullDateTime') }}</span>
               </p>
             </v-col>
             <v-col v-if="!isApproved" class="text-end">
@@ -843,10 +843,10 @@
               </v-data-table-server>
             </v-col>
 
-            <!-- Recieved At -->
-            <v-col v-if="form.receivedAt" cols="12" class="text-body-2 mt-2">
+            <!-- Created At -->
+            <v-col v-if="form.createdAt" cols="12" class="text-body-2 mt-2">
               <p class="text-primary">{{ $t('warranties.receivedAt') }}:
-                <span class="font-weight-bold"> {{ date.format(form.receivedAt, 'fullDateTime') }}</span>
+                <span class="font-weight-bold"> {{ date.format(form.createdAt, 'fullDateTime') }}</span>
               </p>
             </v-col>
             <v-col class="d-flex justify-end mt-2 ga-2">

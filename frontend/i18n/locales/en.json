@@ -903,6 +903,36 @@
       "serialNumberRequired": "The serial number is required"
     }
   },
+  "notifications": {
+    "title": "Notification | Notifications",
+    "name": "Name",
+    "create": {
+      "title": "Create notification"
+    },
+    "update": {
+      "title": "Update notification"
+    },
+    "delete": {
+      "title": "Delete notification",
+      "message": "Are you sure you want to delete the notification?"
+    },
+    "search": {
+      "title": "Notifications search"
+    },
+    "notificationsModules": {
+      "title": "Notifications Modules",
+      "read": "Read",
+      "create": "Create",
+      "update": "Update",
+      "help": "This also applies to approvals/rejections",
+      "delete": "Delete"
+    },
+    "rules": {
+      "nameRequired": "The name is required",
+      "distributorRequired": "The distributor is required",
+      "usersRequired": "At least one user is required"
+    }
+  },
   "countries": "Country | Countries",
   "states": "State | States",
   "cities": "City | Cities",

@@ -28,10 +28,11 @@
             @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
             <template v-slot:item.picture="{ item }">
               <v-hover v-slot="{ isHovering, props }">
-                <v-avatar class="my-2 cursor-pointer" size="50" rounded="circle" color="grey-lighten-2" v-bind="props"
+
+                <v-avatar v-if="item.mainPicture" class="my-2 cursor-pointer" size="50"
+                  rounded="circle" color="grey-lighten-2" v-bind="props"
                   @click="async () => { filesEquipmentId = item.id; await getEquipmentFiles({}); sliderDialog = true; }">
-                  <v-img v-if="item.mainPicture && item.extension !== '.mp4'" alt="Machine photo" cover
-                    :src="`/api/files?path=${item.mainPicture}`">
+                  <v-img v-if="item.extension !== '.mp4'" alt="Machine photo" cover :src="`/api/files/equipments/${item.mainPicture.split('&')[0]}`">
                     <template v-slot:placeholder>
                       <v-row class="fill-height ma-0" align="center" justify="center">
                         <v-progress-circular indeterminate color="grey-lighten-5" size="20" />
@@ -41,10 +42,17 @@
                       <v-icon icon="mdi-eye" color="white" size="28" />
                     </v-overlay>
                   </v-img>
-                  <v-icon v-else icon="mdi-car-wrench" color="grey-darken-2" />
+                  <v-icon v-else icon="mdi-play" color="grey-darken-2" />
                 </v-avatar>
+
+                <v-avatar v-else class="my-2" size="50" rounded="circle" color="grey-lighten-2"
+                  v-bind="props">
+                  <v-icon icon="mdi-car-wrench" color="grey-darken-2" />
+                </v-avatar>
+
               </v-hover>
             </template>
+
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
                 <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">

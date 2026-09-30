@@ -38,7 +38,7 @@
       <template v-slot:activator="{ props }">
         <v-btn icon v-bind="props">
           <v-avatar v-bind="props" color="primary" size="32" class="position-relative cursor-pointer">
-            <v-img style v-if="profile.photoPath" :src="`/api/files?path=${profile.photoPath}`" cover>
+            <v-img style v-if="profile.photo" :src="`/api/files/users/${profile.photo}`" cover>
               <template v-slot:placeholder>
                 <v-row class="fill-height ma-0" align="center" justify="center">
                   <v-progress-circular indeterminate color="grey-lighten-5" size="20" />
@@ -157,6 +157,11 @@ const menu = ref([
     subject: 'aligners',
     path: '/app/aligners',
     icon: 'mdi-car-wrench'
+  },
+  {
+    subject: 'notifications',
+    path: '/app/notifications',
+    icon: 'mdi-bell'
   },
   // {
   //   subject: 'configuration',

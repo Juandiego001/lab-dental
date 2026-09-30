@@ -57,7 +57,8 @@ def create_warranties(form_and_files_data: dict):
     '''Create warranties'''
 
     try:
-        warranties.create_warranty(form_and_files_data)
+        warranty = warranties.create_warranty(form_and_files_data)
+        warranties.notify_creation(warranty)
         return {'message': gettext('warrantyCreated')}
     except Exception as ex:
         abort(500, gettext('abortException'))
@@ -71,6 +72,7 @@ def update_warranties(warranty_id: int, json_data: dict):
     '''Update warranties'''
     try:
         warranties.update_warranty(warranty_id, json_data)
+        warranties.notify_update(warranty_id)
         return {'message': gettext('warrantyUpdated')}
     except Exception as ex:
         abort(500, gettext('abortException'))
@@ -84,6 +86,7 @@ def delete_warranties(warranty_id):
 
     try:
         warranties.delete_warranty(warranty_id)
+        warranties.notify_delete(warranty_id)
         return {'message': gettext('warrantyDeleted')}
     except Exception as ex:
         abort(500, gettext('abortException'))

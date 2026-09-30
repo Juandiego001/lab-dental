@@ -40,19 +40,13 @@ def update_permissions(data: dict):
         raise Exception('Permission ID not found')
 
     permission_id = data['id']
-    group_id, distributor_id, module_name = db.session.query(
-        Group.id, Distributor.id, Module.name
-    ).select_from(
-        Permission
-    ).join(Module,
-           Permission.module_id == Module.id
-           ).join(Group,
-                  Permission.group_id == Group.id
-                  ).join(Distributor,
-                         Group.distributor_id == Distributor.id
-                         ).filter(
-        Permission.id == permission_id
-    ).first()
+    group_id, distributor_id, module_name = db.session.query(Group.id, Distributor.id, Module.name)\
+        .select_from(Permission)\
+        .join(Module, Permission.module_id == Module.id)\
+        .join(Group, Permission.group_id == Group.id)\
+        .join(Distributor, Group.distributor_id == Distributor.id)\
+        .filter(Permission.id == permission_id)\
+        .first()
 
     read = data['read']
     create = data['create']

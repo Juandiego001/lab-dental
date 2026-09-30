@@ -1,6 +1,5 @@
 from apiflask import APIBlueprint, abort
 from flask_jwt_extended import jwt_required, current_user
-from core.models import Permission
 from core.schemas.permissions import PermissionIn, PermissionsGroupOut
 from core.schemas.utils import Pagination
 from core.services import permissions

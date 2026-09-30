@@ -15,6 +15,7 @@ from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 from magika import Magika
 from flask_babel import gettext
+from io import BytesIO
 
 
 def send_mail(subject: str, to: list, plantilla: str, params: dict, attachments: list = [], language: str = 'es', with_soe_logo: bool = True):
@@ -41,7 +42,7 @@ def send_mail(subject: str, to: list, plantilla: str, params: dict, attachments:
 
             message['Subject'] = subject
             message['From'] = sender_email
-            message['To'] = ','.join(to)
+            message['To'] = "undisclosed-recipients:;"
             message.attach(MIMEText(msg, 'html'))
 
             if with_soe_logo:
@@ -186,11 +187,7 @@ def validate_file_types(allowed_extensions: set[str], allowed_mimetypes: set[str
 
         result = magika.identify_bytes(header_bytes)
 
-
-
         if result.ok:
-            print('result.output.mime_type: ')
-            print(result.output.mime_type)
             if not valid_extension or not valid_mime or result.output.mime_type not in allowed_mimetypes:
                 invalids.append(file.filename)
         else:

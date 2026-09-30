@@ -254,8 +254,8 @@
                 hide-details="auto" :label="$t('installations.serialPicture')" chips :readonly="isApproved" />
             </v-col>
             <v-col cols="12">
-              <v-img v-if="form.installationSerialFile.path"
-                :src="`/api/files?path=${form.installationSerialFile.path}`" />
+              <v-img v-if="form.installationSerialFile.hashName"
+                :src="`/api/files/installations/${form.installationSerialFile.hashName}`" />
             </v-col>
             <v-col cols="12">
               <v-file-input v-model="installationPictures" :prepend-icon="null" prepend-inner-icon="mdi-paperclip"
@@ -271,14 +271,14 @@
             <v-col cols="12">
               <v-carousel>
                 <v-carousel-item v-for="picture of form.installationEvidencesFiles"
-                  :src="`/api/files?path=${picture.path}`" cover />
+                  :src="`/api/files/installations/${picture.hashName}`" cover />
               </v-carousel>
             </v-col>
             <v-col v-if="!isApproved" class="text-end">
               <v-btn variant="outlined" @click="updateDialog = false" @mousedown.prevent :disabled="loading">{{
                 $t('cancel') }}</v-btn>
               <span class="mx-1" />
-              <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('register') }}</v-btn>
+              <v-btn type="submit" class="bg-primary" @mousedown.prevent :loading="loading">{{ $t('update') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -351,8 +351,8 @@
                 hide-details="auto" :label="$t('installations.serialPicture')" chips readonly />
             </v-col>
             <v-col cols="12">
-              <v-img v-if="form.installationSerialFile.path"
-                :src="`/api/files?path=${form.installationSerialFile.path}`" />
+              <v-img v-if="form.installationSerialFile.hashName"
+                :src="`/api/files/installations/${form.installationSerialFile.hashName}`" />
             </v-col>
             <v-col cols="12">
               <v-file-input v-model="installationPictures" :prepend-icon="null" prepend-inner-icon="mdi-paperclip"
@@ -367,7 +367,7 @@
             <v-col cols="12">
               <v-carousel>
                 <v-carousel-item v-for="picture of form.installationEvidencesFiles"
-                  :src="`/api/files?path=${picture.path}`" cover />
+                  :src="`/api/files/installations/${picture.hashName}`" cover />
               </v-carousel>
             </v-col>
             <v-col class="d-flex justify-end ga-2">

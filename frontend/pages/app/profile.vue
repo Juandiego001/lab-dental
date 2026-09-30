@@ -6,7 +6,7 @@
       <v-hover v-slot="{ isHovering, props }">
         <v-avatar v-bind="props" color="primary" size="72" class="position-relative cursor-pointer"
           @click="!hasPhoto ? triggerUpload() : null">
-          <v-img v-if="hasPhoto" :src="`/api/files?path=${photoPath}`" cover>
+          <v-img v-if="hasPhoto" :src="`/api/files/users/${photo}`" cover>
             <template v-slot:placeholder>
               <v-row class="fill-height ma-0" align="center" justify="center">
                 <v-progress-circular indeterminate color="grey-lighten-5" size="20" />
@@ -121,7 +121,7 @@ import { ref } from 'vue'
 
 const { notify } = useSnackbar();
 const { t, setLocale } = useI18n();
-const { setPhotoPath } = useProfile();
+const { setPhoto } = useProfile();
 const { $formatEmail, $formatUsername } = useNuxtApp();
 
 definePageMeta({
@@ -142,8 +142,8 @@ const fullName = ref('');
 const email = ref('');
 const username = ref('');
 
-const photoPath = ref(null)
-const hasPhoto = computed(() => !!photoPath.value)
+const photo = ref(null)
+const hasPhoto = computed(() => !!photo.value)
 const fileInput = ref(null)
 
 const passwordForm = ref(null)
@@ -177,9 +177,9 @@ const getProfile = async () => {
     fullName.value = data.fullName;
     email.value = data.email;
     username.value = data.username;
-    photoPath.value = data.photoPath;
+    photo.value = data.photo;
     await setLocale(data.language);
-    setPhotoPath(data.photoPath);
+    setPhoto(data.photo);
   } catch (err) {
     notify(err, 'error');
   }

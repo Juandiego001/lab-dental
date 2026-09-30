@@ -71,7 +71,6 @@ def add_manual_file(manual_id: int, manual_file: FileStorage):
         manual_id=manual_id,
         original_name=original_name,
         hash_name=hash_name,
-        path=file_path,
         mimetype=mimetype,
         extension=extension,
         size=size
@@ -150,7 +149,8 @@ def delete_manual(manual_id: int):
         .filter(ManualFile.manual_id == manual_id)\
         .first()
     try:
-        Path(manual_file.path).unlink(missing_ok=True)
+        Path(f'./manuals_files/{manual_file.hash_name}{manual_file.extension}')\
+            .unlink(missing_ok=True)
     except Exception as e:
         print(
             f"Ocurrió un error al intentar eliminar el archivo: {e}")

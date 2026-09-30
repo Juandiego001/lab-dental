@@ -1,26 +1,24 @@
-from apiflask import fields
-from marshmallow import post_load
-from core.models import Permission
 from core.schemas.utils import BaseSchema
+from apiflask.fields import Integer, Boolean, String, List, Nested
 
 
 class PermissionIn(BaseSchema):
-  id = fields.Integer()
-  read = fields.Boolean()
-  create = fields.Boolean()
-  update = fields.Boolean()
-  delete = fields.Boolean()
+    id = Integer()
+    read = Boolean()
+    create = Boolean()
+    update = Boolean()
+    delete = Boolean()
 
 
 class PermissionGroupOut(BaseSchema):
-  id = fields.Integer()
-  read = fields.Boolean()
-  create = fields.Boolean()
-  update = fields.Boolean()
-  delete = fields.Boolean()
-  module_name = fields.String(data_key='moduleName')
+    id = Integer()
+    read = Boolean()
+    create = Boolean()
+    update = Boolean()
+    delete = Boolean()
+    module_name = String(data_key='moduleName')
 
 
 class PermissionsGroupOut(BaseSchema):
-  items = fields.List(fields.Nested(PermissionGroupOut))
-  total = fields.Integer()
+    items = List(Nested(PermissionGroupOut))
+    total = Integer()

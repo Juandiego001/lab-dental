@@ -18,6 +18,7 @@ from core.controllers.warranties import bp as bp_warranties
 from core.controllers.lists import bp as bp_lists
 from core.controllers.files import bp as bp_files
 from core.controllers.aligners import bp as bp_aligners
+from core.controllers.notifications import bp as bp_notifications
 
 
 app.register_blueprint(bp_locations, url_prefix='/api/locations')
@@ -39,6 +40,7 @@ app.register_blueprint(bp_warranties, url_prefix='/api/warranties')
 app.register_blueprint(bp_lists, url_prefix='/api/lists')
 app.register_blueprint(bp_files, url_prefix='/api/files')
 app.register_blueprint(bp_aligners, url_prefix='/api/aligners')
+app.register_blueprint(bp_notifications, url_prefix='/api/notifications')
 
 
 if __name__ == '__main__':

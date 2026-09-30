@@ -25,6 +25,7 @@ MAIL_SERVER = os.getenv('MAIL_SERVER')
 FRONTEND_APP_BASE_URL = os.getenv(
     'FRONTEND_APP_BASE_URL', 'http://localhost')
 REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+MASTER_SNAPON_EMAIL = os.getenv('MASTER_SNAPON_EMAIL', 'Andres.Leon@snapon.com')
 
 app = APIFlask(__name__, title='SOE Latam API', version='0.0.1', enable_openapi=ENV ==
                'development', template_folder='../templates', json_errors=False)

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ _('approvedInstallationNotification') }}</title>
+    <title>{{ _('warrantyApprovedNotification') }}</title>
     <style>
       * {
         padding: 0;
@@ -43,9 +43,7 @@
 
       <tr>
         <td style="padding: 1rem">
-          <p style="margin-bottom: 1rem">
-            {{ _('dearColleagues') }} {{ distributor }},
-          </p>
+          <p style="margin-bottom: 1rem">{{ _('bestRegards') }},</p>
 
           <p>
             {{ _('warrantyWithFollowingData') }}
@@ -114,11 +112,8 @@
               <span style="font-weight: bold">{{ site.address }}.</span>
             </li>
             <li>
-              {% if site.city %}
-                {{ _('warrantyCityCountry') }}:
-              {% else %}
-                {{ _('warrantyStateCountry') }}:
-              {% endif %}
+              {% if site.city %} {{ _('warrantyCityCountry') }}: {% else %} {{
+              _('warrantyStateCountry') }}: {% endif %}
               <span style="font-weight: bold">
                 {{ (site.city or site.state) + ', ' + site.country }}.
               </span>

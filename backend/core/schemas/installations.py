@@ -80,11 +80,6 @@ class InstallationInUpdate(InstallationIn):
     pass
 
 
-class FileOut(BaseSchema):
-    name = String()
-    path = String()
-
-
 def process_expiration_date(row: Installation):
     '''
     Process expiration date when returning installations checking for nulls because Function can fail for nulls
@@ -94,6 +89,11 @@ def process_expiration_date(row: Installation):
     '''
 
     return row.expiration_date.strftime('%B %d, %Y') if row.expiration_date else ''
+
+
+class InstallationFileOut(BaseSchema):
+    original_name = String(data_key='originalName')
+    hash_name = String(data_key='hashName')
 
 
 class InstallationOut(BaseSchema):
@@ -113,9 +113,10 @@ class InstallationOut(BaseSchema):
     installed_date = String(data_key='installedDate')
     expiration_date = Function(
         lambda row: process_expiration_date(row), data_key='expirationDate')
-    installation_serial_file = Dict(data_key='installationSerialFile')
+    installation_serial_file = Nested(
+        InstallationFileOut, data_key='installationSerialFile')
     installation_evidences_files = List(
-        Dict, data_key='installationEvidencesFiles')
+        Nested(InstallationFileOut), data_key='installationEvidencesFiles')
     status = String()
 
 

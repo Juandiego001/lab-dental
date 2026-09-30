@@ -29,7 +29,7 @@
           @update:itemsPerPage="v => perPage = v" density="compact" :disable-sort="true" :loading="loading">
           <template v-slot:item.picture="{ item }">
             <v-avatar class="my-2" size="50" rounded="circle" color="grey-lighten-2">
-              <v-img v-if="item.extension !== '.mp4'" alt="Machine photo" cover :src="`/api/files?path=${item.path}`">
+              <v-img v-if="item.extension !== '.mp4'" alt="Machine photo" cover :src="`/api/files/equipments/${item.hashName}`">
                 <template v-slot:placeholder>
                   <v-row class="fill-height ma-0" align="center" justify="center">
                     <v-progress-circular indeterminate color="grey-lighten-5" size="20" />
@@ -53,7 +53,7 @@
               <v-tooltip :text="$t('equipments.tooltip.viewFile')" :disabled="loading" location="bottom">
                 <template v-slot:activator="{ props }">
                   <v-btn v-bind="props" class="my-1 bg-secondary" size="x-small" icon="mdi-open-in-new"
-                    :href="`/api/files?path=${item.path}`" target="_blank" />
+                    :href="`/api/files/equipments/${item.hashName}`" target="_blank" />
                 </template>
               </v-tooltip>
 

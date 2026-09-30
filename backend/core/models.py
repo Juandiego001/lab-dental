@@ -379,7 +379,7 @@ class User(db.Model):
     role: Mapped[str] = mapped_column(String(20), nullable=False)
     language: Mapped[str] = mapped_column(
         String(10), nullable=False, server_default='es')
-    photo_path: Mapped[str] = mapped_column(String, nullable=True)
+    photo: Mapped[str] = mapped_column(String, nullable=True)
     status: Mapped[str] = mapped_column(String(20),
                                         nullable=False,
                                         server_default='ACTIVE')
@@ -393,6 +393,8 @@ class User(db.Model):
         server_default=func.now(),
         onupdate=func.now())
     user_groups = relationship('UserGroup', back_populates='user')
+    user_notifications = relationship(
+        'UserNotification', back_populates='user')
 
     def check_password(self, password: str):
         return checkpw(password.encode('utf-8'), self.password.encode('utf-8'))
@@ -615,8 +617,8 @@ class ManualFile(db.Model):
     manual_id: Mapped[int] = mapped_column(
         ForeignKey('manuals.id'), nullable=False)
     original_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    hash_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    path: Mapped[str] = mapped_column(String, nullable=False)
+    hash_name: Mapped[str] = mapped_column(
+        String(100), nullable=False, unique=True)
     mimetype: Mapped[str] = mapped_column(String(100), nullable=False)
     extension: Mapped[str] = mapped_column(String(20), nullable=False)
     size: Mapped[int] = mapped_column(
@@ -646,8 +648,8 @@ class EquipmentFile(db.Model):
     title: Mapped[str] = mapped_column(String(50), nullable=True)
     description: Mapped[str] = mapped_column(String(100), nullable=True)
     original_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    hash_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    path: Mapped[str] = mapped_column(String, nullable=False)
+    hash_name: Mapped[str] = mapped_column(
+        String(100), nullable=False, unique=True)
     mimetype: Mapped[str] = mapped_column(String(100), nullable=False)
     extension: Mapped[str] = mapped_column(String(20), nullable=False)
     size: Mapped[int] = mapped_column(
@@ -763,8 +765,8 @@ class InstallationFile(db.Model):
     installation_id: Mapped[int] = mapped_column(
         ForeignKey('installations.id'), nullable=False)
     original_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    hash_name: Mapped[str] = mapped_column(String(100), nullable=True)
-    path: Mapped[str] = mapped_column(String, nullable=False)
+    hash_name: Mapped[str] = mapped_column(
+        String(100), nullable=False, unique=True)
     mimetype: Mapped[str] = mapped_column(String(100), nullable=True)
     extension: Mapped[str] = mapped_column(String(20), nullable=True)
     size: Mapped[int] = mapped_column(
@@ -826,8 +828,8 @@ class WarrantyFile(db.Model):
     title: Mapped[str] = mapped_column(String(50), nullable=True)
     description: Mapped[str] = mapped_column(String(100), nullable=True)
     original_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    hash_name: Mapped[str] = mapped_column(String(100), nullable=True)
-    path: Mapped[str] = mapped_column(String, nullable=False)
+    hash_name: Mapped[str] = mapped_column(
+        String(100), nullable=False, unique=True)
     mimetype: Mapped[str] = mapped_column(String(100), nullable=True)
     extension: Mapped[str] = mapped_column(String(20), nullable=True)
     size: Mapped[int] = mapped_column(
@@ -869,7 +871,6 @@ class Warranty(db.Model):
     shipt_to: Mapped[str] = mapped_column(String(400), nullable=False)
     problem: Mapped[str] = mapped_column(String(400), nullable=False)
     solution: Mapped[str] = mapped_column(String(400), nullable=False)
-    received_at: Mapped[datetime] = mapped_column(DateTime(), nullable=True)
     approved_at: Mapped[datetime] = mapped_column(DateTime(), nullable=True)
     parts: Mapped[dict] = mapped_column(JSONB, nullable=True)
 
@@ -908,3 +909,66 @@ class WarrantyWCO(db.Model):
         ForeignKey('warranties.id'), nullable=False)
     code: Mapped[int] = mapped_column(Integer, nullable=False)
     year: Mapped[int] = mapped_column(Integer, nullable=False)
+
+
+class Notification(db.Model):
+    __tablename__ = 'notifications'
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    distributor_id: Mapped[int] = mapped_column(
+        ForeignKey('distributors.id'), nullable=False)
+    name: Mapped[str] = mapped_column(String(30))
+    status: Mapped[str] = mapped_column(String(20),
+                                        nullable=False,
+                                        server_default='ACTIVE')
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(),
+        nullable=False,
+        server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now())
+    user_notifications = relationship(
+        'UserNotification', back_populates='notification')
+
+
+class UserNotification(db.Model):
+    __tablename__ = 'user_notifications'
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    notification_id: Mapped[int] = mapped_column(
+        ForeignKey('notifications.id'))
+    user = relationship('User', back_populates='user_notifications')
+    notification = relationship(
+        'Notification', back_populates='user_notifications')
+
+
+class NotificationModule(db.Model):
+    __tablename__ = 'notifications_modules'
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    notification_id: Mapped[int] = mapped_column(
+        ForeignKey('notifications.id'), nullable=False)
+    module_id: Mapped[int] = mapped_column(
+        ForeignKey('modules.id'), nullable=False)
+    create: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, server_default=expression.false())
+    update: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, server_default=expression.false())
+    delete: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, server_default=expression.false())
+    status: Mapped[str] = mapped_column(String(20),
+                                        nullable=False,
+                                        server_default='ACTIVE')
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(),
+        nullable=False,
+        server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now())

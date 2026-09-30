@@ -199,4 +199,3 @@ def delete_equipment_file(equipment_file_id: int):
         return {'message': gettext('equipmentFileDeleted')}
     except Exception as ex:
         abort(500, gettext('abortException'))
-

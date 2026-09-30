@@ -298,7 +298,7 @@ class ProfileOut(Schema):
     role = String()
     email = String()
     language = String()
-    photo_path = String(data_key='photoPath')
+    photo = String()
     abilities = List(Nested(AbilitiesOut), dump_only=True)
 
 

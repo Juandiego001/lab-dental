@@ -292,21 +292,20 @@ def upload_user_photo(current_user: User, data: dict):
     mimetype, extension, original_name, size = process_file(
         user_photo)
     hash_name = str(uuid.uuid4())
-    file_path = f'./users_files/{hash_name}{extension}'
-    db.session.merge(User(id=current_user.id, photo_path=file_path))
+    db.session.merge(User(id=current_user.id, photo=f'{hash_name}{extension}'))
     db.session.commit()
-    user_photo.save(file_path)
+    user_photo.save(f'./users_files/{hash_name}{extension}')
 
 
 def delete_user_photo(current_user: User):
     '''Delete user photo'''
 
     try:
-        Path(current_user.photo_path).unlink(missing_ok=True)
+        Path(f'./users_files/{current_user.photo}').unlink(missing_ok=True)
     except Exception as e:
         print(
             f"Ocurrió un error al intentar eliminar el archivo: {e}")
 
-    current_user.photo_path = None
+    current_user.photo = None
     db.session.merge(current_user)
     db.session.commit()

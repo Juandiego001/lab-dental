@@ -101,7 +101,7 @@ def get_profile():
         user_detail = users.get_user_by_id(user_id)
         user_profile = ProfileOut().dump(user_detail)
         user_profile['full_name'] = user_profile.pop('fullName')
-        user_profile['photo_path'] = user_profile.pop('photoPath')
+        user_profile['photo'] = user_profile.pop('photo')
         user_profile['abilities'] = [
             {'subject': ability[0], 'action': ability[1]} for ability in get_user_permissions(user_id)]
         return user_profile

@@ -1,11 +1,14 @@
 ### Migración base de datos
 
 ```bash
-# aplicar migraciones
-flask --app run db upgrade
+# crear una migración vacía
+flask --app run db revision -m "Empty revision"
 
 # crear nueva migración
-flask --app run db migrate -m 'Initial migration.'
+flask --app run db migrate -m "Initial migration."
+
+# aplicar migraciones
+flask --app run db upgrade
 ```
 
 

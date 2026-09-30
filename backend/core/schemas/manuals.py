@@ -12,7 +12,7 @@ class ManualsSearch(BaseSchema):
     description = String(required=False, validate=validate.Length(
         max=800), load_default=None)
     manual_type_id = Integer(required=False, allow_none=True,
-                            load_default=None, data_key='manualTypeId')
+                             load_default=None, data_key='manualTypeId')
     original_name = String(required=False, validate=validate.Length(
         max=100), load_default=None, data_key='originalName')
     extension = String(required=False, validate=validate.Length(
@@ -38,8 +38,8 @@ class ManualsCreateIn(ManualsIn):
 class ManualFileOut(BaseSchema):
     original_name = String(data_key='originalName')
     size = Function(lambda data: format_file_size(data.size))
+    hash_name = String(data_key='hashName')
     extension = String()
-    path = String()
 
 
 class ManualTypeOut(BaseSchema):

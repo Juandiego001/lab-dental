@@ -228,23 +228,23 @@
             <span class="text-capitalize">{{ item.moduleName }}</span>
           </template>
           <template v-slot:item.read="{ item }">
-            <v-checkbox-btn color="primary" :model-value="item.read" :ripple="false" hide-details="auto"
-              density="compact" @update:modelValue="v => updatePermissions(v, item, 'read')"
+            <v-checkbox-btn style="justify-self: center;" color="primary" :model-value="item.read" :ripple="false"
+              hide-details="auto" density="compact" @update:modelValue="v => updatePermissions(v, item, 'read')"
               :disabled="disablePermission(item, 'read')" />
           </template>
           <template v-slot:item.create="{ item }">
-            <v-checkbox-btn color="primary" :model-value="item.create" :ripple="false" hide-details="auto"
-              density="compact" @update:modelValue="v => updatePermissions(v, item, 'create')"
+            <v-checkbox-btn style="justify-self: center;" color="primary" :model-value="item.create" :ripple="false"
+              hide-details="auto" density="compact" @update:modelValue="v => updatePermissions(v, item, 'create')"
               :disabled="disablePermission(item, 'create')" />
           </template>
           <template v-slot:item.update="{ item }">
-            <v-checkbox-btn color="primary" :model-value="item.update" :ripple="false" hide-details="auto"
-              density="compact" @update:modelValue="v => updatePermissions(v, item, 'update')"
+            <v-checkbox-btn style="justify-self: center;" color="primary" :model-value="item.update" :ripple="false"
+              hide-details="auto" density="compact" @update:modelValue="v => updatePermissions(v, item, 'update')"
               :disabled="disablePermission(item, 'update')" />
           </template>
           <template v-slot:item.delete="{ item }">
-            <v-checkbox-btn color="primary" :model-value="item.delete" :ripple="false" hide-details="auto"
-              density="compact" @update:modelValue="v => updatePermissions(v, item, 'delete')"
+            <v-checkbox-btn style="justify-self: center;" color="primary" :model-value="item.delete" :ripple="false"
+              hide-details="auto" density="compact" @update:modelValue="v => updatePermissions(v, item, 'delete')"
               :disabled="disablePermission(item, 'delete')" />
           </template>
         </v-data-table>

@@ -52,7 +52,7 @@
               <v-tooltip :text="$t('manuals.tooltip.view')" :disabled="loading" location="bottom">
                 <template v-slot:activator="{ props }">
                   <v-btn v-bind="props" class="bg-secondary" size="x-small" icon="mdi-open-in-new"
-                    :href="`/api/files?path=${item.manualFile.path}`" target="_blank" />
+                    :href="`/api/files/manuals/${item.manualFile.hashName}`" target="_blank" />
                 </template>
               </v-tooltip>
 

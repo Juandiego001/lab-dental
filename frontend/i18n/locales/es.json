@@ -897,6 +897,36 @@
       "serialNumberRequired": "El número serial es requerido"
     }
   },
+  "notifications": {
+    "title": "Notificación | Notificaciones",
+    "name": "Nombre",
+    "create": {
+      "title": "Crear notificación"
+    },
+    "update": {
+      "title": "Actualizar notificación"
+    },
+    "delete": {
+      "title": "Eliminar notificación",
+      "message": "¿Está seguro que desea eliminar la notificación?"
+    },
+    "search": {
+      "title": "Buscar notificación"
+    },
+    "notificationsModules": {
+      "title": "Módulos de notificaciones",
+      "read": "Leer",
+      "create": "Crear",
+      "update": "Actualizar",
+      "help": "Aplica también para aprobaciones/rechazos",
+      "delete": "Eliminar"
+    },
+    "rules": {
+      "nameRequired": "El nombre es requerido",
+      "distributorRequired": "El distribuidor es requerido",
+      "usersRequired": "Por lo menos un usuario es requerido"
+    }
+  },
   "countries": "País | Paises",
   "states": "Estado | Estados",
   "cities": "Ciudad | Ciudades",
