@@ -112,7 +112,7 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateGroup">
+        <v-form ref="updateForm" v-model="updateModel" @submit.prevent="updateNotification">
           <v-row dense>
             <v-col cols="12">
               <v-text-field v-model="form.name" hide-details="auto" :label="$t('notifications.name')"
@@ -409,7 +409,7 @@ watch(perPageNotificationsModules, async () => {
 })
 
 onBeforeMount(async () => {
-  if ($ability.can('read', 'groups')) {
+  if ($ability.can('read', 'notifications')) {
     await getNotifications();
     return;
   }
@@ -474,7 +474,7 @@ const createNotification = async () => {
   }
 }
 
-const updateGroup = async () => {
+const updateNotification = async () => {
   try {
     loading.value = true;
     if (!updateModel.value) return;
