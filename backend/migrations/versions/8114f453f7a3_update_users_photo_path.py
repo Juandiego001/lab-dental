@@ -19,14 +19,22 @@ depends_on = None
 
 
 def upgrade():
-    users = db.session.query(User).filter(User.photo != None).all()
-    all_users = []
-    for user in users:
-        user.photo = user.photo.replace('./users_files/', '')
-        all_users.append(user)
+    conn = op.get_bind()
+    query = sa.text(
+        "SELECT id, photo FROM users WHERE photo IS NOT NULL")
+    results = conn.execute(query).fetchall()
 
-    db.session.add_all(all_users)
-    db.session.commit()
+    update_data = []
+    for row in results:
+        user_id = row[0]
+        user_photo = row[1].replace('./users_files/', '')
+        update_data.append({
+            "id": user_id,
+            "photo": user_photo,
+        })
+
+    query = sa.text("UPDATE users SET photo = :photo WHERE id = :id")
+    conn.execute(query, update_data)
 
 
 def downgrade():
