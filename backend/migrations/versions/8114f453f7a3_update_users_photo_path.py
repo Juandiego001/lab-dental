@@ -20,10 +20,12 @@ depends_on = None
 
 def upgrade():
     users = db.session.query(User).filter(User.photo != None).all()
+    all_users = []
     for user in users:
         user.photo = user.photo.replace('./users_files/', '')
-        db.session.add(user)
+        all_users.append(user)
 
+    db.session.add_all(all_users)
     db.session.commit()
 
 
