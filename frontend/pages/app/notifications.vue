@@ -44,7 +44,7 @@
 
                 <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" v-if="item.id !== 1" class="my-2 bg-red" size="small" icon="mdi-trash-can"
+                    <v-btn v-bind="props" class="my-2 bg-red" size="small" icon="mdi-trash-can"
                       @click="form.id = item.id; deleteDialog = true" />
                   </template>
                 </v-tooltip>
