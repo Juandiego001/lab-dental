@@ -401,84 +401,78 @@ const tab = ref('dashboard');
 const routes = ref([])
 const menu = ref([
   {
-    title: 'Distributors',
+    subject: 'notifications',
+    path: '/app/notifications',
+    icon: 'mdi-bell',
+    background: '#1976D2'
+  },
+  {
     subject: 'distributors',
     path: '/app/distributors',
     icon: 'mdi-domain',
     background: '#1976D2'
   },
   {
-    title: 'Clients',
     subject: 'clients',
     path: '/app/clients',
     icon: 'mdi-account-tie',
     background: '#009688'
   },
   {
-    title: 'Sites',
     subject: 'sites',
     path: '/app/sites',
     icon: 'mdi-fireplace-off',
     background: '#FF9800'
   },
   {
-    title: 'Users',
     subject: 'users',
     path: '/app/users',
     icon: 'mdi-account',
     background: '#3F51B5'
   },
   {
-    title: 'Groups',
     subject: 'groups',
     path: '/app/groups',
     icon: 'mdi-account-group',
     background: '#9C27B0'
   },
   {
-    title: 'Brands',
     subject: 'brands',
     path: '/app/brands',
     icon: 'mdi-shield-car',
     background: '#E91E63'
   },
   {
-    title: 'Categories',
     subject: 'categories',
     path: '/app/categories',
     icon: 'mdi-shape-outline',
     background: '#4CAF50'
   },
   {
-    title: 'Equipments',
     subject: 'equipments',
     path: '/app/equipments',
     icon: 'mdi-car-cog',
     background: '#607D8B'
   },
   {
-    title: 'Installations',
     subject: 'installations',
     path: '/app/installations',
     icon: 'mdi-train-car-flatbed-car',
     background: '#00BCD4'
   },
   {
-    title: 'Reasons',
     subject: 'reasons',
     path: '/app/reasons',
     icon: 'mdi-file-cancel',
     background: '#F44336'
   },
   {
-    title: 'Warranties',
     subject: 'warranties',
     path: '/app/warranties',
     icon: 'mdi-certificate',
     background: '#FFC107' // Amber
   },
   {
-    title: 'Lists',
     subject: 'lists',
     path: '/app/lists',
     icon: 'mdi-office-building-cog-outline',

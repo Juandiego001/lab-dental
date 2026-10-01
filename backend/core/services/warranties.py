@@ -638,7 +638,7 @@ def notify_approval(warranty_id: int):
             },
             *[
                 {
-                    'path':  f'{warranty_file.hash_name}{warranty_file.extension}',
+                    'path':  f'./warranties_files/{warranty_file.hash_name}{warranty_file.extension}',
                     'filename': warranty_file.original_name
                 }
                 for warranty_file in warranty_files
