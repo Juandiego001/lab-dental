@@ -8,14 +8,14 @@
             <v-tooltip :text="$t('tooltip.create')" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('create', 'warranties')" class="me-2" icon="mdi-plus"
-                  size="small" variant="text" @click="createDialog = !createDialog" />
+                  size="small" variant="text" @click="createDialog = !createDialog" :disabled="loading" />
               </template>
             </v-tooltip>
 
             <v-tooltip :text="$t('tooltip.search')" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('read', 'warranties')" class="me-2" icon="mdi-magnify"
-                  size="small" variant="text" @click="searchDialog = !searchDialog" />
+                  size="small" variant="text" @click="searchDialog = !searchDialog" :disabled="loading" />
               </template>
             </v-tooltip>
           </client-only>
@@ -26,7 +26,8 @@
 
           <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
             :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-            @update:itemsPerPage="v => perPage = v" :disable-sort="true" show-expand :loading="loading">
+            @update:itemsPerPage="v => perPage = v" :disable-sort="true" :show-expand="!loading" :loading="loading"
+            :hide-default-footer="loading">
             <template v-slot:expanded-row="{ columns, item }">
               <tr>
                 <td :colspan="columns.length" class="bg-grey-lighten-4 pa-3">
@@ -66,42 +67,45 @@
                 <template v-slot:activator="{ props }">
                   <v-btn v-bind="props" v-if="$ability.can('update', 'installations') && item.status !== 'APPROVED'"
                     class="my-2 bg-primary me-2" size="small" icon="mdi-pencil"
-                    @click="async () => { await getWarranty(item.id); updateDialog = true }" />
+                    @click="async () => { await getWarranty(item.id, 'update'); updateDialog = true }"
+                    :loading="loading && loadingUpdate && warrantyId === item.id" :disabled="loading" />
                 </template>
               </v-tooltip>
 
               <v-tooltip :text="$t('warranties.tooltip.approveReject')" location="bottom">
                 <template v-slot:activator="{ props }">
                   <v-btn v-bind="props" v-if="isAdmin" class="my-2 me-2 bg-secondary" size="small" icon="mdi-eye"
-                    @click="async () => { await getWarranty(item.id); approvalDialog = true }" />
+                    @click="async () => { await getWarranty(item.id, 'approval'); approvalDialog = true }"
+                    :loading="loading && loadingApproval && warrantyId === item.id" :disabled="loading" />
                 </template>
               </v-tooltip>
 
               <v-tooltip :text="$t('warranties.tooltip.files')" location="bottom">
                 <template v-slot:activator="{ props }">
                   <v-btn v-bind="props" class="my-2 bg-secondary me-2" size="small" icon="mdi-image-area"
-                    @click="async () => { warrantyId = item.id; await getWarrantyFiles({}); tableDialog = true; }" />
+                    @click="doGetWarrantyFiles(item.id)" :loading="loading && loadingFiles && warrantyId === item.id"
+                    :disabled="loading" />
                 </template>
               </v-tooltip>
 
               <v-tooltip :text="$t('warranties.tooltip.viewPdf')" location="bottom">
                 <template v-slot:activator="{ props }">
                   <v-btn v-bind="props" class="my-2 bg-secondary me-2" size="small" icon="mdi-open-in-new"
-                    :href="`/api/warranties/${item.id}/pdf`" target="_blank" />
+                    :href="`/api/warranties/${item.id}/pdf`" target="_blank" :disabled="loading" />
                 </template>
               </v-tooltip>
 
               <v-tooltip :text="$t('warranties.tooltip.logs')" location="bottom">
                 <template v-slot:activator="{ props }">
                   <v-btn v-bind="props" v-if="isAdmin" class="my-2 bg-secondary me-2" size="small"
-                    icon="mdi-file-document" />
+                    icon="mdi-file-document" :disabled="loading" />
                 </template>
               </v-tooltip>
 
               <v-tooltip :text="$t('warranties.tooltip.delete')" location="bottom">
                 <template v-slot:activator="{ props }">
                   <v-btn v-bind="props" v-if="$ability.can('delete', 'installations')" class="my-2 bg-red" size="small"
-                    icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" />
+                    icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" :disabled="loading" />
                 </template>
               </v-tooltip>
             </template>
@@ -349,9 +353,9 @@
             </v-col>
 
             <v-col class="mt-2 text-end">
-              <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="createDialog = false" :disabled="loading">{{ $t('cancel') }}</v-btn>
               <span class="mx-1" />
-              <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
+              <v-btn type="submit" class="bg-primary" :loading="loading" :disabled="loading">{{ $t('confirm') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -577,9 +581,9 @@
               </p>
             </v-col>
             <v-col v-if="!isApproved" class="text-end">
-              <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="updateDialog = false" :disabled="loading">{{ $t('cancel') }}</v-btn>
               <span class="mx-1" />
-              <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
+              <v-btn type="submit" class="bg-primary" :loading="loading" :disabled="loading">{{ $t('confirm') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -850,15 +854,15 @@
               </p>
             </v-col>
             <v-col class="d-flex justify-end mt-2 ga-2">
-              <v-btn variant="outlined" @click="approvalDialog = false" @mousedown.prevent :disabled="approveLoading">
+              <v-btn variant="outlined" @click="approvalDialog = false" @mousedown.prevent :disabled="loading">
                 {{ $t('cancel') }}
               </v-btn>
-              <v-btn v-if="form.status !== 'REJECTED'" class="bg-error" @click="rejectDialog = true" @mousedown.prevent
-                :disabled="approveLoading">
+              <v-btn class="bg-error" @click="rejectDialog = true" @mousedown.prevent :loading="loadingReject"
+                :disabled="loading">
                 {{ $t('reject') }}
               </v-btn>
               <v-btn v-if="form.status !== 'APPROVED'" type="submit" class="bg-success" @mousedown.prevent
-                :disabled="approveLoading">
+                :loading="loadingApprove" :disabled="loading">
                 {{ $t('approve') }}
               </v-btn>
             </v-col>
@@ -885,10 +889,10 @@
               <v-textarea v-model="rejectComments" :placeholder="$t('warranties.reject.description')" />
             </v-col>
             <v-col class="d-flex justify-end ga-2">
-              <v-btn variant="outlined" @click="rejectDialog = false" @mousedown.prevent :disabled="rejectLoading">
+              <v-btn variant="outlined" @click="rejectDialog = false" @mousedown.prevent :disabled="loadingReject">
                 {{ $t('cancel') }}
               </v-btn>
-              <v-btn type="submit" class="bg-error" @mousedown.prevent :loading="rejectLoading">
+              <v-btn type="submit" class="bg-error" @mousedown.prevent :loading="loadingReject">
                 {{ $t('reject') }}
               </v-btn>
             </v-col>
@@ -950,9 +954,12 @@ useHead({
   title: `SOE Latam | ${t('warranties.title', 2)}`
 })
 
-const rejectLoading = ref(false);
-const approveLoading = ref(false);
+const loadingReject = ref(false);
+const loadingApprove = ref(false);
 const loading = ref(false);
+const loadingUpdate = ref(false);
+const loadingApproval = ref(false);
+const loadingFiles = ref(false);
 
 // Warranties
 const searchDialog = ref(false);
@@ -1034,15 +1041,15 @@ const itemsPerPageOptions = computed(() => [
 
 const headers = computed(() => {
   const defaultHeaders = [
-    { title: t('equipments.title'), key: 'equipmentModelReference' },
+    { title: t('equipments.title'), key: 'equipmentModelReference', sortable: !loading.value },
   ]
 
   if (isAdmin.value) {
-    defaultHeaders.push({ title: t('distributors.title'), key: 'distributorName' });
+    defaultHeaders.push({ title: t('distributors.title'), key: 'distributorName', sortable: !loading.value });
   }
 
-  defaultHeaders.push({ title: 'WCO', key: 'wco', align: 'center' });
-  defaultHeaders.push({ title: t('warranties.invoice'), key: 'invoice', align: 'center' });
+  defaultHeaders.push({ title: 'WCO', key: 'wco', align: 'center', sortable: !loading.value });
+  defaultHeaders.push({ title: t('warranties.invoice'), key: 'invoice', align: 'center', sortable: !loading.value });
 
   if ($ability.can('update', 'warranties') || $ability.can('delete', 'warranties')) {
     defaultHeaders.push({ title: t('options'), key: 'option', align: 'center', sortable: false })
@@ -1102,6 +1109,7 @@ watch(createDialog, async (val) => {
 
 watch(updateDialog, async (val) => {
   if (!val) {
+    warrantyId.value = null;
     resetForm();
     return;
   }
@@ -1257,13 +1265,15 @@ const getWarranties = async () => {
   }
 }
 
-const getWarranty = async (id) => {
+const getWarranty = async (id, format) => {
   try {
     loading.value = true;
+    warrantyId.value = id;
+    if (format === 'update') loadingUpdate.value = true;
+    else loadingApproval.value = true;
     const data = await $api(`/api/warranties/${id}`, {
       method: 'GET'
     })
-
     form.value = data;
     contact.value = data.contact;
     site.value = data.site;
@@ -1274,7 +1284,9 @@ const getWarranty = async (id) => {
   } catch (err) {
     notify(err, 'error');
   } finally {
-    loading.value = true;
+    loading.value = false;
+    if (format === 'update') loadingUpdate.value = false;
+    else loadingApproval.value = false;
   }
 }
 
@@ -1417,7 +1429,8 @@ const getDistributorsContacts = async (name) => {
 
 const approveWarranty = async () => {
   try {
-    approveLoading.value = true;
+    loading.value = true;
+    loadingApprove.value = true;
     const { message } = await $api(`/api/warranties/approve/${form.value.id}`, {
       method: 'PATCH'
     })
@@ -1427,14 +1440,15 @@ const approveWarranty = async () => {
   } catch (err) {
     notify(err, 'error');
   } finally {
-    approveLoading.value = false;
+    loading.value = false;
+    loadingApprove.value = false;
   }
 }
 
 const rejectWarranty = async () => {
-  rejectLoading.value = true;
   try {
-    rejectLoading.value = true;
+    loading.value = true;
+    loadingReject.value = true;
     const { message } = await $api(`/api/warranties/reject/${form.value.id}`, {
       method: 'POST',
       body: { rejectComments: rejectComments.value }
@@ -1446,7 +1460,23 @@ const rejectWarranty = async () => {
   } catch (err) {
     notify(err, 'error');
   } finally {
-    rejectLoading.value = false;
+    loading.value = false;
+    loadingReject.value = false;
+  }
+}
+
+const doGetWarrantyFiles = async (id) => {
+  try {
+    loading.value = true;
+    loadingFiles.value = true;
+    warrantyId.value = id;
+    await getWarrantyFiles({});
+    tableDialog.value = true;
+  } catch (err) {
+    notify(err, 'error');
+  } finally {
+    loading.value = false;
+    loadingFiles.value = false;
   }
 }
 

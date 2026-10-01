@@ -8,14 +8,14 @@
             <v-tooltip :text="$t('tooltip.create')" :disabled="loading" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('create', 'sites')" class="me-2" icon="mdi-plus" size="small"
-                  variant="text" @click="createDialog = !createDialog" />
+                  variant="text" @click="createDialog = !createDialog" :disabled="loading" />
               </template>
             </v-tooltip>
 
             <v-tooltip :text="$t('tooltip.search')" :disabled="loading" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('read', 'sites')" class="me-2" icon="mdi-magnify" size="small"
-                  variant="text" @click="searchDialog = !searchDialog" />
+                  variant="text" @click="searchDialog = !searchDialog" :disabled="loading" />
               </template>
             </v-tooltip>
           </client-only>
@@ -25,7 +25,8 @@
         <client-only>
           <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
             :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
+            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading"
+            :disable-sort="loading" :hide-default-footer="loading">
             <template v-slot:item.siteType="{ item }">
               <p class="d-inline-block py-1 px-2 rounded-lg text-caption"
                 :class="item.distributorId ? 'bg-primary' : 'bg-secondary'">
@@ -37,14 +38,15 @@
                 <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" v-if="$ability.can('update', 'sites')" class="my-2 bg-primary" size="small"
-                      icon="mdi-pencil" @click="getSite(item.id)" />
+                      icon="mdi-pencil" @click="getSite(item.id)" :loading="loading && siteId === item.id"
+                      :disabled="loading" />
                   </template>
                 </v-tooltip>
 
                 <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" v-if="$ability.can('delete', 'sites')" class="my-2 bg-red" size="small"
-                      icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" />
+                      icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" :disabled="loading" />
                   </template>
                 </v-tooltip>
               </div>
@@ -313,6 +315,7 @@ useHead({
 })
 
 const loading = ref(false);
+const siteId = ref(null);
 const searchDialog = ref(false);
 const createDialog = ref(false);
 const countries = ref([]);
@@ -351,8 +354,8 @@ const itemsPerPageOptions = computed(() => [
 ])
 
 const headers = computed(() => [
-  { title: t('sites.name'), key: 'name' },
-  { title: t('sites.distributorClient'), key: 'distributorClient', align: 'center' },
+  { title: t('sites.name'), key: 'name', sortable: !loading.value },
+  { title: t('sites.distributorClient'), key: 'distributorClient', align: 'center', sortable: !loading.value },
   { key: 'siteType', align: 'center', sortable: false },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
@@ -370,6 +373,7 @@ watch(createDialog, async (val) => {
 
 watch(updateDialog, async (val) => {
   if (!val) {
+    siteId.value = null;
     updateForm.value.reset();
     resetForm();
     return;
@@ -542,6 +546,8 @@ const getCities = async (name) => {
 
 const getSite = async (id) => {
   try {
+    loading.value = true;
+    siteId.value = id;
     const site = await $api(`/api/sites/${id}`, {
       method: 'GET'
     })
@@ -549,6 +555,8 @@ const getSite = async (id) => {
     updateDialog.value = true;
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 

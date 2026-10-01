@@ -8,14 +8,14 @@
             <v-tooltip :text="$t('tooltip.create')" :disabled="loading" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('create', 'groups')" class="me-2" icon="mdi-plus" size="small"
-                  variant="text" @click="createDialog = !createDialog" />
+                  variant="text" @click="createDialog = !createDialog" :disabled="loading" />
               </template>
             </v-tooltip>
 
             <v-tooltip :text="$t('tooltip.search')" :disabled="loading" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('read', 'groups')" class="me-2" icon="mdi-magnify" size="small"
-                  variant="text" @click="searchDialog = !searchDialog" />
+                  variant="text" @click="searchDialog = !searchDialog" :disabled="loading" />
               </template>
             </v-tooltip>
           </client-only>
@@ -25,27 +25,30 @@
         <client-only>
           <v-data-table-server :items="items" :headers="tableHeaders" :page="page" :items-per-page="perPage"
             :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
+            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading"
+            :disable-sort="loading" :hide-default-footer="loading">
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
                 <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" class="my-2 bg-primary" size="small" icon="mdi-pencil"
-                      @click="getGroup(item.id)" />
+                      @click="getGroup(item.id)" :loading="loading && loadingUpdate && groupId === item.id"
+                      :disabled="loading" />
                   </template>
                 </v-tooltip>
 
                 <v-tooltip :text="$t('groups.permissions.title')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" class="my-2 mx-2 bg-secondary" size="small" icon="mdi-shield-edit"
-                      @click="form = item; getPermissions()" />
+                      @click="form = item; getPermissions()"
+                      :loading="loading && loadingPermissions && groupId === item.id" :disabled="loading" />
                   </template>
                 </v-tooltip>
 
                 <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" v-if="item.id !== 1" class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                      @click="form.id = item.id; deleteDialog = true" />
+                      @click="form.id = item.id; deleteDialog = true" :disabled="loading" />
                   </template>
                 </v-tooltip>
               </div>
@@ -223,29 +226,34 @@
         <v-data-table :items="itemsPermissions" :headers="headersPermissions" :page="pagePermissions"
           :items-per-page="perPagePermissions" :items-length="totalPermissions"
           :items-per-page-options="itemsPerPageOptions" @update:page="v => pagePermissions = v"
-          @update:itemsPerPage="v => perPagePermissions = v" :disable-sort="true" density="compact">
+          @update:itemsPerPage="v => perPagePermissions = v" :disable-sort="true" density="compact" :loading="loading"
+          :hide-default-footer="loading">
           <template v-slot:item.moduleName="{ item }">
             <span class="text-capitalize">{{ item.moduleName }}</span>
           </template>
           <template v-slot:item.read="{ item }">
-            <v-checkbox-btn style="justify-self: center;" color="primary" :model-value="item.read" :ripple="false"
-              hide-details="auto" density="compact" @update:modelValue="v => updatePermissions(v, item, 'read')"
-              :disabled="disablePermission(item, 'read')" />
+            <v-checkbox-btn v-if="!disablePermission(item, 'read')" style="justify-self: center;" color="primary"
+              :model-value="item.read" :ripple="false" hide-details="auto" density="compact"
+              @update:modelValue="v => updatePermissions(v, item, 'read')" :disabled="loading" />
+            <span v-else>-</span>
           </template>
           <template v-slot:item.create="{ item }">
-            <v-checkbox-btn style="justify-self: center;" color="primary" :model-value="item.create" :ripple="false"
-              hide-details="auto" density="compact" @update:modelValue="v => updatePermissions(v, item, 'create')"
-              :disabled="disablePermission(item, 'create')" />
+            <v-checkbox-btn v-if="!disablePermission(item, 'create')" style="justify-self: center;" color="primary"
+              :model-value="item.create" :ripple="false" hide-details="auto" density="compact"
+              @update:modelValue="v => updatePermissions(v, item, 'create')" :disabled="loading" />
+            <span v-else>-</span>
           </template>
           <template v-slot:item.update="{ item }">
-            <v-checkbox-btn style="justify-self: center;" color="primary" :model-value="item.update" :ripple="false"
-              hide-details="auto" density="compact" @update:modelValue="v => updatePermissions(v, item, 'update')"
-              :disabled="disablePermission(item, 'update')" />
+            <v-checkbox-btn v-if="!disablePermission(item, 'update')" style="justify-self: center;" color="primary"
+              :model-value="item.update" :ripple="false" hide-details="auto" density="compact"
+              @update:modelValue="v => updatePermissions(v, item, 'update')" :disabled="loading" />
+            <span v-else>-</span>
           </template>
           <template v-slot:item.delete="{ item }">
-            <v-checkbox-btn style="justify-self: center;" color="primary" :model-value="item.delete" :ripple="false"
-              hide-details="auto" density="compact" @update:modelValue="v => updatePermissions(v, item, 'delete')"
-              :disabled="disablePermission(item, 'delete')" />
+            <v-checkbox-btn v-if="!disablePermission(item, 'delete')" style="justify-self: center;" color="primary"
+              :model-value="item.delete" :ripple="false" hide-details="auto" density="compact"
+              @update:modelValue="v => updatePermissions(v, item, 'delete')" :disabled="loading" />
+            <span v-else>-</span>
           </template>
         </v-data-table>
       </v-card-text>
@@ -275,6 +283,9 @@ useHead({
 })
 
 const loading = ref(false);
+const groupId = ref(null);
+const loadingUpdate = ref(false);
+const loadingPermissions = ref(false);
 const searchDialog = ref(false);
 const createDialog = ref(false);
 
@@ -419,6 +430,7 @@ const resetForm = () => {
 
 const getGroups = async () => {
   try {
+    loading.value = true;
     const data = await $api('/api/groups/search', {
       body: {
         distributorId: searchForm.value.distributorId,
@@ -433,11 +445,16 @@ const getGroups = async () => {
     total.value = data.total
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const getGroup = async (id) => {
   try {
+    loading.value = true;
+    loadingUpdate.value = true;
+    groupId.value = id;
     const data = await $api(`/api/groups/${id}`, {
       method: 'GET'
     })
@@ -445,6 +462,9 @@ const getGroup = async (id) => {
     updateDialog.value = true
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
+    loadingUpdate.value = false;
   }
 }
 
@@ -516,6 +536,8 @@ const doSearch = async () => {
 
 const getPermissions = async (search) => {
   try {
+    loading.value = true;
+    loadingPermissions.value = true;
     const data = await $api(`/api/permissions/groups/${form.value.id}`, {
       query: {
         search,
@@ -529,11 +551,15 @@ const getPermissions = async (search) => {
     totalPermissions.value = data.total
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
+    loadingPermissions.value = false;
   }
 }
 
 const updatePermissions = async (v, item, action) => {
   try {
+    loading.value = true;
     item[action] = v;
     const { message } = await $api('/api/permissions/', {
       method: 'PUT',
@@ -542,6 +568,8 @@ const updatePermissions = async (v, item, action) => {
     notify(message, 'success');
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 

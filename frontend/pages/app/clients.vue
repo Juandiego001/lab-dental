@@ -8,14 +8,15 @@
             <v-tooltip :text="$t('tooltip.create')" :disabled="loading" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('create', 'clients')" class="me-2" icon="mdi-plus" size="small"
-                  variant="text" @click="createDialog = !createDialog" />
+                  variant="text" @click="createDialog = !createDialog" :disabled="loading" />
               </template>
             </v-tooltip>
 
             <v-tooltip :text="$t('tooltip.search')" :disabled="loading" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('read', 'clients')" class="me-2" icon="mdi-magnify"
-                  size="small" variant="text" @click="searchDialog = !searchDialog" />
+                  size="small" variant="text" @click="searchDialog = !searchDialog" :disabled="loading"
+                  :disable-sort="loading" />
               </template>
             </v-tooltip>
           </client-only>
@@ -25,7 +26,8 @@
         <client-only>
           <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
             :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
+            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading"
+            :disable-sort="loading" :hide-default-footer="loading">
             <template v-slot:item.phone="{ item }">
               <span v-if="item.phone">{{ item.phone }}</span>
               <span v-else>-</span>
@@ -35,14 +37,14 @@
                 <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" class="my-2 bg-primary" size="small" icon="mdi-pencil"
-                      @click="getClient(item.id);" />
+                      @click="getClient(item.id);" :loading="loading && clientId === item.id" :disabled="loading" />
                   </template>
                 </v-tooltip>
 
                 <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                      @click="form.id = item.id; deleteDialog = true" />
+                      @click="form.id = item.id; deleteDialog = true" :disabled="loading" />
                   </template>
                 </v-tooltip>
               </div>
@@ -226,6 +228,7 @@ useHead({
 })
 
 const loading = ref(false);
+const clientId = ref(null);
 const searchDialog = ref(false);
 const createDialog = ref(false);
 const page = ref(1);
@@ -258,16 +261,16 @@ const itemsPerPageOptions = computed(() => [
 const headers = computed(() => {
   if (isAdmin.value) {
     return [
-      { title: t('clients.name'), key: 'name' },
-      { title: t('clients.phone'), key: 'phone', align: 'center' },
-      { title: t('clients.distributor'), key: 'distributorName', align: 'center' },
+      { title: t('clients.name'), key: 'name', sortable: !loading.value },
+      { title: t('clients.phone'), key: 'phone', align: 'center', sortable: !loading.value },
+      { title: t('clients.distributor'), key: 'distributorName', align: 'center', sortable: !loading.value },
       { title: t('options'), key: 'option', align: 'center', sortable: false }
     ]
   }
 
   return [
-    { title: t('clients.name'), key: 'name' },
-    { title: t('clients.phone'), key: 'phone', align: 'center' },
+    { title: t('clients.name'), key: 'name', sortable: !loading.value },
+    { title: t('clients.phone'), key: 'phone', align: 'center', sortable: !loading.value },
     { title: t('options'), key: 'option', align: 'center', sortable: false }
   ]
 })
@@ -283,6 +286,7 @@ watch(createDialog, async (val) => {
 
 watch(updateDialog, async (val) => {
   if (!val) {
+    clientId.value = null;
     updateForm.value.reset();
     resetForm();
     return;
@@ -348,6 +352,8 @@ const searchClients = async (defPage, defPerPage) => {
 
 const getClient = async (id) => {
   try {
+    loading.value = true;
+    clientId.value = id;
     const client = await $api(`/api/clients/${id}`, {
       method: 'GET'
     })
@@ -355,6 +361,8 @@ const getClient = async (id) => {
     updateDialog.value = true
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 

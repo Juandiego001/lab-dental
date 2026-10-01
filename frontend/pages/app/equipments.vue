@@ -8,14 +8,14 @@
             <v-tooltip :text="$t('tooltip.create')" :disabled="loading" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('create', 'equipments')" class="me-2" icon="mdi-plus"
-                  size="small" variant="text" @click="createDialog = !createDialog" />
+                  size="small" variant="text" @click="createDialog = !createDialog" :disabled="loading" />
               </template>
             </v-tooltip>
 
             <v-tooltip :text="$t('tooltip.search')" :disabled="loading" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('read', 'equipments')" class="me-2" icon="mdi-magnify"
-                  size="small" variant="text" @click="searchDialog = !searchDialog" />
+                  size="small" variant="text" @click="searchDialog = !searchDialog" :disabled="loading" />
               </template>
             </v-tooltip>
           </client-only>
@@ -25,14 +25,14 @@
         <client-only>
           <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
             :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
+            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading"
+            :disable-sort="loading" :hide-default-footer="loading">
             <template v-slot:item.picture="{ item }">
               <v-hover v-slot="{ isHovering, props }">
-
-                <v-avatar v-if="item.mainPicture" class="my-2 cursor-pointer" size="50"
-                  rounded="circle" color="grey-lighten-2" v-bind="props"
-                  @click="async () => { filesEquipmentId = item.id; await getEquipmentFiles({}); sliderDialog = true; }">
-                  <v-img v-if="item.extension !== '.mp4'" alt="Machine photo" cover :src="`/api/files/equipments/${item.mainPicture.split('&')[0]}`">
+                <v-avatar v-if="item.mainPicture" class="my-2 cursor-pointer" size="50" rounded="circle"
+                  color="grey-lighten-2" v-bind="props" @click="doGetEquipmentFiles(item.id, 'slider')">
+                  <v-img v-if="item.extension !== '.mp4'" alt="Machine photo" cover
+                    :src="`/api/files/equipments/${item.mainPicture.split('&')[0]}`">
                     <template v-slot:placeholder>
                       <v-row class="fill-height ma-0" align="center" justify="center">
                         <v-progress-circular indeterminate color="grey-lighten-5" size="20" />
@@ -45,11 +45,9 @@
                   <v-icon v-else icon="mdi-play" color="grey-darken-2" />
                 </v-avatar>
 
-                <v-avatar v-else class="my-2" size="50" rounded="circle" color="grey-lighten-2"
-                  v-bind="props">
+                <v-avatar v-else class="my-2" size="50" rounded="circle" color="grey-lighten-2" v-bind="props">
                   <v-icon icon="mdi-car-wrench" color="grey-darken-2" />
                 </v-avatar>
-
               </v-hover>
             </template>
 
@@ -58,28 +56,31 @@
                 <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" v-if="isAdmin" class="my-2 bg-primary" size="small" icon="mdi-pencil"
-                      @click="getEquipment(item.id)" />
+                      @click="getEquipment(item.id)" :loading="loading && loadingUpdate && equipmentId === item.id"
+                      :disabled="loading" />
                   </template>
                 </v-tooltip>
 
                 <v-tooltip :text="$t('equipments.files.title')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" class="my-2 bg-secondary" size="small" icon="mdi-image-area"
-                      @click="async () => { filesEquipmentId = item.id; await getEquipmentFiles({}); tableDialog = true; }" />
+                      @click="doGetEquipmentFiles(item.id, 'table')"
+                      :loading="loading && loadingFiles && filesEquipmentId === item.id" :disabled="loading" />
                   </template>
                 </v-tooltip>
 
                 <v-tooltip :text="$t('manuals.title', 2)" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" class="my-2 bg-secondary" size="small" icon="mdi-file-multiple"
-                      @click="async () => { manualsEquipmentId = item.id; await getManuals({ equipmentId: item.id }); manualsDialog = true; }" />
+                      @click="doGetManuals(item.id)"
+                      :loading="loading && loadingManuals && filesEquipmentId === item.id" :disabled="loading" />
                   </template>
                 </v-tooltip>
 
                 <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" v-if="isAdmin" class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                      @click="form.id = item.id; deleteDialog = true" />
+                      @click="form.id = item.id; deleteDialog = true" :disabled="loading" />
                   </template>
                 </v-tooltip>
               </div>
@@ -283,6 +284,10 @@ useHead({
 })
 
 const loading = ref(false);
+const equipmentId = ref(null);
+const loadingUpdate = ref(false);
+const loadingFiles = ref(false);
+const loadingManuals = ref(false);
 const page = ref(1);
 const perPage = ref(15);
 const sortBy = ref(null);
@@ -323,10 +328,10 @@ const itemsPerPageOptions = computed(() => [
 const headers = computed(() => {
   const defaultHeaders = [
     { key: 'picture', sortable: false },
-    { title: t('brands.title', 1), key: 'brandName' },
-    { title: t('categories.title', 1), key: 'categoryName', align: 'center' },
-    { title: t('equipments.model'), key: 'model', align: 'center' },
-    { title: t('equipments.reference'), key: 'reference', align: 'center' },
+    { title: t('brands.title', 1), key: 'brandName', sortable: !loading.value },
+    { title: t('categories.title', 1), key: 'categoryName', align: 'center', sortable: !loading.value },
+    { title: t('equipments.model'), key: 'model', align: 'center', sortable: !loading.value },
+    { title: t('equipments.reference'), key: 'reference', align: 'center', sortable: !loading.value },
     { title: t('options'), key: 'option', align: 'center', sortable: false }
   ]
   return defaultHeaders;
@@ -344,6 +349,7 @@ watch(createDialog, async (val) => {
 
 watch(updateDialog, async (val) => {
   if (!val) {
+    equipmentId.value = null;
     updateForm.value.reset();
     resetForm();
     return;
@@ -420,6 +426,9 @@ const searchEquipments = async (defPage, defPerPage) => {
 
 const getEquipment = async (id) => {
   try {
+    loading.value = true;
+    loadingUpdate.value = true;
+    equipmentId.value = id;
     const data = await $api(`/api/equipments/${id}`, {
       method: 'GET'
     })
@@ -427,6 +436,9 @@ const getEquipment = async (id) => {
     updateDialog.value = true
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
+    loadingUpdate.value = false;
   }
 }
 
@@ -479,6 +491,37 @@ const deleteEquipment = async () => {
     notify(err, 'error');
   } finally {
     loading.value = false;
+  }
+}
+
+const doGetEquipmentFiles = async (id, format) => {
+  try {
+    loading.value = true;
+    loadingFiles.value = true;
+    filesEquipmentId.value = id;
+    await getEquipmentFiles({});
+    if (format === 'slider') sliderDialog.value = true;
+    else tableDialog.value = true;
+  } catch (err) {
+    notify(err, 'error')
+  } finally {
+    loading.value = false;
+    loadingFiles.value = false;
+  }
+}
+
+const doGetManuals = async (id) => {
+  try {
+    loading.value = true;
+    loadingManuals.value = true;
+    manualsEquipmentId.value = id;
+    await getManuals({ equipmentId: id });
+    manualsDialog.value = true;
+  } catch (err) {
+    notify(err, 'error')
+  } finally {
+    loading.value = false;
+    loadingManuals.value = false;
   }
 }
 

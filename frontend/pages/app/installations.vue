@@ -8,14 +8,14 @@
             <v-tooltip :text="$t('tooltip.create')" :disabled="loading" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('create', 'installations')" class="me-2" icon="mdi-plus"
-                  size="small" variant="text" @click="createDialog = !createDialog" />
+                  size="small" variant="text" @click="createDialog = !createDialog" :disabled="loading" />
               </template>
             </v-tooltip>
 
             <v-tooltip :text="$t('tooltip.search')" :disabled="loading" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('read', 'installations')" class="me-2" icon="mdi-magnify"
-                  size="small" variant="text" @click="searchDialog = !searchDialog" />
+                  size="small" variant="text" @click="searchDialog = !searchDialog" :disabled="loading" />
               </template>
             </v-tooltip>
           </client-only>
@@ -41,21 +41,23 @@
                 <template v-slot:activator="{ props }">
                   <v-btn v-bind="props" v-if="$ability.can('update', 'installations')" class="my-2 bg-primary me-2"
                     size="small" icon="mdi-pencil"
-                    @click="async () => { await getInstallation(item.id); updateDialog = true }" />
+                    @click="async () => { await getInstallation(item.id, 'update'); updateDialog = true }"
+                    :loading="loading && loadingUpdate && installationId === item.id" :disabled="loading" />
                 </template>
               </v-tooltip>
 
               <v-tooltip :text="$t('tooltip.approveReject')" :disabled="loading" location="bottom">
                 <template v-slot:activator="{ props }">
                   <v-btn v-bind="props" v-if="isAdmin" class="my-2 me-2 bg-secondary" size="small" icon="mdi-eye"
-                    @click="async () => { await getInstallation(item.id); approvalDialog = true }" />
+                    @click="async () => { await getInstallation(item.id, 'approval'); approvalDialog = true }"
+                    :loading="loading && loadingApproval && installationId === item.id" :disabled="loading" />
                 </template>
               </v-tooltip>
 
               <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
                 <template v-slot:activator="{ props }">
                   <v-btn v-bind="props" v-if="$ability.can('delete', 'installations')" class="my-2 bg-red" size="small"
-                    icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" />
+                    icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" :disabled="loading" />
                 </template>
               </v-tooltip>
             </template>
@@ -371,12 +373,17 @@
               </v-carousel>
             </v-col>
             <v-col class="d-flex justify-end ga-2">
-              <v-btn variant="outlined" @click="approvalDialog = false" @mousedown.prevent :disabled="approveLoading">{{
-                $t('cancel') }}</v-btn>
-              <v-btn class="bg-error" @click="rejectDialog = true" @mousedown.prevent :disabled="approveLoading">{{
-                $t('reject') }}</v-btn>
-              <v-btn type="submit" class="bg-success" @mousedown.prevent :loading="approveLoading">{{ $t('approve')
-              }}</v-btn>
+              <v-btn variant="outlined" @click="approvalDialog = false" @mousedown.prevent :disabled="loading">
+                {{ $t('cancel') }}
+              </v-btn>
+              <v-btn class="bg-error" @click="rejectDialog = true" @mousedown.prevent :loading="loadingReject"
+                :disabled="loading">
+                {{ $t('reject') }}
+              </v-btn>
+              <v-btn v-if="form.status !== 'APPROVED'" type="submit" class="bg-success" @mousedown.prevent
+                :loading="loadingApprove" :disabled="loading">
+                {{ $t('approve') }}
+              </v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -401,10 +408,12 @@
               <v-textarea v-model="rejectComments" :placeholder="$t('installations.reject.description')"></v-textarea>
             </v-col>
             <v-col class="d-flex justify-end ga-2">
-              <v-btn variant="outlined" @click="rejectDialog = false" @mousedown.prevent :disabled="rejectLoading">{{
-                $t('cancel') }}</v-btn>
-              <v-btn type="submit" class="bg-error" @mousedown.prevent :loading="rejectLoading">{{ $t('reject')
-              }}</v-btn>
+              <v-btn variant="outlined" @click="rejectDialog = false" @mousedown.prevent :disabled="loading">
+                {{ $t('cancel') }}
+              </v-btn>
+              <v-btn type="submit" class="bg-error" @mousedown.prevent :loading="loadingReject" :disabled="loading">
+                {{ $t('reject') }}
+              </v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -506,9 +515,12 @@ useHead({
   title: `SOE Latam | ${t('installations.title', 2)}`
 })
 
-const rejectLoading = ref(false);
-const approveLoading = ref(false);
+const loadingApprove = ref(false);
+const loadingReject = ref(false);
 const loading = ref(false);
+const installationId = ref(null);
+const loadingUpdate = ref(false);
+const loadingApproval = ref(false);
 const searchDialog = ref(false);
 const createDialog = ref(false);
 const distributorsSites = ref([]);
@@ -583,20 +595,20 @@ const itemsPerPageOptions = computed(() => [
 
 const headers = computed(() => {
   const defaultHeaders = [
-    { title: t('equipments.title'), key: 'equipmentModelReference' },
+    { title: t('equipments.title'), key: 'equipmentModelReference', sortable: !loading.value },
   ]
 
   if (isAdmin.value) {
-    defaultHeaders.push({ title: t('distributors.title'), key: 'distributorName' });
+    defaultHeaders.push({ title: t('distributors.title'), key: 'distributorName', sortable: !loading.value });
   } else {
-    defaultHeaders.push({ title: t('clients.title'), key: 'clientName' });
+    defaultHeaders.push({ title: t('clients.title'), key: 'clientName', sortable: !loading.value });
   }
 
-  defaultHeaders.push({ title: t('installations.serial'), key: 'serial', align: 'center' });
-  defaultHeaders.push({ title: t('installations.installedDate'), key: 'installedDate', align: 'center' });
+  defaultHeaders.push({ title: t('installations.serial'), key: 'serial', align: 'center', sortable: !loading.value });
+  defaultHeaders.push({ title: t('installations.installedDate'), key: 'installedDate', align: 'center', sortable: !loading.value });
 
   if (isAdmin.value) {
-    defaultHeaders.push({ title: t('installations.expirationDate'), key: 'expirationDate', align: 'center' });
+    defaultHeaders.push({ title: t('installations.expirationDate'), key: 'expirationDate', align: 'center', sortable: !loading.value });
   }
 
   if ($ability.can('update', 'installations') || $ability.can('delete', 'installations')) {
@@ -623,6 +635,7 @@ watch(createDialog, async (val) => {
 
 watch(updateDialog, async (val) => {
   if (!val) {
+    installationId.value = null;
     updateForm.value.reset();
     resetForm();
     return;
@@ -792,9 +805,12 @@ const getInstallations = async () => {
   }
 }
 
-const getInstallation = async (id) => {
+const getInstallation = async (id, format) => {
   try {
     loading.value = true;
+    installationId.value = id;
+    if (format === 'update') loadingUpdate.value = true;
+    else loadingApproval.value = true;
     const data = await $api(`/api/installations/${id}`, {
       method: 'GET'
     })
@@ -804,6 +820,8 @@ const getInstallation = async (id) => {
     notify(err, 'error');
   } finally {
     loading.value = false;
+    if (format === 'update') loadingUpdate.value = false;
+    else loadingApproval.value = false;
   }
 }
 
@@ -919,7 +937,8 @@ const doSearch = async () => {
 
 const approveInstallation = async () => {
   try {
-    approveLoading.value = true;
+    loading.value = true;
+    loadingApprove.value = true;
     const { message } = await $api(`/api/installations/approve/${form.value.id}`, {
       method: 'PATCH'
     })
@@ -929,13 +948,15 @@ const approveInstallation = async () => {
   } catch (err) {
     notify(err, 'error');
   } finally {
-    approveLoading.value = false;
+    loading.value = false;
+    loadingApprove.value = false;
   }
 }
 
 const rejectInstallation = async () => {
   try {
-    rejectLoading.value = true;
+    loading.value = true;
+    loadingReject.value = true;
     const { message } = await $api(`/api/installations/reject/${form.value.id}`, {
       method: 'POST',
       body: { rejectComments: rejectComments.value }
@@ -947,7 +968,8 @@ const rejectInstallation = async () => {
   } catch (err) {
     notify(err, 'error');
   } finally {
-    rejectLoading.value = false;
+    loading.value = false;
+    loadingReject.value = false;
   }
 }
 

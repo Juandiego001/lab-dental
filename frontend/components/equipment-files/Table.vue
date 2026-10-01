@@ -14,13 +14,14 @@
           <v-tooltip :text="$t('equipments.tooltip.addFile')" :disabled="loading" location="bottom">
             <template v-slot:activator="{ props }">
               <v-btn v-bind="props" v-if="isAdmin" class="me-2" icon="mdi-plus" size="x-small"
-                @click="createDialog = !createDialog" />
+                @click="createDialog = !createDialog" :disabled="loading" />
             </template>
           </v-tooltip>
 
           <v-tooltip :text="$t('equipments.tooltip.searchFile')" :disabled="loading" location="bottom">
             <template v-slot:activator="{ props }">
-              <v-btn v-bind="props" icon="mdi-magnify" size="x-small" @click="searchDialog = !searchDialog" />
+              <v-btn v-bind="props" icon="mdi-magnify" size="x-small" @click="searchDialog = !searchDialog"
+                :disabled="loading" />
             </template>
           </v-tooltip>
         </v-row>
@@ -29,7 +30,8 @@
           @update:itemsPerPage="v => perPage = v" density="compact" :disable-sort="true" :loading="loading">
           <template v-slot:item.picture="{ item }">
             <v-avatar class="my-2" size="50" rounded="circle" color="grey-lighten-2">
-              <v-img v-if="item.extension !== '.mp4'" alt="Machine photo" cover :src="`/api/files/equipments/${item.hashName}`">
+              <v-img v-if="item.extension !== '.mp4'" alt="Machine photo" cover
+                :src="`/api/files/equipments/${item.hashName}`">
                 <template v-slot:placeholder>
                   <v-row class="fill-height ma-0" align="center" justify="center">
                     <v-progress-circular indeterminate color="grey-lighten-5" size="20" />
@@ -53,7 +55,7 @@
               <v-tooltip :text="$t('equipments.tooltip.viewFile')" :disabled="loading" location="bottom">
                 <template v-slot:activator="{ props }">
                   <v-btn v-bind="props" class="my-1 bg-secondary" size="x-small" icon="mdi-open-in-new"
-                    :href="`/api/files/equipments/${item.hashName}`" target="_blank" />
+                    :href="`/api/files/equipments/${item.hashName}`" target="_blank" :disabled="loading" />
                 </template>
               </v-tooltip>
 
@@ -61,14 +63,14 @@
                 <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" class="my-1 bg-primary" size="x-small" icon="mdi-pencil"
-                      @click="getEquipmentFile(item.id)" />
+                      @click="getEquipmentFile(item.id)" :loading="loading && fileId === item.id" :disabled="loading" />
                   </template>
                 </v-tooltip>
 
                 <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" class="my-1 bg-red" size="x-small" icon="mdi-trash-can"
-                      @click="form.id = item.id; deleteDialog = true" />
+                      @click="form.id = item.id; deleteDialog = true" :disabled="loading" />
                   </template>
                 </v-tooltip>
 
@@ -261,6 +263,7 @@ const { isAdmin } = useProfile();
 const { equipmentId, getEquipmentFiles, tableDialog, items, total } = useEquipmentFiles();
 
 const loading = ref(false);
+const fileId = ref(null);
 const page = ref(1);
 const perPage = ref(15);
 
@@ -327,6 +330,7 @@ watch(createDialog, async (val) => {
 
 watch(updateDialog, async (val) => {
   if (!val) {
+    fileId.value = null;
     updateForm.value.reset();
     resetForm();
     return;
@@ -395,6 +399,8 @@ const createEquipmentFile = async () => {
 
 const getEquipmentFile = async (id) => {
   try {
+    loading.value = true;
+    fileId.value = id;
     const data = await $api(`/api/equipments/files/${id}`, {
       method: 'GET'
     })
@@ -402,6 +408,8 @@ const getEquipmentFile = async (id) => {
     updateDialog.value = true
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 

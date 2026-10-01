@@ -14,20 +14,21 @@
           <v-tooltip :text="$t('reasons.tooltip.add')" :disabled="loading" location="bottom">
             <template v-slot:activator="{ props }">
               <v-btn v-bind="props" v-if="isAdmin" class="me-2" icon="mdi-plus" size="x-small"
-                @click="createDialog = !createDialog" />
+                @click="createDialog = !createDialog" :disabled="loading" />
             </template>
           </v-tooltip>
 
           <v-tooltip :text="$t('reasons.tooltip.search')" :disabled="loading" location="bottom">
             <template v-slot:activator="{ props }">
-              <v-btn v-bind="props" icon="mdi-magnify" size="x-small" @click="searchDialog = !searchDialog" />
+              <v-btn v-bind="props" icon="mdi-magnify" size="x-small" @click="searchDialog = !searchDialog"
+                :disabled="loading" />
             </template>
           </v-tooltip>
         </v-row>
         <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
           @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" density="compact" :loading="loading"
-          show-expand>
+          :show-expand="!loading" :disable-sort="loading" :hide-default-footer="loading">
           <template v-slot:expanded-row="{ columns, item }">
             <tr>
               <td :colspan="columns.length" class="bg-grey-lighten-4 pa-3">
@@ -53,14 +54,14 @@
                 <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" class="bg-primary" size="x-small" icon="mdi-pencil"
-                      @click="getReason(item.id)" />
+                      @click="getReason(item.id)" :loading="loading && reasonId === item.id" :disabled="loading" />
                   </template>
                 </v-tooltip>
 
                 <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" class="bg-red" size="x-small" icon="mdi-trash-can"
-                      @click="form.id = item.id; deleteDialog = true" />
+                      @click="form.id = item.id; deleteDialog = true" :disabled="loading" />
                   </template>
                 </v-tooltip>
               </template>
@@ -111,7 +112,7 @@
     <v-card tile>
       <v-card-title class="bg-primary">
         <v-row class="text-body-1" no-gutters align="center">
-          {{ $t('manuals.update.title') }}
+          {{ $t('reasons.update.title') }}
           <v-spacer />
           <v-btn class="bg-primary" size="x-small" icon="mdi-close" @click="updateDialog = false" />
         </v-row>
@@ -202,11 +203,11 @@ import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n();
 const { notify } = useSnackbar();
-const { $ability } = useNuxtApp();
 const { isAdmin } = useProfile();
 const { items, total, categoryId, reasonsDialog, getReasons, get, create, update, remove } = useReasons();
 
 const loading = ref(false);
+const reasonId = ref(null);
 const page = ref(1);
 const perPage = ref(15);
 const sortBy = ref(null);
@@ -241,8 +242,8 @@ const itemsPerPageOptions = computed(() => [
 
 const headers = computed(() => {
   return [
-    { title: t('reasons.name'), key: 'name' },
-    { title: t('reasons.slug'), key: 'slug' },
+    { title: t('reasons.name'), key: 'name', sortable: !loading.value },
+    { title: t('reasons.slug'), key: 'slug', sortable: !loading.value },
     { title: t('options'), key: 'option', align: 'center', sortable: false }
   ]
 })
@@ -257,6 +258,7 @@ watch(createDialog, async (val) => {
 
 watch(updateDialog, async (val) => {
   if (!val) {
+    reasonId.value = null;
     updateForm.value.reset();
     resetForm();
     return;
@@ -325,11 +327,15 @@ const createReason = async () => {
 
 const getReason = async (id) => {
   try {
+    loading.value = true;
+    reasonId.value = id;
     const data = await get(id);
     form.value = data
     updateDialog.value = true
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 

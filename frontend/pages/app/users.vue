@@ -8,14 +8,14 @@
             <v-tooltip :text="$t('tooltip.create')" :disabled="loading" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('create', 'users')" class="me-2" icon="mdi-plus" size="small"
-                  variant="text" @click="createDialog = !createDialog" />
+                  variant="text" @click="createDialog = !createDialog" :disabled="loading" />
               </template>
             </v-tooltip>
 
             <v-tooltip :text="$t('tooltip.search')" :disabled="loading" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('read', 'users')" class="me-2" icon="mdi-magnify" size="small"
-                  variant="text" @click="searchDialog = !searchDialog" />
+                  variant="text" @click="searchDialog = !searchDialog" :disabled="loading" />
               </template>
             </v-tooltip>
           </client-only>
@@ -25,20 +25,22 @@
         <client-only>
           <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
             :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
+            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading"
+            :disable-sort="loading" :hide-default-footer="loading">
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
                 <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" v-if="$ability.can('update', 'users')" class="my-2 bg-primary" size="small"
-                      icon="mdi-pencil" @click="getUser(item.id)" />
+                      icon="mdi-pencil" @click="getUser(item.id)" :loading="loading && userId === item.id"
+                      :disabled="loading" />
                   </template>
                 </v-tooltip>
 
                 <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" v-if="$ability.can('delete', 'users')" class="my-2 bg-red" size="small"
-                      icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" />
+                      icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" :disabled="loading" />
                   </template>
                 </v-tooltip>
               </div>
@@ -273,6 +275,7 @@ useHead({
 })
 
 const loading = ref(false);
+const userId = ref(null);
 const searchDialog = ref(false);
 const createDialog = ref(false);
 const page = ref(1);
@@ -336,9 +339,9 @@ const username = computed({
 
 const headers = computed(() => {
   const defaultHeaders = [
-    { title: t('users.fullName'), key: 'fullName' },
-    { title: t('users.username'), key: 'username', align: 'center' },
-    { title: t('users.email'), key: 'email', align: 'center' },
+    { title: t('users.fullName'), key: 'fullName', sortable: !loading.value },
+    { title: t('users.username'), key: 'username', align: 'center', sortable: !loading.value },
+    { title: t('users.email'), key: 'email', align: 'center', sortable: !loading.value },
   ]
 
   if ($ability.can('update', 'users') || $ability.can('delete', 'users')) {
@@ -364,6 +367,7 @@ watch(createDialog, async (val) => {
 
 watch(updateDialog, async (val) => {
   if (!val) {
+    userId.value = null;
     updateForm.value.reset();
     resetForm();
     return;
@@ -437,6 +441,8 @@ const searchUsers = async (defPage, defPerPage) => {
 
 const getUser = async (id) => {
   try {
+    loading.value = true;
+    userId.value = id;
     const user = await $api(`/api/users/${id}`, {
       method: 'GET'
     })
@@ -444,6 +450,8 @@ const getUser = async (id) => {
     updateDialog.value = true;
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 

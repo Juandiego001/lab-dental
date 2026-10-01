@@ -8,14 +8,14 @@
             <v-tooltip :text="$t('tooltip.create')" :disabled="loading" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('create', 'notifications')" class="me-2" icon="mdi-plus"
-                  size="small" variant="text" @click="createDialog = !createDialog" />
+                  size="small" variant="text" @click="createDialog = !createDialog" :disabled="loading" />
               </template>
             </v-tooltip>
 
             <v-tooltip :text="$t('tooltip.search')" :disabled="loading" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('read', 'notifications')" class="me-2" icon="mdi-magnify"
-                  size="small" variant="text" @click="searchDialog = !searchDialog" />
+                  size="small" variant="text" @click="searchDialog = !searchDialog" :disabled="loading" />
               </template>
             </v-tooltip>
           </client-only>
@@ -25,27 +25,30 @@
         <client-only>
           <v-data-table-server :items="items" :headers="tableHeaders" :page="page" :items-per-page="perPage"
             :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
+            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading"
+            :disable-sort="loading" :hide-default-footer="loading">
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
                 <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" class="my-2 bg-primary" size="small" icon="mdi-pencil"
-                      @click="getNotification(item.id)" />
+                      @click="getNotification(item.id)"
+                      :loading="loading && loadingUpdate && notificationId === item.id" :disabled="loading" />
                   </template>
                 </v-tooltip>
 
                 <v-tooltip :text="$t('notifications.notificationsModules.title')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" class="my-2 mx-2 bg-secondary" size="small" icon="mdi-shield-edit"
-                      @click="form = item; getNotificationsModules()" />
+                      @click="form = item; getNotificationsModules()"
+                      :loading="loading && loadingNotificationModules && form.id === item.id" :disabled="loading" />
                   </template>
                 </v-tooltip>
 
                 <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                      @click="form.id = item.id; deleteDialog = true" />
+                      @click="form.id = item.id; deleteDialog = true" :disabled="loading" />
                   </template>
                 </v-tooltip>
               </div>
@@ -223,7 +226,8 @@
         <v-data-table :items="itemsNotificationsModules" :headers="headersPermissions" :page="pageNotificationsModules"
           :items-per-page="perPageNotificationsModules" :items-length="totalNotificationsModules"
           :items-per-page-options="itemsPerPageOptions" @update:page="v => pageNotificationsModules = v"
-          @update:itemsPerPage="v => perPageNotificationsModules = v" :disable-sort="true" density="compact">
+          @update:itemsPerPage="v => perPageNotificationsModules = v" :disable-sort="true" density="compact"
+          :loading="loading" :hide-default-footer="loading">
           <template v-slot:header.update="{ column }">
             <span v-if="column.key !== 'update'">{{ column }}</span>
             <div class="d-flex algin-center justify-center" v-else>
@@ -241,20 +245,17 @@
           <template v-slot:item.create="{ item }">
             <v-checkbox-btn style="justify-self: center;" color="primary" :model-value="item.create" :ripple="false"
               hide-details="auto" density="compact"
-              @update:modelValue="v => updateNotificationsModules(v, item, 'create')"
-              :disabled="disableNotificationsModules(item, 'create')" />
+              @update:modelValue="v => updateNotificationsModules(v, item, 'create')" :disabled="loading" />
           </template>
           <template v-slot:item.update="{ item }">
             <v-checkbox-btn style="justify-self: center;" color="primary" :model-value="item.update" :ripple="false"
               hide-details="auto" density="compact"
-              @update:modelValue="v => updateNotificationsModules(v, item, 'update')"
-              :disabled="disableNotificationsModules(item, 'update')" />
+              @update:modelValue="v => updateNotificationsModules(v, item, 'update')" :disabled="loading" />
           </template>
           <template v-slot:item.delete="{ item }">
             <v-checkbox-btn style="justify-self: center;" color="primary" :model-value="item.delete" :ripple="false"
               hide-details="auto" density="compact"
-              @update:modelValue="v => updateNotificationsModules(v, item, 'delete')"
-              :disabled="disableNotificationsModules(item, 'delete')" />
+              @update:modelValue="v => updateNotificationsModules(v, item, 'delete')" :disabled="loading" />
           </template>
         </v-data-table>
       </v-card-text>
@@ -284,6 +285,10 @@ useHead({
 })
 
 const loading = ref(false);
+const loadingUpdate = ref(false);
+const loadingNotificationModules = ref(false);
+const notificationId = ref(null);
+
 const searchDialog = ref(false);
 const createDialog = ref(false);
 
@@ -327,8 +332,8 @@ const itemsPerPageOptions = computed(() => [
 const tableHeaders = computed(() => {
   if (isAdmin.value) {
     return [
-      { title: t('notifications.name'), key: 'name' },
-      { title: t('distributors.title'), key: 'distributorName' },
+      { title: t('notifications.name'), key: 'name', sortable: !loading.value },
+      { title: t('distributors.title'), key: 'distributorName', sortable: !loading.value },
       { title: t('options'), key: 'option', align: 'center', sortable: false }
     ]
   }
@@ -361,6 +366,7 @@ watch(createDialog, async (val) => {
 
 watch(updateDialog, async (val) => {
   if (!val) {
+    notificationId.value = null;
     updateForm.value.reset();
     resetForm();
     return;
@@ -427,6 +433,7 @@ const resetForm = () => {
 
 const getNotifications = async () => {
   try {
+    loading.value = true;
     const data = await $api('/api/notifications/search', {
       body: {
         distributorId: searchForm.value.distributorId,
@@ -441,11 +448,16 @@ const getNotifications = async () => {
     total.value = data.total
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const getNotification = async (id) => {
   try {
+    loading.value = true;
+    loadingUpdate.value = true;
+    notificationId.value = id;
     const data = await $api(`/api/notifications/${id}`, {
       method: 'GET'
     })
@@ -453,6 +465,9 @@ const getNotification = async (id) => {
     updateDialog.value = true
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
+    loadingUpdate.value = false;
   }
 }
 
@@ -477,6 +492,7 @@ const createNotification = async () => {
 const updateNotification = async () => {
   try {
     loading.value = true;
+    loadingUpdate.value = true;
     if (!updateModel.value) return;
     const { message } = await $api(`/api/notifications/${form.value.id}`, {
       method: 'PUT',
@@ -489,6 +505,7 @@ const updateNotification = async () => {
     notify(err, 'error');
   } finally {
     loading.value = false;
+    loadingUpdate.value = false;
   }
 }
 
@@ -524,6 +541,8 @@ const doSearch = async () => {
 
 const getNotificationsModules = async (search) => {
   try {
+    loading.value = true;
+    loadingNotificationModules.value = true;
     const data = await $api(`/api/notifications/modules/${form.value.id}`, {
       query: {
         search,
@@ -537,11 +556,15 @@ const getNotificationsModules = async (search) => {
     totalNotificationsModules.value = data.total
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
+    loadingNotificationModules.value = false;
   }
 }
 
 const updateNotificationsModules = async (v, item, action) => {
   try {
+    loading.value = true;
     item[action] = v;
     const { message } = await $api('/api/notifications/modules', {
       method: 'PUT',
@@ -550,30 +573,9 @@ const updateNotificationsModules = async (v, item, action) => {
     notify(message, 'success');
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
-}
-
-const modulesOnlyRead = ['brands', 'categories', 'equipments', 'aligners'];
-const modulesBan = ['distributors', 'lists', 'reasons'];
-
-const disableNotificationsModules = (permission, action) => {
-  if (form.value.id == 1) return true;
-
-  if (!isAdmin.value &&
-    ['equipments', 'brands', 'categories', 'aligners'].includes(permission.moduleName) &&
-    ['create', 'update', 'delete'].includes(action)) return true;
-
-  if (form.value.distributorId !== 1 &&
-    modulesOnlyRead.includes(permission.moduleName) &&
-    ['create', 'update', 'delete'].includes(action)
-  ) return true;
-
-  if (form.value.distributorId !== 1 &&
-    modulesBan.includes(permission.moduleName) &&
-    ['read', 'create', 'update', 'delete'].includes(action)
-  ) return true;
-
-  return false;
 }
 
 // Rules

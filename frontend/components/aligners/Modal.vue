@@ -230,7 +230,6 @@ const stage = async () => {
     let seconds = 0;
     while (!showUnstage.value) {
       await getAligner();
-      await new Promise((res) => setTimeout(res, 1000));
       seconds += 1;
       if (seconds >= 5) throw new Error(t('aligners.commandError'));
     }
@@ -251,7 +250,6 @@ const unstage = async () => {
     let seconds = 0;
     while (!showStage.value) {
       await getAligner();
-      await new Promise((res) => setTimeout(res, 1000));
       seconds += 1;
       if (seconds >= 5) throw new Error(t('aligners.commandError'));
     }
@@ -268,7 +266,6 @@ const checkCloud = async () => {
   try {
     loading.value = true;
     await sendCloud();
-    await new Promise((res) => setTimeout(res, 2000));
     await getAligner();
   } catch (err) {
     notify(err, 'error')
@@ -281,7 +278,6 @@ const activate = async () => {
   try {
     loading.value = true;
     await sendActivate();
-    await new Promise((res) => setTimeout(res, 2000));
     await getAligner();
   } catch (err) {
     notify(err, 'error')

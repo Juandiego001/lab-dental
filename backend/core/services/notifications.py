@@ -178,7 +178,7 @@ def update_notifications_modules(data: dict):
         raise Exception('Permission ID not found')
 
     notification_module_id = data['id']
-    notification_id, distributor_id, module_name = db.session.query(
+    _, distributor_id, module_name = db.session.query(
         Notification.id, Distributor.id, Module.name)\
         .select_from(NotificationModule)\
         .join(Module, NotificationModule.module_id == Module.id)\
@@ -208,9 +208,6 @@ def update_notifications_modules(data: dict):
         module_name in modules_ban and\
             (create or update or delete):
         raise Exception('Forbiden permission assignment')
-
-    if notification_id == 1:
-        raise Exception('Forbiden permission update')
 
     new_notification_module = NotificationModule(
         id=notification_module_id,

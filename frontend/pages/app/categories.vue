@@ -8,14 +8,14 @@
             <v-tooltip :text="$t('tooltip.create')" :disabled="loading" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('create', 'categories')" class="me-2" icon="mdi-plus"
-                  size="small" variant="text" @click="createDialog = !createDialog" />
+                  size="small" variant="text" @click="createDialog = !createDialog" :disabled="loading" />
               </template>
             </v-tooltip>
 
             <v-tooltip :text="$t('tooltip.search')" :disabled="loading" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('read', 'categories')" class="me-2" icon="mdi-magnify"
-                  size="small" variant="text" @click="searchDialog = !searchDialog" />
+                  size="small" variant="text" @click="searchDialog = !searchDialog" :disabled="loading" />
               </template>
             </v-tooltip>
           </client-only>
@@ -25,27 +25,30 @@
         <client-only>
           <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
             :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading">
+            @update:itemsPerPage="v => perPage = v" @update:sort-by="v => sortBy = v" :loading="loading"
+            :disable-sort="loading" :hide-default-footer="loading">
             <template v-slot:item.option="{ item }">
               <div class="d-flex align-center justify-center ga-2">
                 <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" v-if="$ability.can('update', 'categories')" class="my-2 bg-primary"
-                      size="small" icon="mdi-pencil" @click="getCategory(item.id)" />
+                      size="small" icon="mdi-pencil" @click="getCategory(item.id)"
+                      :loading="loading && loadingUpdate && categoryId === item.id" :disabled="loading" />
                   </template>
                 </v-tooltip>
 
                 <v-tooltip :text="$t('reasons.title', 2)" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" v-if="isAdmin" class="bg-secondary" size="small" icon="mdi-file-cancel"
-                      @click="async () => { categoryId = item.id; await getReasons({ categoryId: item.id }); reasonsDialog = true }" />
+                      @click="doGetReasons(item.id)" :loading="loading && loadingReasons && categoryId === item.id"
+                      :disabled="loading" />
                   </template>
                 </v-tooltip>
 
                 <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" v-if="$ability.can('delete', 'categories')" class="my-2 bg-red" size="small"
-                      icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" />
+                      icon="mdi-trash-can" @click="form.id = item.id; deleteDialog = true" :disabled="loading" />
                   </template>
                 </v-tooltip>
               </div>
@@ -202,6 +205,8 @@ useHead({
 })
 
 const loading = ref(false);
+const loadingUpdate = ref(false);
+const loadingReasons = ref(false);
 const searchDialog = ref(false);
 const createDialog = ref(false);
 const page = ref(1);
@@ -231,8 +236,8 @@ const itemsPerPageOptions = computed(() => [
 
 const headers = computed(() => {
   const defaultHeaders = [
-    { title: t('categories.name'), key: 'name' },
-    { title: t('categories.slug'), key: 'slug' }
+    { title: t('categories.name'), key: 'name', sortable: !loading.value },
+    { title: t('categories.slug'), key: 'slug', sortable: !loading.value }
   ];
 
   if ($ability.can('update', 'categories') || $ability.can('delete', 'categories')) {
@@ -252,6 +257,7 @@ watch(createDialog, (val) => {
 
 watch(updateDialog, (val) => {
   if (!val) {
+    categoryId.value = null;
     updateForm.value.reset();
     resetForm();
     return;
@@ -313,6 +319,9 @@ const searchCategories = async (defPage, defPerPage) => {
 
 const getCategory = async (id) => {
   try {
+    loading.value = true;
+    loadingUpdate.value = true;
+    categoryId.value = id;
     const category = await $api(`/api/categories/${id}`, {
       method: 'GET'
     })
@@ -320,6 +329,9 @@ const getCategory = async (id) => {
     updateDialog.value = true
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
+    loadingUpdate.value = false;
   }
 }
 
@@ -375,6 +387,22 @@ const deleteCategory = async () => {
     loading.value = false;
   }
 }
+
+
+const doGetReasons = async (id) => {
+  try {
+    loading.value = true;
+    loadingReasons.value = true;
+    categoryId.value = id;
+    await getReasons({ categoryId: id });
+    reasonsDialog.value = true
+  } catch (err) {
+    notify(err, 'error');
+  } finally {
+    loading.value = false;
+  }
+}
+
 
 // Rules
 const nameRequired = (v) => !!v || t('categories.rules.nameRequired');

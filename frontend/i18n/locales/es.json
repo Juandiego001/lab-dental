@@ -314,7 +314,7 @@
     "name": "Nombre",
     "address": "Dirección",
     "distributorClient": "Distribuidor/Cliente",
-    "distributorsSite": "Sede Distribuidor",
+    "distributorSite": "Sede Distribuidor",
     "clientsSite": "Sede Cliente",
     "create": {
       "title": "Crear sede",

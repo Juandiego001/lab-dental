@@ -56,13 +56,13 @@
               size="small">{{ $t('update') }}</v-btn>
           </v-col>
 
-          <v-col cols="12" :md="isAdmin ? 3 : 6" sm="12" :class="$vuetify.display.mdAndUp ? 'pe-2' : ''">
+          <v-col cols="12" md="3" sm="12" :class="$vuetify.display.mdAndUp ? 'pe-2' : ''">
             <v-text-field id="serial-input" type="text" v-model="semantic" @input="(e) => semantic = e.target.value"
               maxlength="19" :label="$t('aligners.softwareVersion')" hide-details density="compact" max-width="340"
               @update:model-value="handleInput" @blur="handleBlur" :disabled="loading" />
           </v-col>
 
-          <v-col cols="12" :md="isAdmin ? 3 : 6" sm="12" :class="$vuetify.display.mdAndUp ? 'pe-2' : 'py-2'">
+          <v-col cols="12" md="3" sm="12" :class="$vuetify.display.mdAndUp ? 'pe-2' : 'py-2'">
             <v-text-field id="specs-input" type="text" v-model="specsInput" @input="(e) => specsInput = e.target.value"
               maxlength="19" :label="$t('aligners.specsVersion')" hide-details density="compact" max-width="340"
               @update:model-value="handleSpecsInput" @blur="handleSpecsBlur" :disabled="loading" />

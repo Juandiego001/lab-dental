@@ -8,14 +8,14 @@
             <v-tooltip :text="$t('tooltip.create')" :disabled="loading" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('create', 'lists')" class="me-2" icon="mdi-plus" size="small"
-                  variant="text" @click="createDialog = !createDialog" />
+                  variant="text" @click="createDialog = !createDialog" :disabled="loading" />
               </template>
             </v-tooltip>
 
             <v-tooltip :text="$t('tooltip.search')" :disabled="loading" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('read', 'lists')" class="me-2" icon="mdi-magnify" size="small"
-                  variant="text" @click="searchDialog = !searchDialog" />
+                  variant="text" @click="searchDialog = !searchDialog" :disabled="loading" />
               </template>
             </v-tooltip>
           </client-only>
@@ -34,14 +34,14 @@
                 <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" class="my-2 bg-primary" size="small" icon="mdi-pencil"
-                      @click="getList(item.id)" />
+                      @click="getList(item.id)" :loading="loading && listId === item.id" :disabled="loading" />
                   </template>
                 </v-tooltip>
 
                 <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" v-if="!item.isMain" class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                      @click="form.id = item.id; deleteDialog = true" />
+                      @click="form.id = item.id; deleteDialog = true" :disabled="loading" />
                   </template>
                 </v-tooltip>
               </div>
@@ -208,6 +208,7 @@ useHead({
 })
 
 const loading = ref(false);
+const listId = ref(null);
 const searchDialog = ref(false);
 const createDialog = ref(false);
 const items = ref([]);
@@ -237,7 +238,7 @@ const itemsPerPageOptions = computed(() => [
 ])
 
 const headers = computed(() => [
-  { title: t('lists.name'), key: 'name' },
+  { title: t('lists.name'), key: 'name', sortable: !loading.value },
   { title: t('options'), key: 'option', align: 'center', sortable: false }
 ])
 
@@ -253,6 +254,7 @@ watch(createDialog, async (val) => {
 
 watch(updateDialog, async (val) => {
   if (!val) {
+    listId.value = null;
     updateForm.value.reset();
     resetForm()
     return;
@@ -323,6 +325,8 @@ const getLists = async () => {
 
 const getList = async (id) => {
   try {
+    loading.value = true;
+    listId.value = id;
     const data = await $api(`/api/lists/${id}`, {
       method: 'GET'
     })
@@ -330,6 +334,8 @@ const getList = async (id) => {
     updateDialog.value = true
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 

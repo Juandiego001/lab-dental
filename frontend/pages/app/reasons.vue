@@ -8,14 +8,14 @@
             <v-tooltip :text="$t('tooltip.create')" :disabled="loading" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('create', 'reasons')" class="me-2" icon="mdi-plus" size="small"
-                  variant="text" @click="createDialog = !createDialog" />
+                  variant="text" @click="createDialog = !createDialog" :disabled="loading" />
               </template>
             </v-tooltip>
 
             <v-tooltip :text="$t('tooltip.search')" :disabled="loading" location="bottom">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" v-if="$ability.can('read', 'reasons')" class="me-2" icon="mdi-magnify"
-                  size="small" variant="text" @click="searchDialog = !searchDialog" />
+                  size="small" variant="text" @click="searchDialog = !searchDialog" :disabled="loading" />
               </template>
             </v-tooltip>
           </client-only>
@@ -24,20 +24,21 @@
       <v-card-text>
         <v-data-table-server :items="items" :headers="headers" :page="page" :items-per-page="perPage"
           :items-length="total" :items-per-page-options="itemsPerPageOptions" @update:page="v => page = v"
-          @update:itemsPerPage="v => perPage = v">
+          @update:itemsPerPage="v => perPage = v" :loading="loading" :disable-sort="loading"
+          :hide-default-footer="loading">
           <template v-slot:item.option="{ item }">
             <div class="d-flex align-center justify-center ga-2">
               <v-tooltip :text="$t('tooltip.viewUpdate')" :disabled="loading" location="bottom">
                 <template v-slot:activator="{ props }">
                   <v-btn v-bind="props" class="my-2 bg-primary" size="small" icon="mdi-pencil"
-                    @click="getReason(item.id)" />
+                    @click="getReason(item.id)" :loading="loading && reasonId === item.id" :disabled="loading" />
                 </template>
               </v-tooltip>
 
               <v-tooltip :text="$t('tooltip.delete')" :disabled="loading" location="bottom">
                 <template v-slot:activator="{ props }">
                   <v-btn v-bind="props" class="my-2 bg-red" size="small" icon="mdi-trash-can"
-                    @click="form.id = item.id; deleteDialog = true" />
+                    @click="form.id = item.id; deleteDialog = true" :disabled="loading" />
                 </template>
               </v-tooltip>
             </div>
@@ -79,9 +80,9 @@
               <v-textarea v-model="form.description" hide-details="auto" :label="$t('reasons.description')" />
             </v-col>
             <v-col class="text-end">
-              <v-btn variant="outlined" @click="createDialog = false">{{ $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="createDialog = false" :disabled="loading">{{ $t('cancel') }}</v-btn>
               <span class="mx-1" />
-              <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
+              <v-btn type="submit" class="bg-primary" :loading="loading" :disabled="loading">{{ $t('confirm') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -121,9 +122,9 @@
               <v-textarea v-model="form.description" hide-details="auto" :label="$t('reasons.description')" />
             </v-col>
             <v-col class="text-end">
-              <v-btn variant="outlined" @click="updateDialog = false">{{ $t('cancel') }}</v-btn>
+              <v-btn variant="outlined" @click="updateDialog = false" :disabled="loading">{{ $t('cancel') }}</v-btn>
               <span class="mx-1" />
-              <v-btn type="submit" class="bg-primary">{{ $t('confirm') }}</v-btn>
+              <v-btn type="submit" class="bg-primary" :loading="loading" :disabled="loading">{{ $t('confirm') }}</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -188,10 +189,11 @@ const { back } = useBack()
 const { notify } = useSnackbar();
 const { $ability, $generateSlug } = useNuxtApp();
 const { t } = useI18n();
-const { items, total, categoryId, reasonsDialog, getReasons, get, create, update, remove } = useReasons();
+const { items, total, getReasons, create, update, remove } = useReasons();
 const { items: categories, getCategories } = useCategories();
 
 const loading = ref(false);
+const reasonId = ref(null);
 const page = ref(1);
 const perPage = ref(15);
 const sortBy = ref(null);
@@ -251,6 +253,7 @@ watch(createDialog, async (val) => {
 
 watch(updateDialog, async (val) => {
   if (!val) {
+    reasonId.value = null;
     updateForm.value.reset();
     resetForm();
     return;
@@ -321,6 +324,8 @@ const searchReasons = async (defPage, defPerPage) => {
 
 const getReason = async (id) => {
   try {
+    loading.value = true;
+    reasonId.value = id;
     const user = await $api(`/api/reasons/${id}`, {
       method: 'GET'
     })
@@ -328,11 +333,14 @@ const getReason = async (id) => {
     updateDialog.value = true
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const createReason = async () => {
   try {
+    loading.value = true;
     if (!createModel.value) return;
     const { message } = await create(form.value);
     notify(message, 'success');
@@ -340,11 +348,14 @@ const createReason = async () => {
     createDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const updateReason = async () => {
   try {
+    loading.value = true;
     if (!updateModel.value) return;
     const { message } = await update(form.value.id, form.value);
     notify(message, 'success');
@@ -352,17 +363,22 @@ const updateReason = async () => {
     updateDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 
 const deleteReason = async () => {
   try {
+    loading.value = true;
     const { message } = await remove(form.value);
     notify(message, 'success');
     await getReasons({})
     deleteDialog.value = false
   } catch (err) {
     notify(err, 'error');
+  } finally {
+    loading.value = false;
   }
 }
 

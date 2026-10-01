@@ -72,6 +72,11 @@ const { abortController } = useAligners();
 
 const menu = ref([
   {
+    subject: 'notifications',
+    path: '/app/notifications',
+    icon: 'mdi-bell'
+  },
+  {
 
     subject: 'distributors',
     path: '/app/distributors',
@@ -157,11 +162,6 @@ const menu = ref([
     subject: 'aligners',
     path: '/app/aligners',
     icon: 'mdi-car-wrench'
-  },
-  {
-    subject: 'notifications',
-    path: '/app/notifications',
-    icon: 'mdi-bell'
   },
   // {
   //   subject: 'configuration',
