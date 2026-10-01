@@ -204,6 +204,8 @@ def associate_aligner_to_distributor(json_data: dict):
             distributor_id=json_data['distributor_id'],
         )
         return {'message': gettext('alignerAssociatedSuccessfully')}
+    except HTTPException as ex:
+        abort(400, ex.description)
     except Exception as ex:
         abort(500, gettext('abortException'))
 

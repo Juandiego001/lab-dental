@@ -413,13 +413,13 @@ def aligner_exist(serial: str) -> bool | dict:
 def associate_aligner_to_distributor(serial: str, distributor_id: int):
     '''Associate aligner to distributor'''
 
-    aligner_data = get_aliners_info(serials=[serial])[0]
-    specs = aligner_data['specs']
+    aligner_data = get_aliners_info(serials=[serial])
+
+    if len(aligner_data) == 0:
+        raise HTTPException(gettext('alignerNotFound'))
+
     db.session.add(DistributorAligner(
         serial=serial,
-        specs=f'{specs['name']} {specs['month']}/{specs['year']}',
-        software=aligner_data['version']['semantic'],
-        v_created_at=aligner_data['createdAt'],
         distributor_id=distributor_id
     ))
     db.session.commit()
